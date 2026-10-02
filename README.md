@@ -2,7 +2,7 @@
 
 독립 실행하는 ISDC 궤도 디지털 트윈 개발 저장소입니다. 선배의 ISDC-ODT 기능을 채택 V6 UI에 단계적으로 연결하며, 향후 AeroDT 연계를 위해 계층과 파일 생성 규칙을 유지합니다.
 
-개발 경로: `D:\projects\ISDC\ISDC_ODT`. 원격: https://github.com/GIY0201/ISDC_ODT
+
 
 현재 JavaScript UI, Python FastAPI와 Rust SGP4 계산 기반을 사용합니다. 기본 화면은 V6 구조 시안이고 기존 프로토타입 콘솔은 `/legacy`에서 사용할 수 있습니다. V6에는 아직 실제 궤도 API가 연결되지 않았습니다. 실측, 실제 통신, HIL로 해석하지 않습니다.
 
