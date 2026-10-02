@@ -1,0 +1,31 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+data/workspace/
+project_support/.pytest_cache/
+project_support/reference/before_refactoring/
+*.log
+*.pid
+
+# Local tools, environments and credentials
+.codeboarding/
+.vscode/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local planning material and pre-refactoring copies are not runtime source.
+/project_support/reference/
+
+# Project-local Rust toolchains, build caches and validation downloads
+/project_support/tooling/rust_env/
+/project_support/tooling/rust_validation_inputs/
+/project_support/tooling/node_modules/
+
+/project_support/tooling/sgp4_python_probe/wheels/
+/project_support/tooling/sgp4_python_probe/wheels_repaired/
+/project_support/tooling/orbit_wheels/

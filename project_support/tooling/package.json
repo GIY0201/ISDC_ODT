@@ -1,0 +1,12 @@
+{
+  "name": "isdc-odt-web-tooling",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config vite.config.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "pnpm typecheck && vite build --config vite.config.ts",
+    "test": "tsx --test ../tests/browser/workspace.test.ts"
+  },
+  "devDependencies": { "vite": "^8.0.0", "typescript": "^5.9.0", "tsx": "^4.20.0", "@types/node": "^24.0.0" }
+}
