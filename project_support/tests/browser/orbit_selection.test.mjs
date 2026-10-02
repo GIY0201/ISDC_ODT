@@ -13,3 +13,38 @@ test('conflict adopts server snapshot without retrying a command',async()=>{cons
 test('matching result is displayed and snapshots cannot mutate client copies',async()=>{const client=createOrbitSelection(fixture(),()=>{});await client.load();await client.select('tle');await client.samples();const copy=client.snapshot();assert.equal(copy.result.status,'complete');copy.state.revision=999;assert.equal(client.snapshot().state.revision,1);});
 test('unavailable calculation shows error instead of fabricated rows',async()=>{const client=createOrbitSelection(fixture({orbitSamples:async()=>{throw new Error('unavailable');}}),()=>{});await client.load();await client.select('tle');await client.samples();assert.equal(client.snapshot().status,'error');assert.equal(client.snapshot().result,null);});
 test('missing stored inputs remains explicitly empty',async()=>{const client=createOrbitSelection(fixture({orbitInputs:async()=>({inputs:[]})}),()=>{});await client.load();assert.equal(client.snapshot().status,'empty');assert.equal(client.snapshot().result,null);});
+test('play/pause take a fresh server UTC while seek returns to an explicit timestamp',async()=>{
+  const commands=[];let current=state;
+  const api=fixture({orbitState:async()=>({...current,current_utc:current.anchor_utc||'2020-07-12T21:16:01Z'})});
+  const original=api.selectOrbit;api.selectOrbit=async p=>{commands.push(p);current=await original(p);return current;};
+  const client=createOrbitSelection(api,()=>{});await client.load();await client.select('tle');
+  await client.control('play');assert.equal(commands.at(-1).playing,true);
+  await client.control('pause');assert.equal(commands.at(-1).playing,false);
+  await client.seek(input.epoch_utc);assert.equal(commands.at(-1).anchor_utc,input.epoch_utc);
+  assert.equal(commands.at(-1).playing,false);
+});
+test('background prefetch keeps the old buffer until a matching response and uses one-second rows',async()=>{
+  let release;const api=fixture();const client=createOrbitSelection(api,()=>{});await client.load();await client.select('tle');await client.samples();
+  const before=client.snapshot().result;
+  api.orbitSamples=p=>new Promise(resolve=>{assert.equal(p.step_seconds,1);assert.equal(p.count,601);release=()=>resolve({...p,revision:p.selection_revision,input_hash:'hash',rows:[],status:'complete'});});
+  const task=client.samples({background:true,count:601,stepSeconds:1});assert.deepEqual(client.snapshot().result,before);assert.equal(client.snapshot().fetching,true);release();await task;assert.equal(client.snapshot().fetching,false);
+});
+test('an old background response cannot restore a buffer after pause',async()=>{
+  let current=state,release;
+  const api=fixture({orbitState:async()=>({...current,current_utc:current.anchor_utc||input.epoch_utc})});
+  const original=api.selectOrbit;api.selectOrbit=async p=>(current=await original(p));
+  const client=createOrbitSelection(api,()=>{});await client.load();await client.select('tle');await client.control('play');
+  api.orbitSamples=p=>new Promise(resolve=>{release=()=>resolve({...p,revision:p.selection_revision,input_hash:'hash',rows:[],status:'complete'});});
+  const pending=client.samples({background:true,count:601,stepSeconds:1});await client.control('pause');release();await pending;
+  assert.equal(client.snapshot().state.playing,false);assert.equal(client.snapshot().result,null);assert.equal(client.snapshot().fetching,false);
+});
+test('display rejects a different EOP/leap snapshot or coordinate/profile contract',async()=>{
+  const provenance={eop_sha256:'eop',leap_sha256:'leap',frame:'ITRF',profile:'WGS72_AFSPC'};
+  for(const key of Object.keys(provenance)){
+    const api=fixture();const select=api.selectOrbit;
+    api.selectOrbit=async p=>({...await select(p),...provenance});
+    api.orbitSamples=async p=>({...p,...provenance,[key]:'other',revision:p.selection_revision,input_hash:'hash',stale:false,rows:[],status:'complete'});
+    const client=createOrbitSelection(api,()=>{});await client.load();await client.select('tle');await client.samples();
+    assert.equal(client.snapshot().status,'stale');assert.equal(client.snapshot().result,null);
+  }
+});

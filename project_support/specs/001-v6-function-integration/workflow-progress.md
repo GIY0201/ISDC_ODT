@@ -4,7 +4,7 @@
 
 ## 최초 요청과 현재 진행 경계
 최종 목적은 독립 ISDC ODT의 확정 V6 UI에 선배 프로토타입 기능을 단계적으로 연결하고, 향후 AeroDT 연결/이식이 가능하도록 계층 책임과 파일 생성 규칙을 공유하는 것이다. ISS 시험만으로 전체 목적이 완료되지 않는다.
-현재 사용자 승인으로 첫 구현 묶음을 단계적으로 실행한다. 전체 기능 계획과 후속필수를 유지하며 T001~T016 구현과 검증을 완료했다. PR 리뷰와 main 병합은 별도로 추적한다.
+현재 사용자 승인으로 첫 구현 묶음을 단계적으로 실행한다. 전체 기능 계획과 후속필수를 유지하며 T001~T018 구현과 검증을 완료했다. PR 리뷰와 main 병합은 별도로 추적한다.
 보호 범위: V6 채택, 기존 코드와 계산, 합의 문서, 초기 초안 및 도구 실험 이력. 초안의 존재는 승인 증거가 아니다.
 
 ## 근거
@@ -19,16 +19,16 @@
 
 | ID | 요구 / 출처 | 수용 기준 | 담당 단계 | 계획 절 / task | 증거 및 상태 |
 |---|---|---|---|---|---|
-| R001 | 독립 ISDC ODT + AeroDT 이식 가능한 구조 / S1,S5 | AeroDT 설치 의존성 없이 실행, 계층/명명/상태 소유권 검사 | constitution, plan, verify | plan File placement/Constitution / T001,T004,T010,T029 | 구조 규칙 확인, 새 통합 검증 없음 |
-| R002 | 확정 V6 UI 유지 / S1,S2 | 공용 지구와 역할별 작업 창에서 연결 기능 사용, 기존 UI 결정 추적 | specify, plan, verify | plan State/Workspace / T014,T016,T024,T025 | V6 채택 확인, 기능 연결 미구현 |
-| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030 + F002 | 기존 기능 조사만, 재사용 정도는 기능별 검토 |
-| R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | 현재 복구 및 명세 검토 준비 |
-| R005 | 첫 위성 1개 + 지상국 1개 / S1 | 저장된 실제 TLE/OMM, UTC 조작, 위치/고도각/가시 구간, 오류/출처 표시 검증 | specify, plan, implement, verify | plan Input/State/Geometry / T003-T023 | ISS/제주 가상 지점/10도 시험안 합의, 미구현 |
+| R001 | 독립 ISDC ODT + AeroDT 이식 가능한 구조 / S1,S5 | AeroDT 설치 의존성 없이 실행, 계층/명명/상태 소유권 검사 | constitution, plan, verify | plan File placement/Constitution / T001,T004,T010,T029 | 독립 실행 및 계층 시험 PASS, AeroDT 재통합 검증 T029 미완료 |
+| R002 | 확정 V6 UI 유지 / S1,S2 | 공용 지구와 역할별 작업 창에서 연결 기능 사용, 기존 UI 결정 추적 | specify, plan, verify | plan State/Workspace / T014,T016,T024,T025 | V6 원본 SHA 보존 및 단일 지구 위치/UTC 연결 검증; 전체 창/다중창 T024~T031 미완료 |
+| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030 + F002 | 저장 궤도/UTC 첫 연결 완료. 전체 선배 기능 F002/T030 미완료 |
+| R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | T001~T018 단계별 승인/검증 및 개별 PR 유지. 다음 가시 구간 시험 |
+| R005 | 첫 위성 1개 + 지상국 1개 / S1 | 저장된 실제 TLE/OMM, UTC 조작, 위치/고도각/가시 구간, 오류/출처 표시 검증 | specify, plan, implement, verify | plan Input/State/Geometry / T003-T023 | ISS 저장 입력/제주 가상/위치/고도각/UTC 검증. 가시 구간 T019~T023 미구현 |
 | R006 | 실제 통신 조건 확인 및 적용 / S1 | 출처 있는 서비스/장비 입력과 링크 조건 적용, 정상/실패/미확인 시험 | clarify, plan, implement, verify | plan Visibility/후속 / T023,T030 + F001 | 필수 후속, 조사/적용 미실행 |
-| R007 | 결과 의미 구분 / S1,S5 | 기하 가시성, 모델 통신 충족, 실제 수신 증거를 UI/산출물에서 구분 | specify, verify | plan Validation / T003,T005,T007,T011,T017,T019,T021,T026,T028,T029 | agreed_scope.md 기준, 구현 증거 없음 |
-| R008 | JS 모듈/HTML/CSS/Cesium + Python/FastAPI / S1 | 기술 계획이 합의와 일치, 버전/현대화 선택 근거 기록 | constitution, plan | plan Technical Context / T002,T006,T008,T029 | TS/React 보류, 기존 도구 실험 미승인 |
-| R009 | 빠르고 원활한 사용성 / S1 | 지구/시간/창 조작의 측정 조건과 합의된 목표로 실제 웹 검증 | clarify, plan, verify | plan State/Validation / T018,T024-T028 | 성능 수치/측정 환경 미확정, 성능 주장 없음 |
-| R010 | 기존 자료와 합의 보존 / S1 | 수정 이력 보존, 초안/합의/검증 증거 구분 | 모든 단계 | plan Summary/Phase1 / T001,T030 | 이번 변경은 작업 기록, 코드 변경 없음 |
+| R007 | 결과 의미 구분 / S1,S5 | 기하 가시성, 모델 통신 충족, 실제 수신 증거를 UI/산출물에서 구분 | specify, verify | plan Validation / T003,T005,T007,T011,T017,T019,T021,T026,T028,T029 | GP/가상/기하 계산과 통신 미확인 표시 검증. 실제 통신 조건 F001 미완료 |
+| R008 | JS 모듈/HTML/CSS/Cesium + Python/FastAPI / S1 | 기술 계획이 합의와 일치, 버전/현대화 선택 근거 기록 | constitution, plan | plan Technical Context / T002,T006,T008,T029 | JS/Cesium/Python FastAPI 및 Rust 코어 기준선 구현. TS/React 보류 유지 |
+| R009 | 빠르고 원활한 사용성 / S1 | 지구/시간/창 조작의 측정 조건과 합의된 목표로 실제 웹 검증 | clarify, plan, verify | plan State/Validation / T018,T024-T028 | 게임 성능 목표 유지. T018 사용 흐름만 검증, T028 정량 성능 미측정 |
+| R010 | 기존 자료와 합의 보존 / S1 | 수정 이력 보존, 초안/합의/검증 증거 구분 | 모든 단계 | plan Summary/Phase1 / T001,T030 | V6 snapshot/합의/legacy 보존, 실제 단계별 증거와 이력 기록 |
 
 ## 결정
 - D001: 독립 개발 저장소를 사용. 최상위 계층 책임과 명명 규칙은 AeroDT 호환. R001.
@@ -217,3 +217,10 @@ Red: 최초module누락2개 수집실패. 누락OMM필드4시험 KeyError실패 
 - 새 Rust 분수시각 전파를 참값으로 고정 ISS/제주 1,223구간 검증: 위치 최대1.000891m, 고도각0.004974918도. 1초 간격 게이트 PASS; 60초 간격은10m초과를 확인했다. 유한 fixture이며 전체 위성/자료범위 보장은 아니다.
 - 전체 Python121 PASS/기존 경고1(10.68초), 기존 Node19 PASS. 새 orbit_playback.test.mjs는 미구현 RED로 구분하며 wildcard 전체 PASS를 주장하지 않는다. validation/t017_playback_gate.md 참조.
 - T017 시험 작성 완료, 제품은T016까지. T018 실제 UTC codec/프리페치/UI재생 미구현, 게임 성능/다중창/F001 실제 통신/F002 전체 기능은 유지한다. codex/v6-orbit-playback-tests에서 PR #3 의존 draft PR로 시험 준비를 제안한다. 미구현 시험이 남아 있으므로 병합 대상이 아니다.
+
+## 2026-10-02 T018 UTC 재생 연결
+- 서버 snapshot의 수신 단조 시각/배율로 표시만 투영하고 재생·정지·속도·지정UTC·epoch복귀를 기존 selection API에 연결했다. 새 권위 시계나 전파 구현은 만들지 않았다.
+- 1초601행 prefetch, 300초 전 다음 묶음 요청, 기존 버퍼 수신 중 유지, 5초 서버 snapshot 재동기화, 이진검색/행검증과 늦은 응답/자료 계약 거절을 구현했다. 나노초/윤초는 고정 hash 검증 BigInt codec로 처리한다.
+- 시험 우선 새 control/prefetch/codec/lifecycle/provenance 실패 확인 후 구현. Node31 PASS, Python122 PASS/기존 경고1. 원본 V6/API/계층 회귀 유지. 정지 화면 고도각 placeholder 문제를 실제 브라우저에서 찾아 수정했다.
+- 실제 IAB 1배·60배 재생/반복601행버퍼 전환/정지/지정UTC/epoch복귀 좌표 재현, EOP 범위밖 오류와 위치 미표시 및 정상복구/canvas1개 확인. validation/t018_playback.md와 ADR0002 참조. 서버는 정지 epoch로 남겼다.
+- T001~T018,18/31 구현·검증 완료. 다음 T019 가시구간 계산 시험. PR #4 시험 준비분은 T018 없이 독립 병합하면 RED이므로, 구현과 시험을 함께 리뷰·반영해야 한다. 자동 병합하지 않는다. 게임 성능/다중창/F001 실제통신/F002 전체 기능은 유지한다.

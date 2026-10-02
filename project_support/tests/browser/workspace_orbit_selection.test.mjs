@@ -14,6 +14,7 @@ test('empty UI choice restores server selection without clearing its result or s
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
     .replace(/import \{api\} from [^;]+;/,'const api={};')
     .replace(/import \{createOrbitSelection\} from [^;]+;/,'const createOrbitSelection=()=>globalThis.testOrbitClient;')
+    .replace(/import \{createWorkspacePlayback\} from [^;]+;/,'const createWorkspacePlayback=()=>({update(){},destroy(){}});')
     .replace(/import \{createWorkspaceGlobe\} from [^;]+;/,'const createWorkspaceGlobe=()=>({update(){},destroy(){}});');
   try {
     const ui=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);

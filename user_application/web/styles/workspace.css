@@ -24,3 +24,5 @@
 
 /* Stored orbit globe replaces the synthetic background; legacy cards remain labelled examples. */
 .desktop-globe{display:none}#stored-orbit-globe{position:absolute;inset:0}.orbit-globe-caption{position:absolute;z-index:3;left:18px;top:12px;max-width:calc(100% - 320px);padding:8px 12px;background:#102d3ce8;border:1px solid #87adb6;border-radius:8px;font-size:11px}.orbit-globe-caption p{margin:0 0 7px;overflow-wrap:anywhere}.orbit-globe-caption button:disabled{opacity:.5;cursor:default}.scene-credit{z-index:3}@media(max-width:900px){.orbit-globe-caption{max-width:calc(100% - 265px)}}
+
+.orbit-playback-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #86adb660}.orbit-playback-controls label{display:flex;align-items:center;gap:5px}.orbit-playback-controls input{min-width:270px;max-width:100%;font:12px Consolas,monospace}.orbit-playback-controls p,.orbit-playback-controls small{flex-basis:100%;margin:0;overflow-wrap:anywhere}.orbit-playback-controls output{font-family:Consolas,monospace}

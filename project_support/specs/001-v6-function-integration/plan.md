@@ -73,3 +73,6 @@ V6 별도창 기능을 first workspace 보존 범위에 포함한다. Viewer는�
 
 ### T016 구현 경로 보완
 legacy globe.js/tabs/orbit.js는 보존한다. 새 GP 위치 렌더러는 digital_twin/visualization/orbit_globe.js, 서버 snapshot 검증과 문서당 Viewer 조립은 user_application/web/scripts/workspace_globe.js로 연결했다. 표시 사본만 가지며 UTC 재생과 지점/가시성은 후속 T017~T023이다. 상세 검증은 validation/t016_globe.md에 기록했다.
+
+### T018 구현 경계 보완
+orbit_playback.js/ orbit_utc.js/ workspace_playback.js가 서버 UTC snapshot의 표시 투영 및 제한된 버퍼를 맡는다. 1초/601행/300초 전 refill, 5초 state 동기화 및 고정 윤초 hash codec를 사용한다. HTTP/계산/runtime 소유권은 변경하지 않는다. ADR0002 및 validation/t018_playback.md를 근거로 하고 게임 성능/가시 구간은 후속이다.
