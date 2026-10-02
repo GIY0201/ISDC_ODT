@@ -211,3 +211,9 @@ Red: 최초module누락2개 수집실패. 누락OMM필드4시험 KeyError실패 
 - 기존 globe.js의 legacy synthetic 경로를 유지하고 orbit_globe.js/workspace_globe.js로 새 GP 표시를 분리했다. NASA 보존 영상 및 Cesium1.143 공식 CDN을 사용한다. 현재 상태 소유자는 여전히 runtime이다.
 - 시험 우선 모듈 누락 실패 확인 후 구현. Node19 PASS, Python119 PASS/기존 경고1(8.86초), 실제 브라우저 TLE/OMM 좌표/UTC 일치·입력변경 점 제거·역할전환/복귀·canvas1개 및 콘솔 오류 없음 확인. 상세: validation/t016_globe.md.
 - T001~T016,16/31 구현·검증 완료. PR #2 의존 별도 브랜치 codex/v6-orbit-globe에서 리뷰 예정. T017/T018 재생/보간, F001 실제 통신 조건, F002 전체 기능 연결 및 게임 성능/다중창 검증은 유지한다.
+
+## 2026-10-02 T017 UTC 재생 시험 준비
+- 정지/재생/복귀, 단조 시간 투영과 valid 1초 이내 보간, 버퍼 밖/오류/과도한 간격 거절을 브라우저 수용 시험으로 작성했다. T018 모듈 누락으로 예상된 RED(exit1)를 확인했으며 재생 구현 완료가 아니다.
+- 새 Rust 분수시각 전파를 참값으로 고정 ISS/제주 1,223구간 검증: 위치 최대1.000891m, 고도각0.004974918도. 1초 간격 게이트 PASS; 60초 간격은10m초과를 확인했다. 유한 fixture이며 전체 위성/자료범위 보장은 아니다.
+- 전체 Python121 PASS/기존 경고1(10.68초), 기존 Node19 PASS. 새 orbit_playback.test.mjs는 미구현 RED로 구분하며 wildcard 전체 PASS를 주장하지 않는다. validation/t017_playback_gate.md 참조.
+- T017 시험 작성 완료, 제품은T016까지. T018 실제 UTC codec/프리페치/UI재생 미구현, 게임 성능/다중창/F001 실제 통신/F002 전체 기능은 유지한다. codex/v6-orbit-playback-tests에서 PR #3 의존 draft PR로 시험 준비를 제안한다. 미구현 시험이 남아 있으므로 병합 대상이 아니다.
