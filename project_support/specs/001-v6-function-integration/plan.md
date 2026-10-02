@@ -64,6 +64,9 @@ SC001~006: 출처/UTC재현, 위치10m/고도각0.01도/경계1초, 오류와 �
 ## Phase 1 artifacts
 [data-model.md](data-model.md), [contracts/orbit_api.md](contracts/orbit_api.md), [contracts/workspace.md](contracts/workspace.md), [quickstart.md](quickstart.md), architecture/technology_selection.md 갱신. 다음 tasks를 이 계획에 연결하고 analyze는 tasks 작성 뒤 read-only로 수행한다. 리뷰 종료 전 제품소스 변경 없음.
 
+### T020 계산 경계 보완
+visibility.py는 immutable OrbitCalculation 반환 함수를 주입받고 VisibilityResult를 반환한다. query별 자료 identity/오류 검증과 1초 SI grid/극값/경계 보정을 맡고 runtime/API/파일을 호출하지 않는다. 내부 typed VisibilityInterval/Contact/Error/Result는 contracts/orbit.py에 둔다. 첫/마지막cell 보완과 접점 수치 허용치/부분 실패 한계는 ADR0003 및 validation/t020_visibility.md를 따른다. API/UI와 성능 목표는 후속이다.
+
 ## 전체 설계와의 관계 및 V6 보존 보완
 전체 요청 범위는 full_integration_plan.md의W00~W09와V6전영역표를기준으로한다. 이 plan은W01/W02와W00의첫상세계획이다. 전체요청의절반/전체구현설계완료라고표현하지않는다.
 V6 별도창 기능을 first workspace 보존 범위에 포함한다. Viewer는문서당1개이며별도브라우저문서는별도Viewer를가질수있다. 같은origin의선택/입력전달과runtime snapshot동기화,동시편집revision충돌표시를T031에서검증한다. 원래문서의Viewer를다시만들지않는다. W03~W08은전체계획에근거/책임/완료게이트를기록했지만파일수준상세계약은각묶음전검토에서확장한다.

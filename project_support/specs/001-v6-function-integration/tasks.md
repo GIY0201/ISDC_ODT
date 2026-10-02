@@ -1,6 +1,6 @@
 # Tasks: V6 첫 위성 및 가상 지점 연결
 
-입력: 같은 feature의 spec/plan/data-model/contracts/quickstart/research. 2026-10-02 현재 T001~T018 구현·검증 완료, 나머지 task 미완료. PR 리뷰/병합은 별도다. 저장소 규칙과 명세에 따라 제품 시험을 먼저 작성하고 실패를 확인한 뒤 구현한다. 연구도구의 PASS를 아래 checkbox 완료로 옮기지 않는다.
+입력: 같은 feature의 spec/plan/data-model/contracts/quickstart/research. 2026-10-02 현재 T001~T020 구현·검증 완료, 나머지 task 미완료. PR 리뷰/병합은 별도다. 저장소 규칙과 명세에 따라 제품 시험을 먼저 작성하고 실패를 확인한 뒤 구현한다. 연구도구의 PASS를 아래 checkbox 완료로 옮기지 않는다.
 
 ## Phase 1: 준비
 - [x] T001 V6 원본 해시, 기존 API/WS/화면 기준과 새로운 공개 계약 및 상태 분리 결정을 project_support/docs/adr/0001_orbit_workspace.md에 기록하고 data/development_log/CURRENT.md에 기준선 명령을 남긴다. R001/R002/R010.
@@ -33,8 +33,8 @@ Checkpoint: T001~010 완료 후 입력/계산 API 기반을 독립적으로 확�
 ## Phase 4: US2 지점과 가시 구간 (P1)
 목표: 가상지점/높이/최소각과 지정범위의 모든 지원 구간, 접점, 잘림/없음을 확인.
 독립검증: UI 없이 visibility API와 고정oracle로 고도각0.01도/경계1초, UI에서10도변경과 통신미확인 표시. US1과 공통계약은 재사용.
-- [ ] T019 [P] [US2] project_support/tests/test_visibility.py에 1초dense 기준, 짧은pass/gap/접점/잘림/없음/부분실패/임계값범위 및 경계1초 시험을 먼저 작성한다. 극값 탐색 가정과 한계를 명시한다.
-- [ ] T020 [US2] digital_twin/simulation/visibility.py에 조밀탐색/극값보완/경계보정/접점분리와 query 상태/provenance를 구현하여 T019를 통과시킨다. 처음3개 제한 및 기존45초5도 경로를 새 계산에 쓰지 않는다.
+- [x] T019 [P] [US2] project_support/tests/test_visibility.py에 35개 수용 시험과 1초dense 기준을 작성했다. 짧은pass/gap/접점/잘림/없음/부분실패/임계값범위/경계1초/윤초/자료계약을 포함한다. 기준 준비1 PASS, T020 모듈 누락34 ERROR의 RED 확인. 시험 준비 완료이며 계산 기능 완료가 아니다. 극값 가정/한계와 결과는 validation/t019_visibility_tests.md 참조.
+- [x] T020 [US2] digital_twin/simulation/visibility.py에 1초 조밀탐색/극값·조회edge 보완/경계보정/접점분리와 상태/provenance를 구현했다. T019 및 추가 회귀38개 PASS, 전체 Python160 PASS/Node31 PASS. 처음3개 제한 및 기존45초5도 경로는 새 계산에 쓰지 않았다. validation/t020_visibility.md 참조. API/UI/성능은 후속이다.
 - [ ] T021 [P] [US2] project_support/tests/test_visibility_api.py에 /api/orbit/visibility 범위/설정/revision 검증, 전체/없음/실패/통신unknown 계약을 먼저 작성한다.
 - [ ] T022 [US2] communication/http/orbit.py와 orbit_schemas.py에 visibility 계약을 구현하여 T021을 통과시킨다. start/end/peak/clipped/contacts/자료hash 포함.
 - [ ] T023 [US2] user_application/web/scripts/tabs/ground_visibility.js와 digital_twin/visualization/globe.js에 지점/타원체높이/가상/고도각/구간 UI를 연결하고 통신미확인과 결과시각을 표시한다. 단일globe 유지. US2 실제시연.
