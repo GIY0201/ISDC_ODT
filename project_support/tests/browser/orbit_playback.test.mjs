@@ -1,4 +1,4 @@
-// T017 acceptance contract. The T018 implementation intentionally does not exist yet.
+// T017 acceptance contract, exercised by the T018 display implementation.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {projectUtc,interpolateSample} from '../../../user_application/web/scripts/orbit_playback.js';

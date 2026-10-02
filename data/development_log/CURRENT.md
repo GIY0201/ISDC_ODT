@@ -202,3 +202,10 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 새 Rust 분수시각 전파를 참값으로 고정 ISS/제주 1,223구간 검증: 위치 최대1.000891m, 고도각0.004974918도. 1초 간격 게이트 PASS; 60초 간격은10m초과를 확인했다. 유한 fixture이며 전체 위성/자료범위 보장은 아니다.
 - 전체 Python121 PASS/기존 경고1(10.68초), 기존 Node19 PASS. 새 orbit_playback.test.mjs는 미구현 RED로 구분하며 wildcard 전체 PASS를 주장하지 않는다. validation/t017_playback_gate.md 참조.
 - T017 시험 작성 완료, 제품은T016까지. T018 실제 UTC codec/프리페치/UI재생 미구현, 게임 성능/다중창/F001 실제 통신/F002 전체 기능은 유지한다. codex/v6-orbit-playback-tests에서 PR #3 의존 draft PR로 시험 준비를 제안한다. 미구현 시험이 남아 있으므로 병합 대상이 아니다.
+
+## 2026-10-02 T018 UTC 재생 연결
+- 서버 snapshot의 수신 단조 시각/배율로 표시만 투영하고 재생·정지·속도·지정UTC·epoch복귀를 기존 selection API에 연결했다. 새 권위 시계나 전파 구현은 만들지 않았다.
+- 1초601행 prefetch, 300초 전 다음 묶음 요청, 기존 버퍼 수신 중 유지, 5초 서버 snapshot 재동기화, 이진검색/행검증과 늦은 응답/자료 계약 거절을 구현했다. 나노초/윤초는 고정 hash 검증 BigInt codec로 처리한다.
+- 시험 우선 새 control/prefetch/codec/lifecycle/provenance 실패 확인 후 구현. Node31 PASS, Python122 PASS/기존 경고1. 원본 V6/API/계층 회귀 유지. 정지 화면 고도각 placeholder 문제를 실제 브라우저에서 찾아 수정했다.
+- 실제 IAB 1배·60배 재생/반복601행버퍼 전환/정지/지정UTC/epoch복귀 좌표 재현, EOP 범위밖 오류와 위치 미표시 및 정상복구/canvas1개 확인. validation/t018_playback.md와 ADR0002 참조. 서버는 정지 epoch로 남겼다.
+- T001~T018,18/31 구현·검증 완료. 다음 T019 가시구간 계산 시험. PR #4 시험 준비분은 T018 없이 독립 병합하면 RED이므로, 구현과 시험을 함께 리뷰·반영해야 한다. 자동 병합하지 않는다. 게임 성능/다중창/F001 실제통신/F002 전체 기능은 유지한다.

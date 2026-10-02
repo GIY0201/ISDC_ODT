@@ -15,16 +15,16 @@ export class OrbitGlobe {
   update(sample){
     if(this.destroyed)throw new Error('OrbitGlobe destroyed');
     const {C,viewer}=this;
-    viewer.entities.removeAll();this.position=null;
     const coordinates=sample?.position_m;
     if(sample?.frame!=='ITRF'||!Array.isArray(coordinates)||coordinates.length!==3||!coordinates.every(Number.isFinite)||!sample.utc?.endsWith('Z')){
-      viewer.scene.requestRender();return false;
+      viewer.entities.removeAll();this.entity=null;this.position=null;viewer.scene.requestRender();return false;
     }
     let utc;
-    try{utc=C.JulianDate.fromIso8601(sample.utc);}catch{viewer.scene.requestRender();return false;}
+    try{utc=C.JulianDate.fromIso8601(sample.utc);}catch{viewer.entities.removeAll();this.entity=null;this.position=null;viewer.scene.requestRender();return false;}
     this.position=new C.Cartesian3(...coordinates);
     viewer.clock.currentTime=utc;
-    viewer.entities.add({id:'stored-orbit-satellite',name:'ISS · SGP4 모델',
+    if(this.entity)this.entity.position=new C.ConstantPositionProperty(this.position,C.ReferenceFrame.FIXED);
+    else this.entity=viewer.entities.add({id:'stored-orbit-satellite',name:'ISS · SGP4 모델',
       position:new C.ConstantPositionProperty(this.position,C.ReferenceFrame.FIXED),
       point:{pixelSize:11,color:C.Color.CYAN,outlineColor:C.Color.WHITE,outlineWidth:2},
       label:{text:'ISS · GP 예측',font:'13px sans-serif',fillColor:C.Color.WHITE},
