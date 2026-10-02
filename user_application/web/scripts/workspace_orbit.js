@@ -1,13 +1,15 @@
+import {createWorkspaceRevisionSync} from './workspace_revision_sync.js';
 import {api} from '/static/communication/api.js';
-import {createOrbitSelection} from './orbit_selection.js?v=t027-r1';
-import {createWorkspaceGlobe} from './workspace_globe.js?v=t027-r1';
+import {createOrbitSelection} from './orbit_selection.js?v=t031-r1';
+import {createWorkspaceGlobe} from './workspace_globe.js?v=t031-r1';
 import {createWorkspacePlayback} from './workspace_playback.js';
-import {createGroundPanel} from './tabs/ground_visibility.js';
+import {createGroundPanel} from './tabs/ground_visibility.js?v=t031-r1';
 
 const escape=value=>String(value??'미확인').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let view=null,displayUtc=null,displayElevation='자료 준비 중';
 const globe=createWorkspaceGlobe(document.getElementById('stored-orbit-globe'),document.getElementById('orbit-globe-status'),document.getElementById('orbit-globe-focus'));
 const client=createOrbitSelection(api,render);
+const revisionSync=createWorkspaceRevisionSync(client);
 const groundPanel=createGroundPanel(client,api);
 const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   displayUtc=utc;displayElevation=row?`${row.elevation_deg.toFixed(4)}°`:'자료 준비 중 / 위치 미표시';globe.update(error?{...snapshot,status:'error',error}:snapshot,row,utc);
@@ -15,9 +17,10 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;client.destroy();groundPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;revisionSync.destroy();client.destroy();groundPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
+  revisionSync.observe(client.snapshot());
   playback.update(client.snapshot());
   groundPanel.update();
   if(view!=='satellite')return;
@@ -41,3 +44,8 @@ function render(){
 }
 export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);render();}
 client.load();
+
+export function applyWorkspaceDraft(items){
+  groundPanel.applyDraft(items);
+  for(const item of items){if(item.id!=='orbit-utc'||typeof item.value!=='string')continue;const field=document.getElementById(item.id);if(field){field.value=item.value;field.dataset.dirty='true';}}
+}

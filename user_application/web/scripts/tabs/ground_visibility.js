@@ -59,7 +59,7 @@ export function createGroundPanel(client,api){
     const nextPoint=JSON.stringify([state?.ground_point,state?.minimum_elevation_deg]);
     if(state&&!dirty&&nextPoint!==pointKey){writeFields({...readFields(),lat:state.ground_point.latitude_deg,lon:state.ground_point.longitude_deg,height:state.ground_point.ellipsoid_height_m,angle:state.minimum_elevation_deg});draft=readFields();pointKey=nextPoint;}
     const select=panel.querySelector('#ground-input');select.innerHTML='<option value="">입력 선택</option>'+inputs.map(item=>`<option value="${escape(item.input_id)}" ${item.input_id===state?.input_id?'selected':''}>${escape(item.satellite_id)} / ${escape(item.format)}</option>`).join('');
-    if(state?.input_id&&rangeInput!==state.input_id){try{setRange(state);rangeInput=state.input_id;draft=readFields();}catch(exc){message=exc.message;}}
+    if(state?.input_id&&rangeInput!==state.input_id&&!dirty){try{setRange(state);rangeInput=state.input_id;draft=readFields();}catch(exc){message=exc.message;}}
     const query=controller.snapshot();
     panel.querySelector('#visibility-status').textContent=working?'설정 적용 중…':query.status==='pending'?'가시 구간 계산 중… 지구와 작업창을 계속 사용할 수 있습니다.':query.error||message||selectionError||'계산할 설정과 UTC 범위를 확인하세요.';
     const markup=visibilityMarkup(query.result);
@@ -86,5 +86,12 @@ export function createGroundPanel(client,api){
       if(query)await controller.query(start,end);
     }catch(exc){message=exc.message;working=false;render();}
   }
-  return {show(view){active=view==='ground';render();},update:render,destroy:()=>controller.cancel()};
+  function applyDraft(items){
+    if(!panel||!active)return;
+    const ids=['ground-lat','ground-lon','ground-height','ground-angle','visibility-start','visibility-end'];
+    let changed=false;
+    for(const item of items){if(!ids.includes(item.id)||typeof item.value!=='string')continue;const field=panel.querySelector('#'+item.id);if(field&&field.value!==item.value){field.value=item.value;changed=true;}}
+    if(changed){dirty=true;draft=readFields();controller.cancel();message='별도 창에서 전달된 편집값 · 적용 전입니다.';render();}
+  }
+  return {applyDraft,show(view){active=view==='ground';render();},update:render,destroy:()=>controller.cancel()};
 }

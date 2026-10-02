@@ -1,6 +1,6 @@
 # Tasks: V6 첫 위성 및 가상 지점 연결
 
-입력: 같은 feature의 spec/plan/data-model/contracts/quickstart/research. 현재 T001~T027 완료(시험 준비 task 포함), T026 실패는 T027에서 해소, T031/T028~T030 미완료. PR 리뷰/병합은 별도다. 저장소 규칙과 명세에 따라 제품 시험을 먼저 작성하고 실패를 확인한 뒤 구현한다. 연구도구의 PASS를 아래 checkbox 완료로 옮기지 않는다.
+입력: 같은 feature의 spec/plan/data-model/contracts/quickstart/research. 현재 T001~T027 및 T031 완료(시험 준비 task 포함), T026 실패는 T027에서 해소, T028~T030 미완료. PR 리뷰/병합은 별도다. 저장소 규칙과 명세에 따라 제품 시험을 먼저 작성하고 실패를 확인한 뒤 구현한다. 연구도구의 PASS를 아래 checkbox 완료로 옮기지 않는다.
 
 ## Phase 1: 준비
 - [x] T001 V6 원본 해시, 기존 API/WS/화면 기준과 새로운 공개 계약 및 상태 분리 결정을 project_support/docs/adr/0001_orbit_workspace.md에 기록하고 data/development_log/CURRENT.md에 기준선 명령을 남긴다. R001/R002/R010.
@@ -47,7 +47,7 @@ Checkpoint: T001~010 완료 후 입력/계산 API 기반을 독립적으로 확�
 - [x] T026 [P] [US3] orbit_requests.test.mjs 및 test_orbit_concurrency.py에 역순응답/동시선택409/실제큐포화503/취소/렌더실패 시험 추가. 초기Node5 PASS/3 FAIL 및 조립종료1 FAIL 확인 후 T027에서 해소. Python새5 PASS. validation/t026_t027_requests.md 참조.
 - [x] T027 [US3] V6 orbit_selection.js/workspace_orbit.js/workspace_globe.js에서 취소상태 정리/문서종료 요청폐기/후속prefetch중단/focus 렌더실패 안내를 보완. 기존API transport/application.py/legacy 보존. Node61 PASS/Python207 PASS, 실제IAB계산/지구이동/재생·정지/epoch복귀 확인. 실행중native/visibility job 강제중단 보장 없음. validation/t026_t027_requests.md 참조.
 
-- [ ] T031 [US3] project_support/tests/browser/workspace_popout.test.mjs에 V6별도창의 현재업무·입력전달/수정동기화/409충돌/팝업차단/닫기·channel해제/문서당Viewer1개 시험을 먼저 작성하고 user_application/web/scripts/workspace.js에 구현한다. T025,T027 뒤, T028 이전.
+- [x] T031 [US3] project_support/tests/browser/workspace_popout.test.mjs에 V6별도창의 현재업무·입력전달/수정동기화/409충돌/팝업차단/닫기·channel해제/문서당Viewer1개 시험을 먼저 작성하고 user_application/web/scripts/workspace.js에 구현한다. T025,T027 뒤, T028 이전. Node74/Python207 PASS 및 실제 Chrome 부모·자식 편집/충돌/선택/종료 검증. validation/t031_popout.md 참조.
 
 ## Phase 6: 제품 검증과 기록
 - [ ] T028 project_support/tests/validation/orbit_workspace.md 및 tooling/measure_orbit_ui.mjs에서 두해상도의 실제브라우저/frame/input/result/24h 계측과 역순덮어쓰기0을 검증한다. p95/p99/max,환경/GPU/전원/자료hash/trace/screenshot을 data/workspace/validation에 기록하고 전체pytest/Node/native시험 실행.

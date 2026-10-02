@@ -255,3 +255,8 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 변경: 역순응답/동시선택/큐포화/취소/렌더실패 시험과 V6 취소상태·요청client종료·focus실패 처리 보완. 서버/legacy/계산 보존.
 - 검증: 초기Node3FAIL+조립1FAIL 해소. 전체Node61 PASS(216.97ms)/Python207 PASS/기존Starlette경고1(100.20초). 실제IAB계산/지구이동/재생·정지/epoch복귀/canvas1/error로그0. 고장주입은adapter, 서버경합은ASGI/실제bounded executor, native수치성능시험아님.
 - 남은위험: 실행중native/visibility job 즉시중단보장없음. 첫묶음4개, 다음T031 별도창. F001/F002/게임성능/설치지원 미완료. PR게시와리뷰/병합별도.
+
+## 2026-10-03 T031 별도 창
+- 변경: 업무/편집값 opener 전달 및 화면재구성 보존, 활성편집 충돌 안내, 서버 선택 draft 제외, revision 힌트/snapshot 조회, 409 snapshot 재조회, channel/Viewer 종료.
+- 검증: 초기 실패 후 전체Node74 PASS/Python207 PASS(102.02초, 기존Starlette경고1), git diff --check PASS. 실제Chrome popup 입력전달/양방향편집/충돌/서버선택/닫기/부모canvas1; validation/t031_popout.md에 adapter와 실제증거 및 popup 도구제약 구분.
+- 상태/위험: 첫묶음28/31, T028/T029/T030 남음. 게임성능/F001실제통신/F002전체기능 미완료. PR리뷰/병합 별도, extension hooks 없음.
