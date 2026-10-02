@@ -19,7 +19,7 @@ export function createOrbitSelection(api, notify, requestId=()=>crypto.randomUUI
       }
       adopt(await api.selectOrbit({client_request_id:requestId(),expected_revision:state.revision,input_id:inputId,ground_point:options.groundPoint??state.ground_point,minimum_elevation_deg:options.minimumElevation??state.minimum_elevation_deg,anchor_utc:utc||(options.preserveUtc?state.current_utc:record.epoch_utc),playing:options.playing??false,play_rate:options.playRate??state.play_rate}));
       if(ticket===generation){status='ready';emit();}
-    }catch(exc){if(ticket===generation)fail(exc);else if(exc.status===409&&exc.state)adopt(exc.state);}};
+    }catch(exc){if(ticket===generation){fail(exc);if(exc.status===409)await refresh({force:true});}else if(exc.status===409&&exc.state)adopt(exc.state);}};
     chain=chain.then(run,run);return chain;
   }
   async function samples({startUtc,stepSeconds=60,count=3,background=false}={}){
@@ -47,8 +47,8 @@ export function createOrbitSelection(api, notify, requestId=()=>crypto.randomUUI
     if(!['play','pause','speed'].includes(action))return Promise.reject(new Error('invalid orbit control'));
     return select(state.input_id,undefined,{preserveUtc:true,playing:action==='speed'?state.playing:action==='play',playRate:rate??state.play_rate});
   }
-  async function refresh(){
-    if(disposed||status!=='ready'||fetching)return;
+  async function refresh({force=false}={}){
+    if(disposed||(!force&&status!=='ready')||status==='pending'||fetching)return;
     const ticket=generation;
     try{
       const current=await api.orbitState();if(ticket!==generation||current.revision<state.revision)return;

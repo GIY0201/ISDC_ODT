@@ -1,4 +1,4 @@
-import {showWorkspaceOrbit} from './workspace_orbit.js?v=t027-r1';
+import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t031-r1';
 (() => {
   const screen = document.getElementById('screen');
   const groups = [
@@ -10,7 +10,8 @@ import {showWorkspaceOrbit} from './workspace_orbit.js?v=t027-r1';
   const state = {view:'wall',sat:'',follow:false,case:'X-GS01',step:0,normalPoint:0,orbit:'LEO',station:'제주 후보',insertion:6,satLat:0,satLon:0,gsLat:33.5,gsLon:126.5,scenario:'',events:[],editIndex:-1,injected:false,run:'RUN-P01',mode:'기준'};
   const isPopout=new URLSearchParams(location.search).get('popout')==='1';
   const windowId=`${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  let applyingRemote=false;
+  let applyingRemote=false,pendingWorkspaceDraft=[];
+  const childWindows=new Set();
   let awaitingInitial=isPopout&&Boolean(window.opener);
   const syncChannel='BroadcastChannel' in window?new BroadcastChannel('isdc-odt-v6-mock'):null;
   const cases = {
@@ -75,7 +76,15 @@ import {showWorkspaceOrbit} from './workspace_orbit.js?v=t027-r1';
     screen.innerHTML=`<div class="view studio">${head('DT · 운용자 비교·검증','SYS-07 · F04/F09/F10 · 기준/후보/실측의 차이와 인계',btn('EM 검증','em'))}${panel('비교 기준','동일 시각 필요',`<div class="actions"><button class="choice" data-run="RUN-P01" aria-pressed="${state.run==='RUN-P01'}">RUN-P01 기준 예시</button><button class="choice" data-run="RUN-P02" aria-pressed="${state.run==='RUN-P02'}">RUN-P02 후보 예시</button></div>${rows([['기준 시각','03:18 UTC 예시'],['선택 run',state.run],['동일 입력 검증','없음'],['실제 실행','없음']])}`)}${panel('업무 영향 비교','미산출',`<div class="comparison"><div class="tile"><small>기준</small><strong>접촉·기한 미산출</strong></div><div class="tile"><small>후보</small><strong>사건 ${state.events.length}건 · 결과 없음</strong></div><div class="tile"><small>차이</small><strong>판정 보류</strong></div></div><div class="tiles" style="margin-top:8px"><div class="tile"><small>M-204 결과 기한</small><strong>영향 미판정</strong></div><div class="tile"><small>D-731 품질/수신</small><strong>실측·모델 없음</strong></div></div>`)}${panel('신뢰도·인계','운용 판단 전',rows([['모델/자료 버전','없음'],['적용 범위','미정'],['불확실성','미산정'],['EM/실측 대조','없음'],['운용 권고','없음']])+`<div class="note violet-note" style="margin-top:8px">DT 가정을 관측 상태나 승인된 조치로 읽지 않습니다.</div>`)}${panel('운용자에게 전달할 근거 묶음','현재 모두 비어 있음',`<div class="mini-timeline"><div><b>기준</b><span>스냅샷·UTC</span></div><div><b>변경</b><span>입력·사건·모델</span></div><div><b>차이</b><span>임무·데이터·접촉</span></div><div><b>한계</b><span>검증·불확실성</span></div></div>`,'bottom')}</div>`;
   }
   function render(){
-    queueMicrotask(()=>showWorkspaceOrbit(state.view));
+    if(!pendingWorkspaceDraft.length)pendingWorkspaceDraft=draftValues();
+    queueMicrotask(()=>{
+      showWorkspaceOrbit(state.view);
+      if(pendingWorkspaceDraft.length){
+        applyWorkspaceDraft(pendingWorkspaceDraft);
+        for(const item of pendingWorkspaceDraft){if(item.id.startsWith('ground-')||item.id.startsWith('visibility-')||item.id==='orbit-utc'||['orbit-input','orbit-rate'].includes(item.id))continue;const field=document.getElementById(item.id);if(field&&'value' in field)field.value=item.value;}
+        pendingWorkspaceDraft=[];
+      }
+    });
     const v=state.view;
     if(v==='wall')wall(); else if(v==='normal')normal(); else if(v==='initial')initial(); else if(v==='exception')exception(); else if(roles[v])role(v); else if(v==='scene')scene(); else if(v==='composer')composer(); else if(v==='run')run(); else compare();
     document.querySelectorAll('#nav button').forEach(b=>b.dataset.view===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
@@ -97,17 +106,23 @@ import {showWorkspaceOrbit} from './workspace_orbit.js?v=t027-r1';
   document.getElementById('rail-groups').innerHTML=groups.map(([g],i)=>`<button type="button" data-group="${i}" aria-label="${g} 작업 목록 열기">${groupLabels[i]}</button>`).join('');
   function showGroup(index){const [label,views]=groups[index];document.getElementById('launcher-title').textContent=label+' 작업공간';nav.innerHTML=views.map(([id,n])=>`<button type="button" data-view="${id}">${n}</button>`).join('');launcher.hidden=false;document.querySelectorAll('#rail-groups button').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.group)===index)));nav.querySelector('button')?.focus()}
   function openView(view){if(!names[view])return;state.view=view;workWindow.hidden=false;fitWindow();shelf.hidden=true;launcher.hidden=true;render();location.hash=view;screen.focus()}
-  function draftValues(){return [...screen.querySelectorAll('input[id],select[id],textarea[id]')].map(el=>({id:el.id,value:el.value}));}
+  function isDraftField(id){return !['ground-input','orbit-input','orbit-rate'].includes(id);}
+  function draftValues(){return [...screen.querySelectorAll('input[id],select[id],textarea[id]')].filter(el=>isDraftField(el.id)).map(el=>({id:el.id,value:el.value}));}
   function transferSnapshot(){return {type:'isdc-v6-snapshot',state:{...state},view:state.view,draft:draftValues()};}
-  function applySnapshot(data){if(!data||!names[data.view]||!data.state)return;applyingRemote=true;Object.assign(state,data.state,{view:data.view});openView(data.view);for(const item of data.draft||[]){const field=document.getElementById(item.id);if(field&&'value' in field)field.value=item.value;}applyingRemote=false;awaitingInitial=false;}
+  function applySnapshot(data){
+    if(!data||!names[data.view]||!data.state)return;
+    applyingRemote=true;Object.assign(state,data.state,{view:data.view});
+    pendingWorkspaceDraft=Array.isArray(data.draft)?data.draft.filter(item=>typeof item?.id==='string'&&isDraftField(item.id)&&typeof item.value==='string'):[];
+    openView(data.view);applyingRemote=false;awaitingInitial=false;
+  }
   syncChannel?.addEventListener('message',event=>{const data=event.data;if(data?.sender===windowId||awaitingInitial)return;
-    if(data?.type==='draft'&&data.view===state.view){const field=document.getElementById(data.id);if(field&&field!==document.activeElement&&'value' in field)field.value=data.value;return;}
+    if(data?.type==='draft'&&data.view===state.view&&isDraftField(data.id)){const field=document.getElementById(data.id);if(field&&typeof data.value==='string'&&'value' in field){if(field===document.activeElement&&field.value!==data.value){const feedback=document.getElementById('popout-feedback');feedback.hidden=false;feedback.textContent='다른 창에서도 이 항목을 수정했습니다. 현재 편집값을 유지합니다.';}else{applyWorkspaceDraft([{id:data.id,value:data.value}]);field.value=data.value;}}return;}
     if(data?.type!=='state'||!data.state)return;
     applyingRemote=true;const currentView=state.view;Object.assign(state,data.state,{view:currentView});render();applyingRemote=false;
   });
-  screen.addEventListener('input',event=>{const field=event.target;if(field.id&&'value' in field)syncChannel?.postMessage({type:'draft',sender:windowId,view:state.view,id:field.id,value:field.value});});
-  screen.addEventListener('change',event=>{const field=event.target;if(field.id&&'value' in field)syncChannel?.postMessage({type:'draft',sender:windowId,view:state.view,id:field.id,value:field.value});});
-  window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const data=event.data;if(data?.type==='isdc-v6-ready'&&!isPopout&&event.source){event.source.postMessage(transferSnapshot(),event.origin);}else if(data?.type==='isdc-v6-snapshot'&&isPopout){applySnapshot(data);}});
+  screen.addEventListener('input',event=>{const field=event.target;if(!applyingRemote&&field.id&&isDraftField(field.id)&&'value' in field)syncChannel?.postMessage({type:'draft',sender:windowId,view:state.view,id:field.id,value:field.value});});
+  screen.addEventListener('change',event=>{const field=event.target;if(!applyingRemote&&field.id&&isDraftField(field.id)&&'value' in field)syncChannel?.postMessage({type:'draft',sender:windowId,view:state.view,id:field.id,value:field.value});});
+  window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const data=event.data;if(data?.type==='isdc-v6-ready'&&!isPopout&&childWindows.has(event.source)){event.source.postMessage(transferSnapshot(),event.origin);}else if(data?.type==='isdc-v6-snapshot'&&isPopout&&event.source===window.opener){applySnapshot(data);}});
   if(isPopout){document.body.classList.add('popup-mode');workWindow.classList.add('expanded');window.addEventListener('load',()=>window.opener?.postMessage({type:'isdc-v6-ready'},location.origin));}
   let savedRect=null;
   function expand(){const button=document.getElementById('window-expand');if(!workWindow.classList.contains('expanded')){savedRect={left:workWindow.style.left,top:workWindow.style.top,width:workWindow.style.width,height:workWindow.style.height};workWindow.classList.add('expanded');Object.assign(workWindow.style,{left:'84px',top:'118px',width:'calc(100vw - 92px)',height:'calc(100vh - 149px)'});button.setAttribute('aria-label','작업 창 작은 크기로 복원');button.title='작은 크기로 복원'}else{workWindow.classList.remove('expanded');Object.assign(workWindow.style,savedRect||{left:'',top:'',width:'',height:''});button.setAttribute('aria-label','작업 창 확장');button.title='확장';fitWindow()}document.getElementById('window-title').focus()}
@@ -118,7 +133,7 @@ import {showWorkspaceOrbit} from './workspace_orbit.js?v=t027-r1';
     let child=null;
     try{child=window.open(url.href,`isdc-odt-v6-${state.view}`,'popup=yes,width=1280,height=800,resizable=yes,scrollbars=no');}catch{}
     if(!child){feedback.hidden=false;feedback.textContent='브라우저에서 별도 창 열기가 차단되었습니다.';return;}
-    feedback.hidden=true;try{child.focus();}catch{}
+    childWindows.add(child);feedback.hidden=true;try{child.focus();}catch{}
     // A fresh window requests its snapshot after loading; an existing named window receives it here.
     try{if(child.location.origin===location.origin&&child.document.readyState==='complete')child.postMessage(transferSnapshot(),location.origin);}catch{}
   });
@@ -169,7 +184,7 @@ import {showWorkspaceOrbit} from './workspace_orbit.js?v=t027-r1';
   let ended=false;
   window.addEventListener('pagehide',event=>{
     if(event.persisted||ended)return;
-    ended=true;finishGesture?.();syncChannel?.close();
+    ended=true;finishGesture?.();syncChannel?.close();childWindows.clear();
   });
   dragTarget.addEventListener('pointerdown',e=>beginPointer(e,false));resizeTarget.addEventListener('pointerdown',e=>beginPointer(e,true));
   document.getElementById('window-title').addEventListener('keydown',e=>{const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!d||workWindow.classList.contains('expanded'))return;e.preventDefault();const b=bounds(),rect=workWindow.getBoundingClientRect(),step=e.shiftKey?32:8;workWindow.style.left=Math.max(b.minX,Math.min(b.maxX,rect.left+d[0]*step))+'px';workWindow.style.top=Math.max(b.minY,Math.min(b.maxY,rect.top+d[1]*step))+'px'});
