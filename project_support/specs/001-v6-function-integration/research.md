@@ -1,0 +1,55 @@
+# Phase 0 Research: 첫 위성/지상 지점 검증
+
+Status: 진행 중. 읽기 전용 코드/공식 자료 조사 완료, 아래 구현 전 게이트는 미해결. Phase 1 완료로 표시하지 않는다.
+
+## Decision: 계산 주 구현
+권고: Python sgp4 순수 계산을 주 구현으로 사용, 앱이 생성/종료하는 제한된 실행기로 요청을 처리한다. JS/Cesium은 입력/표시를 맡는다. runtime의 현재 상태와 읽기 전용 탐색 결과는 분리한다. 대기열을 제한하고 최신 요청 ID를 적용한다. 실행기만으로 GIL/응답시간 목표 달성을 보장하지 않는다.
+Rationale: 입력/단위/오차 기준을 한곳에서 검증하고 renderer와 계산 경계를 유지한다.
+Alternatives: JS worker는 브라우저 부하 격리 가능하지만 runtime과 클라이언트 계산의 두 구현 유지가 필요; 처음부터 C++/Rust는 측정된 병목 근거 없음. Worker의 역할은 MDN 공식 문서 확인.
+
+## Decision: 기존 코드 재사용 범위
+FastAPI 조립/정적 경로/runtime 종료와 Cesium 카메라 조작은 재사용 후보. 기존 orbit.js의 순수 함수 분리 패턴은 참고한다. synthetic fallback, 음수 고도 clamp, 구면 고도각, 고정 5도/45초/최대 3구간 경로는 새 수치 검증 기준을 충족하는 계산으로 채택하지 않는다. 기존 경로는 회귀시험과 함께 보존한다.
+Rationale: 초기 10도 설정, 하루 전체 구간, 높이 반영과 1초 경계 목표에 기존 의미가 맞지 않는다.
+
+## Decision: 검증 계층
+SGP4 TEME 원시 위치 -> 지구고정/지상좌표 변환 -> 고도각 -> 패스 경계 -> 웹 결과 일치 -> 성능을 분리한다. Python/JS 두 구현은 계보를 공유할 수 있어 서로의 일치만을 독립 검증으로 삼지 않는다. 공식 Vallado fixture를 기준으로 삼는다.
+WGS72 중력상수와 WGS84 지점 타원체는 용도가 다르다. TEME를 J2000 좌표로 취급하지 않는다. UTC/UT1/극운동 적용 여부와 지점 높이 기준을 계약에 명시한다.
+
+## Decision: 입력/가시 구간
+저장 원문, 출처, 조회시각, epoch, SHA256 및 형식 defaults를 보존. 같은 시각에 받은 TLE/OMM이라고 무조건 동일 요소로 판단하지 않는다. CelesTrak OMM JSON의 EARTH/TEME/UTC/SGP4 defaults를 명시한다.
+거친 탐색과 경계 보정을 분리하고 짧은 구간/접점/잘림/없음/실패를 별도 시험한다. 최초 3개만 반환하지 않는다. 실제 통신 상태는 미확인으로 유지한다.
+
+## 구현 전 미해결 게이트
+- Python sgp4 선택 버전과 Python3.14 Windows 설치/가속 지원 검증. 기존 환경 실험을 배포 환경 승인으로 간주하지 않는다.
+- 공식 fixture와 원시 입력/출력/변환 기준 자료의 실제 확보, 버전/해시 기록.
+- UTC/UT1/극운동을 포함할지 또는 명시된 근사 계약을 채택할지 검증 근거로 결정.
+- 제주 가상 좌표는 기존 33.4996N/126.5312E 재사용 후보, 높이는 실제 시설이 아닌 가정값으로 선정/공개. 아직 확정 아님.
+- 설치 후 계산/왕복/화면 실측. JS 7.0.1 동등 계산 모드/상수는 별도 확인.
+
+## 공식 근거
+- https://celestrak.org/publications/AIAA/2006-6753/ : 코어 코드/검증 자료.
+- https://celestrak.org/publications/AIAA/2006-6753/faq.php : TEME/ECEF 및 지상국 절차.
+- https://pypi.org/project/sgp4/ : Python 패키지의 출력/상수/형식 설명.
+- https://celestrak.org/NORAD/documentation/gp-data-formats.php : OMM defaults/GP 형식.
+- https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers : background thread와 DOM 제한.
+- https://cesium.com/learn/cesiumjs/ref-doc/Viewer.html : 단일 viewer 구성.
+
+조사 담당의 읽기 전용 확인 및 로컬 코드 정적 검토를 근거로 한다. 설치/수치 시험/실제 웹 실행은 하지 않았다. 자료의 존재 확인과 실제 기준 파일 검증은 구분한다.
+
+## Rust 후보 재검토
+사용자 동의로 Rust 우선 후보 조사 진행. rust_core_review.md에 sgp4 2.4.0/MIT/배포/계산 기본값 차이 및 C++ baseline 비교 절차를 기록했다. Python 주 계산 추천은 비교 대안으로 내려놓고 Rust core + PyO3 + Python API + JS UI를 우선 설계 후보로 삼는다. 실제 build/benchmark 미실행이므로 최종 선정 게이트 미해결.
+
+## 실제 Rust/C++ 비교
+rust_cpp_comparison_results.md에 동일 ISS historical/WGS72/AFSPC 1,440/86,400 시각 비교 증거 기록. 86,400 Rust18.1175ms/C++batch18.2558ms/C++scalar113.4258ms 중앙값. 최대 위치 차이6.874e-6m. 계산 성능은 동급, batch 경계 중요. Rust 우선 후보 유지. PyO3/좌표변환/API/UI 검증 미완료, Phase0 게이트 전체 완료로 표시하지 않음.
+
+## PyO3 연결 연구 실측
+rust_python_probe_results.md: CPython3.14 Windows wheel build/repair/별도venv 설치/9tests 통과. 버퍼 반환 총20.01ms(86400시각), C++20.08ms. batch+소유buffer 반환을 우선 설계. 변환/time/independent fixture 및 실제API/웹 연구 게이트는 남음.
+
+## 고정 자료 수치 시험 후속
+coordinate_probe_results.md: 저장된 IERS B 및 윤초 자료 해시 확인 후 재실행 통과. Phase0 공개 위치fixture/고도각/경계 부분 증거 확보. 일반 날짜/윤초/EOP 범위/짧은구간/속도 및 Rust 변환 통합은 미완료. 연구 문서의 이전 미실행 상태는 해당 범위만 이번 증거로 갱신한다.
+
+## 계산연구 검증 게이트 결과
+coordinate_probe_results.md 최종 묶음 참조. 확장17시험+Rust연결9+기존회귀35 통과. 공개fixture/윤초UTCJD/자료범위/짧은구간·접점·공백/속도0LOD/전범위배치 및 하루가시탐색 성능 확인. 계산연구 실행게이트는 해당조합 내 완료, 제품구현 및 UI 검증과 배포설계는 별개. 다음은 Phase1 문서의 stale 입력을 수정한다.
+
+## Phase1 설계 정리
+plan/data-model/contracts/orbit_api 및workspace/quickstart를 현재검증조합으로갱신했다. 기술문서의미합의TS/Vite권고는backup보존후JS/Rust전파+Python좌표조합으로수정했다. 공개route는별도prefix/ADR, currentstate는runtime기존구성요소, artifact버전은plan참조. 연구gate의배포/UI미검증은제품task에서검증하는사항으로명확히분리. 제품source변경없음.

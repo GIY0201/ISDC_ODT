@@ -1,0 +1,11 @@
+# ISDC ODT: pinned first local implementation environment (CPython 3.14, Windows x64)
+-c project_support/tooling/python_constraints.txt
+fastapi==0.142.2
+uvicorn[standard]==0.54.0
+httpx==0.28.1
+pydantic==2.13.5
+astropy==8.0.1
+astropy-iers-data==0.2026.9.28.0.59.37
+pyerfa==2.0.1.5
+numpy==2.5.3
+pytest==8.4.2

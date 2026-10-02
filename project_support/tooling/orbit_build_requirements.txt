@@ -1,0 +1,2 @@
+maturin==1.15.0
+delvewheel==1.13.1

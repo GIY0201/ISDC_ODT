@@ -1,0 +1,31 @@
+{
+  "reference": {
+    "source": "https://crates.io/crates/sgp4/2.4.0",
+    "file": "sgp4_test_cases.toml",
+    "sha256": "b7c05c2d9e2f965e491401c9ca1f38fe588eeec21b0f0a9e54c0f57dca0cc002",
+    "license": "MIT",
+    "license_file": "sgp4_license.txt",
+    "cases": 33,
+    "states": 668,
+    "profile": "WGS72_AFSPC"
+  },
+  "coordinate_reference": {
+    "file": "vallado_teme_itrf.json",
+    "sha256": "c3f5cd74715aa42d92d1f36b7c829f6b371cd2f472155e31269df9de14c6ddf2",
+    "source": "https://celestrak.org/publications/AIAA/2006-6753/AIAA-2006-6753-Rev2.pdf",
+    "scope": "published TEME to ITRF position with explicit EOP"
+  },
+  "stored_iss_profile": {
+    "source": "https://docs.rs/crate/sgp4/2.4.0/source/examples/tle_afspc.rs",
+    "crate_sha256": "9467b9a7be8485ed8be0f336d399c8f32c0fcd60686e7dd2ed3dab75c9a73eb3",
+    "published_example_sha256": "33bc15e2ff382dfcc4ad26e3c4b909b0ad375e754761c2278035d0a4a7e8315e",
+    "epoch": "2020-07-12T21:16:01.000416Z",
+    "input_sha256": {
+      "TLE": "8d7c0750a5c89662ce8b113dff5b74104ba355a1d9742efc08e951158a9184fc",
+      "OMM": "68a5776943f3a2d4513d058780c3598355a378d91295715d290f362335007b9e"
+    },
+    "eop_sha256": "31bb7f67a30f629ad87562cb2b9c22b86e252767cbdda44e40c0afd39b6dccc7",
+    "leap_sha256": "6cb6f5d4b819f2e568e25db4b0b26d89dedf031fdffb18bc94d40f4e94e268d7",
+    "note": "Historical published example; derived OMM equivalence, copied to ignored data/workspace via explicit preparation tool; not current telemetry"
+  }
+}

@@ -1,0 +1,5 @@
+maturin==1.15.0
+delvewheel==1.13.1
+pefile==2024.8.26
+numpy==2.5.3
+sgp4==2.25

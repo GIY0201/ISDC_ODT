@@ -1,0 +1,20 @@
+{
+  "source": "https://celestrak.org/publications/AIAA/2006-6753/AIAA-2006-6753-Rev2.pdf",
+  "source_pdf_sha256": "538a5c0ea174eb569bbc258011717142a26d72871ab07cc64ee5fa3773164b16",
+  "section": "Appendix C",
+  "utc": "2004-04-06T07:51:28.386Z",
+  "ut1_minus_utc_s": -0.439961,
+  "xp_arcsec": -0.140682,
+  "yp_arcsec": 0.333309,
+  "position_teme_km": [
+    5094.1801621,
+    6127.6446595,
+    6380.3445327
+  ],
+  "position_itrf_km": [
+    -1033.479383,
+    7901.2952754,
+    6380.3565958
+  ],
+  "position_tolerance_m": 0.3
+}

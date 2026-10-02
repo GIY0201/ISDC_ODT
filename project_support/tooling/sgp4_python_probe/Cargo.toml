@@ -1,0 +1,16 @@
+[package]
+name = "isdc_sgp4_probe"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "isdc_sgp4_probe"
+crate-type = ["cdylib"]
+
+[dependencies]
+sgp4 = "=2.4.0"
+pyo3 = "=0.29.2"
+
+[profile.release]
+lto = true
+codegen-units = 1

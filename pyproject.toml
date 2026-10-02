@@ -1,0 +1,11 @@
+[project]
+name = "isdc-odt"
+version = "0.4.0"
+requires-python = ">=3.13,<3.15"
+dependencies = ["fastapi>=0.136,<1", "uvicorn[standard]>=0.48,<1", "httpx>=0.28,<1", "pydantic>=2.13,<3"]
+
+[dependency-groups]
+dev = ["pytest>=8.3,<9"]
+
+[tool.uv]
+package = false
