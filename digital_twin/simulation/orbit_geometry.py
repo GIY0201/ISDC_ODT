@@ -6,6 +6,7 @@ polar motion rates are neglected. No network, file or runtime dependency.
 """
 from dataclasses import dataclass
 import numbers
+import math
 import numpy as np
 import erfa
 from astropy.time import Time
@@ -27,8 +28,12 @@ def _readonly(values):
     return np.frombuffer(array.tobytes(),dtype='<f8').reshape(array.shape)
 
 def _vectors(values):
-    original=np.asarray(values,dtype=object)
-    if any(isinstance(v,(bool,np.bool_)) or not isinstance(v,numbers.Real) for v in original.flat):raise ValueError('real numeric vector components required')
+    # Owned numeric arrays from the native boundary need no Python object copy.
+    if isinstance(values,np.ndarray) and values.dtype.kind in 'iuf':
+        original=None
+    else:
+        original=np.asarray(values,dtype=object)
+        if any(isinstance(v,(bool,np.bool_)) or not isinstance(v,numbers.Real) for v in original.flat):raise ValueError('real numeric vector components required')
     try:array=np.asarray(values,dtype=float)
     except (ValueError,TypeError) as exc:raise ValueError('numeric vectors required') from exc
     if array.ndim!=2 or array.shape[1]!=3 or not np.isfinite(array).all():raise ValueError('finite N by 3 vectors required')
@@ -43,8 +48,8 @@ def station_itrf(site:GroundPoint):
 def teme_to_itrf(positions_km,instants,eop,*,velocities_km_s=None,lod_s=0.):
     r=_vectors(positions_km);utc=tuple(instants);points=tuple(eop);n=len(r)
     if len(utc)!=n or len(points)!=n:raise ValueError('UTC/EOP/vector row count mismatch')
-    if any(not isinstance(t,UtcInstant) or not np.isfinite([t.jd1,t.jd2]).all() for t in utc):raise ValueError('finite UTC instants required')
-    if any(not isinstance(p,EarthOrientationPoint) or not np.isfinite([p.ut1_minus_utc_s,p.xp_rad,p.yp_rad]).all() for p in points):raise ValueError('finite EOP points required')
+    if any(not isinstance(t,UtcInstant) or not math.isfinite(t.jd1) or not math.isfinite(t.jd2) for t in utc):raise ValueError('finite UTC instants required')
+    if any(not isinstance(p,EarthOrientationPoint) or not math.isfinite(p.ut1_minus_utc_s) or not math.isfinite(p.xp_rad) or not math.isfinite(p.yp_rad) for p in points):raise ValueError('finite EOP points required')
     if len({(p.snapshot_sha256,p.leap_sha256) for p in points})>1:raise ValueError('mixed EOP snapshots')
     if isinstance(lod_s,(bool,np.bool_)) or not isinstance(lod_s,numbers.Real) or not np.isfinite(lod_s) or abs(lod_s)>=86400:raise ValueError('invalid LOD seconds')
     v=None if velocities_km_s is None else _vectors(velocities_km_s)

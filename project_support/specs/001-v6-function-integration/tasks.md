@@ -50,9 +50,9 @@ Checkpoint: T001~010 완료 후 입력/계산 API 기반을 독립적으로 확�
 - [x] T031 [US3] project_support/tests/browser/workspace_popout.test.mjs에 V6별도창의 현재업무·입력전달/수정동기화/409충돌/팝업차단/닫기·channel해제/문서당Viewer1개 시험을 먼저 작성하고 user_application/web/scripts/workspace.js에 구현한다. T025,T027 뒤, T028 이전. Node74/Python207 PASS 및 실제 Chrome 부모·자식 편집/충돌/선택/종료 검증. validation/t031_popout.md 참조.
 
 ## Phase 6: 제품 검증과 기록
-- [ ] T028 project_support/tests/validation/orbit_workspace.md 및 tooling/measure_orbit_ui.mjs에서 두해상도의 실제브라우저/frame/input/result/24h 계측과 역순덮어쓰기0을 검증한다. p95/p99/max,환경/GPU/전원/자료hash/trace/screenshot을 data/workspace/validation에 기록하고 전체pytest/Node/native시험 실행.
-- [ ] T029 project_support/tooling/build_orbit_wheel.ps1 및 tests/test_orbit_install.py로 제품wheel 격리venv 설치/호출, 외부DLL출처와license, cp314지원범위를 확인한다. 미검증다른PC를지원완료로표시하지않는다.
-- [ ] T030 project_support/specs/001-v6-function-integration/workflow-progress.md와 data/development_log/CURRENT.md,HISTORY.jsonl에 요구별 제품증거/실패/후속필수를 연결하고 공동검토용 결과를 보고한다. F001실제통신과 F002후속기능순서를 닫지 않는다.
+- [x] T028 project_support/tests/validation/orbit_workspace.md 및 tooling/measure_orbit_ui.mjs에서 두해상도 실제브라우저/frame/input/result/24h 계측과 역순덮어쓰기 시험을 수행했다. p95/p99/max,환경/GPU/전원/자료hash/trace/screenshot을 보존하고 전체Python224/Node77/native1 PASS. 계측 작업 완료이며 **SC-006 FAIL**이다. 3회 개선 후 하루p95 2.27/2.20초, frame/피드백 대리지표 미달을 T032로 남긴다. validation/t028_performance.md 참조.
+- [x] T029 제품wheel을 새venv에 오프라인설치하고 프로젝트밖 -I native호출, 외부DLL hash/출처/LICENSE 및cp314-win_amd64 태그를 확인했다. 초기LICENSE누락/잘못된PATH DLL을 수정한 뒤2 PASS. validation/t029_install.md 참조. 다른PC/ABI/OS/실제AeroDT 연결 미검증.
+- [x] T030 workflow-progress.md/CURRENT.md/HISTORY.jsonl과 validation/t030_review.md에 FR/SC/R별 실제증거 및 SC006실패/후속을 연결했다. F001실제통신/F002전체기능 및 다른PC·실측 후속을 닫지 않았다. 현재31개 수행 기록이며 수용기준 전체통과나 전체제품완료가 아니다.
 
 ## Dependencies
 T001→T002. 공통시험 T003/T005/T007/T009는 설계문서준비 후 작성 가능하나 각각 구현 T004/T006/T008/T010 이전 실패 확인. T004+T006+T008→T010. 공통완료→US1(T011~018)→첫시연→US2(T019~023)→US3(T024~027,T031)→T028~030. UI구조 T014는 계산식변경과 분리.
@@ -68,3 +68,7 @@ US1: T011 API시험 파일과 T017 playback/interpolation시험 파일은 서로
 
 ## Requirement coverage
 R001:T001,T004,T010,T029. R002:T014,T016,T024,T025,T031. R003:T030(후속기능,이번단계완료아님). R004:T018,T023,T030. R005:T003~023. R006:T023,T030(표시및F001유지,실제통신구현후속). R007:T003,T005,T007,T011,T017,T019,T021,T026,T028,T029. R008:T002,T006,T008,T029. R009:T018,T024~028. R010:T001,T030.
+
+## Phase 7: Convergence
+
+- [ ] T032 user_application/orbit_calculation.py와 digital_twin/simulation/visibility.py의 실제 병목을 profile로 확인하고 1초dense/극값/경계/윤초/오류·provenance 정확도를 유지한 채 하루결과p95≤1000ms를 달성한다. user_application/web/scripts/orbit_ui_measurement.js 및 project_support/tooling/measure_orbit_ui.mjs에서 실제전경60Hz이상 GPU프레임제출/입력Event Timing 또는 동등한 표시증거를 보완하고, 두해상도30초완료trial3회/다른UTC100회/다른24h범위20회로 frame p95≤16.7ms/피드백≤50ms/UTC완료≤100ms 및역순덮어쓰기0을 재검증한다. 중단trial·최댓값·실패·환경/trace/hash를 보존하며 T028의미달을 PASS로재분류하지않는다. 검증보고서와전체회귀를갱신한다 per SC-006,FR-006,plan: Validation and delivery gates (partial). HIGH; F001실통신/F002전체기능은 별도후속으로유지한다.

@@ -8,7 +8,7 @@ import math
 import numbers
 import numpy as np
 from astropy.time import TimeDelta
-from foundation.orbit_time import parse_utc, advance_seconds
+from foundation.orbit_time import parse_utc
 from digital_twin.contracts.orbit import (
     OrbitCalculation, OrbitSample, VisibilityInterval, VisibilityContact,
     VisibilityError, VisibilityResult,
@@ -43,17 +43,27 @@ def search_visibility(*, calculate, start_utc, end_utc, minimum_elevation_deg):
     threshold = float(minimum_elevation_deg)
     cache = {}  # Local query evaluations only, never current runtime state.
     provenance = None
+    start_time=start.as_time()
+
+    def timestamps_at(offsets):
+        times=start_time+TimeDelta(np.asarray(offsets),format='sec',scale='tai')
+        times.precision=9
+        stamps=[stamp+'Z' for stamp in times.utc.isot]
+        for i,t in enumerate(offsets):
+            if t==0.:stamps[i]=start.iso_utc
+            elif t==duration:stamps[i]=end.iso_utc
+        return tuple(stamps)
 
     def utc(t):
         if t == 0.: return start.iso_utc
         if t == duration: return end.iso_utc
-        return advance_seconds(start, t).iso_utc
+        return timestamps_at([t])[0]
 
     def evaluate(offsets, timestamps=None):
         nonlocal provenance
         missing = [float(t) for t in offsets if float(t) not in cache]
         if not missing: return
-        times = tuple(timestamps) if timestamps is not None else tuple(utc(t) for t in missing)
+        times = tuple(timestamps) if timestamps is not None else timestamps_at(missing)
         result = calculate(times)
         if not isinstance(result, OrbitCalculation) or type(result.rows) is not tuple or len(result.rows) != len(times):
             raise ValueError('invalid visibility calculation contract')
@@ -89,39 +99,50 @@ def search_visibility(*, calculate, start_utc, end_utc, minimum_elevation_deg):
     timestamps[0],timestamps[-1] = start.iso_utc,end.iso_utc
     evaluate(grid,timestamps)
 
-    def extremum(a,b,maximize):
-        # Ternary refinement is bounded and assumes a unimodal bracket.
+    def extrema(brackets):
+        # Independent unimodal brackets use the same ternary points, together
+        # per round, so UTC/EOP/native setup is shared without coarsening time.
+        active=list(brackets)
         for _ in range(40):
-            if b-a < 1e-6: break
-            x,y = a+(b-a)/3, b-(b-a)/3
-            evaluate([x,y])
-            fx,fy = value(x),value(y)
-            if fx is None or fy is None: return
-            if fx == fy == value(a) == value(b): return
-            if (fx < fy) == maximize: a = x
-            else: b = y
-        t = (a+b)/2
-        v = value(t)
-        if v is not None and abs(v) <= CONTACT_TOLERANCE_DEG:
-            cache[t] = (0.,None)
+            pending=[(a,b,m) for a,b,m in active if b-a>=1e-6]
+            if not pending:break
+            evaluate([t for a,b,_ in pending for t in (a+(b-a)/3,b-(b-a)/3)])
+            next_active=[(a,b,m) for a,b,m in active if b-a<1e-6]
+            for a,b,maximize in pending:
+                x,y=a+(b-a)/3,b-(b-a)/3
+                fx,fy=cache[x][0],cache[y][0]
+                if fx is None or fy is None:continue
+                if fx==fy==cache[a][0]==cache[b][0]:continue
+                if (fx<fy)==maximize:a=x
+                else:b=y
+                next_active.append((a,b,maximize))
+            active=next_active
+        evaluate([(a+b)/2 for a,b,_ in active])
+        for a,b,_ in active:
+            t=(a+b)/2;v=cache[t][0]
+            if v is not None and abs(v)<=CONTACT_TOLERANCE_DEG:
+                cache[t]=(0.,None)
 
     # Only refine visible sampled slope reversals. Flat runs need no search.
+    brackets=[]
     for i in range(1,len(grid)-1):
         a,b,c = (cache[grid[j]][0] for j in (i-1,i,i+1))
         if a is None or b is None or c is None: continue
         if b >= a and b >= c and (b > a or b > c):
-            extremum(grid[i-1],grid[i+1],True)
+            brackets.append((grid[i-1],grid[i+1],True))
         elif b <= a and b <= c and (b < a or b < c):
-            extremum(grid[i-1],grid[i+1],False)
+            brackets.append((grid[i-1],grid[i+1],False))
+    extrema(brackets)
 
     # A peak/trough inside the first or last cell has no three-grid-point
     # slope reversal. Refine those cells under the same unimodal assumption.
     edge_cells = {(grid[0],grid[1]), (grid[-2],grid[-1])}
+    brackets=[]
     for a,b in edge_cells:
         fa,fb = cache[a][0],cache[b][0]
         if fa is not None and fb is not None:
-            extremum(a,b,True)
-            extremum(a,b,False)
+            brackets.extend(((a,b,True),(a,b,False)))
+    extrema(brackets)
 
     roots = set()
     knots = sorted(cache)

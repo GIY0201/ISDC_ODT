@@ -1,7 +1,7 @@
 import {createWorkspaceRevisionSync} from './workspace_revision_sync.js';
 import {api} from '/static/communication/api.js';
 import {createOrbitSelection} from './orbit_selection.js?v=t031-r1';
-import {createWorkspaceGlobe} from './workspace_globe.js?v=t031-r1';
+import {createWorkspaceGlobe} from './workspace_globe.js?v=t028-r1';
 import {createWorkspacePlayback} from './workspace_playback.js';
 import {createGroundPanel} from './tabs/ground_visibility.js?v=t031-r1';
 

@@ -1,4 +1,4 @@
-import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t031-r1';
+import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t028-r1';
 (() => {
   const screen = document.getElementById('screen');
   const groups = [
@@ -208,3 +208,5 @@ import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t03
   window.addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(names[v]&&v!==state.view)openView(v)});
   const initialView=location.hash.slice(1);if(names[initialView])openView(initialView);else{showGroup(0);launcher.hidden=true}
 })();
+
+if(new URLSearchParams(location.search).get('validation')==='t028'){import('./orbit_ui_measurement.js?v=t028-r1').then(module=>module.installOrbitUiMeasurement());}

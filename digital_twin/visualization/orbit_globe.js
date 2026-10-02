@@ -39,7 +39,10 @@ export class OrbitGlobe {
     if(this.destroyed)return;
     const {C,viewer}=this;
     const valid=point?.virtual===true&&point.ellipsoid==='WGS84'&&[point.latitude_deg,point.longitude_deg,point.ellipsoid_height_m].every(Number.isFinite)&&Math.abs(point.latitude_deg)<=90&&Math.abs(point.longitude_deg)<=180;
-    if(!valid){if(this.groundEntity)viewer.entities.remove(this.groundEntity);this.groundEntity=null;viewer.scene.requestRender();return false;}
+    if(!valid){if(this.groundEntity)viewer.entities.remove(this.groundEntity);this.groundEntity=null;this.groundKey=null;viewer.scene.requestRender();return false;}
+    const key=[point.latitude_deg,point.longitude_deg,point.ellipsoid_height_m].join(':');
+    if(this.groundEntity&&this.groundKey===key)return true;
+    this.groundKey=key;
     const position=C.Cartesian3.fromDegrees(point.longitude_deg,point.latitude_deg,point.ellipsoid_height_m);
     const property=new C.ConstantPositionProperty(position,C.ReferenceFrame.FIXED);
     if(this.groundEntity)this.groundEntity.position=property;

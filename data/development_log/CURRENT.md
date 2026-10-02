@@ -1,5 +1,12 @@
 # 현재 개발 기록
 
+## 2026-10-03 T028/T029/T030 검증 묶음 및 성능 미달
+- 변경: 정확UTC/EOP/native/geometry/극값round batch와같은지점Cesium property 재사용, opt-in실제UI계측/분석도구 및 batch15·설치2 회귀시험. dated제품wheel/선택Python DLL출처·hash/LICENSE·RECORD 검증. ADR0005 및 feature validation/t028_performance.md,t029_install.md,t030_review.md에 결과·한계 기록. 원본자료/환경/과거wheel/legacy/합의 보존.
+- 검증: 최종Python224 PASS(107.80초,기존Starlette경고1), Node77 PASS(256.24ms), 제품cargo release locked offline integration1 PASS(공식33입력668상태), 실제TCP 입력2/샘플3/구간1/409/선택UTC보존/health PASS. 새venv offline/-I 프로젝트밖 native호출2 PASS. diffcheck PASS.
+- 실제IAB1280/1920: 각다른UTC100회/24h20회/30초완료3trial. 1920중단trial은 별도보충/원문보존. UTC p95 44.0/43.6ms PASS; 하루p95 2266.0/2197.8ms FAIL. RAF/두RAF피드백 미달, 실제GPU60Hz 제출경로 미입증. 데이터/EOP/윤초hash·환경/GPU/전원·trace/profile·screenshot은 data/workspace/validation/performance 보존. Chrome가림probe는수용표본아님.
+- 개선: 동일1000행중앙0.65630→0.02685초, 하루중앙5.23572→2.06527초,4구간경계/peak차이0초/0도. 정확도/grid/오류/자료계약과목표는유지. 게임성능달성이나실측통신증거가아님.
+- 상태: 초기31개작업수행,SC006미달T032추가(Converge HIGH partial1/tasks_appended). verify3회개선후에도미달,fullyverified완료아님. F001실제통신/F002전체기능/F004/F005/F006 및다른PC·AeroDT실제연결미완료. PR11의존branch에서리뷰하며자동병합없음.
+
 ## 2026-10-01 단계별 개발 및 실제 통신 조건 요구 기록
 - 변경: project_support/specs/001-v6-function-integration/agreed_scope.md에 사용자 합의와 실제 통신 조건 확인/적용의 후속 필수 요구를 기록했다. 초기 전체 이식 초안보다 합의 범위를 우선한다.
 - 검증: 문서 간 상대 링크와 필수 요구 문구를 확인했다. 이번 변경은 문서만이며 기능 시험을 새로 실행하지 않았다.

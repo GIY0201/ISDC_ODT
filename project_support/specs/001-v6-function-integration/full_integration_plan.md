@@ -3,6 +3,8 @@
 2026-10-01. 이 문서가 최초 요청 전체의 범위와 단계 관계를 정의한다. plan.md와 tasks.md는 이 중 W01/W02 및 W00의 첫 상세 구현 묶음이다. 첫 ISS 시연이나 연구시험을 전체 제품 완료로 기록하지 않는다. 이후 묶음은 현재 기능 결과를 함께 검토해 상세 명세/계약/작업을 작성하며, 아래 순서는 제안이지 확정 승인 이력이 아니다.
 
 ## 최초 요청과 공통 구조
+현재 checkpoint(2026-10-03): 아래 표의 W00~W02 상태는 초기 계획 이력이다. W01/W02 첫 제품 흐름과 W00 창·별도창은 구현·회귀 검증했고 로컬wheel 설치도 통과했다. W00의 게임UX/하루1초는 SC-006 미달(T032)이다. W03~W08 상세 기능과 W09 다른PC/실제AeroDT연계는 여전히 후속이다. 전체 목적을 ISS 시험으로 축소하지 않는다.
+
 채택 V6 UI에 선배 ISDC-ODT의 실제 존재하는 기능을 단계적으로 연결한다. 독립 개발 루트는 ISDC_ODT, AeroDT는 계층 책임/파일 생성 규칙/좌표·단위·계약을 공유할 향후 연결 대상이다. 지금 UAM을 ISDC 내부에 넣거나 AeroDT의 UAM 빌드 범위를 바꾸지 않는다.
 foundation은 단위/시간/좌표의 공통 정의, communication은 HTTP/native/향후 외부 연결, data는 입력/산출물, digital_twin의 contracts/model_library/simulation/runtime/visualization은 각각 계약/정의/계산/현재상태/표현, user_application은 조립/사용자흐름/configs, project_support는 문서/시험/도구를 맡는다. ai_eng/ai_pnp는 실제 승인 기능이 없으므로 폴더를 미리 만들지 않는다. runtime의 현재 상태를 data/renderer/native에 중복 소유시키지 않는다.
 
