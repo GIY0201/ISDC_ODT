@@ -8,7 +8,7 @@ def test_every_local_script_import_and_stylesheet_is_served():
     from user_application.web.application import create_app
 
     with TestClient(create_app()) as client:
-        html = client.get('/').text
+        html = client.get('/').text + client.get('/legacy').text
         roots = re.findall(r'(?:src|href)="(/static/[^"?]+)(?:\?[^" ]*)?"', html)
         pending, seen = list(roots), set()
         while pending:

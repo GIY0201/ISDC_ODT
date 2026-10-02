@@ -97,6 +97,10 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
     async def favicon():
         return Response(status_code=204)
 
+    @app.get('/legacy', include_in_schema=False)
+    async def legacy_frontend():
+        return FileResponse(WEB_DIR / 'legacy.html')
+
     @app.get('/{full_path:path}', include_in_schema=False)
     async def frontend(full_path: str):
         return FileResponse(WEB_DIR / 'index.html')

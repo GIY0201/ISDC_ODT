@@ -170,3 +170,10 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 검증: 최초API미구현19FAIL과catalog모듈누락을확인후구현. API19+저장4+기존94=전체pytest117PASS/경고1(7.62초),pip check PASS. Node3PASS. 별도localhostTCP HTTP 서버기동→입력2종→선택revision1→실제위치/고도각3행→기존health200→자기서버만종료PASS. data/workspace/validation/orbit_api에results/live_http/source_hashes 기록.
 - 수정: router와OrbitRuntime 변수명충돌을orbit_http 별칭으로해결. 기존OpenAPI 전체동등시험의허용신규범위를명시했다. original_openapi.json은보존하고4개신규path/3개신규schema만제외한전체문서가baseline과정확히같아야한다. 이후전체회귀통과.
 - 상태: 첫묶음13/31완료. 다음T014에서채택V6원본hash를보존하며화면구조이식,그후T015~T018입력/공용지구/UTC재생연결및첫시연. 현재V6연결/실제브라우저게임성능/가시구간/배포미완료. F001실제통신조건확인/적용,F002전체후속기능유지.
+
+## 2026-10-02 V6 이식 및 Git 버전 관리 T014
+- 사용자 지정 GIY0201/ISDC_ODT 원격의 기존 main d26af42를 보존하고 codex/v6-workspace-migration 브랜치를 생성했다. 기존 계산/API 구현을 기준 커밋 fef9dd6으로 기록했다.
+- V6 원본 HTML/CSS/JS를 project_support/docs/ui/v6_source에 byte 단위 보존했다. .gitattributes -text로 checkout 줄바꿈 변환을 막으며 3개 SHA256은 회귀시험으로 검사한다. 원본 AeroDT 파일은 수정하지 않았다.
+- index.html, styles/workspace.css, scripts/workspace.js 및 로고/지구 이미지가 독립 저장소 내 정적 경로를 사용한다. 기존 index는 legacy.html과 /legacy 경로로 보존했다. API 및 계산식 변경 없음. 자산 시험은 두 화면의 기존 import 그래프를 모두 검사한다.
+- 시험 우선: 새 회귀 2 FAIL 확인 후 구현. 전체 pytest119 PASS/기존 Starlette 경고1(8.71초), Node API3 PASS, workspace.js 문법 검사 PASS. 실제 IAB localhost:8876에서 지구/로고 표시, 위성 작업창 열기, 최소화/복원, 확장/복원, 닫기를 확인했다. 단일 브라우저 viewport 확인이며 게임 성능, 다중 해상도, popout 동기화 완료 증거가 아니다.
+- 상태: T001~T014,14/31 완료. V6는 예시 state와 CSS 지구이며 실제 궤도 API 연결은 T015 이후다. 단일 runtime 현재상태 및 Cesium 연결 T016~T018, F001 실제 통신 조건, F002 전체 기능 범위 유지. 실행 데이터와 환경은 ignore했다. GitHub push 결과는 별도 확인한다.
