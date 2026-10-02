@@ -245,3 +245,8 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 변경: workspace.test.mjs 시험10개 및 validation/t024_workspace_tests.md 추가. 제품 코드 변경 없음.
 - 검증: 새5 PASS/5 FAIL, 전체Node45 PASS/5 FAIL(exit1), 기존40 PASS. Python202 PASS/기존Starlette경고1(100.57초). 실제IAB 최소화 중1920→1280 변경 후 복원 경계 이탈 확인. 입력과 구간 유지. 창/임시viewport 복구.
 - 남은 위험: geometry3경로/channel/gesture 종료5FAIL은 T025에서 수정. T024는 시험준비이며 제품완료는T023. 남은첫묶음7개, 전체제품/게임성능/F001/F002/다중창/배포 미완료. 실패시험만 독립 정상 병합하지 않는다.
+
+## 2026-10-03 T025 작업창 복원 및 종료 수정
+- 변경: workspace.js 크기·위치 clamp/복원 재검증 및 최종pagehide channel/gesture 정리. persisted 자원 보존, entry버전t025-r1. legacy/state.js/CSS/API/계산 보존.
+- 검증: 작업창10 PASS/전체Node50 PASS(216.32ms), 전체Python202 PASS/기존Starlette경고1(101.17초), diff check PASS. 실제IAB두해상도3geometry경로/입력·구간 보존/canvas1/error로그0. pagehide/bfcache는adapter시험증거.
+- 남은 사항: 첫묶음6개, 다음T026 동시성시험. F001/F002/게임성능/다중창/배포 미완료. 시험과구현 같은PR 게시, 자동병합없음.
