@@ -37,7 +37,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   }
   const timer=host.setTimeout(boot,12000);
   if(host.Cesium)boot();else host.addEventListener('load',boot,{once:true});
-  const focus=()=>globe?.focus();focusButton.addEventListener('click',focus);
+  const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
     update(snapshot,display,displayUtc){
       if(disposed)return;

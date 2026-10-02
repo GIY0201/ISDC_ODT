@@ -1,6 +1,6 @@
 import {api} from '/static/communication/api.js';
-import {createOrbitSelection} from './orbit_selection.js';
-import {createWorkspaceGlobe} from './workspace_globe.js';
+import {createOrbitSelection} from './orbit_selection.js?v=t027-r1';
+import {createWorkspaceGlobe} from './workspace_globe.js?v=t027-r1';
 import {createWorkspacePlayback} from './workspace_playback.js';
 import {createGroundPanel} from './tabs/ground_visibility.js';
 
@@ -14,7 +14,8 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const clock=document.getElementById('orbit-display-utc');if(clock)clock.textContent=utc||'미선택';
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
-window.addEventListener('pagehide',event=>{if(!event.persisted){groundPanel.destroy();playback.destroy();globe.destroy();}});
+let disposed=false;
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;client.destroy();groundPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   playback.update(client.snapshot());

@@ -16,7 +16,7 @@ const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.
 
 function fixture(width=1280,height=720){
   const elements=new Map(),jobs=[],timers=new Set(),frames=new Set(),viewers=[],channels=[];
-  let context,active=null,nextId=0,commands=0,queries=0;
+  let context,active=null,nextId=0,commands=0,queries=0,clientDestroyed=0;
   class Element {
     constructor(id='',tag='div'){this.id=id;this.tag=tag;this.style={};this.dataset={};this.attributes={};this.listeners=new Map();this.children=[];this.hidden=false;this.isConnected=true;this._value='';this._html='';this.textContent='';this.scrollTop=0;this.capture=null;const classes=new Set();this.classList={contains:v=>classes.has(v),add:v=>classes.add(v),remove:v=>classes.delete(v)};}
     set value(value){this._value=String(value??'');}get value(){return this._value;}
@@ -56,7 +56,7 @@ function fixture(width=1280,height=720){
   const Cesium={Viewer,Cartesian3,Color:{CYAN:'cyan',WHITE:'white',fromCssColorString:v=>v},JulianDate:{fromIso8601:v=>v},ReferenceFrame:{FIXED:'fixed'},ConstantPositionProperty:class{constructor(value){this.value=value;}},BoundingSphere:class{},HeadingPitchRange:class{},Matrix4:{IDENTITY:{}},EllipsoidTerrainProvider:class{},SingleTileImageryProvider:{fromUrl:()=>new Promise(()=>{})}};
   const state={revision:4,input_id:'tle',input_hash:'hash',current_utc:'2020-07-12T21:16:01.000416000Z',ground_point:{latitude_deg:33.4996,longitude_deg:126.5312,ellipsoid_height_m:0,virtual:true,ellipsoid:'WGS84'},minimum_elevation_deg:10,playing:false,play_rate:1,leap_sha256:LEAP_SHA256,eop_sha256:'eop',frame:'ITRF',profile:'WGS72_AFSPC'};
   const snapshot={inputs:[{input_id:'tle',satellite_id:'25544',format:'TLE',epoch_utc:state.current_utc,raw_sha256:'hash'}],state,result:{client_request_id:'buffer',revision:4,input_id:'tle',input_hash:'hash',frame:'ITRF',rows:[{utc:state.current_utc,status:'valid',position_m:[1,2,3],elevation_deg:10}]},status:'ready',error:'',receivedAtMs:0};
-  const client={snapshot:()=>structuredClone(snapshot),load:()=>jobs.push(()=>context.render()),samples:async()=>{queries++;},setGround:async()=>{commands++;},refresh:async()=>{}};
+  const client={destroy:()=>{clientDestroyed++;},snapshot:()=>structuredClone(snapshot),load:()=>jobs.push(()=>context.render()),samples:async()=>{queries++;},setGround:async()=>{commands++;},refresh:async()=>{}};
   const api={orbitVisibility:async p=>{queries++;return {...p,revision:p.selection_revision,query_start_utc:p.start_utc,query_end_utc:p.end_utc,input_hash:state.input_hash,eop_sha256:state.eop_sha256,leap_sha256:state.leap_sha256,frame:state.frame,profile:state.profile,communication_status:'unknown',status:'none',intervals:[],contacts:[],errors:[],stale:false};}};
   const schedule=set=>()=>{const id=++nextId;set.add(id);return id;};
   Object.assign(win,{Cesium,setTimeout:()=>++nextId,clearTimeout(){},BroadcastChannel:Channel,opener:null});
@@ -66,7 +66,7 @@ function fixture(width=1280,height=720){
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}
   const resize=async(w,h)=>{context.innerWidth=w;context.innerHeight=h;await win.dispatch('resize');};
-  return {get,win,doc,resize,viewers,channels,timers,frames,snapshot:()=>structuredClone(snapshot),counts:()=>({commands,queries}),flush,dispose(){delete globalThis.document;}};
+  return {get,win,doc,resize,viewers,channels,timers,frames,snapshot:()=>structuredClone(snapshot),counts:()=>({commands,queries,clientDestroyed}),flush,dispose(){delete globalThis.document;}};
 }
 
 function inside(f,width,height){const rect=f.get('work-window').getBoundingClientRect();assert.ok(rect.left>=80,'left controls remain past rail');assert.ok(rect.top>=116,'title remains below app header');assert.ok(rect.right<=width-8,`right ${rect.right} <= ${width-8}`);assert.ok(rect.bottom<=height-29,`bottom ${rect.bottom} <= ${height-29}`);}
@@ -83,3 +83,5 @@ test('restoring an expanded window clamps saved geometry to the new viewport',as
 test('real page exit releases document subscriptions and renderer exactly once; bfcache preserves them',async()=>{const f=fixture();try{await f.win.dispatch('pagehide',{persisted:true});assert.equal(f.viewers[0].destroyCount,undefined);assert.equal(f.timers.size,1);await f.win.dispatch('pagehide',{persisted:false});await f.win.dispatch('pagehide',{persisted:false});assert.equal(f.viewers[0].destroyCount,1);assert.equal(f.timers.size,0);assert.equal(f.frames.size,0);assert.equal(f.viewers[0].errorRemoved,true);assert.ok(f.channels.every(channel=>channel.closed),'workspace BroadcastChannel is released');}finally{f.dispose();}});
 
 test('page exit also detaches an unfinished pointer gesture',async()=>{const f=fixture();try{const title=f.get('window-titlebar');await title.dispatch('pointerdown',{button:0,pointerId:7,clientX:200,clientY:160});await f.win.dispatch('pagehide',{persisted:false});assert.equal(title.listeners.get('pointermove')?.size,0);assert.equal(title.listeners.get('pointerup')?.size,0);assert.equal(title.listeners.get('pointercancel')?.size,0);assert.equal(title.capture,null);}finally{f.dispose();}});
+
+test('orbit assembly disposes request client only on final page exit',async()=>{const f=fixture();try{await f.win.dispatch('pagehide',{persisted:true});assert.equal(f.counts().clientDestroyed,0);await f.win.dispatch('pagehide',{persisted:false});await f.win.dispatch('pagehide',{persisted:false});assert.equal(f.counts().clientDestroyed,1);}finally{f.dispose();}});

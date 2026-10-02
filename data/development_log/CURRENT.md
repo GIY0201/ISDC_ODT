@@ -250,3 +250,8 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 변경: workspace.js 크기·위치 clamp/복원 재검증 및 최종pagehide channel/gesture 정리. persisted 자원 보존, entry버전t025-r1. legacy/state.js/CSS/API/계산 보존.
 - 검증: 작업창10 PASS/전체Node50 PASS(216.32ms), 전체Python202 PASS/기존Starlette경고1(101.17초), diff check PASS. 실제IAB두해상도3geometry경로/입력·구간 보존/canvas1/error로그0. pagehide/bfcache는adapter시험증거.
 - 남은 사항: 첫묶음6개, 다음T026 동시성시험. F001/F002/게임성능/다중창/배포 미완료. 시험과구현 같은PR 게시, 자동병합없음.
+
+## 2026-10-03 T026/T027 요청 경합 및 종료
+- 변경: 역순응답/동시선택/큐포화/취소/렌더실패 시험과 V6 취소상태·요청client종료·focus실패 처리 보완. 서버/legacy/계산 보존.
+- 검증: 초기Node3FAIL+조립1FAIL 해소. 전체Node61 PASS(216.97ms)/Python207 PASS/기존Starlette경고1(100.20초). 실제IAB계산/지구이동/재생·정지/epoch복귀/canvas1/error로그0. 고장주입은adapter, 서버경합은ASGI/실제bounded executor, native수치성능시험아님.
+- 남은위험: 실행중native/visibility job 즉시중단보장없음. 첫묶음4개, 다음T031 별도창. F001/F002/게임성능/설치지원 미완료. PR게시와리뷰/병합별도.
