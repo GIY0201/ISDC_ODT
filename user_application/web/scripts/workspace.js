@@ -96,7 +96,7 @@ import {showWorkspaceOrbit} from './workspace_orbit.js?v=t023-r1';
   const groupLabels=['관제','운용','DT'];
   document.getElementById('rail-groups').innerHTML=groups.map(([g],i)=>`<button type="button" data-group="${i}" aria-label="${g} 작업 목록 열기">${groupLabels[i]}</button>`).join('');
   function showGroup(index){const [label,views]=groups[index];document.getElementById('launcher-title').textContent=label+' 작업공간';nav.innerHTML=views.map(([id,n])=>`<button type="button" data-view="${id}">${n}</button>`).join('');launcher.hidden=false;document.querySelectorAll('#rail-groups button').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.group)===index)));nav.querySelector('button')?.focus()}
-  function openView(view){if(!names[view])return;state.view=view;workWindow.hidden=false;shelf.hidden=true;launcher.hidden=true;render();location.hash=view;screen.focus()}
+  function openView(view){if(!names[view])return;state.view=view;workWindow.hidden=false;fitWindow();shelf.hidden=true;launcher.hidden=true;render();location.hash=view;screen.focus()}
   function draftValues(){return [...screen.querySelectorAll('input[id],select[id],textarea[id]')].map(el=>({id:el.id,value:el.value}));}
   function transferSnapshot(){return {type:'isdc-v6-snapshot',state:{...state},view:state.view,draft:draftValues()};}
   function applySnapshot(data){if(!data||!names[data.view]||!data.state)return;applyingRemote=true;Object.assign(state,data.state,{view:data.view});openView(data.view);for(const item of data.draft||[]){const field=document.getElementById(item.id);if(field&&'value' in field)field.value=item.value;}applyingRemote=false;awaitingInitial=false;}
@@ -110,7 +110,7 @@ import {showWorkspaceOrbit} from './workspace_orbit.js?v=t023-r1';
   window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const data=event.data;if(data?.type==='isdc-v6-ready'&&!isPopout&&event.source){event.source.postMessage(transferSnapshot(),event.origin);}else if(data?.type==='isdc-v6-snapshot'&&isPopout){applySnapshot(data);}});
   if(isPopout){document.body.classList.add('popup-mode');workWindow.classList.add('expanded');window.addEventListener('load',()=>window.opener?.postMessage({type:'isdc-v6-ready'},location.origin));}
   let savedRect=null;
-  function expand(){const button=document.getElementById('window-expand');if(!workWindow.classList.contains('expanded')){savedRect={left:workWindow.style.left,top:workWindow.style.top,width:workWindow.style.width,height:workWindow.style.height};workWindow.classList.add('expanded');Object.assign(workWindow.style,{left:'84px',top:'118px',width:'calc(100vw - 92px)',height:'calc(100vh - 149px)'});button.setAttribute('aria-label','작업 창 작은 크기로 복원');button.title='작은 크기로 복원'}else{workWindow.classList.remove('expanded');Object.assign(workWindow.style,savedRect||{left:'',top:'',width:'',height:''});button.setAttribute('aria-label','작업 창 확장');button.title='확장'}document.getElementById('window-title').focus()}
+  function expand(){const button=document.getElementById('window-expand');if(!workWindow.classList.contains('expanded')){savedRect={left:workWindow.style.left,top:workWindow.style.top,width:workWindow.style.width,height:workWindow.style.height};workWindow.classList.add('expanded');Object.assign(workWindow.style,{left:'84px',top:'118px',width:'calc(100vw - 92px)',height:'calc(100vh - 149px)'});button.setAttribute('aria-label','작업 창 작은 크기로 복원');button.title='작은 크기로 복원'}else{workWindow.classList.remove('expanded');Object.assign(workWindow.style,savedRect||{left:'',top:'',width:'',height:''});button.setAttribute('aria-label','작업 창 확장');button.title='확장';fitWindow()}document.getElementById('window-title').focus()}
   document.getElementById('window-expand').addEventListener('click',expand);
   document.getElementById('window-popout').addEventListener('click',()=>{
     const url=new URL(location.href);url.searchParams.set('popout','1');url.hash=state.view;
@@ -124,15 +124,57 @@ import {showWorkspaceOrbit} from './workspace_orbit.js?v=t023-r1';
   });
   document.getElementById('window-minimize').addEventListener('click',()=>{workWindow.hidden=true;shelf.hidden=false;shelf.textContent=`${names[state.view]} 창 다시 열기`;shelf.focus()});
   document.getElementById('window-close').addEventListener('click',()=>{if(isPopout){window.close();return;}workWindow.hidden=true;shelf.hidden=true;document.querySelector('#rail-groups button')?.focus()});
-  shelf.addEventListener('click',()=>{workWindow.hidden=false;shelf.hidden=true;document.getElementById('window-title').focus()});
+  shelf.addEventListener('click',()=>{workWindow.hidden=false;fitWindow();shelf.hidden=true;document.getElementById('window-title').focus()});
   document.getElementById('launcher-close').addEventListener('click',()=>{launcher.hidden=true;document.querySelector('#rail-groups button[aria-pressed=true]')?.focus()});
   const dragTarget=document.getElementById('window-titlebar'),resizeTarget=document.getElementById('resize-handle');
+  // Keep the entire window between the navigation rail, header and footer.
+  function fitWindow(){
+    if(workWindow.hidden||workWindow.classList.contains('expanded'))return;
+    const rect=workWindow.getBoundingClientRect();
+    const width=Math.min(rect.width,Math.max(0,innerWidth-88));
+    const height=Math.min(rect.height,Math.max(0,innerHeight-145));
+    Object.assign(workWindow.style,{width:width+'px',height:height+'px'});
+    const b=bounds();
+    workWindow.style.left=Math.max(b.minX,Math.min(b.maxX,rect.left))+'px';
+    workWindow.style.top=Math.max(b.minY,Math.min(b.maxY,rect.top))+'px';
+  }
   function bounds(){return {minX:80,maxX:innerWidth-workWindow.offsetWidth-8,minY:116,maxY:innerHeight-workWindow.offsetHeight-29}}
-  function beginPointer(event,resize){if(event.button!==0||workWindow.classList.contains('expanded')||(!resize&&event.target.closest('button')))return;event.preventDefault();const target=resize?resizeTarget:dragTarget,targetRect=workWindow.getBoundingClientRect(),startX=event.clientX,startY=event.clientY;target.setPointerCapture(event.pointerId);const move=e=>{const dx=e.clientX-startX,dy=e.clientY-startY;if(resize){workWindow.style.width=Math.max(460,Math.min(innerWidth-targetRect.left-8,targetRect.width+dx))+'px';workWindow.style.height=Math.max(360,Math.min(innerHeight-targetRect.top-29,targetRect.height+dy))+'px'}else{const b=bounds();workWindow.style.left=Math.max(b.minX,Math.min(b.maxX,targetRect.left+dx))+'px';workWindow.style.top=Math.max(b.minY,Math.min(b.maxY,targetRect.top+dy))+'px'}};const finish=()=>{target.removeEventListener('pointermove',move);target.removeEventListener('pointerup',finish);target.removeEventListener('pointercancel',finish);try{target.releasePointerCapture(event.pointerId)}catch{}};target.addEventListener('pointermove',move);target.addEventListener('pointerup',finish);target.addEventListener('pointercancel',finish)}
+  let finishGesture=null;
+  function beginPointer(event,resize){
+    if(event.button!==0||workWindow.classList.contains('expanded')||(!resize&&event.target.closest('button')))return;
+    event.preventDefault();finishGesture?.();fitWindow();
+    const target=resize?resizeTarget:dragTarget,targetRect=workWindow.getBoundingClientRect(),startX=event.clientX,startY=event.clientY;
+    target.setPointerCapture(event.pointerId);
+    const move=e=>{
+      if(e.pointerId!==event.pointerId)return;
+      const dx=e.clientX-startX,dy=e.clientY-startY;
+      if(resize){
+        workWindow.style.width=Math.max(460,Math.min(innerWidth-targetRect.left-8,targetRect.width+dx))+'px';
+        workWindow.style.height=Math.max(360,Math.min(innerHeight-targetRect.top-29,targetRect.height+dy))+'px';
+      }else{
+        const b=bounds();
+        workWindow.style.left=Math.max(b.minX,Math.min(b.maxX,targetRect.left+dx))+'px';
+        workWindow.style.top=Math.max(b.minY,Math.min(b.maxY,targetRect.top+dy))+'px';
+      }
+      fitWindow();
+    };
+    const finish=()=>{
+      target.removeEventListener('pointermove',move);target.removeEventListener('pointerup',finish);target.removeEventListener('pointercancel',finish);
+      try{target.releasePointerCapture(event.pointerId)}catch{}
+      if(finishGesture===finish)finishGesture=null;
+    };
+    finishGesture=finish;
+    target.addEventListener('pointermove',move);target.addEventListener('pointerup',finish);target.addEventListener('pointercancel',finish);
+  }
+  let ended=false;
+  window.addEventListener('pagehide',event=>{
+    if(event.persisted||ended)return;
+    ended=true;finishGesture?.();syncChannel?.close();
+  });
   dragTarget.addEventListener('pointerdown',e=>beginPointer(e,false));resizeTarget.addEventListener('pointerdown',e=>beginPointer(e,true));
   document.getElementById('window-title').addEventListener('keydown',e=>{const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!d||workWindow.classList.contains('expanded'))return;e.preventDefault();const b=bounds(),rect=workWindow.getBoundingClientRect(),step=e.shiftKey?32:8;workWindow.style.left=Math.max(b.minX,Math.min(b.maxX,rect.left+d[0]*step))+'px';workWindow.style.top=Math.max(b.minY,Math.min(b.maxY,rect.top+d[1]*step))+'px'});
-  resizeTarget.addEventListener('keydown',e=>{const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!d||workWindow.classList.contains('expanded'))return;e.preventDefault();const rect=workWindow.getBoundingClientRect(),step=e.shiftKey?32:8;workWindow.style.width=Math.max(460,Math.min(innerWidth-rect.left-8,rect.width+d[0]*step))+'px';workWindow.style.height=Math.max(360,Math.min(innerHeight-rect.top-29,rect.height+d[1]*step))+'px'});
-  window.addEventListener('resize',()=>{if(workWindow.hidden||workWindow.classList.contains('expanded'))return;const b=bounds(),rect=workWindow.getBoundingClientRect();workWindow.style.left=Math.max(b.minX,Math.min(b.maxX,rect.left))+'px';workWindow.style.top=Math.max(b.minY,Math.min(b.maxY,rect.top))+'px'});
+  resizeTarget.addEventListener('keydown',e=>{const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!d||workWindow.classList.contains('expanded'))return;e.preventDefault();const rect=workWindow.getBoundingClientRect(),step=e.shiftKey?32:8;workWindow.style.width=Math.max(460,Math.min(innerWidth-rect.left-8,rect.width+d[0]*step))+'px';workWindow.style.height=Math.max(360,Math.min(innerHeight-rect.top-29,rect.height+d[1]*step))+'px';fitWindow()});
+  window.addEventListener('resize',()=>{finishGesture?.();fitWindow()});
   document.addEventListener('click',e=>{const t=e.target.closest('[data-view],[data-sat],[data-follow],[data-reset],[data-case],[data-normal],[data-remove],[data-edit],[data-clear-events],[data-inject],[data-uninject],[data-run]');if(!t)return;
     if(t.dataset.view){openView(t.dataset.view)}
     else if(t.dataset.sat){state.sat=t.dataset.sat;state.follow=false;openView('satellite')}
