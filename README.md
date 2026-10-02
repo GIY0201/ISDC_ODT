@@ -4,7 +4,7 @@
 
 
 
-현재 JavaScript UI, Python FastAPI와 Rust SGP4 계산 기반을 사용합니다. 기본 화면은 V6 구조 시안이고 기존 프로토타입 콘솔은 `/legacy`에서 사용할 수 있습니다. V6 위성 작업창에서 저장 궤도 입력을 선택하고 실제 계산 결과를 확인할 수 있습니다. 지구는 아직 CSS 시안입니다. 실측, 실제 통신, HIL로 해석하지 않습니다.
+현재 JavaScript UI, Python FastAPI와 Rust SGP4 계산 기반을 사용합니다. 기존 프로토타입 콘솔은 `/legacy`에서 사용할 수 있습니다. V6 위성 작업창에서 저장 궤도 입력을 선택하고 계산하면 공용 Cesium 지구에 해당 UTC의 ITRF 위치가 표시됩니다. 지구 영상은 보존한 NASA Blue Marble이며 Cesium 1.143 라이브러리는 공식 CDN에서 읽습니다. 다른 운용 카드는 아직 예시입니다. 실측, 실제 통신, HIL로 해석하지 않습니다.
 
 ## 실행
 
@@ -18,7 +18,7 @@ project_support/.venv/Scripts/python -m uvicorn user_application.web.application
 
 ## 작업 기록과 검증
 
-`project_support/specs/001-v6-function-integration/workflow-progress.md`가 전체 요구, 확정 사항, 단계별 결과와 미완료 사항을 추적합니다. 현재 T001~T015 완료이며 다음 단계는 공용 지구 실제 위치 연결(T016)입니다. 실제 통신 조건 확인(F001)과 전체 프로토타입 기능 연결(F002)은 계속 추적합니다.
+`project_support/specs/001-v6-function-integration/workflow-progress.md`가 전체 요구, 확정 사항, 단계별 결과와 미완료 사항을 추적합니다. 현재 T001~T016 구현·검증 완료이며 PR 리뷰와 병합은 별도입니다. 다음 단계는 UTC 재생과 보간 검증(T017)입니다. 실제 통신 조건 확인(F001)과 전체 프로토타입 기능 연결(F002)은 계속 추적합니다.
 
 ```powershell
 project_support/.venv/Scripts/python -m pytest -q

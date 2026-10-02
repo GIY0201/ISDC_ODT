@@ -191,3 +191,8 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 수정: 빈 change는 server snapshot의 input_id로 즉시 복원한다. 새 서버 명령이나 계산 요청을 보내지 않으며 결과를 지우지 않는다. 실제 입력 변경 경로는 유지한다. 모듈 갱신은 entry/import 버전으로 구분한다.
 - 시험 우선: 새 UI change 회귀에서 빈 값 != stored-tle 실패 확인 후 수정했다. Node11 PASS, 전체 Python119 PASS/기존 경고1(7.86초). 실제 브라우저에서 TLE 계산 revision3 complete 후 빈 옵션 선택→동일 선택값 복원 및 출처/hash/3행 유지 확인했다. DOM stub 시험과 실제 브라우저 확인을 구분한다.
 - 상태: PR #2 열림/미병합 확인. 같은 PR에 수정 커밋을 추가한다. T016 이후 및 F001/F002 범위는 그대로 유지한다. 전체 기능/독립 외부 리뷰 완료 또는 병합 성공으로 기록하지 않는다.
+## 2026-10-02 T016 공용 Cesium 지구 연결
+- ITRF m/FIXED와 서버 UTC를 주입해 정지한 첫 계산 위치를 표시했다. 역할/창 전환 밖 Viewer 하나 유지, 입력 변경·pending·error·stale에서 이전 entity 제거, 렌더 실패 안내 및 멱등 종료를 구현했다. 원본 V6 snapshot/legacy API 및 계산은 보존했다.
+- 기존 globe.js의 legacy synthetic 경로를 유지하고 orbit_globe.js/workspace_globe.js로 새 GP 표시를 분리했다. NASA 보존 영상 및 Cesium1.143 공식 CDN을 사용한다. 현재 상태 소유자는 여전히 runtime이다.
+- 시험 우선 모듈 누락 실패 확인 후 구현. Node19 PASS, Python119 PASS/기존 경고1(8.86초), 실제 브라우저 TLE/OMM 좌표/UTC 일치·입력변경 점 제거·역할전환/복귀·canvas1개 및 콘솔 오류 없음 확인. 상세: validation/t016_globe.md.
+- T001~T016,16/31 구현·검증 완료. PR #2 의존 별도 브랜치 codex/v6-orbit-globe에서 리뷰 예정. T017/T018 재생/보간, F001 실제 통신 조건, F002 전체 기능 연결 및 게임 성능/다중창 검증은 유지한다.

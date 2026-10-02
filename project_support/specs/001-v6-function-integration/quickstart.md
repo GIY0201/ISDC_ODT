@@ -41,7 +41,7 @@ cargo test --release --locked --offline --manifest-path digital_twin/simulation/
 project_support/.venv/Scripts/python.exe project_support/tooling/prepare_orbit_inputs.py
 project_support/.venv/Scripts/python.exe -m uvicorn user_application.web.application:create_stored_orbit_app --factory --host 127.0.0.1 --port 8765
 ```
-GET /api/orbit/inputs의input_id/epoch_utc로selection을PUT하고그revision으로samples를POST한다. 기존CLI/defaultcreate_app과달리이profile이localmanifest를lifespan에서읽는다. 현재화면은아직V6와연결되지않았으므로이번확인은API다. 과거epoch2020-07-12이며확보시각은로컬보존시각이다.현재telemetry/현재ISS예측으로사용하지않는다.
+GET /api/orbit/inputs의input_id/epoch_utc로selection을PUT하고그revision으로samples를POST한다. 기존CLI/defaultcreate_app과달리이profile이localmanifest를lifespan에서읽는다. V6 위성 창에서 저장 입력 선택과 샘플 계산을 수행하면 공용 Cesium 지구에 첫 행의 UTC/ITRF 위치가 표시된다. UTC 재생은 후속 단계다. 과거epoch2020-07-12이며확보시각은로컬보존시각이다.현재telemetry/현재ISS예측으로사용하지않는다.
 검증명령:
 ```powershell
 node --test project_support/tests/browser/orbit_api.test.mjs

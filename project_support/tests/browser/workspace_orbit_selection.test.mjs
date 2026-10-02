@@ -10,9 +10,11 @@ test('empty UI choice restores server selection without clearing its result or s
   const data={inputs:[{input_id:'stored-tle',satellite_id:'25544',format:'TLE',epoch_utc:'2020-07-12T21:16:01Z',raw_sha256:'hash'}],state:{input_id:'stored-tle',current_utc:'2020-07-12T21:16:01Z'},result:{revision:3,status:'complete',rows:[{utc:'2020-07-12T21:16:01Z',position_m:[1,2,3],elevation_deg:10,status:'valid'}]},status:'ready',error:''};
   globalThis.document={getElementById(id){return id==='stored-orbit'?panel:{};}};
   globalThis.testOrbitClient={snapshot:()=>data,select:value=>calls.push(value),samples(){},load(){}};
+  globalThis.window={addEventListener(){}};
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
     .replace(/import \{api\} from [^;]+;/,'const api={};')
-    .replace(/import \{createOrbitSelection\} from [^;]+;/,'const createOrbitSelection=()=>globalThis.testOrbitClient;');
+    .replace(/import \{createOrbitSelection\} from [^;]+;/,'const createOrbitSelection=()=>globalThis.testOrbitClient;')
+    .replace(/import \{createWorkspaceGlobe\} from [^;]+;/,'const createWorkspaceGlobe=()=>({update(){},destroy(){}});');
   try {
     const ui=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
     ui.showWorkspaceOrbit('satellite');
@@ -25,5 +27,5 @@ test('empty UI choice restores server selection without clearing its result or s
     selection.value='another-input';
     selection.listeners.change({target:selection});
     assert.deepEqual(calls,['another-input']);
-  } finally {delete globalThis.document;delete globalThis.testOrbitClient;}
+  } finally {delete globalThis.document;delete globalThis.testOrbitClient;delete globalThis.window;}
 });

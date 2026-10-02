@@ -1,10 +1,14 @@
 import {api} from '/static/communication/api.js';
 import {createOrbitSelection} from './orbit_selection.js';
+import {createWorkspaceGlobe} from './workspace_globe.js';
 
 const escape=value=>String(value??'미확인').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let view=null;
+const globe=createWorkspaceGlobe(document.getElementById('stored-orbit-globe'),document.getElementById('orbit-globe-status'),document.getElementById('orbit-globe-focus'));
+window.addEventListener('pagehide',event=>{if(!event.persisted)globe.destroy();});
 const client=createOrbitSelection(api,render);
 function render(){
+  globe.update(client.snapshot());
   if(view!=='satellite')return;
   const screen=document.getElementById('screen');let panel=document.getElementById('stored-orbit');
   if(!panel){panel=document.createElement('section');panel.id='stored-orbit';panel.className='panel';screen.prepend(panel);}
