@@ -2,6 +2,8 @@
 from pathlib import Path
 import json,socket,subprocess,sys,time,urllib.request,urllib.error
 root=Path(__file__).resolve().parents[2]
+sys.path.insert(0,str(root))
+from foundation.orbit_time import parse_utc,advance_seconds
 out=root/'data/workspace/validation/orbit_api';out.mkdir(parents=True,exist_ok=True)
 with socket.socket() as probe:
     probe.bind(('127.0.0.1',0));port=probe.getsockname()[1]
@@ -29,8 +31,30 @@ with (out/'live_server.log').open('w',encoding='utf-8') as log:
         chosen=request('/api/orbit/selection','PUT',payload)[1];assert chosen['revision']==1
         data=request('/api/orbit/samples','POST',dict(client_request_id='live-samples',selection_revision=1,input_id=record['input_id'],start_utc=record['epoch_utc'],step_seconds=1,count=3))[1]
         assert data['status']=='complete' and len(data['rows'])==3 and data['frame']=='ITRF'
+        epoch=parse_utc(record['epoch_utc'])
+        visibility_payload=dict(client_request_id='live-visibility',selection_revision=1,input_id=record['input_id'],
+            start_utc=advance_seconds(epoch,1900).iso_utc,end_utc=advance_seconds(epoch,2300).iso_utc,
+            ground_point=payload['ground_point'],minimum_elevation_deg=10)
+        visibility=request('/api/orbit/visibility','POST',visibility_payload)[1]
+        assert visibility['status']=='complete' and len(visibility['intervals'])==1 and not visibility['errors']
+        assert visibility['revision']==1 and not visibility['stale'] and visibility['communication_status']=='unknown'
+        assert visibility['input_hash']==data['input_hash'] and visibility['eop_sha256']==data['eop_sha256'] and visibility['leap_sha256']==data['leap_sha256']
+        interval=visibility['intervals'][0]
+        assert not interval['start_clipped'] and not interval['end_clipped'] and interval['max_elevation_deg']>=10
+        try:
+            request('/api/orbit/visibility','POST',visibility_payload|{'selection_revision':0})
+            raise AssertionError('stale visibility revision accepted')
+        except urllib.error.HTTPError as exc:
+            with exc:
+                assert exc.code==409 and json.loads(exc.read())['detail']['code']=='revision_conflict'
+        after=request('/api/orbit/state')[1]
+        assert after['revision']==chosen['revision'] and after['current_utc']==chosen['current_utc']
         assert request('/api/health')[0]==200
-        report={'result':'pass','transport':'actual localhost TCP HTTP','inputs':2,'sample_rows':3,'revision':1,'input_hash':data['input_hash'],'eop_sha256':data['eop_sha256'],'leap_sha256':data['leap_sha256'],'communication_status':data['communication_status'],'ui_verified':False}
+        report={'result':'pass','transport':'actual localhost TCP HTTP','inputs':2,'sample_rows':3,'revision':1,
+            'visibility_intervals':len(visibility['intervals']),'visibility_status':visibility['status'],
+            'visibility_interval':interval,'conflict_status':409,'selection_utc_preserved':True,
+            'input_hash':data['input_hash'],'eop_sha256':data['eop_sha256'],'leap_sha256':data['leap_sha256'],
+            'communication_status':data['communication_status'],'ui_verified':False}
         (out/'live_http.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
         print(json.dumps(report))
     finally:

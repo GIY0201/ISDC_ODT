@@ -1,4 +1,4 @@
-# Orbit API v1: 입력/상태/선택/samples 구현, visibility 검토 계약
+# Orbit API v1: 입력/상태/선택/samples/visibility 구현 계약
 기존 endpoint/WS는 보존. 새 prefix /api/orbit. 공개 구현 전 ADR 기록.
 
 ## 공통
@@ -28,4 +28,7 @@ OrbitSelection snapshot 반환. 처음 input 미선택 가능, revision0. 기존
 
 
 ## 2026-10-02 구현 응답 형식
-inputs: {inputs:[metadata],eop_sha256,leap_sha256}. state/selection: selection필드 flat + current_utc/observed_monotonic_s/input_hash/EOP·윤초hash/frame=ITRF/profile/units/communication_status=unknown. ground_point wire는 latitude_deg/longitude_deg/ellipsoid_height_m, virtual=true/ellipsoid=WGS84 선택기본값이다. metadata 입력frame은TEME이며query결과frame과구분한다. samples: client_request_id/revision/input_id/input_hash/rows[{utc,position_m,elevation_deg,error_code,status}]/hashes/stale/status/units/profile/frame. 전부실패error/일부partial/완료complete. 원본file/TLE본문은반환하지않는다. error.detail는code/message,409은state를함께반환. 형식validation.detail은type/loc/msg 배열이고불법NaN 원입력은echo하지않는다. visibility는아직미구현이며T021/T022대상.
+inputs: {inputs:[metadata],eop_sha256,leap_sha256}. state/selection: selection필드 flat + current_utc/observed_monotonic_s/input_hash/EOP·윤초hash/frame=ITRF/profile/units/communication_status=unknown. ground_point wire는 latitude_deg/longitude_deg/ellipsoid_height_m, virtual=true/ellipsoid=WGS84 선택기본값이다. metadata 입력frame은TEME이며query결과frame과구분한다. samples: client_request_id/revision/input_id/input_hash/rows[{utc,position_m,elevation_deg,error_code,status}]/hashes/stale/status/units/profile/frame. 전부실패error/일부partial/완료complete. 원본file/TLE본문은반환하지않는다. error.detail는code/message,409은state를함께반환. 형식validation.detail은type/loc/msg 배열이고불법NaN 원입력은echo하지않는다.
+
+## T022 visibility 구현 응답
+flat 응답: query_start_utc/query_end_utc/minimum_elevation_deg/intervals/contacts/status/errors + client_request_id/revision/input_id/input_hash/ground_point/EOP·leap hash/frame/profile/units/stale/communication_status=unknown. contacts는 UTC/elevation_deg(임계값)/duration_seconds0, errors는 UTC/error_code다. readonly query는선택/UTC를변경하지않고완료시revision이달라지면stale=true를표시한다. 별도runtime/HTTP계약근거는ADR0004다. 실제TCP검증과한계는validation/t022_visibility_api.md에기록하며UI는T023에서연결한다.

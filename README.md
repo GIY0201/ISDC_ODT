@@ -18,7 +18,7 @@ project_support/.venv/Scripts/python -m uvicorn user_application.web.application
 
 ## 작업 기록과 검증
 
-`project_support/specs/001-v6-function-integration/workflow-progress.md`가 전체 요구, 확정 사항, 단계별 결과와 미완료 사항을 추적합니다. 현재 T001~T020 구현·검증 완료이며 PR 리뷰와 병합은 별도입니다. 가시 구간 계산은 독립 모듈 시험까지 완료했고 API/화면은 연결 전입니다. 다음 단계는 가시 구간 API 시험(T021)입니다. 실제 통신 조건 확인(F001)과 전체 프로토타입 기능 연결(F002)은 계속 추적합니다.
+`project_support/specs/001-v6-function-integration/workflow-progress.md`가 전체 요구, 확정 사항, 단계별 결과와 미완료 사항을 추적합니다. 현재 T001~T022 구현·검증 완료이며 PR 리뷰와 병합은 별도입니다. 가시 구간 계산과 서버 API 조회를 연결했고 화면 표시는 연결 전입니다. 다음 단계는 지점·고도각·가시 구간 UI 연결(T023)입니다. 실제 통신 조건 확인(F001)과 전체 프로토타입 기능 연결(F002)은 계속 추적합니다.
 
 ```powershell
 project_support/.venv/Scripts/python -m pytest -q
