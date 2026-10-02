@@ -1,6 +1,6 @@
 # Tasks: V6 첫 위성 및 가상 지점 연결
 
-입력: 같은 feature의 spec/plan/data-model/contracts/quickstart/research. 2026-10-01 실행 목록. 현재 T001~T013 입력/계산/runtime 및 첫 Orbit API 구현 완료, 나머지 task 미완료. 저장소 규칙과 명세에 따라 제품 시험을 먼저 작성하고 실패를 확인한 뒤 구현한다. 연구도구의 PASS를 아래 checkbox 완료로 옮기지 않는다.
+입력: 같은 feature의 spec/plan/data-model/contracts/quickstart/research. 2026-10-02 현재 T001~T016 구현·검증 완료, 나머지 task 미완료. PR 리뷰/병합은 별도다. 저장소 규칙과 명세에 따라 제품 시험을 먼저 작성하고 실패를 확인한 뒤 구현한다. 연구도구의 PASS를 아래 checkbox 완료로 옮기지 않는다.
 
 ## Phase 1: 준비
 - [x] T001 V6 원본 해시, 기존 API/WS/화면 기준과 새로운 공개 계약 및 상태 분리 결정을 project_support/docs/adr/0001_orbit_workspace.md에 기록하고 data/development_log/CURRENT.md에 기준선 명령을 남긴다. R001/R002/R010.
@@ -26,7 +26,7 @@ Checkpoint: T001~010 완료 후 입력/계산 API 기반을 독립적으로 확�
 - [x] T013 [US1] communication/http/orbit.py, orbit_schemas.py 및 communication/browser/api.js에 /api/orbit/inputs,state,selection,samples 계약을 구현하여 T011을 통과시킨다. 기존 endpoint 회귀 유지.
 - [x] T014 [US1] user_application/web/index.html, styles/workspace.css, scripts/workspace.js에 채택 V6의 공용지구/역할 목록/작업창 구조를 이식한다. 원본 snapshot 해시를 기록하고 기존 기능을 삭제하지 않는다. 계산 변경은 이 task에 넣지 않는다.
 - [x] T015 [US1] user_application/web/scripts/orbit_selection.js 및 workspace_orbit.js에 저장입력선택/출처/epoch/age/UTC와 pending·error·stale 결과 흐름을 구현한다. 선택변경명령 직렬화, client_request_id/revision/hash 비교. 권위상태를 browser에 새로 만들지 않는다.
-- [ ] T016 [US1] digital_twin/visualization/globe.js와 tabs/orbit.js에 ITRF m/표시UTC 주입과 단일Viewer 수명 관리를 연결한다. 기존 synthetic fallback 경로는 새 기능 결과로 사용하지 않는다.
+- [x] T016 [US1] digital_twin/visualization/orbit_globe.js와 user_application/web/scripts/workspace_globe.js 및 workspace_orbit.js에 ITRF m/표시UTC 주입과 단일Viewer 수명 관리를 연결한다. 기존 globe.js/tabs/orbit.js는 legacy 합성 경로를 보존하므로 새 GP 표시는 전용 모듈에 둔다. synthetic fallback 사용 없음. 검증: validation/t016_globe.md.
 - [ ] T017 [P] [US1] project_support/tests/browser/orbit_playback.test.mjs와 project_support/tests/test_orbit_interpolation.py에 정지/재생/복귀와 sample 중간시각 보간10m/고도각0.01도 게이트를 먼저 작성한다. 자료밖/버퍼없음 처리도 확인한다.
 - [ ] T018 [US1] user_application/web/scripts/orbit_playback.js에 UTC snapshot anchor 기반 표시 투영과 허용범위 batch prefetch/보간을 구현한다. 매frame API호출금지. T017 후 US1을 실제브라우저로 시연한다.
 
@@ -68,5 +68,4 @@ US1: T011 API시험 파일과 T017 playback/interpolation시험 파일은 서로
 
 ## Requirement coverage
 R001:T001,T004,T010,T029. R002:T014,T016,T024,T025,T031. R003:T030(후속기능,이번단계완료아님). R004:T018,T023,T030. R005:T003~023. R006:T023,T030(표시및F001유지,실제통신구현후속). R007:T003,T005,T007,T011,T017,T019,T021,T026,T028,T029. R008:T002,T006,T008,T029. R009:T018,T024~028. R010:T001,T030.
-
 

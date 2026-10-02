@@ -70,3 +70,6 @@ V6 별도창 기능을 first workspace 보존 범위에 포함한다. Viewer는�
 
 ### T015 구현 경로 보완
 기존 콘솔을 보존하기 위해 V6 입력/응답 수명은 scripts/orbit_selection.js, 패널은 scripts/workspace_orbit.js에 둔다. state.js/tabs/orbit.js는 기존 콘솔 책임을 유지한다. API와 서버 runtime 계약은 변경하지 않는다.
+
+### T016 구현 경로 보완
+legacy globe.js/tabs/orbit.js는 보존한다. 새 GP 위치 렌더러는 digital_twin/visualization/orbit_globe.js, 서버 snapshot 검증과 문서당 Viewer 조립은 user_application/web/scripts/workspace_globe.js로 연결했다. 표시 사본만 가지며 UTC 재생과 지점/가시성은 후속 T017~T023이다. 상세 검증은 validation/t016_globe.md에 기록했다.
