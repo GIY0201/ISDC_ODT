@@ -1,3 +1,4 @@
+import {showWorkspaceOrbit} from './workspace_orbit.js?v=t015-p2';
 (() => {
   const screen = document.getElementById('screen');
   const groups = [
@@ -74,6 +75,7 @@
     screen.innerHTML=`<div class="view studio">${head('DT · 운용자 비교·검증','SYS-07 · F04/F09/F10 · 기준/후보/실측의 차이와 인계',btn('EM 검증','em'))}${panel('비교 기준','동일 시각 필요',`<div class="actions"><button class="choice" data-run="RUN-P01" aria-pressed="${state.run==='RUN-P01'}">RUN-P01 기준 예시</button><button class="choice" data-run="RUN-P02" aria-pressed="${state.run==='RUN-P02'}">RUN-P02 후보 예시</button></div>${rows([['기준 시각','03:18 UTC 예시'],['선택 run',state.run],['동일 입력 검증','없음'],['실제 실행','없음']])}`)}${panel('업무 영향 비교','미산출',`<div class="comparison"><div class="tile"><small>기준</small><strong>접촉·기한 미산출</strong></div><div class="tile"><small>후보</small><strong>사건 ${state.events.length}건 · 결과 없음</strong></div><div class="tile"><small>차이</small><strong>판정 보류</strong></div></div><div class="tiles" style="margin-top:8px"><div class="tile"><small>M-204 결과 기한</small><strong>영향 미판정</strong></div><div class="tile"><small>D-731 품질/수신</small><strong>실측·모델 없음</strong></div></div>`)}${panel('신뢰도·인계','운용 판단 전',rows([['모델/자료 버전','없음'],['적용 범위','미정'],['불확실성','미산정'],['EM/실측 대조','없음'],['운용 권고','없음']])+`<div class="note violet-note" style="margin-top:8px">DT 가정을 관측 상태나 승인된 조치로 읽지 않습니다.</div>`)}${panel('운용자에게 전달할 근거 묶음','현재 모두 비어 있음',`<div class="mini-timeline"><div><b>기준</b><span>스냅샷·UTC</span></div><div><b>변경</b><span>입력·사건·모델</span></div><div><b>차이</b><span>임무·데이터·접촉</span></div><div><b>한계</b><span>검증·불확실성</span></div></div>`,'bottom')}</div>`;
   }
   function render(){
+    queueMicrotask(()=>showWorkspaceOrbit(state.view));
     const v=state.view;
     if(v==='wall')wall(); else if(v==='normal')normal(); else if(v==='initial')initial(); else if(v==='exception')exception(); else if(roles[v])role(v); else if(v==='scene')scene(); else if(v==='composer')composer(); else if(v==='run')run(); else compare();
     document.querySelectorAll('#nav button').forEach(b=>b.dataset.view===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));

@@ -4,7 +4,7 @@
 
 
 
-현재 JavaScript UI, Python FastAPI와 Rust SGP4 계산 기반을 사용합니다. 기본 화면은 V6 구조 시안이고 기존 프로토타입 콘솔은 `/legacy`에서 사용할 수 있습니다. V6에는 아직 실제 궤도 API가 연결되지 않았습니다. 실측, 실제 통신, HIL로 해석하지 않습니다.
+현재 JavaScript UI, Python FastAPI와 Rust SGP4 계산 기반을 사용합니다. 기본 화면은 V6 구조 시안이고 기존 프로토타입 콘솔은 `/legacy`에서 사용할 수 있습니다. V6 위성 작업창에서 저장 궤도 입력을 선택하고 실제 계산 결과를 확인할 수 있습니다. 지구는 아직 CSS 시안입니다. 실측, 실제 통신, HIL로 해석하지 않습니다.
 
 ## 실행
 
@@ -18,7 +18,7 @@ project_support/.venv/Scripts/python -m uvicorn user_application.web.application
 
 ## 작업 기록과 검증
 
-`project_support/specs/001-v6-function-integration/workflow-progress.md`가 전체 요구, 확정 사항, 단계별 결과와 미완료 사항을 추적합니다. 현재 T001~T014 완료이며 다음 단계는 입력 선택과 API 결과 표시(T015)입니다. 실제 통신 조건 확인(F001)과 전체 프로토타입 기능 연결(F002)은 계속 추적합니다.
+`project_support/specs/001-v6-function-integration/workflow-progress.md`가 전체 요구, 확정 사항, 단계별 결과와 미완료 사항을 추적합니다. 현재 T001~T015 완료이며 다음 단계는 공용 지구 실제 위치 연결(T016)입니다. 실제 통신 조건 확인(F001)과 전체 프로토타입 기능 연결(F002)은 계속 추적합니다.
 
 ```powershell
 project_support/.venv/Scripts/python -m pytest -q

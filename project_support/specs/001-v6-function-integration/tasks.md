@@ -25,7 +25,7 @@ Checkpoint: T001~010 완료 후 입력/계산 API 기반을 독립적으로 확�
 - [x] T012 [US1] project_support/tests/fixtures/orbit/manifest.json과 user_application/configs/orbit.py에 실제ISS 저장입력/EOP 확보 절차와 가상제주/10도/24h 기본값을 선언하고 출처/hash를 검증한다. 원본 생성물은 data/workspace/inputs/orbit에 저장한다.
 - [x] T013 [US1] communication/http/orbit.py, orbit_schemas.py 및 communication/browser/api.js에 /api/orbit/inputs,state,selection,samples 계약을 구현하여 T011을 통과시킨다. 기존 endpoint 회귀 유지.
 - [x] T014 [US1] user_application/web/index.html, styles/workspace.css, scripts/workspace.js에 채택 V6의 공용지구/역할 목록/작업창 구조를 이식한다. 원본 snapshot 해시를 기록하고 기존 기능을 삭제하지 않는다. 계산 변경은 이 task에 넣지 않는다.
-- [ ] T015 [US1] user_application/web/scripts/state.js 및 tabs/orbit.js에 저장입력선택/출처/epoch/age/UTC와 pending·error·stale 결과 흐름을 구현한다. 선택변경명령 직렬화, client_request_id/revision/hash 비교. 권위상태를 browser에 새로 만들지 않는다.
+- [x] T015 [US1] user_application/web/scripts/orbit_selection.js 및 workspace_orbit.js에 저장입력선택/출처/epoch/age/UTC와 pending·error·stale 결과 흐름을 구현한다. 선택변경명령 직렬화, client_request_id/revision/hash 비교. 권위상태를 browser에 새로 만들지 않는다.
 - [ ] T016 [US1] digital_twin/visualization/globe.js와 tabs/orbit.js에 ITRF m/표시UTC 주입과 단일Viewer 수명 관리를 연결한다. 기존 synthetic fallback 경로는 새 기능 결과로 사용하지 않는다.
 - [ ] T017 [P] [US1] project_support/tests/browser/orbit_playback.test.mjs와 project_support/tests/test_orbit_interpolation.py에 정지/재생/복귀와 sample 중간시각 보간10m/고도각0.01도 게이트를 먼저 작성한다. 자료밖/버퍼없음 처리도 확인한다.
 - [ ] T018 [US1] user_application/web/scripts/orbit_playback.js에 UTC snapshot anchor 기반 표시 투영과 허용범위 batch prefetch/보간을 구현한다. 매frame API호출금지. T017 후 US1을 실제브라우저로 시연한다.

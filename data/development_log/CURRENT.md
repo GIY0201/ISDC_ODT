@@ -177,3 +177,17 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - index.html, styles/workspace.css, scripts/workspace.js 및 로고/지구 이미지가 독립 저장소 내 정적 경로를 사용한다. 기존 index는 legacy.html과 /legacy 경로로 보존했다. API 및 계산식 변경 없음. 자산 시험은 두 화면의 기존 import 그래프를 모두 검사한다.
 - 시험 우선: 새 회귀 2 FAIL 확인 후 구현. 전체 pytest119 PASS/기존 Starlette 경고1(8.71초), Node API3 PASS, workspace.js 문법 검사 PASS. 실제 IAB localhost:8876에서 지구/로고 표시, 위성 작업창 열기, 최소화/복원, 확장/복원, 닫기를 확인했다. 단일 브라우저 viewport 확인이며 게임 성능, 다중 해상도, popout 동기화 완료 증거가 아니다.
 - 상태: T001~T014,14/31 완료. V6는 예시 state와 CSS 지구이며 실제 궤도 API 연결은 T015 이후다. 단일 runtime 현재상태 및 Cesium 연결 T016~T018, F001 실제 통신 조건, F002 전체 기능 범위 유지. 실행 데이터와 환경은 ignore했다. GitHub push 결과는 별도 확인한다.
+## 2026-10-02 T015 저장 입력 및 결과 표시
+- V6 위성 작업창에 저장 TLE/파생 OMM, 출처/epoch/보존 UTC/서버 UTC/epoch 대비 시간/hash 및 실제 ITRF m·고도각 deg 결과를 연결했다. 예시 지구와 실제 계산 패널을 구분하며 실측/실제 통신으로 표현하지 않는다. 현재 UTC 재생이나 Cesium 연결은 구현하지 않았다.
+- 서버 snapshot 사본만 표시한다. 선택 명령은 직렬화하고 서버가 반환한 revision을 다음 명령에 사용한다. 계산은 요청 ID/revision/input ID/hash/stale를 검증하고 선택 변경 이전 응답은 폐기한다. 충돌은 서버 snapshot을 채택해 오류로 표시하며 무조건 재시도하지 않는다. 빈 입력·미준비·오류 흐름을 구분한다.
+- 경로 조정: 기존 state.js와 tabs/orbit.js는 /legacy 콘솔이 사용하므로 보존했다. V6 전용 orbit_selection.js/workspace_orbit.js로 같은 책임을 구현한다. 새 내부 상태 소유자를 만들지 않고 서버 응답 사본과 UI 요청 수명만 관리한다. 원본 V6 snapshot hash는 불변이다.
+- 시험 먼저: 새 모듈 누락 ENOENT 확인 후 구현. 최초 Node7 PASS/Python119 PASS. 브라우저에서 역할화면 조기 반환 및 이전 스크립트 캐시로 패널이 표시되지 않는 것을 발견해 렌더 이후 microtask 연결 및 entry script 버전으로 수정했다. 이후 실제 localhost stored profile에서 TLE 선택→revision1→UTC별 Rust/ITRF/고도각3행 complete 표시를 확인했다. 게임 성능/다중창 동기화 측정은 아니다.
+- Git 정책: 기능별 브랜치/PR 리뷰 후 main 반영. 원격 초기 PR #1 병합과 사용자 README 수정 6f42791을 확인해 보존했다. T015는 codex/v6-orbit-inputs에서 별도 PR로 제안하며 자동 병합하지 않는다.
+- 상태: T001~T015,15/31 완료. 다음 T016 공용 지구 실제 위치 연결. T017/T018 UTC 재생, F001 실제 통신 조건 확인/적용, F002 전체 선배 기능 연결 및 후속 검증은 유지한다.
+- 최종 검증: Python119 PASS/경고1(7.76초), Node10 PASS. 실제 브라우저에서 TLE revision1 3행 후 파생 OMM 전환 시 이전 행 제거 및 revision2 3행 complete 확인. 두 형식 표시값 동일. 원격 최신 main에서 T015 PR로 리뷰 예정.
+
+## 2026-10-02 PR #2 P2 빈 선택 표시 수정
+- 리뷰 재현: 계산 후 빈 입력 옵션을 선택하면 드롭다운만 비어 이전 입력의 출처/hash/결과와 불일치했다. 서버에는 선택 해제 계약이 없다.
+- 수정: 빈 change는 server snapshot의 input_id로 즉시 복원한다. 새 서버 명령이나 계산 요청을 보내지 않으며 결과를 지우지 않는다. 실제 입력 변경 경로는 유지한다. 모듈 갱신은 entry/import 버전으로 구분한다.
+- 시험 우선: 새 UI change 회귀에서 빈 값 != stored-tle 실패 확인 후 수정했다. Node11 PASS, 전체 Python119 PASS/기존 경고1(7.86초). 실제 브라우저에서 TLE 계산 revision3 complete 후 빈 옵션 선택→동일 선택값 복원 및 출처/hash/3행 유지 확인했다. DOM stub 시험과 실제 브라우저 확인을 구분한다.
+- 상태: PR #2 열림/미병합 확인. 같은 PR에 수정 커밋을 추가한다. T016 이후 및 F001/F002 범위는 그대로 유지한다. 전체 기능/독립 외부 리뷰 완료 또는 병합 성공으로 기록하지 않는다.
