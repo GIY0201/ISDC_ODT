@@ -4,7 +4,7 @@
 
 ## 최초 요청과 현재 진행 경계
 최종 목적은 독립 ISDC ODT의 확정 V6 UI에 선배 프로토타입 기능을 단계적으로 연결하고, 향후 AeroDT 연결/이식이 가능하도록 계층 책임과 파일 생성 규칙을 공유하는 것이다. ISS 시험만으로 전체 목적이 완료되지 않는다.
-현재 사용자 승인으로 첫 구현 묶음을 단계적으로 실행한다. 전체 기능 계획과 후속필수를 유지하며 T001~T027 및 T031을 완료했다(시험 준비 task 포함). PR 리뷰와 main 병합은 별도로 추적한다.
+현재 사용자 승인으로 첫 구현 묶음을 단계적으로 실행한다. T001~T031의31개 작업을 수행했으나 SC-006 성능은 미달이다. 남은 수용기준은 T032로 추적하며 첫 묶음 fully verified/전체제품완료를 주장하지 않는다. PR 리뷰와 main 병합은 별도로 추적한다.
 보호 범위: V6 채택, 기존 코드와 계산, 합의 문서, 초기 초안 및 도구 실험 이력. 초안의 존재는 승인 증거가 아니다.
 
 ## 근거
@@ -19,15 +19,15 @@
 
 | ID | 요구 / 출처 | 수용 기준 | 담당 단계 | 계획 절 / task | 증거 및 상태 |
 |---|---|---|---|---|---|
-| R001 | 독립 ISDC ODT + AeroDT 이식 가능한 구조 / S1,S5 | AeroDT 설치 의존성 없이 실행, 계층/명명/상태 소유권 검사 | constitution, plan, verify | plan File placement/Constitution / T001,T004,T010,T029 | 독립 실행 및 계층 시험 PASS, AeroDT 재통합 검증 T029 미완료 |
-| R002 | 확정 V6 UI 유지 / S1,S2 | 공용 지구와 역할별 작업 창에서 연결 기능 사용, 기존 UI 결정 추적 | specify, plan, verify | plan State/Workspace / T014,T016,T024,T025 | V6 원본 SHA 보존 및 단일 지구 위치/UTC 연결 검증; 창/다중창 T024~T027,T031 검증; 성능/설치 미완료 |
-| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030 + F002 | 저장 궤도/UTC 첫 연결 완료. 전체 선배 기능 F002/T030 미완료 |
-| R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | T001~T023 단계별 승인/검증 및 개별 PR 유지. T026 실패를 T027에서 해소, T031 별도창 검증, 다음 T028 성능 |
+| R001 | 독립 ISDC ODT + AeroDT 이식 가능한 구조 / S1,S5 | AeroDT 설치 의존성 없이 실행, 계층/명명/상태 소유권 검사 | constitution, plan, verify | plan File placement/Constitution / T001,T004,T010,T029 | 독립 실행/계층/로컬격리wheel 설치 PASS. T029는 실제AeroDT 재통합 증거가 아니며 연결·다른PC는 후속 |
+| R002 | 확정 V6 UI 유지 / S1,S2 | 공용 지구와 역할별 작업 창에서 연결 기능 사용, 기존 UI 결정 추적 | specify, plan, verify | plan State/Workspace / T014,T016,T024,T025,T031 | V6 원본 SHA/단일 지구/창·다중창 검증 PASS; 두해상도 성능 계측 완료, SC006 미달 |
+| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030 + F002 | 저장 궤도/UTC/기하가시 첫 연결 및T030기록 완료. 전체 선배 기능 F002는 미완료 |
+| R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | 단계별 승인/실패·해소 및 개별PR 유지. T028~T030 결과 검토, 다음T032 성능미달 보완 |
 | R005 | 첫 위성 1개 + 지상국 1개 / S1 | 저장된 실제 TLE/OMM, UTC 조작, 위치/고도각/가시 구간, 오류/출처 표시 검증 | specify, plan, implement, verify | plan Input/State/Geometry / T003-T023 | ISS 저장 입력/제주 가상/위치/고도각/UTC 검증. 가시 구간 계산/API/UI T019~T023 검증. validation/t023_ground_visibility.md에 실제24h4구간/설정/오류/두해상도 증거 |
 | R006 | 실제 통신 조건 확인 및 적용 / S1 | 출처 있는 서비스/장비 입력과 링크 조건 적용, 정상/실패/미확인 시험 | clarify, plan, implement, verify | plan Visibility/후속 / T023,T030 + F001 | T023 실제통신미확인 표시 검증, F001 필수 조사/적용 미실행 |
 | R007 | 결과 의미 구분 / S1,S5 | 기하 가시성, 모델 통신 충족, 실제 수신 증거를 UI/산출물에서 구분 | specify, verify | plan Validation / T003,T005,T007,T011,T017,T019,T021,T026,T028,T029 | GP/가상/기하 계산과 통신 미확인 표시 검증. 실제 통신 조건 F001 미완료 |
-| R008 | JS 모듈/HTML/CSS/Cesium + Python/FastAPI / S1 | 기술 계획이 합의와 일치, 버전/현대화 선택 근거 기록 | constitution, plan | plan Technical Context / T002,T006,T008,T029 | JS/Cesium/Python FastAPI 및 Rust 코어 기준선 구현. TS/React 보류 유지 |
-| R009 | 빠르고 원활한 사용성 / S1 | 지구/시간/창 조작의 측정 조건과 합의된 목표로 실제 웹 검증 | clarify, plan, verify | plan State/Validation / T018,T024-T028 | 게임 성능 목표 유지. T018 사용 흐름만 검증, T028 정량 성능 미측정 |
+| R008 | JS 모듈/HTML/CSS/Cesium + Python/FastAPI / S1 | 기술 계획이 합의와 일치, 버전/현대화 선택 근거 기록 | constitution, plan | plan Technical Context / T002,T006,T008,T029 | JS/Cesium/Python FastAPI/Rust 및로컬cp314격리설치 PASS. TS/React 보류, 타환경미검증 유지 |
+| R009 | 빠르고 원활한 사용성 / S1 | 지구/시간/창 조작의 측정 조건과 합의된 목표로 실제 웹 검증 | clarify, plan, verify | plan State/Validation / T018,T024-T028,T032 | 실제두해상도100UTC/20일조회/30초3회 계측. UTC PASS/하루·frame·feedback 미달, SC006 FAIL. validation/t028_performance.md 및T032 |
 | R010 | 기존 자료와 합의 보존 / S1 | 수정 이력 보존, 초안/합의/검증 증거 구분 | 모든 단계 | plan Summary/Phase1 / T001,T030 | V6 snapshot/합의/legacy 보존, 실제 단계별 증거와 이력 기록 |
 
 ## 결정
@@ -54,10 +54,10 @@
 | clarify | complete | 첫 단계 검증 의미/성능/정확도 3개 질문 합의. 다음 기능 순서/통신 대상은 F001/F002 후속 담당 단계 |
 | plan | complete | 연구 결과를 반영한 plan/data-model/contracts/quickstart/technology_selection 작성 및 원칙 검토 완료. 제품 검증/설계 승인 완료와 별개 |
 | checklist | complete | checklists/requirements.md: 6/8에서 8/8 문서 검토 통과. 구현 시험 아님 |
-| tasks | complete | tasks.md 31개, US1 8/US2 5/US3 5 및 공통13개. 형식 검사 오류0, 모두 미구현 |
+| tasks | complete | 초기31개 작성·수행, SC006미달 보완T032 별도 추가. 초기작업완료와 수용기준전체통과 구분 |
 | analyze | complete | 첫묶음14기준/31task read-only분석, 차단충돌0. 전체후속구현완료아님 |
-| implement | running | T001~T027 및 T031 완료,31개 중28개. 다음T028 성능. 전체기능/실제통신 미완료 |
-| verify | pending | 연구용 확장17/연결9/기존회귀35 통과 이력. 제품 새 기능 실제API/UI/설치/게임UX 검증은 T028/T029 미진행 |
+| implement | running | 초기31개 수행,수용기준미달T032 미완료. 전체기능/실제통신 미완료 |
+| verify | running | 제품Python224/Node77/native1 및실제TCP/브라우저/격리설치 PASS. SC006성능FAIL로 fully verified 아님, 3회 개선 후 후속T032 |
 
 ## 실제 증거와 실패
 - E001: 이번 재개에서 두 참조 채팅과 최신 orchestrator, 프로젝트 규칙 및 합의 파일을 읽음.
@@ -67,9 +67,9 @@
 - 이번 기록 수정: 문서 구조와 요구/후속 연결 정적 확인만. 기능 시험을 새로 실행하지 않음.
 
 ## 다음 선택과 복구
-최초 목적과 합의를 복구했으므로 다음은 constitution의 충돌 정리 후 speckit-specify로 기존 spec을 개정한다. 현재 feature_directory를 재사용한다. 첫 단계 완료와 전체 기능 완료를 별개로 검토한다. 뒤 단계는 stale 상태를 해소하기 전 실행하지 않는다.
+현재 선택은 speckit-converge의SC006공백 기록 이후 speckit-implement의T032다. 합의된 수치와 기존feature를 재사용한다. 아래 날짜별 초기기록은 이력이며 현재 진행단계를 되돌리는 지시가 아니다. 첫 단계 수행과 전체제품완료를 별개로 검토한다.
 현재 사용자에게 반복 선택을 요구하지 않음. 합의된 사항은 유지. 새로운 기술 선택과 기능 확대는 구체적 검토안을 마련하여 함께 논의한다.
-Hooks: extensions.yml 없음. 필수 hook 없음. Repair count: 0. 전체 제품 완료: 아님.
+Hooks: extensions.yml 없음. 필수 hook 없음. 현재T028/verify repair count: 3. 전체 제품 완료: 아님.
 
 ## 첫 단계 명세 개정 기록
 constitution 1.2.0으로 충돌을 정리했고 spec.md의 FR-001~008을 R001~010에 연결했다. 초기 spec/checklist는 review_history에 보존했다. 다음 선택은 clarify: SC-002 정확도 기준과 SC-006 성능 목표를 구체적 제안으로 공동 검토한다. 계획은 계속 stale, 구현은 pending이다. Repair count: 1 (정량 기준은 임의 확정하지 않고 열린 항목으로 유지). 기능 검증 없음.
@@ -277,3 +277,12 @@ Red: 최초module누락2개 수집실패. 누락OMM필드4시험 KeyError실패 
 - 현재 업무/편집값 전달, 화면 재구성 보존, 활성 입력 충돌 안내, opener/등록 child 검증. 서버 선택을 draft에서 제외하고 revision 힌트 후 snapshot 재조회, 409 명령 재시도 없음. 최종 채널/Viewer 종료.
 - Node74 PASS/Python207 PASS(102.02초, 기존Starlette경고1), diff check PASS. 실제 Chrome 두 창 전달/양방향 편집/충돌 안내/TLE-OMM-TLE 서버 선택/자식 종료 및 부모canvas1 검증. 도구 popup 캡처 제약은 validation/t031_popout.md에 구분.
 - 첫묶음28/31 완료, 남은3개 T028/T029/T030. 다음T028 게임성능 계측·개선. F001 실제통신/F002 전체기능 미완료 유지. PR 리뷰/병합 별도, extension hooks 없음.
+
+## 2026-10-03 T028/T029/T030 계측·격리설치·검토
+- 사용자 요청: 남은3개 모두 진행. 기존feature/합의/최초목적 보존, speckit-auto/implement/체크리스트8/8/prerequisite 재확인. 병렬승인 이력에 따라 설치와 계산별 파일을 분리하고 최종시험은 안정된 코드에서 재실행했다.
+- T028: 정확UTC/EOP/native 준비와geometry·극값round 배치화3회 개선, 같은지점Cesium property 재사용. 1초grid/40회극값/0.01초root/오류·윤초계약 유지. 1000행중앙0.65630→0.02685초, 하루중앙5.23572→2.06527초. 전후4구간경계/peak차이0초/0도는 동일kernel 회귀이며 독립물리증거 아님.
+- 실제IAB각100다른UTC/20다른24h/30초완료3trial, 환경/GPU/전원/hash/화면/probe trace/profile 보존. 1920주trial1개29.814초중단은 삭제하지 않고 별도30초완료로 보충. UTC p95 44.0/43.6ms PASS; 하루2266.0/2197.8ms FAIL. RAF와두RAF피드백도미달, 실제GPU60Hz 제출경로 미입증. SC006FAIL,목표완화없음. validation/t028_performance.md.
+- T029: 초기zlib LICENSE누락과잘못된PATH DLL 선택을 검출/수정. datedlocked 제품wheel+선택Python package hash/LICENSE/RECORD/receipt. 새venv no-index/no-deps/프로젝트밖-I 실제native호출2 PASS. 로컬cp314-win_amd64만검증; 다른PC/ABI/OS/실제AeroDT/대외배포license범위 후속. validation/t029_install.md.
+- 최종Python224 PASS(107.80초,기존Starlette경고1), Node77 PASS(256.24ms), 제품native integration1 PASS(공식33입력668상태), actualTCP inputs2/samples3/visibility1/409/UTC보존/health PASS, diffcheck PASS. 역순/실패주입은client/ASGI시험, 정상브라우저에서주입했다고주장하지않음. validation/t030_review.md에 FR8/SC6/R10 및후속을연결했다.
+- Converge: FR8/SC6/US수용10/기존task31, 계층·상태·입력·검증계획 및원칙5검토. HIGH partial1(SC006), missing/contradicts/unrequested0. append-only Phase7/T032추가, outcome tasks_appended. before/after hooks없음. verify repair3회,implement/verify running유지. 초기31개수행+T032미완료이며 fullyverified/전체제품완료 아님.
+- F001실제통신/F002전체선배기능/F004실장비·영구기록/F005실제ISS오차/F006다른PC·ABI·배포·AeroDT 연결을닫지않았다. 다음T032 성능보완, PR리뷰/병합별도. codex/orbit-validation-install은 PR11에의존하며 자동병합없음.

@@ -18,11 +18,13 @@ project_support/.venv/Scripts/python -m uvicorn user_application.web.application
 
 ## 작업 기록과 검증
 
-`project_support/specs/001-v6-function-integration/workflow-progress.md`가 전체 요구, 확정 사항, 단계별 결과와 미완료 사항을 추적합니다. 현재 T001~T027 및 T031 완료(시험 준비 task 포함)이며 PR 리뷰와 병합은 별도입니다. 지상국·통신 창에서 가상 지점과 타원체 높이·최소 고도각·조회 UTC를 설정하고 모든 기하학적 구간과 접점·잘림·없음·오류를 확인할 수 있습니다. T024에서 확인한 작업창 경계·종료 문제 5개를 T025에서 수정했습니다. 동시성·취소·렌더 실패 보완 후 전체 Node74/Python207 시험이 통과했습니다. 별도 창에 현재 업무와 편집값을 전달하고 서버 선택을 동기화합니다. 동시 편집 충돌 시 현재 입력을 보호하며 안내합니다. 첫 묶음28/31 완료, 다음은 T028 성능 검증입니다. 하루 조회 성능 목표는 아직 통과하지 않았습니다. 실제 통신 조건 확인(F001)과 전체 프로토타입 기능 연결(F002)은 계속 추적합니다.
+`project_support/specs/001-v6-function-integration/workflow-progress.md`가 전체 요구, 확정 사항, 단계별 결과와 미완료 사항을 추적합니다. 지상국·통신 창에서 가상 지점과 타원체 높이·최소 고도각·조회 UTC를 설정하고 모든 기하학적 구간과 접점·잘림·없음·오류를 확인할 수 있습니다. 별도 창의 입력 보존·편집 충돌 안내와 서버 선택 동기화도 지원합니다. 첫 묶음31개 작업을 수행했고 최종 Python224/Node77/native1 시험 및 로컬 제품wheel 격리 설치를 통과했습니다. PR 리뷰와 병합은 별도입니다.
+
+**성능 수용 기준은 아직 미달입니다.** 두해상도 UTC 완료 p95 44.0/43.6ms는 통과했지만 하루 결과 p95 2.27/2.20초는1초 목표를 넘습니다. 프레임/입력 피드백 대리지표도 미달이며 실제GPU60Hz 제출 경로는 미입증입니다. SC-006 보완 T032를 남겼습니다. 측정 절차와 결과는 `project_support/tests/validation/orbit_workspace.md` 및 feature의 `validation/t028_performance.md`, 설치 범위는 `validation/t029_install.md`, 요구별 최종 검토는 `validation/t030_review.md`를 참고합니다. 실제 통신 조건 확인·적용(F001)과 전체 프로토타입 기능 연결(F002)은 계속 추적하며 첫 묶음을 전체 제품 완료로 해석하지 않습니다.
 
 ```powershell
 project_support/.venv/Scripts/python -m pytest -q
-node --test project_support/tests/browser/orbit_api.test.mjs
+node --test project_support/tests/browser/*.test.mjs
 ```
 
 선배 프로그램의 기존 소개는 `project_support/docs/prototype_readme.md`에 보존했습니다.

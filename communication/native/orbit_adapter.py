@@ -1,10 +1,11 @@
 """Owned native TEME batches; failure rows are never exposed as numeric samples."""
 from dataclasses import dataclass
 import json
+import math
 import numpy as np
 import isdc_orbit_propagation as native
 from digital_twin.contracts.orbit import OrbitInput
-from foundation.orbit_time import parse_utc, minutes_since_epoch
+from foundation.orbit_time import UtcInstant,parse_utc,parse_utc_batch,format_utc_batch,minutes_since_epoch
 
 @dataclass(frozen=True)
 class NativeOrbitBatch:
@@ -30,7 +31,16 @@ def propagate(orbit:OrbitInput,utc)->NativeOrbitBatch:
     utc=tuple(utc)
     if any(not isinstance(value,str) for value in utc):raise ValueError("UTC rows must be strings")
     if len(utc)>native.MAX_BATCH_ROWS:raise ValueError('native batch limit exceeded')
-    instants=tuple(parse_utc(value) for value in utc)
+    return propagate_instants(orbit,parse_utc_batch(utc))
+
+
+def propagate_instants(orbit:OrbitInput,instants)->NativeOrbitBatch:
+    """Reuse validated UTC instants from the calculation assembly boundary."""
+    if orbit.profile!=native.calculation_profile or orbit.frame!='TEME' or orbit.time_system!='UTC':raise ValueError('unsupported native profile')
+    instants=tuple(instants)
+    if len(instants)>native.MAX_BATCH_ROWS:raise ValueError('native batch limit exceeded')
+    if any(not isinstance(t,UtcInstant) or not math.isfinite(t.jd1) or not math.isfinite(t.jd2) for t in instants):
+        raise ValueError('finite UTC instants required')
     epoch=parse_utc(orbit.epoch_utc);minutes=[minutes_since_epoch(t,epoch) for t in instants]
     if orbit.format=='TLE' and orbit.tle is not None:
         buffer,errors=native.propagate_tle(*orbit.tle,minutes)
@@ -41,5 +51,6 @@ def propagate(orbit:OrbitInput,utc)->NativeOrbitBatch:
     else:raise ValueError('unsupported orbit format')
     if len(buffer)!=len(instants)*48 or len(errors)!=len(instants):raise RuntimeError('invalid native batch shape')
     rows=np.frombuffer(buffer,dtype='<f8').reshape(-1,6)
-    if any(error is None and not np.isfinite(rows[i]).all() for i,error in enumerate(errors)):raise RuntimeError('nonfinite native success')
-    return NativeOrbitBatch(orbit.input_id,tuple(t.iso_utc for t in instants),tuple(errors),buffer)
+    valid=np.array([error is None for error in errors],dtype=bool)
+    if not np.isfinite(rows[valid]).all():raise RuntimeError('nonfinite native success')
+    return NativeOrbitBatch(orbit.input_id,format_utc_batch(instants),tuple(errors),buffer)

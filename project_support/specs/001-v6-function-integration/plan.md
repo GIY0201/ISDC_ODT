@@ -1,7 +1,7 @@
 # Implementation Plan: V6 첫 위성 및 가상 지점 연결
 
-2026-10-01. 기존 feature 001-v6-function-integration 유지. 실제 Git branch 생성 없음.
-상태: 연구 실행 결과를 반영한 설계 검토안. 다음 tasks 작성 및 공동 검토까지 진행, 제품 구현은 아직 시작하지 않는다.
+2026-10-01 설계, 2026-10-03 상태 갱신. 기존 feature 001-v6-function-integration 유지.
+상태: 첫 구현 묶음 실행·설치·계측 수행. 합의된 수치/구조 설계는 유지하며 SC-006 성능 미달은 T032 후속으로 남긴다. validation/t030_review.md 및 workflow-progress.md가 현재 제품 증거다. 아래 Phase0 연구 성능은 제품 UI 성능을 대신하지 않는다.
 
 ## Summary
 독립 ISDC ODT의 확정 V6 공용 지구와 위성/지상 작업 창에 저장된 ISS 자료, UTC 조작, 위치, 고도각 및 가시 구간을 연결한다. 첫 기능을 완성한 뒤 선배 통신/임무/분석/내보내기/MOCK-HIL/SIM 기능을 단계별 검토해 확장한다. 원래 목적과 AeroDT 계층 규칙을 유지한다.

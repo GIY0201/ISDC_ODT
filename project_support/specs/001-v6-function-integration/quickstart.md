@@ -1,5 +1,5 @@
 # Quickstart: 구현 후 검증 절차
-2026-10-01 설계. 아래제품시나리오는미구현,연구시험과혼동하지않는다.
+2026-10-01 설계, 2026-10-03 상태 갱신. 첫 제품 시나리오 구현·실제 브라우저/격리 설치 검증을 수행했다. SC-006 성능은 미달이며 validation/t028_performance.md, t029_install.md, t030_review.md에 현재 증거를 기록했다. 아래 연구 재현 명령/35PASS는 초기 이력으로 현재 전체224PASS와 구분한다.
 
 ## 연구 증거 재현
 - project_support/tooling/sgp4_benchmark/.venv/Scripts/python.exe project_support/tooling/coordinate_probe/validate_extended.py (17PASS 이력, 고정snapshot/hash필요)
