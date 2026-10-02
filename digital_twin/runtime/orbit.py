@@ -3,7 +3,7 @@ import asyncio
 import math
 import time
 from foundation.orbit_time import parse_utc,advance_seconds
-from digital_twin.contracts.orbit import OrbitSelection,OrbitSnapshot,OrbitQueryResult,OrbitCalculation,OrbitSample,GroundPoint,OrbitConflict,OrbitUnavailable
+from digital_twin.contracts.orbit import OrbitSelection,OrbitSnapshot,OrbitQueryResult,OrbitCalculation,OrbitSample,GroundPoint,OrbitConflict,OrbitUnavailable,OrbitVisibilityQueryResult
 
 
 def _integer(value,minimum):
@@ -68,3 +68,30 @@ class OrbitRuntime:
         async with self._lock:
             stale=selection.revision!=self._selection.revision
         return OrbitQueryResult(client_request_id,selection.revision,input_id,orbit.raw_sha256,calculation.rows,calculation.eop_sha256,calculation.leap_sha256,stale,calculation.frame,calculation.profile)
+
+    async def visibility(self,*,client_request_id,selection_revision,input_id,start_utc,end_utc,ground_point,minimum_elevation_deg):
+        from digital_twin.simulation.visibility import search_visibility
+        _request_id(client_request_id);_integer(selection_revision,0);_real(minimum_elevation_deg)
+        if not isinstance(ground_point,GroundPoint) or not 0<=minimum_elevation_deg<=90:
+            raise ValueError('invalid visibility selection')
+        start,end=parse_utc(start_utc),parse_utc(end_utc)
+        elapsed=float((end.as_time().tai-start.as_time().tai).sec)
+        if not 0<elapsed<=86400+1e-8:raise ValueError('visibility range must be >0 and <=24h SI')
+        async with self._lock:
+            selection=self._selection
+            if (selection_revision!=selection.revision or input_id!=selection.input_id or
+                    ground_point!=selection.ground_point or minimum_elevation_deg!=selection.minimum_elevation_deg):
+                raise OrbitConflict('orbit visibility context conflict')
+            orbit=self._lookup_input(input_id)
+            if orbit is None:raise ValueError('orbit input not found')
+        if self._calculate is None or self._execute is None:
+            raise OrbitUnavailable('orbit calculation/EOP not ready')
+        def work():
+            return search_visibility(calculate=lambda times:self._calculate(orbit,times,selection.ground_point),
+                start_utc=start.iso_utc,end_utc=end.iso_utc,minimum_elevation_deg=selection.minimum_elevation_deg)
+        calculation=await self._execute(work)
+        if calculation.profile!=orbit.profile:raise RuntimeError('visibility input profile mismatch')
+        async with self._lock:
+            stale=selection.revision!=self._selection.revision
+        return OrbitVisibilityQueryResult(client_request_id,selection.revision,input_id,orbit.raw_sha256,
+                                           selection.ground_point,calculation,stale)

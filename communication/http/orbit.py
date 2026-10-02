@@ -2,7 +2,7 @@
 from dataclasses import asdict
 from fastapi import APIRouter,Request,HTTPException
 from digital_twin.contracts.orbit import OrbitConflict,OrbitUnavailable,OrbitBusy
-from .orbit_schemas import SelectionRequest,SamplesRequest
+from .orbit_schemas import SelectionRequest,SamplesRequest,VisibilityRequest
 
 router=APIRouter(prefix='/api/orbit',tags=['orbit'])
 UNITS={'position':'m','elevation':'deg','time':'UTC','ground_height':'m (WGS84 ellipsoid)'}
@@ -55,4 +55,20 @@ async def samples(request:Request,command:SamplesRequest):
     for row in value['rows']:row['status']='valid' if row['error_code'] is None else 'error'
     failures=sum(row['status']=='error' for row in value['rows'])
     value.update(status='error' if failures==len(value['rows']) else 'partial' if failures else 'complete',units=UNITS,communication_status='unknown')
+    return value
+
+@router.post('/visibility')
+async def visibility(request:Request,command:VisibilityRequest):
+    _input(request,command.input_id)
+    arguments=command.model_dump()
+    arguments['ground_point']=command.ground_point.contract()
+    try:result=await request.app.state.runtime.orbit.visibility(**arguments)
+    except (OrbitConflict,OrbitUnavailable,OrbitBusy,ModuleNotFoundError,ValueError) as exc:
+        raise _error(request,exc) from exc
+    value=asdict(result.calculation)
+    value.update(client_request_id=result.client_request_id,revision=result.revision,input_id=result.input_id,
+                 input_hash=result.input_hash,stale=result.stale,ground_point=asdict(result.ground_point),
+                 units=UNITS,communication_status='unknown')
+    value['ground_point'].update(virtual=True,ellipsoid='WGS84')
+    for contact in value['contacts']:contact['elevation_deg']=result.calculation.minimum_elevation_deg
     return value

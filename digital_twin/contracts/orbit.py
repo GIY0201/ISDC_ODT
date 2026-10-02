@@ -121,3 +121,13 @@ class VisibilityResult:
     leap_sha256: str
     frame: str = 'ITRF'
     profile: str = 'WGS72_AFSPC'
+
+@dataclass(frozen=True)
+class OrbitVisibilityQueryResult:
+    client_request_id: str
+    revision: int
+    input_id: str
+    input_hash: str
+    ground_point: GroundPoint
+    calculation: VisibilityResult
+    stale: bool

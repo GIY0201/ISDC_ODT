@@ -220,3 +220,15 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - immutable 내부 VisibilityResult/Interval/Contact/Error와 주입 calculate 기반 search_visibility를 구현했다. 1초 SI grid/고립 극값/첫·마지막cell 보완/0.01초 경계 bracket, 접점 및 오류별 구간 분리, 단일 provenance/행계약 검증. runtime/API/기존SIM/legacy/UI 변경 없음.
 - T019 RED를 실제 assertion 실행으로 전환했다. 정수 접점42ns 군집/조회 시작 직후0.2초 pass/같은endpoint 단일cell 누락을 시험 먼저 재현한 뒤 수정했다. 추가3개 포함 가시구간38개 PASS. 마지막 전체Python160 PASS/기존Starlette경고1(97.19초), Node31 PASS(185.56ms). ADR0003/validation/t020_visibility.md 참조.
 - T001~T020,20/31 구현 및 검증 완료이며 전체 프로토타입 완료율은 아니다. 다음 T021 API 시험, T022 API/runtime 조립, T023 UI 연결. F001 실제통신/F002 전체기능, 게임성능/다중창/배포지원은 유지한다. 화면은 변경하지 않아 새 화면 검증 없음. 단계 commit 고정 후 T019시험+T020구현을 같은 PR로 병렬 게시한다. 자동 병합하지 않는다.
+
+## 2026-10-02 T021 가시 구간 API 시험 준비
+- T019/T020 PR #6 https://github.com/GIY0201/ISDC_ODT/pull/6 open/미병합 확인, attach 완료. 게시된 dab5c46/upstream 상태에서 codex/v6-visibility-api-tests로 분리했다. 사용자 승인에 따라 다음 시험 단계만 수행하고 T022와 함께 리뷰할 예정이다.
+- 실제 FastAPI/selection/주입 calculation을 사용하는 HTTP 수용 시험42개 작성. request/range/ground/threshold/revision, 현재 선택·UTC 보존, 출처/단위, 전체/없음/부분·전체실패/접점, unknown 통신, unavailable/EOP/native, 윤초/24h/0·90도 및 실제 native/EOP first-pass 경로를 포함한다. 아직 구현되지 않은 endpoint를 mock하지 않았다.
+- 전체Python161 PASS/41 FAIL/기존Starlette경고1(101.42초). 기존160개와selection 준비1개 통과, 새POST41개는 경로 미구현405의 예상RED다. lastfailed의다른실패0 확인. Node31 PASS(189.45ms). 첫HTTP status assertion 이후 의미 검증은 T022 구현 전 미실행이며 전체PASS/API완료를 주장하지 않는다.
+- T021 시험 준비 완료, 제품은T020까지. 다음T022 schema/runtime/HTTP 조립, 이후T023 UI. 시험만 먼저 독립 병합하지 않고 구현과 같은PR에 묶는다. 게임성능/다중창/F001 실제통신/F002 전체기능은 유지한다. 화면 변경/새브라우저시연 없음. validation/t021_visibility_api_tests.md 참조.
+
+## 2026-10-03 T022 가시 구간 HTTP 조회 연결
+- VisibilityRequest/OrbitVisibilityQueryResult/OrbitRuntime.visibility와 POST /api/orbit/visibility 연결. snapshot context 비교/범위·설정 검증 후 기존 bounded executor와 T020 계산을 호출한다. query는현재선택·UTC를변경하지않고완료후revision변경을stale로표시한다. 오류/없음/접점/잘림/hash/단위/통신unknown 반환. ADR0004/validation/t022_visibility_api.md 참조.
+- T021 실패원인정정: 41개중40개는미구현405,1개는시험도우미input_id중복 TypeError였다. 도우미인자명수정후API42 PASS(4.30초). 기존OpenAPI 새허용목록누락201 PASS/1 FAIL을 확인하고 visibility 경로/schema하나씩만추가한뒤전체Python202 PASS/기존Starlette경고1(101.33초), Node31 PASS(180.07ms). 원본API fixture/기존경로exact 비교는유지했다.
+- 실제TCP HTTP: 자신의임시uvicorn만시작/종료하여저장입력2/samples3행/400초구간complete1개/잘못된revision409/선택정지UTC보존/health 확인. 최대기하각16.34968415627627도,통신unknown. 기존8876서버/화면재시작없음. live_http.json receipt와시험클라이언트증거를구분한다.
+- T001~T022,22/31 구현·검증 완료,전체제품완료율아님. 다음T023 지점·임계값·가시구간화면연결. T021시험+T022구현을같은PR로병렬게시/리뷰예정이며자동병합없음. 게임성능/다중창/동시성/F001실제통신/F002전체기능은미완료. 이번새화면변경/시연없음.

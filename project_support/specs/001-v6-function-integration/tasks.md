@@ -1,6 +1,6 @@
 # Tasks: V6 첫 위성 및 가상 지점 연결
 
-입력: 같은 feature의 spec/plan/data-model/contracts/quickstart/research. 2026-10-02 현재 T001~T020 구현·검증 완료, 나머지 task 미완료. PR 리뷰/병합은 별도다. 저장소 규칙과 명세에 따라 제품 시험을 먼저 작성하고 실패를 확인한 뒤 구현한다. 연구도구의 PASS를 아래 checkbox 완료로 옮기지 않는다.
+입력: 같은 feature의 spec/plan/data-model/contracts/quickstart/research. 현재 T001~T022 구현·검증 완료, 나머지 task 미완료. PR 리뷰/병합은 별도다. 저장소 규칙과 명세에 따라 제품 시험을 먼저 작성하고 실패를 확인한 뒤 구현한다. 연구도구의 PASS를 아래 checkbox 완료로 옮기지 않는다.
 
 ## Phase 1: 준비
 - [x] T001 V6 원본 해시, 기존 API/WS/화면 기준과 새로운 공개 계약 및 상태 분리 결정을 project_support/docs/adr/0001_orbit_workspace.md에 기록하고 data/development_log/CURRENT.md에 기준선 명령을 남긴다. R001/R002/R010.
@@ -35,8 +35,8 @@ Checkpoint: T001~010 완료 후 입력/계산 API 기반을 독립적으로 확�
 독립검증: UI 없이 visibility API와 고정oracle로 고도각0.01도/경계1초, UI에서10도변경과 통신미확인 표시. US1과 공통계약은 재사용.
 - [x] T019 [P] [US2] project_support/tests/test_visibility.py에 35개 수용 시험과 1초dense 기준을 작성했다. 짧은pass/gap/접점/잘림/없음/부분실패/임계값범위/경계1초/윤초/자료계약을 포함한다. 기준 준비1 PASS, T020 모듈 누락34 ERROR의 RED 확인. 시험 준비 완료이며 계산 기능 완료가 아니다. 극값 가정/한계와 결과는 validation/t019_visibility_tests.md 참조.
 - [x] T020 [US2] digital_twin/simulation/visibility.py에 1초 조밀탐색/극값·조회edge 보완/경계보정/접점분리와 상태/provenance를 구현했다. T019 및 추가 회귀38개 PASS, 전체 Python160 PASS/Node31 PASS. 처음3개 제한 및 기존45초5도 경로는 새 계산에 쓰지 않았다. validation/t020_visibility.md 참조. API/UI/성능은 후속이다.
-- [ ] T021 [P] [US2] project_support/tests/test_visibility_api.py에 /api/orbit/visibility 범위/설정/revision 검증, 전체/없음/실패/통신unknown 계약을 먼저 작성한다.
-- [ ] T022 [US2] communication/http/orbit.py와 orbit_schemas.py에 visibility 계약을 구현하여 T021을 통과시킨다. start/end/peak/clipped/contacts/자료hash 포함.
+- [x] T021 [P] [US2] project_support/tests/test_visibility_api.py에 /api/orbit/visibility 범위/설정/revision 및 정상/없음/부분·전체실패/통신unknown 계약42개 시험을 작성했다. 당시selection 준비1 PASS/41 FAIL(미구현405 40개/도우미오류1개), T022에서 도우미를 수정한 뒤42 PASS로 실제 재검증했다. validation/t021_visibility_api_tests.md와 validation/t022_visibility_api.md 참조.
+- [x] T022 [US2] communication/http/orbit.py와 orbit_schemas.py, runtime/orbit.py에 visibility 조회를 연결했다. start/end/peak/clipped/contacts/자료hash와 immutable query context를 반환한다. API42 PASS, 전체Python202 PASS/Node31 PASS 및 실제TCP HTTP구간1개/409/선택UTC보존 확인. validation/t022_visibility_api.md 참조. 화면은T023이다.
 - [ ] T023 [US2] user_application/web/scripts/tabs/ground_visibility.js와 digital_twin/visualization/globe.js에 지점/타원체높이/가상/고도각/구간 UI를 연결하고 통신미확인과 결과시각을 표시한다. 단일globe 유지. US2 실제시연.
 
 ## Phase 5: US3 작업 창과 응답 유지 (P2)
