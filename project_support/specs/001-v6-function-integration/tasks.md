@@ -27,7 +27,7 @@ Checkpoint: T001~010 완료 후 입력/계산 API 기반을 독립적으로 확�
 - [x] T014 [US1] user_application/web/index.html, styles/workspace.css, scripts/workspace.js에 채택 V6의 공용지구/역할 목록/작업창 구조를 이식한다. 원본 snapshot 해시를 기록하고 기존 기능을 삭제하지 않는다. 계산 변경은 이 task에 넣지 않는다.
 - [x] T015 [US1] user_application/web/scripts/orbit_selection.js 및 workspace_orbit.js에 저장입력선택/출처/epoch/age/UTC와 pending·error·stale 결과 흐름을 구현한다. 선택변경명령 직렬화, client_request_id/revision/hash 비교. 권위상태를 browser에 새로 만들지 않는다.
 - [x] T016 [US1] digital_twin/visualization/orbit_globe.js와 user_application/web/scripts/workspace_globe.js 및 workspace_orbit.js에 ITRF m/표시UTC 주입과 단일Viewer 수명 관리를 연결한다. 기존 globe.js/tabs/orbit.js는 legacy 합성 경로를 보존하므로 새 GP 표시는 전용 모듈에 둔다. synthetic fallback 사용 없음. 검증: validation/t016_globe.md.
-- [ ] T017 [P] [US1] project_support/tests/browser/orbit_playback.test.mjs와 project_support/tests/test_orbit_interpolation.py에 정지/재생/복귀와 sample 중간시각 보간10m/고도각0.01도 게이트를 먼저 작성한다. 자료밖/버퍼없음 처리도 확인한다.
+- [x] T017 [P] [US1] project_support/tests/browser/orbit_playback.test.mjs와 project_support/tests/test_orbit_interpolation.py에 정지/재생/복귀와 sample 중간시각 보간10m/고도각0.01도 게이트를 먼저 작성했다. 자료밖/버퍼없음/오류/과도한 간격도 포함한다. Python 수치 게이트 PASS, 브라우저 시험은 T018 모듈 누락으로 예상된 RED이며 재생 구현 완료를 뜻하지 않는다. validation/t017_playback_gate.md 참조.
 - [ ] T018 [US1] user_application/web/scripts/orbit_playback.js에 UTC snapshot anchor 기반 표시 투영과 허용범위 batch prefetch/보간을 구현한다. 매frame API호출금지. T017 후 US1을 실제브라우저로 시연한다.
 
 ## Phase 4: US2 지점과 가시 구간 (P1)
@@ -68,4 +68,3 @@ US1: T011 API시험 파일과 T017 playback/interpolation시험 파일은 서로
 
 ## Requirement coverage
 R001:T001,T004,T010,T029. R002:T014,T016,T024,T025,T031. R003:T030(후속기능,이번단계완료아님). R004:T018,T023,T030. R005:T003~023. R006:T023,T030(표시및F001유지,실제통신구현후속). R007:T003,T005,T007,T011,T017,T019,T021,T026,T028,T029. R008:T002,T006,T008,T029. R009:T018,T024~028. R010:T001,T030.
-
