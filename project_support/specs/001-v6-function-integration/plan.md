@@ -67,3 +67,6 @@ SC001~006: 출처/UTC재현, 위치10m/고도각0.01도/경계1초, 오류와 �
 ## 전체 설계와의 관계 및 V6 보존 보완
 전체 요청 범위는 full_integration_plan.md의W00~W09와V6전영역표를기준으로한다. 이 plan은W01/W02와W00의첫상세계획이다. 전체요청의절반/전체구현설계완료라고표현하지않는다.
 V6 별도창 기능을 first workspace 보존 범위에 포함한다. Viewer는문서당1개이며별도브라우저문서는별도Viewer를가질수있다. 같은origin의선택/입력전달과runtime snapshot동기화,동시편집revision충돌표시를T031에서검증한다. 원래문서의Viewer를다시만들지않는다. W03~W08은전체계획에근거/책임/완료게이트를기록했지만파일수준상세계약은각묶음전검토에서확장한다.
+
+### T015 구현 경로 보완
+기존 콘솔을 보존하기 위해 V6 입력/응답 수명은 scripts/orbit_selection.js, 패널은 scripts/workspace_orbit.js에 둔다. state.js/tabs/orbit.js는 기존 콘솔 책임을 유지한다. API와 서버 runtime 계약은 변경하지 않는다.
