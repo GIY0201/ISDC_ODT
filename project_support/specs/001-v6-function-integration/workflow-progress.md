@@ -4,7 +4,7 @@
 
 ## 최초 요청과 현재 진행 경계
 최종 목적은 독립 ISDC ODT의 확정 V6 UI에 선배 프로토타입 기능을 단계적으로 연결하고, 향후 AeroDT 연결/이식이 가능하도록 계층 책임과 파일 생성 규칙을 공유하는 것이다. ISS 시험만으로 전체 목적이 완료되지 않는다.
-현재 사용자 승인으로 첫 구현 묶음을 단계적으로 실행한다. 전체 기능 계획과 후속필수를 유지하며 T001~T025를 완료했다(시험 준비 task 포함). PR 리뷰와 main 병합은 별도로 추적한다.
+현재 사용자 승인으로 첫 구현 묶음을 단계적으로 실행한다. 전체 기능 계획과 후속필수를 유지하며 T001~T027을 완료했다(시험 준비 task 포함). PR 리뷰와 main 병합은 별도로 추적한다.
 보호 범위: V6 채택, 기존 코드와 계산, 합의 문서, 초기 초안 및 도구 실험 이력. 초안의 존재는 승인 증거가 아니다.
 
 ## 근거
@@ -22,7 +22,7 @@
 | R001 | 독립 ISDC ODT + AeroDT 이식 가능한 구조 / S1,S5 | AeroDT 설치 의존성 없이 실행, 계층/명명/상태 소유권 검사 | constitution, plan, verify | plan File placement/Constitution / T001,T004,T010,T029 | 독립 실행 및 계층 시험 PASS, AeroDT 재통합 검증 T029 미완료 |
 | R002 | 확정 V6 UI 유지 / S1,S2 | 공용 지구와 역할별 작업 창에서 연결 기능 사용, 기존 UI 결정 추적 | specify, plan, verify | plan State/Workspace / T014,T016,T024,T025 | V6 원본 SHA 보존 및 단일 지구 위치/UTC 연결 검증; 전체 창/다중창 T024~T031 미완료 |
 | R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030 + F002 | 저장 궤도/UTC 첫 연결 완료. 전체 선배 기능 F002/T030 미완료 |
-| R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | T001~T023 단계별 승인/검증 및 개별 PR 유지. T024 실패를 T025에서 해소, 다음 T026 동시성 시험 |
+| R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | T001~T023 단계별 승인/검증 및 개별 PR 유지. T026 실패를 T027에서 해소, 다음 T031 별도창 시험 |
 | R005 | 첫 위성 1개 + 지상국 1개 / S1 | 저장된 실제 TLE/OMM, UTC 조작, 위치/고도각/가시 구간, 오류/출처 표시 검증 | specify, plan, implement, verify | plan Input/State/Geometry / T003-T023 | ISS 저장 입력/제주 가상/위치/고도각/UTC 검증. 가시 구간 계산/API/UI T019~T023 검증. validation/t023_ground_visibility.md에 실제24h4구간/설정/오류/두해상도 증거 |
 | R006 | 실제 통신 조건 확인 및 적용 / S1 | 출처 있는 서비스/장비 입력과 링크 조건 적용, 정상/실패/미확인 시험 | clarify, plan, implement, verify | plan Visibility/후속 / T023,T030 + F001 | T023 실제통신미확인 표시 검증, F001 필수 조사/적용 미실행 |
 | R007 | 결과 의미 구분 / S1,S5 | 기하 가시성, 모델 통신 충족, 실제 수신 증거를 UI/산출물에서 구분 | specify, verify | plan Validation / T003,T005,T007,T011,T017,T019,T021,T026,T028,T029 | GP/가상/기하 계산과 통신 미확인 표시 검증. 실제 통신 조건 F001 미완료 |
@@ -266,3 +266,9 @@ Red: 최초module누락2개 수집실패. 누락OMM필드4시험 KeyError실패 
 - 기존feature/체크리스트8/8/skill implement 재확인. workspace.js 크기·위치 제한을 복원/resize/열기에서 재사용, 최종pagehide channel/gesture 멱등 종료 및 persisted 자원 보존. legacy/state.js/CSS/API/계산 변경 없음.
 - 검증: T024 실패5개 해소, 작업창10 PASS, 전체Node50 PASS(216.32ms)/Python202 PASS/기존Starlette경고1(101.17초). 실제IAB1920→1280 일반축소/최소화복원/확장복원 경계 안, 높이321m/400초구간1개 결과 유지, canvas1/error로그0. 임시viewport 해제. validation/t025_workspace.md 참조.
 - 상태: 첫묶음25/31 완료(시험준비 포함), 남은6개 T026~T030/T031. 다음T026 역순응답/동시성 시험. stage implement/verify는 전체묶음 기준 running. F001 실제통신/F002 전체기능/게임성능/다중창/배포 미완료. extension hooks 없음. T024시험+T025수정 같은PR로 게시, 리뷰/병합은 별도.
+
+## 2026-10-03 T026/T027 요청 경합·취소·렌더 종료
+- speckit-auto/implement 및 기존feature/체크리스트8/8/prerequisite 정상, extension hooks 없음. T026 초기Node5 PASS/3 FAIL 및 조립종료1 FAIL을 확인 후 T027으로 연결. 렌더 fixture cache 격리 보완, 서버 concurrency5 PASS.
+- 변경: V6 client 취소 상태 정리 및 destroy/늦은결과폐기/대기명령·후속요청 차단, 최종pagehide 조립종료, focus실패 안내. legacy/API/runtime/native/application.py 보존. 이미실행중native/visibility job 강제중단 보장 없음.
+- 검증: 전체Node61 PASS(216.97ms), Python207 PASS/기존Starlette경고1(100.20초), diff check PASS. 실제IAB계산/지구이동/재생UTC증가·정지/epoch복귀/canvas1/error로그0. race/고장주입은adapter/실제ASGI·executor증거로 구분. validation/t026_t027_requests.md 참조.
+- 상태: 첫묶음27/31, 남은4개 T031/T028/T029/T030, 다음T031. implement/verify 전체기준running. F001 실제통신/F002 전체기능/게임성능/격리설치 미완료. 시험+수정을같은PR게시하며리뷰/병합별도.

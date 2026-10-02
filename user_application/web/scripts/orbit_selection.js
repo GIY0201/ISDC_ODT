@@ -1,18 +1,19 @@
 // Server snapshots only: never advance UTC or calculate positions in this client.
 export function createOrbitSelection(api, notify, requestId=()=>crypto.randomUUID(),now=()=>performance.now()) {
-  let inputs=[], state=null, result=null, status='loading', error='';
+  let inputs=[], state=null, result=null, status='loading', error='',disposed=false;
   let generation=0, chain=Promise.resolve(), queryAbort=null,queryGeneration=0,fetching=false,receivedAtMs=0;
   const snapshot=()=>structuredClone({inputs,state,result,status,error,fetching,receivedAtMs});
-  const emit=()=>notify(snapshot());
-  const adopt=current=>{state=current;receivedAtMs=now();};
-  const fail=exc=>{if(exc.status===409&&exc.state)adopt(exc.state);status='error';error=exc.message;result=null;fetching=false;emit();};
-  async function load(){try{const [catalog,current]=await Promise.all([api.orbitInputs(),api.orbitState()]);inputs=catalog.inputs;adopt(current);status=inputs.length?'ready':'empty';emit();}catch(exc){fail(exc);}}
+  const emit=()=>{if(!disposed)notify(snapshot());};
+  const adopt=current=>{if(!disposed){state=current;receivedAtMs=now();}};
+  const fail=exc=>{if(disposed)return;if(exc.status===409&&exc.state)adopt(exc.state);status='error';error=exc.message;result=null;fetching=false;emit();};
+  async function load(){if(disposed)return;try{const [catalog,current]=await Promise.all([api.orbitInputs(),api.orbitState()]);if(disposed)return;inputs=catalog.inputs;adopt(current);status=inputs.length?'ready':'empty';emit();}catch(exc){fail(exc);}}
   function select(inputId, utc,options={}){
+    if(disposed)return Promise.resolve();
     const ticket=++generation;queryAbort?.abort();result=null;fetching=false;status='pending';error='';emit();
-    const run=async()=>{try{
+    const run=async()=>{if(disposed)return;try{
       const record=inputs.find(item=>item.input_id===inputId);if(!record||!state)throw new Error('저장 입력이 준비되지 않았습니다.');
       if(options.preserveUtc){
-        const fresh=await api.orbitState();
+        const fresh=await api.orbitState();if(disposed)return;
         if(fresh.revision!==state.revision)throw Object.assign(new Error('서버 선택이 변경되었습니다.'),{status:409,state:fresh});
         adopt(fresh);
       }
@@ -22,7 +23,7 @@ export function createOrbitSelection(api, notify, requestId=()=>crypto.randomUUI
     chain=chain.then(run,run);return chain;
   }
   async function samples({startUtc,stepSeconds=60,count=3,background=false}={}){
-    if(!state?.input_id)return;
+    if(disposed||!state?.input_id)return;
     const ticket=background?generation:++generation,queryTicket=++queryGeneration;const selected=structuredClone(state), id=requestId();
     queryAbort?.abort();queryAbort=new AbortController();const abort=queryAbort;
     fetching=true;if(!background){status='pending';result=null;}error='';emit();
@@ -34,7 +35,11 @@ export function createOrbitSelection(api, notify, requestId=()=>crypto.randomUUI
       if(response.stale||changedProvenance||response.client_request_id!==id||response.revision!==selected.revision||response.input_id!==selected.input_id||response.input_hash!==selected.input_hash){status='stale';result=null;error='선택과 일치하지 않는 응답을 폐기했습니다.';}
       else {result=response;status=response.status==='error'?'error':'ready';}
       emit();
-    }catch(exc){if(ticket===generation&&queryTicket===queryGeneration&&exc.name!=='AbortError')fail(exc);}
+    }catch(exc){
+      if(ticket!==generation||queryTicket!==queryGeneration||disposed)return;
+      if(exc.name==='AbortError'){fetching=false;status='ready';error='계산 요청이 취소되었습니다.';result=null;emit();}
+      else fail(exc);
+    }
   }
   const seek=utc=>state?.input_id?select(state.input_id,utc):Promise.resolve();
   function control(action,rate){
@@ -43,7 +48,7 @@ export function createOrbitSelection(api, notify, requestId=()=>crypto.randomUUI
     return select(state.input_id,undefined,{preserveUtc:true,playing:action==='speed'?state.playing:action==='play',playRate:rate??state.play_rate});
   }
   async function refresh(){
-    if(status!=='ready'||fetching)return;
+    if(disposed||status!=='ready'||fetching)return;
     const ticket=generation;
     try{
       const current=await api.orbitState();if(ticket!==generation||current.revision<state.revision)return;
@@ -52,5 +57,9 @@ export function createOrbitSelection(api, notify, requestId=()=>crypto.randomUUI
     }catch(exc){if(ticket===generation)fail(exc);}
   }
   const setGround=(groundPoint,minimumElevation)=>select(state?.input_id,undefined,{preserveUtc:true,groundPoint,minimumElevation,playing:false});
-  return {load,select,samples,snapshot,control,seek,refresh,setGround};
+  function destroy(){
+    if(disposed)return;disposed=true;generation++;queryGeneration++;queryAbort?.abort();queryAbort=null;
+    result=null;fetching=false;status='disposed';error='';
+  }
+  return {load,select,samples,snapshot,control,seek,refresh,setGround,destroy};
 }

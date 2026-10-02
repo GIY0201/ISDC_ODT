@@ -1,6 +1,6 @@
 # Tasks: V6 첫 위성 및 가상 지점 연결
 
-입력: 같은 feature의 spec/plan/data-model/contracts/quickstart/research. 현재 T001~T025 완료(시험 준비 task 포함), T024 실패는 T025에서 해소, T026 이후 미완료. PR 리뷰/병합은 별도다. 저장소 규칙과 명세에 따라 제품 시험을 먼저 작성하고 실패를 확인한 뒤 구현한다. 연구도구의 PASS를 아래 checkbox 완료로 옮기지 않는다.
+입력: 같은 feature의 spec/plan/data-model/contracts/quickstart/research. 현재 T001~T027 완료(시험 준비 task 포함), T026 실패는 T027에서 해소, T031/T028~T030 미완료. PR 리뷰/병합은 별도다. 저장소 규칙과 명세에 따라 제품 시험을 먼저 작성하고 실패를 확인한 뒤 구현한다. 연구도구의 PASS를 아래 checkbox 완료로 옮기지 않는다.
 
 ## Phase 1: 준비
 - [x] T001 V6 원본 해시, 기존 API/WS/화면 기준과 새로운 공개 계약 및 상태 분리 결정을 project_support/docs/adr/0001_orbit_workspace.md에 기록하고 data/development_log/CURRENT.md에 기준선 명령을 남긴다. R001/R002/R010.
@@ -44,8 +44,8 @@ Checkpoint: T001~010 완료 후 입력/계산 API 기반을 독립적으로 확�
 독립검증: 1280x720/1920x1080 최소화/복원·지구조작 후 위성/지점/시각 유지. 오류·처리중에도 조작가능.
 - [x] T024 [P] [US3] project_support/tests/browser/workspace.test.mjs에 geometry clamp/최소화/복원/선택보존/구독해제/Viewer1개 시험10개 작성. 5 PASS/5 FAIL, 전체Node45 PASS/5 FAIL/Python202 PASS. 실제IAB 최소화 중 해상도 축소 후 복원 경계 이탈 확인. 시험 준비이며 제품 수정 완료가 아니다. validation/t024_workspace_tests.md 참조.
 - [x] T025 [US3] workspace.js에서 크기·위치 clamp/복원 재검증 및 최종pagehide channel/gesture 정리를 구현. 기존state.js/legacy/CSS 보존. 작업창10 PASS/전체Node50 PASS/Python202 PASS, 실제IAB 두해상도 일반축소/최소화복원/확장복원 및 입력·결과/canvas1 확인. validation/t025_workspace.md 참조.
-- [ ] T026 [P] [US3] project_support/tests/browser/orbit_requests.test.mjs와 project_support/tests/test_orbit_concurrency.py에 역순응답/동시선택409/큐가득503/취소/렌더자원실패 시험을 먼저 작성한다.
-- [ ] T027 [US3] communication/browser/api.js, user_application/web/scripts/tabs/orbit.js 및 application.py에 취소/과부하/후속chunk중단/늦은응답폐기/렌더실패 안내를 완성해 T026을 통과시킨다. 실행중 native call 즉시중단을 주장하지 않는다.
+- [x] T026 [P] [US3] orbit_requests.test.mjs 및 test_orbit_concurrency.py에 역순응답/동시선택409/실제큐포화503/취소/렌더실패 시험 추가. 초기Node5 PASS/3 FAIL 및 조립종료1 FAIL 확인 후 T027에서 해소. Python새5 PASS. validation/t026_t027_requests.md 참조.
+- [x] T027 [US3] V6 orbit_selection.js/workspace_orbit.js/workspace_globe.js에서 취소상태 정리/문서종료 요청폐기/후속prefetch중단/focus 렌더실패 안내를 보완. 기존API transport/application.py/legacy 보존. Node61 PASS/Python207 PASS, 실제IAB계산/지구이동/재생·정지/epoch복귀 확인. 실행중native/visibility job 강제중단 보장 없음. validation/t026_t027_requests.md 참조.
 
 - [ ] T031 [US3] project_support/tests/browser/workspace_popout.test.mjs에 V6별도창의 현재업무·입력전달/수정동기화/409충돌/팝업차단/닫기·channel해제/문서당Viewer1개 시험을 먼저 작성하고 user_application/web/scripts/workspace.js에 구현한다. T025,T027 뒤, T028 이전.
 
