@@ -88,3 +88,36 @@ class OrbitQueryResult:
 class OrbitConflict(ValueError):pass
 class OrbitUnavailable(RuntimeError):pass
 class OrbitBusy(RuntimeError):pass
+
+@dataclass(frozen=True)
+class VisibilityInterval:
+    start_utc: str
+    end_utc: str
+    peak_utc: str
+    max_elevation_deg: float
+    start_clipped: bool
+    end_clipped: bool
+
+@dataclass(frozen=True)
+class VisibilityContact:
+    utc: str
+    duration_seconds: float = 0.
+
+@dataclass(frozen=True)
+class VisibilityError:
+    utc: str
+    error_code: str
+
+@dataclass(frozen=True)
+class VisibilityResult:
+    query_start_utc: str
+    query_end_utc: str
+    minimum_elevation_deg: float
+    intervals: tuple[VisibilityInterval,...]
+    contacts: tuple[VisibilityContact,...]
+    status: str
+    errors: tuple[VisibilityError,...]
+    eop_sha256: str
+    leap_sha256: str
+    frame: str = 'ITRF'
+    profile: str = 'WGS72_AFSPC'

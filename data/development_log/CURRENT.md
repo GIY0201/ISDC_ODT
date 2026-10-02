@@ -209,3 +209,14 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 시험 우선 새 control/prefetch/codec/lifecycle/provenance 실패 확인 후 구현. Node31 PASS, Python122 PASS/기존 경고1. 원본 V6/API/계층 회귀 유지. 정지 화면 고도각 placeholder 문제를 실제 브라우저에서 찾아 수정했다.
 - 실제 IAB 1배·60배 재생/반복601행버퍼 전환/정지/지정UTC/epoch복귀 좌표 재현, EOP 범위밖 오류와 위치 미표시 및 정상복구/canvas1개 확인. validation/t018_playback.md와 ADR0002 참조. 서버는 정지 epoch로 남겼다.
 - T001~T018,18/31 구현·검증 완료. 다음 T019 가시구간 계산 시험. PR #4 시험 준비분은 T018 없이 독립 병합하면 RED이므로, 구현과 시험을 함께 리뷰·반영해야 한다. 자동 병합하지 않는다. 게임 성능/다중창/F001 실제통신/F002 전체 기능은 유지한다.
+
+## 2026-10-02 T019 가시 구간 시험 준비 및 PR 병렬 게시
+- T018 PR #5 게시/첨부 완료, open/미병합. 로컬 및 원격 tree 동일성을 확인했으며 검증 로컬 commit은 별도 branch로 보존했다. 사용자가 요청한 PR 병렬 처리로 게시와 다음 시험 준비를 분리했다.
+- T019는 codex/v6-visibility-tests에서 수용 시험35개를 작성했다. 짧은 pass/gap/접점/잘림/없음/6개 구간 반환, 임계값/조회 범위, 부분/전체실패, hash/잘못된 행/불변 결과, 하루 dense 경계와 실제 좁은 pass, 윤초 SI 시간을 다룬다.
+- 제품 Rust/좌표 경로로 고정 역사 ISS/제주 가상 하루86401행 기준 준비1 PASS, 10도 교차8개 확인. 새 시험 제외 기존Python122 PASS/경고1, Node31 PASS. 전체Python123 PASS/34 ERROR이며 모두 아직 없는 T020 visibility 모듈 fixture의 예상 RED다. skip/xfail로 숨기지 않았다.
+- T019 시험 준비 완료, 제품 구현/검증은 T018까지다. 다음 T020 계산 구현 후 모든 assertion 재검증. API/UI/게임 성능/다중창/F001 실제 통신/F002 전체 기능은 미완료다. 상세 validation/t019_visibility_tests.md. 전체 PASS나 가시 구간 제품 완료로 주장하지 않는다.
+
+## 2026-10-02 T020 기하학적 가시 구간 계산
+- immutable 내부 VisibilityResult/Interval/Contact/Error와 주입 calculate 기반 search_visibility를 구현했다. 1초 SI grid/고립 극값/첫·마지막cell 보완/0.01초 경계 bracket, 접점 및 오류별 구간 분리, 단일 provenance/행계약 검증. runtime/API/기존SIM/legacy/UI 변경 없음.
+- T019 RED를 실제 assertion 실행으로 전환했다. 정수 접점42ns 군집/조회 시작 직후0.2초 pass/같은endpoint 단일cell 누락을 시험 먼저 재현한 뒤 수정했다. 추가3개 포함 가시구간38개 PASS. 마지막 전체Python160 PASS/기존Starlette경고1(97.19초), Node31 PASS(185.56ms). ADR0003/validation/t020_visibility.md 참조.
+- T001~T020,20/31 구현 및 검증 완료이며 전체 프로토타입 완료율은 아니다. 다음 T021 API 시험, T022 API/runtime 조립, T023 UI 연결. F001 실제통신/F002 전체기능, 게임성능/다중창/배포지원은 유지한다. 화면은 변경하지 않아 새 화면 검증 없음. 단계 commit 고정 후 T019시험+T020구현을 같은 PR로 병렬 게시한다. 자동 병합하지 않는다.
