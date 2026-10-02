@@ -240,3 +240,8 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 실제 IAB TLE/OMM 동일400초구간/20도없음/높이500m양끝잘림/잘못된범위/EOP밖오류·복구/지점·0도설정새로고침복구/취소·역할왕복/24h4구간/1280·1920/canvas1개 확인. validation/t023_ground_visibility.md 참조. Screenshot data/workspace/validation/ground_visibility. 독립8877 preview, 기존8876 보존.
 - 첫묶음23/31완료,남은8개T024~T030/T031. 전체제품완료율아님. 다음skill implement의T024 창시험, 이후T025 연결. 하루조회긴대기 관찰로1초성능목표통과아님,T028계측·개선필요. F001/F002/전체기능/배포/다중창/동시성유지.
 - T021/T022 PR7 https://github.com/GIY0201/ISDC_ODT/pull/7 게시·첨부/미병합. T023별도PR를 병렬게시/리뷰하며 자동병합없음.
+
+## 2026-10-03 T024 작업창 회귀시험 준비
+- 변경: workspace.test.mjs 시험10개 및 validation/t024_workspace_tests.md 추가. 제품 코드 변경 없음.
+- 검증: 새5 PASS/5 FAIL, 전체Node45 PASS/5 FAIL(exit1), 기존40 PASS. Python202 PASS/기존Starlette경고1(100.57초). 실제IAB 최소화 중1920→1280 변경 후 복원 경계 이탈 확인. 입력과 구간 유지. 창/임시viewport 복구.
+- 남은 위험: geometry3경로/channel/gesture 종료5FAIL은 T025에서 수정. T024는 시험준비이며 제품완료는T023. 남은첫묶음7개, 전체제품/게임성능/F001/F002/다중창/배포 미완료. 실패시험만 독립 정상 병합하지 않는다.
