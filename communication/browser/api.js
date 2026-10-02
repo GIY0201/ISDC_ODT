@@ -28,6 +28,7 @@ async function orbitRequest(path, options = {}) {
 }
 
 export const api = {
+  orbitVisibility: (payload, { signal } = {}) => orbitRequest("/api/orbit/visibility", { method: "POST", headers: jsonHeaders, body: JSON.stringify(payload), signal }),
   orbitInputs: ({ signal } = {}) => orbitRequest("/api/orbit/inputs", { signal }),
   orbitState: ({ signal } = {}) => orbitRequest("/api/orbit/state", { signal }),
   selectOrbit: (payload, { signal } = {}) => orbitRequest("/api/orbit/selection", { method: "PUT", headers: jsonHeaders, body: JSON.stringify(payload), signal }),

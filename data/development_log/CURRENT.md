@@ -232,3 +232,11 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - T021 실패원인정정: 41개중40개는미구현405,1개는시험도우미input_id중복 TypeError였다. 도우미인자명수정후API42 PASS(4.30초). 기존OpenAPI 새허용목록누락201 PASS/1 FAIL을 확인하고 visibility 경로/schema하나씩만추가한뒤전체Python202 PASS/기존Starlette경고1(101.33초), Node31 PASS(180.07ms). 원본API fixture/기존경로exact 비교는유지했다.
 - 실제TCP HTTP: 자신의임시uvicorn만시작/종료하여저장입력2/samples3행/400초구간complete1개/잘못된revision409/선택정지UTC보존/health 확인. 최대기하각16.34968415627627도,통신unknown. 기존8876서버/화면재시작없음. live_http.json receipt와시험클라이언트증거를구분한다.
 - T001~T022,22/31 구현·검증 완료,전체제품완료율아님. 다음T023 지점·임계값·가시구간화면연결. T021시험+T022구현을같은PR로병렬게시/리뷰예정이며자동병합없음. 게임성능/다중창/동시성/F001실제통신/F002전체기능은미완료. 이번새화면변경/시연없음.
+
+## 2026-10-03 T023 지점 및 가시 구간 UI 연결
+- 사용자 승인 T023만 진행. speckit-auto/implement/prerequisite/ledger 재확인, requirements checklist8/8 PASS, extension hooks 없음. 기존 feature/합의 재사용.
+- 가상 WGS84 지점/높이/최소각/조회UTC, 모든구간/접점/잘림/없음/부분·전체실패/자료hash와 통신미확인 표시. 기존 직렬selection/freshUTC/단일Viewer 재사용, context 검증/취소·늦은응답폐기. 위치 버퍼와 query 수명 분리. legacy/V6원본/API/계산식 보존.
+- 시험우선 missing module/method RED 후 구현. 실제 새로고침 높이0!=500 문제를 회귀시험으로 재현/수정. Node40 PASS(191.04ms), 전체Python202 PASS/경고2(104.09초:기존Starlette+pytestcache). 제한환경임시폴더setup92오류 후 승인된 같은시험 재실행으로 해소. diff check PASS.
+- 실제 IAB TLE/OMM 동일400초구간/20도없음/높이500m양끝잘림/잘못된범위/EOP밖오류·복구/지점·0도설정새로고침복구/취소·역할왕복/24h4구간/1280·1920/canvas1개 확인. validation/t023_ground_visibility.md 참조. Screenshot data/workspace/validation/ground_visibility. 독립8877 preview, 기존8876 보존.
+- 첫묶음23/31완료,남은8개T024~T030/T031. 전체제품완료율아님. 다음skill implement의T024 창시험, 이후T025 연결. 하루조회긴대기 관찰로1초성능목표통과아님,T028계측·개선필요. F001/F002/전체기능/배포/다중창/동시성유지.
+- T021/T022 PR7 https://github.com/GIY0201/ISDC_ODT/pull/7 게시·첨부/미병합. T023별도PR를 병렬게시/리뷰하며 자동병합없음.

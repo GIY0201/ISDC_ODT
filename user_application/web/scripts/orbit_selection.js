@@ -16,7 +16,7 @@ export function createOrbitSelection(api, notify, requestId=()=>crypto.randomUUI
         if(fresh.revision!==state.revision)throw Object.assign(new Error('서버 선택이 변경되었습니다.'),{status:409,state:fresh});
         adopt(fresh);
       }
-      adopt(await api.selectOrbit({client_request_id:requestId(),expected_revision:state.revision,input_id:inputId,ground_point:state.ground_point,minimum_elevation_deg:state.minimum_elevation_deg,anchor_utc:utc||(options.preserveUtc?state.current_utc:record.epoch_utc),playing:options.playing??false,play_rate:options.playRate??state.play_rate}));
+      adopt(await api.selectOrbit({client_request_id:requestId(),expected_revision:state.revision,input_id:inputId,ground_point:options.groundPoint??state.ground_point,minimum_elevation_deg:options.minimumElevation??state.minimum_elevation_deg,anchor_utc:utc||(options.preserveUtc?state.current_utc:record.epoch_utc),playing:options.playing??false,play_rate:options.playRate??state.play_rate}));
       if(ticket===generation){status='ready';emit();}
     }catch(exc){if(ticket===generation)fail(exc);else if(exc.status===409&&exc.state)adopt(exc.state);}};
     chain=chain.then(run,run);return chain;
@@ -51,5 +51,6 @@ export function createOrbitSelection(api, notify, requestId=()=>crypto.randomUUI
       adopt(current);emit();
     }catch(exc){if(ticket===generation)fail(exc);}
   }
-  return {load,select,samples,snapshot,control,seek,refresh};
+  const setGround=(groundPoint,minimumElevation)=>select(state?.input_id,undefined,{preserveUtc:true,groundPoint,minimumElevation,playing:false});
+  return {load,select,samples,snapshot,control,seek,refresh,setGround};
 }

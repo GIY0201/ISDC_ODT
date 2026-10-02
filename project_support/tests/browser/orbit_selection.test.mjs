@@ -48,3 +48,9 @@ test('display rejects a different EOP/leap snapshot or coordinate/profile contra
     assert.equal(client.snapshot().status,'stale');assert.equal(client.snapshot().result,null);
   }
 });
+
+test('ground command uses fresh server UTC and updates height/angle with the same selection owner',async()=>{
+ let current=state,body;const api=fixture({orbitState:async()=>({...current,current_utc:input.epoch_utc})});const original=api.selectOrbit;api.selectOrbit=async p=>{body=p;return current=await original(p);};
+ const client=createOrbitSelection(api,()=>{});await client.load();await client.select('tle');const ground={latitude_deg:35,longitude_deg:127,ellipsoid_height_m:500};await client.setGround(ground,0);
+ assert.deepEqual(body.ground_point,ground);assert.equal(body.minimum_elevation_deg,0);assert.equal(body.expected_revision,1);assert.equal(body.anchor_utc,input.epoch_utc);assert.equal(body.playing,false);
+});

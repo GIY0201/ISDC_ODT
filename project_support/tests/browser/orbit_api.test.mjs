@@ -28,3 +28,5 @@ test('abort remains an abort instead of a successful response', async () => {
   globalThis.fetch=async(url,{signal})=>{signal.throwIfAborted();};
   await assert.rejects(api.orbitSamples({}, {signal:controller.signal}),error=>error.name==='AbortError');
 });
+
+test('visibility POST preserves query and abort signal',async()=>{let request;globalThis.fetch=async(url,options)=>{request={url,options};return new Response('{}');};const controller=new AbortController(),body={selection_revision:2,start_utc:'start',end_utc:'end'};await api.orbitVisibility(body,{signal:controller.signal});assert.equal(request.url,'/api/orbit/visibility');assert.equal(request.options.method,'POST');assert.deepEqual(JSON.parse(request.options.body),body);assert.equal(request.options.signal,controller.signal);});

@@ -2,13 +2,14 @@ import {OrbitGlobe} from '/static/visualization/orbit_globe.js';
 
 /** Render-only copy, never a clock/selection authority. One controller per document. */
 export function createWorkspaceGlobe(container,status,focusButton,host=window){
-  let globe=null,latest=null,disposed=false,failed=false,removeError=null,focused=false;
+  let globe=null,latest=null,groundPoint=null,disposed=false,failed=false,removeError=null,focused=false;
   const describe=message=>{status.textContent=message;};
   function paint(){
     focusButton.disabled=true;
     if(!globe){if(!failed)describe('Cesium 준비 중 · 계산 위치는 아직 표시하지 않습니다.');return;}
     try{
       const shown=globe.update(latest);
+      globe.setGroundPoint(groundPoint);
       container.dataset.orbitVisible=String(shown);
       if(shown){
         if(!focused){globe.focus();focused=true;}
@@ -41,6 +42,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     update(snapshot,display,displayUtc){
       if(disposed)return;
       const {state,result,status:phase}=snapshot;
+      groundPoint=state?.ground_point?structuredClone(state.ground_point):null;
       const row=display===undefined?result?.rows?.[0]:display;
       const matchingUtc=display===undefined?row?.utc===state?.current_utc:row?.utc===displayUtc;
       const valid=phase==='ready'&&!result?.stale&&row?.status==='valid'&&matchingUtc&&result.input_id===state?.input_id&&result.revision===state?.revision&&result.input_hash===state?.input_hash;

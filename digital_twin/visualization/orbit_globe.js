@@ -17,10 +17,10 @@ export class OrbitGlobe {
     const {C,viewer}=this;
     const coordinates=sample?.position_m;
     if(sample?.frame!=='ITRF'||!Array.isArray(coordinates)||coordinates.length!==3||!coordinates.every(Number.isFinite)||!sample.utc?.endsWith('Z')){
-      viewer.entities.removeAll();this.entity=null;this.position=null;viewer.scene.requestRender();return false;
+      this.clearSatellite();viewer.scene.requestRender();return false;
     }
     let utc;
-    try{utc=C.JulianDate.fromIso8601(sample.utc);}catch{viewer.entities.removeAll();this.entity=null;this.position=null;viewer.scene.requestRender();return false;}
+    try{utc=C.JulianDate.fromIso8601(sample.utc);}catch{this.clearSatellite();viewer.scene.requestRender();return false;}
     this.position=new C.Cartesian3(...coordinates);
     viewer.clock.currentTime=utc;
     if(this.entity)this.entity.position=new C.ConstantPositionProperty(this.position,C.ReferenceFrame.FIXED);
@@ -29,6 +29,21 @@ export class OrbitGlobe {
       point:{pixelSize:11,color:C.Color.CYAN,outlineColor:C.Color.WHITE,outlineWidth:2},
       label:{text:'ISS · GP 예측',font:'13px sans-serif',fillColor:C.Color.WHITE},
     });
+    viewer.scene.requestRender();return true;
+  }
+  clearSatellite(){
+    if(this.entity){if(this.viewer.entities.remove)this.viewer.entities.remove(this.entity);else this.viewer.entities.removeAll();}
+    this.entity=null;this.position=null;
+  }
+  setGroundPoint(point){
+    if(this.destroyed)return;
+    const {C,viewer}=this;
+    const valid=point?.virtual===true&&point.ellipsoid==='WGS84'&&[point.latitude_deg,point.longitude_deg,point.ellipsoid_height_m].every(Number.isFinite)&&Math.abs(point.latitude_deg)<=90&&Math.abs(point.longitude_deg)<=180;
+    if(!valid){if(this.groundEntity)viewer.entities.remove(this.groundEntity);this.groundEntity=null;viewer.scene.requestRender();return false;}
+    const position=C.Cartesian3.fromDegrees(point.longitude_deg,point.latitude_deg,point.ellipsoid_height_m);
+    const property=new C.ConstantPositionProperty(position,C.ReferenceFrame.FIXED);
+    if(this.groundEntity)this.groundEntity.position=property;
+    else this.groundEntity=viewer.entities.add({id:'virtual-ground-point',name:'가상 지점 · WGS84 타원체 높이',position:property,point:{pixelSize:10,color:C.Color.fromCssColorString('#ffbd66'),outlineColor:C.Color.WHITE,outlineWidth:2},label:{text:'가상 지점 · 통신 미확인',font:'13px sans-serif',fillColor:C.Color.WHITE}});
     viewer.scene.requestRender();return true;
   }
   focus(){
