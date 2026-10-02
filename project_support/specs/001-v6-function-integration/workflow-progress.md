@@ -1,10 +1,10 @@
 # Spec Kit 작업 추적 기록
 
-갱신: 2026-10-02. 이 파일은 기존 feature의 지속 기록이다. 새 feature를 만들거나 기존 합의를 폐기하지 않는다.
+갱신: 2026-10-03. 이 파일은 기존 feature의 지속 기록이다. 새 feature를 만들거나 기존 합의를 폐기하지 않는다.
 
 ## 최초 요청과 현재 진행 경계
 최종 목적은 독립 ISDC ODT의 확정 V6 UI에 선배 프로토타입 기능을 단계적으로 연결하고, 향후 AeroDT 연결/이식이 가능하도록 계층 책임과 파일 생성 규칙을 공유하는 것이다. ISS 시험만으로 전체 목적이 완료되지 않는다.
-현재 사용자 승인으로 첫 구현 묶음을 단계적으로 실행한다. 전체 기능 계획과 후속필수를 유지하며 T001~T022 구현과 검증을 완료했다. PR 리뷰와 main 병합은 별도로 추적한다.
+현재 사용자 승인으로 첫 구현 묶음을 단계적으로 실행한다. 전체 기능 계획과 후속필수를 유지하며 T001~T023 구현과 검증을 완료했다. PR 리뷰와 main 병합은 별도로 추적한다.
 보호 범위: V6 채택, 기존 코드와 계산, 합의 문서, 초기 초안 및 도구 실험 이력. 초안의 존재는 승인 증거가 아니다.
 
 ## 근거
@@ -22,9 +22,9 @@
 | R001 | 독립 ISDC ODT + AeroDT 이식 가능한 구조 / S1,S5 | AeroDT 설치 의존성 없이 실행, 계층/명명/상태 소유권 검사 | constitution, plan, verify | plan File placement/Constitution / T001,T004,T010,T029 | 독립 실행 및 계층 시험 PASS, AeroDT 재통합 검증 T029 미완료 |
 | R002 | 확정 V6 UI 유지 / S1,S2 | 공용 지구와 역할별 작업 창에서 연결 기능 사용, 기존 UI 결정 추적 | specify, plan, verify | plan State/Workspace / T014,T016,T024,T025 | V6 원본 SHA 보존 및 단일 지구 위치/UTC 연결 검증; 전체 창/다중창 T024~T031 미완료 |
 | R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030 + F002 | 저장 궤도/UTC 첫 연결 완료. 전체 선배 기능 F002/T030 미완료 |
-| R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | T001~T018 단계별 승인/검증 및 개별 PR 유지. 다음 가시 구간 시험 |
-| R005 | 첫 위성 1개 + 지상국 1개 / S1 | 저장된 실제 TLE/OMM, UTC 조작, 위치/고도각/가시 구간, 오류/출처 표시 검증 | specify, plan, implement, verify | plan Input/State/Geometry / T003-T023 | ISS 저장 입력/제주 가상/위치/고도각/UTC 검증. 가시 구간 계산/API T019~T022 검증, UI T023 미연결 |
-| R006 | 실제 통신 조건 확인 및 적용 / S1 | 출처 있는 서비스/장비 입력과 링크 조건 적용, 정상/실패/미확인 시험 | clarify, plan, implement, verify | plan Visibility/후속 / T023,T030 + F001 | 필수 후속, 조사/적용 미실행 |
+| R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | T001~T023 단계별 승인/검증 및 개별 PR 유지. 다음 T024 작업창 시험 |
+| R005 | 첫 위성 1개 + 지상국 1개 / S1 | 저장된 실제 TLE/OMM, UTC 조작, 위치/고도각/가시 구간, 오류/출처 표시 검증 | specify, plan, implement, verify | plan Input/State/Geometry / T003-T023 | ISS 저장 입력/제주 가상/위치/고도각/UTC 검증. 가시 구간 계산/API/UI T019~T023 검증. validation/t023_ground_visibility.md에 실제24h4구간/설정/오류/두해상도 증거 |
+| R006 | 실제 통신 조건 확인 및 적용 / S1 | 출처 있는 서비스/장비 입력과 링크 조건 적용, 정상/실패/미확인 시험 | clarify, plan, implement, verify | plan Visibility/후속 / T023,T030 + F001 | T023 실제통신미확인 표시 검증, F001 필수 조사/적용 미실행 |
 | R007 | 결과 의미 구분 / S1,S5 | 기하 가시성, 모델 통신 충족, 실제 수신 증거를 UI/산출물에서 구분 | specify, verify | plan Validation / T003,T005,T007,T011,T017,T019,T021,T026,T028,T029 | GP/가상/기하 계산과 통신 미확인 표시 검증. 실제 통신 조건 F001 미완료 |
 | R008 | JS 모듈/HTML/CSS/Cesium + Python/FastAPI / S1 | 기술 계획이 합의와 일치, 버전/현대화 선택 근거 기록 | constitution, plan | plan Technical Context / T002,T006,T008,T029 | JS/Cesium/Python FastAPI 및 Rust 코어 기준선 구현. TS/React 보류 유지 |
 | R009 | 빠르고 원활한 사용성 / S1 | 지구/시간/창 조작의 측정 조건과 합의된 목표로 실제 웹 검증 | clarify, plan, verify | plan State/Validation / T018,T024-T028 | 게임 성능 목표 유지. T018 사용 흐름만 검증, T028 정량 성능 미측정 |
@@ -56,7 +56,7 @@
 | checklist | complete | checklists/requirements.md: 6/8에서 8/8 문서 검토 통과. 구현 시험 아님 |
 | tasks | complete | tasks.md 31개, US1 8/US2 5/US3 5 및 공통13개. 형식 검사 오류0, 모두 미구현 |
 | analyze | complete | 첫묶음14기준/31task read-only분석, 차단충돌0. 전체후속구현완료아님 |
-| implement | running | T001~T004 완료, 31개 중4개. 입력/시간만 연결, native/API/UI 미완료 |
+| implement | running | T001~T023 완료,31개 중23개. US1/US2 연결,다음T024 창시험. 전체기능/실제통신 미완료 |
 | verify | pending | 연구용 확장17/연결9/기존회귀35 통과 이력. 제품 새 기능 실제API/UI/설치/게임UX 검증은 T028/T029 미진행 |
 
 ## 실제 증거와 실패
@@ -247,3 +247,11 @@ Red: 최초module누락2개 수집실패. 누락OMM필드4시험 KeyError실패 
 - T021 실패원인정정: 41개중40개는미구현405,1개는시험도우미input_id중복 TypeError였다. 도우미인자명수정후API42 PASS(4.30초). 기존OpenAPI 새허용목록누락201 PASS/1 FAIL을 확인하고 visibility 경로/schema하나씩만추가한뒤전체Python202 PASS/기존Starlette경고1(101.33초), Node31 PASS(180.07ms). 원본API fixture/기존경로exact 비교는유지했다.
 - 실제TCP HTTP: 자신의임시uvicorn만시작/종료하여저장입력2/samples3행/400초구간complete1개/잘못된revision409/선택정지UTC보존/health 확인. 최대기하각16.34968415627627도,통신unknown. 기존8876서버/화면재시작없음. live_http.json receipt와시험클라이언트증거를구분한다.
 - T001~T022,22/31 구현·검증 완료,전체제품완료율아님. 다음T023 지점·임계값·가시구간화면연결. T021시험+T022구현을같은PR로병렬게시/리뷰예정이며자동병합없음. 게임성능/다중창/동시성/F001실제통신/F002전체기능은미완료. 이번새화면변경/시연없음.
+
+## 2026-10-03 T023 지점 및 가시 구간 UI 연결
+- 사용자 승인 T023만 진행. speckit-auto/implement/prerequisite/ledger 재확인, requirements checklist8/8 PASS, extension hooks 없음. 기존 feature/합의 재사용.
+- 가상 WGS84 지점/높이/최소각/조회UTC, 모든구간/접점/잘림/없음/부분·전체실패/자료hash와 통신미확인 표시. 기존 직렬selection/freshUTC/단일Viewer 재사용, context 검증/취소·늦은응답폐기. 위치 버퍼와 query 수명 분리. legacy/V6원본/API/계산식 보존.
+- 시험우선 missing module/method RED 후 구현. 실제 새로고침 높이0!=500 문제를 회귀시험으로 재현/수정. Node40 PASS(191.04ms), 전체Python202 PASS/경고2(104.09초:기존Starlette+pytestcache). 제한환경임시폴더setup92오류 후 승인된 같은시험 재실행으로 해소. diff check PASS.
+- 실제 IAB TLE/OMM 동일400초구간/20도없음/높이500m양끝잘림/잘못된범위/EOP밖오류·복구/지점·0도설정새로고침복구/취소·역할왕복/24h4구간/1280·1920/canvas1개 확인. validation/t023_ground_visibility.md 참조. Screenshot data/workspace/validation/ground_visibility. 독립8877 preview, 기존8876 보존.
+- 첫묶음23/31완료,남은8개T024~T030/T031. 전체제품완료율아님. 다음skill implement의T024 창시험, 이후T025 연결. 하루조회긴대기 관찰로1초성능목표통과아님,T028계측·개선필요. F001/F002/전체기능/배포/다중창/동시성유지.
+- T021/T022 PR7 https://github.com/GIY0201/ISDC_ODT/pull/7 게시·첨부/미병합. T023별도PR를 병렬게시/리뷰하며 자동병합없음.

@@ -79,3 +79,6 @@ legacy globe.js/tabs/orbit.js는 보존한다. 새 GP 위치 렌더러는 digita
 
 ### T018 구현 경계 보완
 orbit_playback.js/ orbit_utc.js/ workspace_playback.js가 서버 UTC snapshot의 표시 투영 및 제한된 버퍼를 맡는다. 1초/601행/300초 전 refill, 5초 state 동기화 및 고정 윤초 hash codec를 사용한다. HTTP/계산/runtime 소유권은 변경하지 않는다. ADR0002 및 validation/t018_playback.md를 근거로 하고 게임 성능/가시 구간은 후속이다.
+
+### T023 구현 경로 보완
+지점 및 visibility 표시사본은 scripts/tabs/ground_visibility.js에 둔다. 설정은 기존 orbit_selection.js, wire 조회는 communication/browser/api.js를 사용한다. 단일Viewer 지점표시는 orbit_globe.js/workspace_globe.js이며 legacy 합성 globe.js를 보존한다. 계산/API 의미 변경 없음. query와 위치버퍼 수명은 분리하고 같은 서버 revision/입력/자료/지점을 검증한다. validation/t023_ground_visibility.md 참조.
