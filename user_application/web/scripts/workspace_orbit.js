@@ -4,7 +4,7 @@ import {createOrbitSelection} from './orbit_selection.js?v=t031-r1';
 import {createWorkspaceGlobe} from './workspace_globe.js?v=t028-r1';
 import {createWorkspacePlayback} from './workspace_playback.js';
 import {createGroundPanel} from './tabs/ground_visibility.js?v=t031-r1';
-import {createRfPanel} from './tabs/rf_link_budget.js?v=t035-r1';
+import {createRfPanel} from './tabs/rf_link_budget.js?v=t039-r1';
 
 const escape=value=>String(value??'미확인').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let view=null,displayUtc=null,displayElevation='자료 준비 중';
@@ -48,8 +48,8 @@ function render(){
 export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);render();}
 client.load();
 
-export function applyWorkspaceDraft(items){
+export function applyWorkspaceDraft(items,remote=false){
   groundPanel.applyDraft(items);
-  rfPanel.applyDraft(items);
+  rfPanel.applyDraft(items,remote);
   for(const item of items){if(item.id!=='orbit-utc'||typeof item.value!=='string')continue;const field=document.getElementById(item.id);if(field){field.value=item.value;field.dataset.dirty='true';}}
 }

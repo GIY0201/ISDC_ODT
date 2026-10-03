@@ -57,3 +57,7 @@ plan/data-model/contracts/orbit_api 및workspace/quickstart를 현재검증조�
 ## W03-A 재사용 결정
 Decision: 기존RF-Friis-v1 계산/POST API와모든11입력을편집하는새V6패널. 사용자A승인. Rationale: 선배기능을작은단위로연결하고기존계산/legacy회귀를보존하며숨겨진장비기본값을배제한다. Alternatives: legacy패널복사(숨은고정값존재), ISS전용프로파일우선(서비스/장비미선정), 새RustRF계산(실측병목근거없음).
 독립연구검토: 반올림전margin으로status결정, HTTP422배열의필드별오류표시, 정확한exclusive/inclusive경계, 전체요청echo/유한결과검증, generation/abort/사본필수. 공식ITU/ARISS는rf_workspace_review.md 조사출발점이며실조건확정자료가아니다. A구현연구게이트완료, F001실조건/모델충족구간은계속열림.
+
+## 2026-10-04 ISS APRS 부분 프로파일 조사
+ARISS https://www.ariss.org/current-status-of-iss-stations.html 확인 UTC2026-10-03T17:12:27Z, 공지 기준2026-09-25: Zvezda/RS0ISS APRS437.825MHz와 troubleshooting/testing. SSTV437.550MHz Oct2~6 공지도 공존하므로 현재 APRS 운용을 자동 확정하지 않는다. https://www.ariss.org/contact-the-iss.html 의 일반 최대 전력은 이 운용의 실제 전력 근거가 아니다. https://www.ariss.org/uploads/1/9/6/8/19681527/k9jkm_2012_symposium_ver2.pdf 의1200baud는2012년 설명이며 현재 장비 조건으로 적용하지 않는다.
+읽기 전용 연구/원본1a1e00297a0301637455b0ef2cf48b2e74576b07 검토: 기존 RF 함수/API 재사용, S/X/Ka 대표 접시/잡음 모델을 UHF 장비로 적용하지 않는다. 사용자 장비 없음에 따라 주파수 외 numeric 값은 모두 사용자 가정/unknown. 네트워크 live 조회 대신 출처를 가진 버전 snapshot을 제공, 고정 source 시점을 표시한다. 나중 장비 선정/도플러/복조/실제 수신 증거는 F001 후속.

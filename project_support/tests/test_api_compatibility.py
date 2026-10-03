@@ -8,9 +8,9 @@ def test_openapi_matches_pre_refactoring_contract():
     # Captured from the verified original ZIP using an isolated Python process.
     baseline = json.loads((Path(__file__).parent / 'fixtures/original_openapi.json').read_text(encoding='utf-8'))
     current = create_app().openapi()
-    # Keep every original path/schema exact; only the approved new namespace differs.
+    # Keep every original path/schema exact; approved additions are explicit.
     added_paths = set(current['paths']) - set(baseline['paths'])
-    assert added_paths == {'/api/orbit/inputs', '/api/orbit/state', '/api/orbit/selection', '/api/orbit/samples', '/api/orbit/visibility'}
+    assert added_paths == {'/api/orbit/inputs', '/api/orbit/state', '/api/orbit/selection', '/api/orbit/samples', '/api/orbit/visibility', '/api/communication/iss-receive-profile'}
     for path in added_paths:
         del current['paths'][path]
     added_schemas = set(current['components']['schemas']) - set(baseline['components']['schemas'])

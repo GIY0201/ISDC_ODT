@@ -55,6 +55,7 @@ export const api = {
   selectScenario: (scenarioId) => request("/api/scenario/select", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ scenario_id: scenarioId }) }),
   injectFault: (payload) => request("/api/faults", { method: "POST", headers: jsonHeaders, body: JSON.stringify(payload) }),
   linkBudget: rfRequest,
+  issReceiveProfile: ({ signal } = {}) => request('/api/communication/iss-receive-profile', { signal }),
   route: (source, target, objective = "balanced") => request("/api/communication/route", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ source, target, objective }) }),
   contacts: (hours = 12) => request(`/api/communication/contacts?hours=${hours}`),
   missionAction: (missionId, action) => request("/api/missions/action", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ mission_id: missionId, action }) }),
