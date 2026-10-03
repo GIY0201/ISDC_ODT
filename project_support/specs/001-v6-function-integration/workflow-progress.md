@@ -1,6 +1,6 @@
 # Spec Kit 작업 추적 기록
 
-갱신: 2026-10-03. 이 파일은 기존 feature의 지속 기록이다. 새 feature를 만들거나 기존 합의를 폐기하지 않는다.
+갱신: 2026-10-04. 이 파일은 기존 feature의 지속 기록이다. 새 feature를 만들거나 기존 합의를 폐기하지 않는다.
 
 ## 최초 요청과 현재 진행 경계
 최종 목적은 독립 ISDC ODT의 확정 V6 UI에 선배 프로토타입 기능을 단계적으로 연결하고, 향후 AeroDT 연결/이식이 가능하도록 계층 책임과 파일 생성 규칙을 공유하는 것이다. ISS 시험만으로 전체 목적이 완료되지 않는다.
@@ -322,3 +322,11 @@ Red: 최초module누락2개 수집실패. 누락OMM필드4시험 KeyError실패 
 
 ## 2026-10-04 최종 검토 보완
 읽기 전용 검토에서 링크 이름의 Unicode 길이 차이를 확인했다. 서버는 code point40자, JS text.length/HTML maxlength는 UTF-16 단위를 세므로 emoji21~40자를 과도하게 거부했다. emoji40/41 경계 시험 RED 확인 후 [...text].length와 maxlength 제거로 서버 계약에 맞췄다. 실제 V6→기존 API에서도40자 정상/41자 오류 확인했다. 계산/API/schema는 그대로다. 수정 후 전체 Python304 PASS103.50초/기존경고1, Node95 PASS313.47ms. 최신 원자료 pytest_final.log/node_full_final.log/unicode_red.log. 이미 기록한 이전 검증은 이력으로 보존한다. 실제 통신 F001과 보류T032는 미완료 유지.
+
+## 2026-10-04 W03-B 범위 확정/설계/작업
+질문2/답변2: ISS부터, 장비 아직 없음. 원래 선배 기능→V6→독립 AerODT 호환 구조 목표 및 확정 사항 보존. FR010/SC008과R006/R007에 T037~T040 연결. F001 실제 조건의 부분 연결, F001전체/F002/T032보류 유지. clarify complete. 변경 영향은 신규 plan/tasks/analyze/verification 범위에 한정하며 기존 T033~36 검증 보존. setup-plan/setup-tasks 실제 실행, extensions.yml 없음. research/data-model/contracts/quickstart 보완 및constitution 충돌0. plan/tasks complete, analyze pending, implement pending. 조회는 공식 버전 snapshot이며 현재 운용/수신 보장은 없음.
+
+분석 read-only: FR010/SC008→T037~40 coverage100%, 신규 task4개 unmapped0/ambiguity0/duplication0/critical0. Constitution 충돌0. 기존 T032 실패와 전체 F001/F002 미완료를 숨기지 않는다. analyze complete. Implement gate checklist requirements8/8 PASS(문서 품질), hooks 없음. T037 Python 모듈 미존재 collection error/Node 모듈 미존재 FAIL을 제품 구현 전 확인. implement running.
+
+## 2026-10-04 T037~T040 검증 완료
+FR010/SC008→R006/R007 부분 증거 E-ISS-PROFILE: validation/t040_iss_receive_profile.md. clarify/plan/tasks/analyze 신규 범위 complete, checklist8/8. RED 후 실제 구현, Python313 PASS107.66초/기존경고1, Node103 PASS340.8823ms, 실제두해상도 UI/GP7입력보존/error로그0/AST7동일. 버전snapshot 주파수만 공식,장비없음/현재수신unknown. package JSON은소스배포, native전용wheel변경없음. 원격draft는가정,로컬복원은보존. FR010/SC008이번묶음complete,전체implement/verify running;F001전체/F002/T032보류및F004~6미완료. codex/iss-receive-profile stacked Draft PR게시/리뷰,자동병합없음.

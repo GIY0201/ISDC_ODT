@@ -293,3 +293,8 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 ## 2026-10-03 다음 구현 범위 검토
 - 사용자 지시로 T032 프레임 확인은 후속으로 보류하고 W03 RF 기능 검토 착수. rf_workspace_review.md에 선배 함수/API/UI 재사용 근거와 실제 조건 공백 기록. codex/rf-link-workspace에서 기존 작업 보존.
 - RF/route 기존 회귀1 PASS0.03초. 제품 소스 변경 및 전체 시험 없음. 질문1개/답변0개이며 첫 RF 계산기 연결과 실제 서비스 프로파일 중 범위 결정 대기. F001 실제 통신 조건 조사·적용은 필수로 유지.
+
+## 2026-10-04 T037~T040 ISS 공식 수신 조건 부분 연결
+- 사용자 ISS부터/장비없음. 공식 출처 버전 모델과read-only GET, 주파수만 명시적용, 공식/사용자가정/미확인입력표시. 기존RF AST7동일/GP불변.
+- RED후구현,compatibility신규경로누락보완. 전체Python313 PASS107.66초/기존경고1,Node103 PASS340.8823ms,실제IAB두해상도정상/오류/동일값무효화/창복원/지점입력7보존,error0. report validation/t040_iss_receive_profile.md.
+- 이묶음완료,F001전체/실제수신/장비검증/F002및T032보류유지. nativewheel변경없음/JSON은소스배포. stacked Draft PR리뷰,자동병합없음.

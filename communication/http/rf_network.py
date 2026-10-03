@@ -7,6 +7,11 @@ from .schemas import LinkBudgetRequest, RouteRequest
 router = APIRouter()
 
 
+@router.get('/api/communication/iss-receive-profile')
+async def iss_receive_profile(request: Request) -> dict:
+    return queries_of(request).iss_receive_profile()
+
+
 @router.post("/api/communication/link-budget")
 async def link_budget(request: Request, command: LinkBudgetRequest) -> dict:
     return queries_of(request).calculate_link_budget(command.model_dump())

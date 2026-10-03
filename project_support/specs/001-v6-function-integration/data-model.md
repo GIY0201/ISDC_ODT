@@ -25,3 +25,6 @@
 ## W03-A RF 화면 모델
 RF draft: link_id 문자열과 contracts/rf_workspace.md의10수치에 대한 편집 문자열. 초기 빈칸, 서버선택상태와독립, 사용자입력가정. 조회입력은trim/유한성/범위검증후새object로생성.
 RF 응답사본: 기존model/link_id/inputs/8수치/status/assumptions. 변경불가능한canonical서버상태가아닌화면결과사본. idle/pending/ready/error 상태, generation 및AbortController로수명관리. 편집/취소/종료는결과소거, 동일draft복원은결과유지. snapshot은structuredClone. HTTP/DOM응답오류는error이며실제통신status로전환하지않는다.
+
+## ISS 수신 공식 부분 프로파일
+정적 버전 자산: schema_version=1, profile_id, ISS25544/RS0ISS/APRS/receive_only, source(url/status_as_of/checked_utc), frequency_mhz, known_inputs(frequency_ghz만), equipment_status=not_selected, communication_status=unknown, source_report, notes, canonical JSON hash. runtime 소유 상태 아님. 화면 사본은 pending/ready/error와 applied 여부만 소유한다. 각 RF input origin은 공식 명시 적용/사용자 가정/빈 미확인으로 계산한다. 프로파일/출처 변경은 RF query 세대 무효화.

@@ -1,4 +1,4 @@
-import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t035-r1';
+import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t039-r1';
 (() => {
   const screen = document.getElementById('screen');
   const groups = [
@@ -10,7 +10,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t03
   const state = {view:'wall',sat:'',follow:false,case:'X-GS01',step:0,normalPoint:0,orbit:'LEO',station:'제주 후보',insertion:6,satLat:0,satLon:0,gsLat:33.5,gsLon:126.5,scenario:'',events:[],editIndex:-1,injected:false,run:'RUN-P01',mode:'기준'};
   const isPopout=new URLSearchParams(location.search).get('popout')==='1';
   const windowId=`${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  let applyingRemote=false,pendingWorkspaceDraft=[];
+  let applyingRemote=false,pendingWorkspaceDraft=[],pendingWorkspaceDraftRemote=false;
   const childWindows=new Set();
   let awaitingInitial=isPopout&&Boolean(window.opener);
   const syncChannel='BroadcastChannel' in window?new BroadcastChannel('isdc-odt-v6-mock'):null;
@@ -80,9 +80,9 @@ import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t03
     queueMicrotask(()=>{
       showWorkspaceOrbit(state.view);
       if(pendingWorkspaceDraft.length){
-        applyWorkspaceDraft(pendingWorkspaceDraft);
+        applyWorkspaceDraft(pendingWorkspaceDraft,pendingWorkspaceDraftRemote);
         for(const item of pendingWorkspaceDraft){if(item.id.startsWith('rf-')||item.id.startsWith('ground-')||item.id.startsWith('visibility-')||item.id==='orbit-utc'||['orbit-input','orbit-rate'].includes(item.id))continue;const field=document.getElementById(item.id);if(field&&'value' in field)field.value=item.value;}
-        pendingWorkspaceDraft=[];
+        pendingWorkspaceDraft=[];pendingWorkspaceDraftRemote=false;
       }
     });
     const v=state.view;
@@ -112,11 +112,12 @@ import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t03
   function applySnapshot(data){
     if(!data||!names[data.view]||!data.state)return;
     applyingRemote=true;Object.assign(state,data.state,{view:data.view});
+    pendingWorkspaceDraftRemote=true;
     pendingWorkspaceDraft=Array.isArray(data.draft)?data.draft.filter(item=>typeof item?.id==='string'&&isDraftField(item.id)&&typeof item.value==='string'):[];
     openView(data.view);applyingRemote=false;awaitingInitial=false;
   }
   syncChannel?.addEventListener('message',event=>{const data=event.data;if(data?.sender===windowId||awaitingInitial)return;
-    if(data?.type==='draft'&&data.view===state.view&&isDraftField(data.id)){const field=document.getElementById(data.id);if(field&&typeof data.value==='string'&&'value' in field){if(field===document.activeElement&&field.value!==data.value){const feedback=document.getElementById('popout-feedback');feedback.hidden=false;feedback.textContent='다른 창에서도 이 항목을 수정했습니다. 현재 편집값을 유지합니다.';}else{applyWorkspaceDraft([{id:data.id,value:data.value}]);field.value=data.value;}}return;}
+    if(data?.type==='draft'&&data.view===state.view&&isDraftField(data.id)){const field=document.getElementById(data.id);if(field&&typeof data.value==='string'&&'value' in field){if(field===document.activeElement&&field.value!==data.value){const feedback=document.getElementById('popout-feedback');feedback.hidden=false;feedback.textContent='다른 창에서도 이 항목을 수정했습니다. 현재 편집값을 유지합니다.';}else{applyWorkspaceDraft([{id:data.id,value:data.value}],true);field.value=data.value;}}return;}
     if(data?.type!=='state'||!data.state)return;
     applyingRemote=true;const currentView=state.view;Object.assign(state,data.state,{view:currentView});render();applyingRemote=false;
   });

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "profile_id": "iss_aprs_receive_v1",
+  "satellite_catalog_number": 25544,
+  "service": "APRS",
+  "station": "RS0ISS",
+  "direction": "receive_only",
+  "frequency_mhz": 437.825,
+  "known_inputs": {
+    "frequency_ghz": 0.437825
+  },
+  "equipment_status": "not_selected",
+  "communication_status": "unknown",
+  "source": {
+    "url": "https://www.ariss.org/current-status-of-iss-stations.html",
+    "status_as_of": "2026-09-25",
+    "checked_utc": "2026-10-03T17:12:27Z"
+  },
+  "source_report": "공식 공지는 APRS 운용과 무전기 troubleshooting/testing을 함께 안내합니다. 현재 송신 및 수신은 별도로 확인해야 합니다.",
+  "notes": [
+    "같은 페이지의 SSTV 공지(10월 2~6일, 437.550 MHz)와 실제 운용 모드의 관계는 미확인입니다.",
+    "우주선 접근, 우주 유영 및 임무에 따라 무전기가 꺼질 수 있습니다.",
+    "주파수 외 RF 조건과 도플러 보정, 복조 및 실제 수신 증거는 미확인입니다."
+  ]
+}

@@ -92,3 +92,9 @@ orbit_playback.js/ orbit_utc.js/ workspace_playback.js가 서버 UTC snapshot의
 - UI: V6 ground에 독립 패널, 시작값은 모두 빈칸. 링크 이름과10개수치 전부 편집. 단위/요청 입력/모델 분류/가정을 표시하며 실제통신미확인/거리직접입력 의미 유지. 생성 문자열은 escape, 오류/status는textContent. 새로운 Viewer 없음.
 - 검증: JS controller/transport/window 보존 및 Python 기존endpoint 수치/경계/상태불변. RED 후 구현, 전체pytest/Node, 실제브라우저1280/1920 정상/오류/창입력보존. 이번 묶음은 프레임성능이나 실제RF수신 완료 게이트가 아니다.
 - Constitution check: 독립 계층/단일상태/V6/기존계산 보존/검증 원칙5개 충돌 없음. 체크리스트8/8 유지. 기존모델의3dB는물리적상수로오인하지않고출처미확인판정기준이라고표시한다.
+
+## W03-B ISS 공식 수신 조건 부분 연결
+FR010/SC008, US2, R006/R007. 기존 Python/FastAPI/JS와 RF 계산 재사용. Phase0 공식 ARISS 상태/일반 안내 및 역사적 패킷 자료 확인, 읽기 전용 재사용 검토 완료. 장비 미선정은 unknown 조건으로 확정, 상세 계약 contracts/iss_receive_profile.md.
+Phase1 실제 사용하는 model_library/packages/iss_aprs_receive_v1의 버전 JSON/manifest와 rf_receive_profile.py loader를 추가한다. TwinQueries로 readonly callback을 주입하며 새 GET을 communication/http에 둔다. 고정 모델 읽기는 요청 시 수행하고 import IO/runtime 복제 없음. JS rf_receive_profile.js가 화면용 출처 사본과 abort/generation을 소유, rf_link_budget.js가 기존 입력/결과 controller와 조립한다. 기존 RF 서버 함수/schema AST 보존.
+공식 주파수만 채우며 어떤 장비값도 보충하지 않는다. 새 패키지/API 형식 ADR0007, Python 앱은 소스 checkout으로 실행하며 이 JSON을 소스에 포함한다. 기존 wheel은 Rust 계산 모듈 전용으로 유지한다. source 날짜/확인 UTC/공지 나이 표시, GP epoch와 연결하지 않는다. 창 draft의 provenance는 공식 권위로 전달하지 않는다. 새 Viewer 없음.
+Constitution: 독립계층/단일권위상태/실측구분/V6보존/TDD 충돌0. T037→T038→T039→T040. 분석과 RED를 통과한 뒤 구현. 전체pytest/Node 및 실제 두해상도 제품 확인 후 stacked Draft PR. 이 묶음 완료는 F001 전체 완료가 아니다.

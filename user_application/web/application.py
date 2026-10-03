@@ -14,6 +14,7 @@ from data.catalog.cache import CatalogCache
 from data.catalog.contracts import CatalogReader
 from digital_twin.contracts.queries import TwinQueries
 from digital_twin.model_library.network import communication
+from digital_twin.model_library.rf_receive_profile import load_iss_receive_profile
 from digital_twin.simulation.rf_network import calculate_link_budget, calculate_route, contact_plan
 from digital_twin.verification.kpis import evaluate
 from user_application.bootstrap import create_runtime
@@ -63,7 +64,7 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
     app.state.orbit_load_error = None
     app.state.orbit_provenance = {"eop_sha256":getattr(eop_provider,"eop_sha256",None),"leap_sha256":getattr(eop_provider,"leap_sha256",None)}
     app.state.catalog = catalog_reader if catalog_reader is not None else Catalog(CelesTrakSource(), CatalogCache(CATALOG_CACHE_DIR))
-    app.state.queries = TwinQueries(communication, calculate_link_budget, calculate_route, contact_plan, evaluate)
+    app.state.queries = TwinQueries(communication, calculate_link_budget, calculate_route, contact_plan, evaluate, load_iss_receive_profile)
     app.add_middleware(GZipMiddleware, minimum_size=1_000, compresslevel=5)
 
     @app.exception_handler(ValueError)

@@ -13,3 +13,4 @@ class TwinQueries:
     calculate_route: Callable[[str, str, str, list[dict]], dict]
     contact_plan: Callable[[int], list[dict]]
     evaluate: Callable[[RuntimeSnapshot], dict]
+    iss_receive_profile: Callable[[], dict]

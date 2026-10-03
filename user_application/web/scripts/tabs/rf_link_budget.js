@@ -1,3 +1,4 @@
+import {createRfReceiveProfile,profileMarkup,fieldOrigin} from './rf_receive_profile.js?v=t039-r1';
 // RF-Friis-v1 is calculated by the preserved upstream HTTP endpoint.
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const RF_FIELDS=[
@@ -63,27 +64,33 @@ export function createRfLinkBudget(api,notify=()=>{}){
 export function rfResultMarkup(result){
   if(!result)return '';
   const label={pass:'기존 모델 여유 충족',marginal:'여유 경계',fail:'기존 모델 여유 부족'}[result.status];
-  return `<p><strong>${escape(label)}</strong> · 실제 통신 미확인</p><p>${escape(result.model)} · 기존 분류: 여유 ≥3 dB / ≥0 dB / &lt;0 dB. 서버의 반올림 전 분류를 표시합니다.</p><dl class="rf-metrics">${METRICS.map(([key,name])=>`<dt>${escape(name)}</dt><dd>${escape(result[key])}</dd>`).join('')}</dl><p>Shannon 이론 용량은 실제 전송 속도를 보장하지 않습니다.</p><details><summary>사용자 설정 가정 · 계산에 사용한 입력</summary><dl>${RF_FIELDS.map(({key,label})=>`<dt>${escape(label)}</dt><dd>${escape(result.inputs[key])}</dd>`).join('')}</dl></details><ul>${result.assumptions.map(item=>`<li>${escape(item)}</li>`).join('')}</ul>`;
+  return `<p><strong>${escape(label)}</strong> · 실제 통신 미확인</p><p>${escape(result.model)} · 기존 분류: 여유 ≥3 dB / ≥0 dB / &lt;0 dB. 서버의 반올림 전 분류를 표시합니다.</p><dl class="rf-metrics">${METRICS.map(([key,name])=>`<dt>${escape(name)}</dt><dd>${escape(result[key])}</dd>`).join('')}</dl><p>Shannon 이론 용량은 실제 전송 속도를 보장하지 않습니다.</p><details><summary>계산에 사용한 입력 · 공식 주파수 또는 사용자 설정 가정</summary><dl>${RF_FIELDS.map(({key,label})=>`<dt>${escape(label)}</dt><dd>${escape(result.inputs[key])}</dd>`).join('')}</dl></details><ul>${result.assumptions.map(item=>`<li>${escape(item)}</li>`).join('')}</ul>`;
 }
 export function createRfPanel(api){
   let active=false,panel=null;
   const controller=createRfLinkBudget(api,render);
+  const profile=createRfReceiveProfile(api,render,values=>{controller.setDraft(values);writeFields();},()=>controller.cancel());
   function writeFields(){const {draft}=controller.snapshot();for(const {key} of RF_FIELDS){const field=panel?.querySelector('#'+fieldId(key));if(field)field.value=draft[key];}}
   function render(){
     if(!active)return;
     if(!panel?.isConnected){
       panel=document.createElement('section');panel.id='rf-link-budget';panel.className='panel';document.getElementById('screen').prepend(panel);
-      panel.innerHTML=`<header><h2>RF 링크 계산</h2><small>선배 프로토타입 RF-Friis-v1 / 실제 통신 미확인</small></header><div class="body"><p>사용자 설정 가정으로 계산합니다. 거리는 직접 입력하며 위성 위치·가시 구간과 자동 연결하지 않습니다.</p><div class="rf-fields">${RF_FIELDS.map(field=>`<label>${escape(field.label)}<input id="${fieldId(field.key)}" ${field.key==='link_id'?'type="text"':'type="number" step="any"'} aria-describedby="rf-input-help"></label>`).join('')}</div><p id="rf-input-help">모든 값을 직접 입력하세요. 실제 서비스와 장비 조건은 아직 확인되지 않았습니다.</p><div class="rf-actions"><button type="button" id="rf-calculate">모델 계산</button><button type="button" id="rf-cancel">조회 취소</button></div><p id="rf-status" role="status" aria-live="polite"></p><div id="rf-result"></div></div>`;
+      panel.innerHTML=`<header><h2>RF 링크 계산</h2><small>선배 프로토타입 RF-Friis-v1 / 실제 통신 미확인</small></header><div class="body"><p>사용자 설정 가정으로 계산합니다. 거리는 직접 입력하며 위성 위치·가시 구간과 자동 연결하지 않습니다.</p><div class="rf-profile"><div class="rf-actions"><button type="button" id="rf-profile-load">ISS 공식 조건 불러오기</button><button type="button" id="rf-profile-apply">공식 주파수 적용</button></div><div id="rf-profile-status" role="status" aria-live="polite"></div></div><div class="rf-fields">${RF_FIELDS.map(field=>`<label>${escape(field.label)}<input id="${fieldId(field.key)}" ${field.key==='link_id'?'type="text"':'type="number" step="any"'} aria-describedby="rf-input-help"><small id="${fieldId('origin_'+field.key)}"></small></label>`).join('')}</div><p id="rf-input-help">공식 주파수는 선택적으로 적용할 수 있습니다. 나머지는 직접 입력한 가정이며 장비 조건과 실제 수신은 미확인입니다.</p><div class="rf-actions"><button type="button" id="rf-calculate">모델 계산</button><button type="button" id="rf-cancel">조회 취소</button></div><p id="rf-status" role="status" aria-live="polite"></p><div id="rf-result"></div></div>`;
       writeFields();
-      for(const {key} of RF_FIELDS)panel.querySelector('#'+fieldId(key)).addEventListener('input',event=>controller.setDraft({[key]:event.target.value}));
+      for(const {key} of RF_FIELDS)panel.querySelector('#'+fieldId(key)).addEventListener('input',event=>{controller.setDraft({[key]:event.target.value});if(key==='frequency_ghz')profile.manualFrequency();});
       panel.querySelector('#rf-calculate').addEventListener('click',()=>controller.calculate());
       panel.querySelector('#rf-cancel').addEventListener('click',()=>controller.cancel());
+      panel.querySelector('#rf-profile-load').addEventListener('click',()=>profile.load());
+      panel.querySelector('#rf-profile-apply').addEventListener('click',()=>profile.apply());
     }
-    const {status,error,result}=controller.snapshot();
+    const {status,error,result,draft}=controller.snapshot(),source=profile.snapshot();
+    const holder=panel.querySelector('#rf-profile-status'),metadata=profileMarkup(source);if(holder.innerHTML!==metadata)holder.innerHTML=metadata;
+    panel.querySelector('#rf-profile-apply').disabled=source.status!=='ready';
+    for(const {key} of RF_FIELDS)panel.querySelector('#'+fieldId('origin_'+key)).textContent={unknown:'미확인',user_assumption:'사용자 가정',official_confirmed:'공식 공지 확인값'}[fieldOrigin(key,draft[key],source)];
     panel.querySelector('#rf-status').textContent={idle:'입력 후 계산하세요. 입력이 변경되면 재계산이 필요합니다.',pending:'기존 RF API 계산 중…',ready:'모델 계산 완료 · 실제 통신 미확인',error:'계산 실패: '+error}[status];
     panel.querySelector('#rf-cancel').disabled=status!=='pending';
     const output=panel.querySelector('#rf-result'),html=rfResultMarkup(result);
     if(output.innerHTML!==html)output.innerHTML=html;
   }
-  return {show(view){active=view==='ground';render();},update:render,applyDraft(items){const values={};for(const {key} of RF_FIELDS){const item=items.find(item=>item.id===fieldId(key)&&typeof item.value==='string');if(item)values[key]=item.value;}controller.setDraft(values);writeFields();},destroy:()=>controller.destroy()};
+  return {show(view){active=view==='ground';render();},update:render,applyDraft(items,remote=false){const values={};for(const {key} of RF_FIELDS){const item=items.find(item=>item.id===fieldId(key)&&typeof item.value==='string');if(item)values[key]=item.value;}if('frequency_ghz' in values&&(remote||values.frequency_ghz!==controller.snapshot().draft.frequency_ghz))profile.manualFrequency();controller.setDraft(values);writeFields();},destroy:()=>{profile.destroy();controller.destroy();}};
 }

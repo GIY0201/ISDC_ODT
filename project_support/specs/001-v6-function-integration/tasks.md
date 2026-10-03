@@ -84,3 +84,11 @@ T032 2026-10-03 부분 수행: 최종 하루 p95543.1/547.3ms와 UTC32.0/32.1ms�
 - [x] T036 project_support/specs/001-v6-function-integration/validation/t036_rf_workspace.md에 전체Python/Node/실제웹두해상도/정상·실패·입력보존 증거를기록하고 workflow-progress.md 및data/development_log를갱신한다. FR009/SC007 완료와F001/T032미완료를구분하고별도PR로리뷰한다.
 
 W03-A 의존성: T033→T034→T035→T036. T033의Python/Node시험은별도파일병렬가능. 기존T032는사용자승인으로deferred이며A의선행게이트가아니다. 승인범위는이번4개task이며F001/F002및W03전체완료가아니다.
+
+## W03-B / User Story 2 — ISS APRS 공식 부분 조건 (P1)
+독립 기준: 공식 공지 주파수만 적용, 나머지는 가정/unknown, 실제 통신 미확인 및 GP 보존. 기존 완료 작업 보존.
+- [x] T037 [US2] 프로파일 변환/손상/읽기 불변 및 비동기 출처 회귀 RED를 project_support/tests/test_iss_receive_profile.py와 project_support/tests/browser/rf_receive_profile.test.mjs에 추가한다.
+- [x] T038 [US2] schema_version=1 / communication_status=unknown / equipment_status=not_selected / known_inputs 주파수만 계약을 digital_twin/model_library/packages/iss_aprs_receive_v1와 rf_receive_profile.py, digital_twin/contracts/queries.py, communication/http/rf_network.py, user_application/web/application.py에 구현하고 project_support/docs/adr/0007_iss_receive_profile.md에 기록한다.
+- [x] T039 [US2] communication/browser/api.js와 user_application/web/scripts/tabs/rf_receive_profile.js 및 rf_link_budget.js에 명시 조회/주파수만 적용/원산지 표시/같은 값 무효화/창 유지 구현, project_support/tests/browser/workspace_rf_profile.test.mjs로 검증한다.
+- [x] T040 전체 pytest/Node, 실제 두해상도 UI, 기존 RF AST/GP 불변, Git 소스 배포에 모델 JSON 포함 확인 후 validation/t040_iss_receive_profile.md 및 data/development_log/CURRENT.md/HISTORY.jsonl을 기록하고 Draft PR 리뷰로 게시한다.
+의존성 T036→T037→T038→T039→T040. Python/JS RED와 공식 근거 검토는 다른 파일에서 병렬 가능, 제품 조립은 순차. MVP는 공식 주파수 부분 연결이며 장비 선정/운용 확인/도플러/복조/실제 수신은 F001 후속.
