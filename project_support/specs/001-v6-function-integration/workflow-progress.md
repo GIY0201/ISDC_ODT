@@ -297,3 +297,8 @@ Red: 최초module누락2개 수집실패. 누락OMM필드4시험 KeyError실패 
 - 실제Chrome 두해상도100다른UTC/20다른24h/30초완료3trial, 중단0/hidden0. 실제presentation p9518.578/18.552ms FAIL; UTC32.0/32.1ms PASS; 관측EventTiming22/25개 p9548ms(16ms검열/8ms반올림). 최종callback보호후 fresh서버추가각20일조회 p95543.1/547.3ms PASS. primary/추가/probe/최댓값/전체gzip trace/GPU/hash/환경/screenshot 보존. 모니터60Hz경로 인증이나전원/주사율변경없음. validation/t032_performance.md.
 - 최종Python242 PASS113.49초/기존Starlette경고1, Node82 PASS351.32ms, product native release locked offline integration1 PASS(공식33/668), 실제TCP 입력2/샘플3/구간1/409/UTC보존/health PASS. 역순 덮어쓰기0은 client/ASGI 회귀근거이며 정상브라우저에서고장주입했다고주장하지않음.
 - implement/verify running 및T032[ ] 유지: SC006의frame16.7ms/실제60Hz표시전제가남음. 목표완화/실패표본삭제/완료재분류없음. 이번범위의계산개선과검증은리뷰용으로게시하되 Draft/자동병합없음. 최초전체목표/F001실통신/F002전체기능/F004/F005/F006은그대로열림.
+
+## 2026-10-03 T032 프레임 대조군 재개
+- 사용자 T032 진행 승인에 따라 계산/Cesium/API 없는 10초 순수RAF/Canvas 대조군을 측정했다. 두해상도 정상 p95 약18ms로16.7ms 미달, 앱 계산만이 원인이라는 근거 부족. 일부 회귀 병행/비정상23표본/브라우저 제어 지연은 별도 기록하고 제품 수용시험으로 사용하지 않는다.
+- project_support/tooling/frame_scheduling_control.html과 validation/t032_performance.md에 재현/한계 기록. 제품 소스/정확도/표시 품질/환경 설정 변경 없음. round3 미사용, T032[ ] 및 implement/verify running 유지.
+- Python 기본 tmp setup135 PASS/107 ERROR 후 프로젝트 내부 새 basetemp242 PASS109.66초/기존경고1. Node82 PASS294.26ms. F001/F002/F004/F005/F006과 실제 표시 경로 재검증 유지. PR13 Draft 업데이트, 자동병합 없음.

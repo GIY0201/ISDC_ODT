@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-03 T032 프레임 대조군 진단
+- 변경: 계산/Cesium/API 없는 10초 RAF 및 Canvas 진단 도구 추가. 제품 동작과 환경 설정은 변경하지 않았다. 원자료와 실패 기록을 로컬 보존, validation/t032_performance.md 참조.
+- 결과: 순수 RAF p95 1280 18.6ms/1920 18.2ms, 정상 Canvas 18.1~18.6ms. 앱 계산만의 병목이라고 단정할 수 없다. 비정상23표본/약1초 간격과 브라우저 제어 지연도 보존. 제품30초 수용시험 대체 아님. 회귀 종료 후 별도 재측정 추가.
+- 검증: Python 기본 임시경로에서135 PASS/107 setup ERROR 후 프로젝트 내부 새 basetemp로242 PASS109.66초/기존 경고1. Node82 PASS294.26ms. Rust/wheel 변경 및 새 native 실행 없음.
+- 남음: T032[ ]/SC006 프레임16.7ms 미달 유지. 표시 경로 재검증 필요, round3 미사용, 목표/정확도/최초 전체 범위/F001 실제 통신 조건을 유지. PR13 Draft 리뷰 및 자동 병합 없음.
+
 ## 2026-10-03 T032 하루 조회 개선, 프레임 기준 미달 유지
 - 변경: 정확UTC 포맷 및 내부 readonly UTC/EOP/ITRF/고도각 벡터주입으로 하루중간문자열/객체비용을 줄였다. 기존scalar/wire/권위상태/1초grid/40회극값/0.01초경계/윤초·오류 유지. callback Time 사본 보호를RED→PASS로 검증. opt-in EventTiming/trial guard/UserTiming와 실제presentation trace 분석 추가. ADR0006/validation/t032_performance.md 참조.
 - 검증: 전체Python242 PASS113.49초/기존Starlette경고1, Node82 PASS351.32ms, product Cargo release locked offline integration1 PASS(공식33입력668상태), 실제TCP inputs2/samples3/visibility1/409/UTC보존/health PASS. 동일자료4구간/peak/각도/provenance exact일치. diffcheck PASS.
