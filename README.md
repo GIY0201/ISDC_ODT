@@ -11,7 +11,7 @@
 ```powershell
 python -m venv project_support/.venv
 project_support/.venv/Scripts/python -m pip install -r requirements.txt
-project_support/.venv/Scripts/python -m uvicorn user_application.web.application:create_app --factory --host 127.0.0.1 --port 8765
+project_support/.venv/Scripts/python -m uvicorn user_application.web.application:create_app --factory --host 127.0.0.1 --port 8891
 ```
 
 저장 입력과 Rust 계산 profile 준비 및 검증 절차는 `project_support/specs/001-v6-function-integration/quickstart.md`를 참고합니다. 실행 데이터, 환경 및 빌드 결과는 Git에 포함하지 않습니다.

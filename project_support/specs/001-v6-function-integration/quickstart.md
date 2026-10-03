@@ -39,7 +39,7 @@ cargo test --release --locked --offline --manifest-path digital_twin/simulation/
 프로젝트root에서실행한다. 최초한번만prepare명령으로공개과거ISS예제와설치된고정EOP를보존한다. 이미manifest가있으면생성도구는덮어쓰기를거절하므로기존자료를보존한다. native wheel 설치는위절차가필요하다.
 ```powershell
 project_support/.venv/Scripts/python.exe project_support/tooling/prepare_orbit_inputs.py
-project_support/.venv/Scripts/python.exe -m uvicorn user_application.web.application:create_stored_orbit_app --factory --host 127.0.0.1 --port 8765
+project_support/.venv/Scripts/python.exe -m uvicorn user_application.web.application:create_stored_orbit_app --factory --host 127.0.0.1 --port 8891
 ```
 GET /api/orbit/inputs의input_id/epoch_utc로selection을PUT하고그revision으로samples를POST한다. 기존CLI/defaultcreate_app과달리이profile이localmanifest를lifespan에서읽는다. V6 위성 창에서 저장 입력 선택과 샘플 계산을 수행하면 공용 Cesium 지구에 첫 행의 UTC/ITRF 위치가 표시된다. UTC 재생은 후속 단계다. 과거epoch2020-07-12이며확보시각은로컬보존시각이다.현재telemetry/현재ISS예측으로사용하지않는다.
 검증명령:
@@ -55,3 +55,6 @@ V6 지상국 창에서 RF 패널을 연다. 모든 필드가 빈칸이며 실제
 
 ## ISS 프로파일 검증 T037~T040
 새 프로파일 API/모듈 미존재에서 RED 확인 후 focused Python/Node 시험. 전체 pytest와 browser/*.test.mjs 실행. fresh stored-orbit server에서 ground RF 패널의 공식 조건 불러오기/주파수 적용, 다른 입력 보존, 재적용 결과 폐기, 편집 출처 강등 및 창 복원을1280x720/1920x1080 확인한다. GP epoch/UTC/기하 판정은 보존하며 실제 수신은 미확인이다. F001/T032 전체 완료로 표시하지 않는다.
+
+## W03-C 검증
+기존서버8891의ground에서시나리오통신망불러오기→출발/도착/목적선택→경로조회, 시간파라미터1~72→접촉일정조회. 실제ISS/예약/가시성아닌예시표시와조회UTC를확인한다. 입력변경후결과폐기/취소/오류/복원, 두해상도접근, RF/GP 보존. 전체pytest및Node,원본AST대조. 새서버포트생성금지.

@@ -32,3 +32,8 @@
 .ground-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}.ground-fields label{display:flex;flex-direction:column;gap:4px}.ground-fields input{width:100%;min-width:0;padding:7px;background:#111c27;color:#edf4ff;border:1px solid #40566a;border-radius:4px}.ground-actions{display:flex;flex-wrap:wrap;gap:8px}.visibility-table{overflow-x:auto}.visibility-table table{width:100%;border-collapse:collapse;font-size:12px}.visibility-table th,.visibility-table td{padding:8px;border-bottom:1px solid #40566a;text-align:left;vertical-align:top}.visibility-table td{overflow-wrap:anywhere}#visibility-result dd{overflow-wrap:anywhere}#visibility-status{min-height:24px}@media(max-width:650px){.ground-fields{grid-template-columns:1fr}}
 
 .rf-profile{padding:12px;border:1px solid #40566a;border-radius:6px;background:#14232f}.rf-profile p,.rf-profile li{overflow-wrap:anywhere}.rf-profile a{color:#8dd4ff}.rf-fields small{color:#b6cadb}
+
+.cp-table { max-height: 360px; overflow: auto; }
+.cp-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.cp-table th, .cp-table td { padding: 8px; text-align: left; border-bottom: 1px solid #344452; white-space: nowrap; }
+.cp-table th { position: sticky; top: 0; background: #10212c; }

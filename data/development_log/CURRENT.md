@@ -298,3 +298,12 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 사용자 ISS부터/장비없음. 공식 출처 버전 모델과read-only GET, 주파수만 명시적용, 공식/사용자가정/미확인입력표시. 기존RF AST7동일/GP불변.
 - RED후구현,compatibility신규경로누락보완. 전체Python313 PASS107.66초/기존경고1,Node103 PASS340.8823ms,실제IAB두해상도정상/오류/동일값무효화/창복원/지점입력7보존,error0. report validation/t040_iss_receive_profile.md.
 - 이묶음완료,F001전체/실제수신/장비검증/F002및T032보류유지. nativewheel변경없음/JSON은소스배포. stacked Draft PR리뷰,자동병합없음.
+
+## 2026-10-04 개발 포트 8891 고정
+- 사용자 지시: 앞으로8891고정. CLI 기본 포트를 configs.DEFAULT_PORT=8891로 설정하고 README/quickstart/AGENTS/DEVELOPMENT에 동일 주소와 동일 포트 재시작 규칙 기록. 기존 검증 이력의 과거 포트는 보존.
+- 검증: entrypoint 회귀8765≠8891 RED 후1 PASS, 전체pytest314 PASS107.71초/기존 Starlette경고1, 현재8891 health HTTP200, git diff --check PASS. 포트만 변경하며 기존 서버 종료/추가 서버 시작 없음.
+
+## 2026-10-04 T041~T044 시나리오 경로·접촉 계획
+- 선배 기존 bootstrap/route/contacts를V6 지상국에연결. 서버함수/API/schema보존,노드API조회,시나리오의미/UTC/전체행/시간범위한계표시. optional signal과독립세대로늦은응답폐기,복원과원격편집처리.
+- RED후구현,Python325 PASS113.65초/기존경고1,Node114 PASS362.4772ms,실제8891두해상도20행/GP·RF입력18개보존/error0/원본AST9동일/read-only리뷰결함0. PATH Python 의존성없음 collection오류를전용venv로해결. report validation/t044_communication_planning.md.
+- 이묶음완료. 실제ISS수신/예약/HIL아님,F001전체/F002/F004~6/T032보류유지. PR15위stacked Draft PR,8891고정변경포함,자동병합없음.
