@@ -98,3 +98,8 @@ FR010/SC008, US2, R006/R007. 기존 Python/FastAPI/JS와 RF 계산 재사용. Ph
 Phase1 실제 사용하는 model_library/packages/iss_aprs_receive_v1의 버전 JSON/manifest와 rf_receive_profile.py loader를 추가한다. TwinQueries로 readonly callback을 주입하며 새 GET을 communication/http에 둔다. 고정 모델 읽기는 요청 시 수행하고 import IO/runtime 복제 없음. JS rf_receive_profile.js가 화면용 출처 사본과 abort/generation을 소유, rf_link_budget.js가 기존 입력/결과 controller와 조립한다. 기존 RF 서버 함수/schema AST 보존.
 공식 주파수만 채우며 어떤 장비값도 보충하지 않는다. 새 패키지/API 형식 ADR0007, Python 앱은 소스 checkout으로 실행하며 이 JSON을 소스에 포함한다. 기존 wheel은 Rust 계산 모듈 전용으로 유지한다. source 날짜/확인 UTC/공지 나이 표시, GP epoch와 연결하지 않는다. 창 draft의 provenance는 공식 권위로 전달하지 않는다. 새 Viewer 없음.
 Constitution: 독립계층/단일권위상태/실측구분/V6보존/TDD 충돌0. T037→T038→T039→T040. 분석과 RED를 통과한 뒤 구현. 전체pytest/Node 및 실제 두해상도 제품 확인 후 stacked Draft PR. 이 묶음 완료는 F001 전체 완료가 아니다.
+
+## W03-C 선배 시나리오 경로/접촉 계획 V6 연결
+FR011/SC009,US2,R002/R003/R004/R007. 기존JS/Python/FastAPI/서버계산/schema 보존. Phase0 재사용 검토: bootstrap.communication의 실제 시나리오 그래프와 route/contacts endpoint를 그대로 호출한다. contact_plan은 벽시계/링크index/quality로 만든 예시 일정이며 hours 안으로 end를 엄밀히 제한하지 않는다. 표시에서 시간 파라미터와 생성 시각/실제기하·수신미확인을 구분하며 임의보정/필터없음. 신규 장비기본값/예시망→ISS 대체없음.
+Phase1 contracts/communication_planning.md, data-model/quickstart. user_application/web/scripts/tabs/communication_planning.js의 표시사본/controller와workspace_orbit.js 조립, transport는communication/browser/api.js의기존bootstrap/route/contacts에optionalAbort signal추가(기존인자호환). server/domain는변경하지않는다. API·model format변경없으므로 신규ADR불필요. 노드와link는API사본에서조회하고UI상수로하드코딩하지않는다. 네트워크명시조회→사용자선택→독립route/contacts조회, 입력별무효화, 취소/종료/역순generation. 창보존/원격draft재조회필요.
+T041 RED→T042 controller/transport→T043 실제V6조립→T044 전체회귀/실제두해상도/로그/stacked Draft PR. Constitution 독립계층/현재상태단일소유/선배보존/V6/검증5원칙 충돌0.8891 고정, 현재서버변경없으면재시작불필요. 기존T032보류/F001/F002전체미완료유지.

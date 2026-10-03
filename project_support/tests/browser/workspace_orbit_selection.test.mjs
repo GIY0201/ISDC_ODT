@@ -14,6 +14,7 @@ test('empty UI choice restores server selection without clearing its result or s
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
     .replace(/import \{createWorkspaceRevisionSync\} from [^;]+;/,'const createWorkspaceRevisionSync=()=>({observe(){},destroy(){}});')
     .replace(/import \{createGroundPanel\} from [^;]+;/,'const createGroundPanel=()=>({show(){},update(){},destroy(){}});')
+    .replace(/import \{createCommunicationPlanningPanel\} from [^;]+;/,'const createCommunicationPlanningPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createRfPanel\} from [^;]+;/,'const createRfPanel=()=>({show(){},update(){},destroy(){}});')
     .replace(/import \{api\} from [^;]+;/,'const api={};')
     .replace(/import \{createOrbitSelection\} from [^;]+;/,'const createOrbitSelection=()=>globalThis.testOrbitClient;')

@@ -28,3 +28,6 @@ RF 응답사본: 기존model/link_id/inputs/8수치/status/assumptions. 변경�
 
 ## ISS 수신 공식 부분 프로파일
 정적 버전 자산: schema_version=1, profile_id, ISS25544/RS0ISS/APRS/receive_only, source(url/status_as_of/checked_utc), frequency_mhz, known_inputs(frequency_ghz만), equipment_status=not_selected, communication_status=unknown, source_report, notes, canonical JSON hash. runtime 소유 상태 아님. 화면 사본은 pending/ready/error와 applied 여부만 소유한다. 각 RF input origin은 공식 명시 적용/사용자 가정/빈 미확인으로 계산한다. 프로파일/출처 변경은 RF query 세대 무효화.
+
+## 시나리오 경로와 접촉 표시 사본
+communication graph: bootstrap가반환한nodes(id,type)와links(id,source,target,quality,protocol). draft: source/target는graph내ID,objective latency/reliability/balanced,hours정수1~72. route response:echo3개,path/link_ids/hops/finitecost 또는unavailable/null,active_fault_targets. contacts response:hours/count/items와scenario-contact-plan-v1, 각item UTC start/end/duration/quality/capacity_mb/graphlink. 조회브라우저UTC를별도기록하며실제수신증거아님. network/route/contacts 각각idle/pending/ready/error, route/contacts 세대독립. 편집/재조회/취소/종료는관련과거결과폐기.

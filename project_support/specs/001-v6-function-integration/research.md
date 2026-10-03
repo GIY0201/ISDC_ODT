@@ -61,3 +61,6 @@ Decision: 기존RF-Friis-v1 계산/POST API와모든11입력을편집하는새V6
 ## 2026-10-04 ISS APRS 부분 프로파일 조사
 ARISS https://www.ariss.org/current-status-of-iss-stations.html 확인 UTC2026-10-03T17:12:27Z, 공지 기준2026-09-25: Zvezda/RS0ISS APRS437.825MHz와 troubleshooting/testing. SSTV437.550MHz Oct2~6 공지도 공존하므로 현재 APRS 운용을 자동 확정하지 않는다. https://www.ariss.org/contact-the-iss.html 의 일반 최대 전력은 이 운용의 실제 전력 근거가 아니다. https://www.ariss.org/uploads/1/9/6/8/19681527/k9jkm_2012_symposium_ver2.pdf 의1200baud는2012년 설명이며 현재 장비 조건으로 적용하지 않는다.
 읽기 전용 연구/원본1a1e00297a0301637455b0ef2cf48b2e74576b07 검토: 기존 RF 함수/API 재사용, S/X/Ka 대표 접시/잡음 모델을 UHF 장비로 적용하지 않는다. 사용자 장비 없음에 따라 주파수 외 numeric 값은 모두 사용자 가정/unknown. 네트워크 live 조회 대신 출처를 가진 버전 snapshot을 제공, 고정 source 시점을 표시한다. 나중 장비 선정/도플러/복조/실제 수신 증거는 F001 후속.
+
+## W03-C 재사용 결정
+사용자는 거리/도플러 대신 선배 경로·접촉 계획을 선택했다. 원본 rf_network.py calculate_route/contact_plan 및 HTTP route/contacts, network.communication은 기존시나리오기능으로재사용한다. 읽기전용연구는정적graph/quality/장애제외와벽시계합성일정의의미를확인했다. 대안: ISS 지상거리/도플러는공식자료와현재위치·속도계약추가검증이필요하므로F001후속. oisl.js는별도원본의위성간LVLH전제라그대로UHF지상수신으로이식하지않는다. actual ISS/GP2020시간과시나리오계획2026벽시계분리. source runtime복제없이결과사본만표시한다.

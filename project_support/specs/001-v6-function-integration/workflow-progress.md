@@ -330,3 +330,13 @@ Red: 최초module누락2개 수집실패. 누락OMM필드4시험 KeyError실패 
 
 ## 2026-10-04 T037~T040 검증 완료
 FR010/SC008→R006/R007 부분 증거 E-ISS-PROFILE: validation/t040_iss_receive_profile.md. clarify/plan/tasks/analyze 신규 범위 complete, checklist8/8. RED 후 실제 구현, Python313 PASS107.66초/기존경고1, Node103 PASS340.8823ms, 실제두해상도 UI/GP7입력보존/error로그0/AST7동일. 버전snapshot 주파수만 공식,장비없음/현재수신unknown. package JSON은소스배포, native전용wheel변경없음. 원격draft는가정,로컬복원은보존. FR010/SC008이번묶음complete,전체implement/verify running;F001전체/F002/T032보류및F004~6미완료. codex/iss-receive-profile stacked Draft PR게시/리뷰,자동병합없음.
+
+2026-10-04 추가 사용자 합의: 개발/UI검증 포트8891고정, 동일포트프로젝트서버재시작. CLI기본값/실행문서/AGENTS반영. entrypoint RED후전체Python314 PASS107.71초/기존경고1,8891health200. 기존포트검증이력/전체미완료항목보존.
+
+## 2026-10-04 W03-C 다음 선택 확정
+추가질문1/답변1: 선배 코드의 통신 경로·접촉 계획 기능 연결. 거리/도플러 선택안은F001후속유지. speckit-auto/clarify 실행, bootstrap/prerequisite/setup-plan/setup-tasks 실제실행,hooks없음. FR011/SC009→R002/R003/R004/R007→T041~44 신규범위만plan/tasks/analyze/verify검토. 현재branchcodex/communication-planning은8891설정localcommit위에서진행. 설계/계약작성;clarify/plan/taskscomplete,analyze pending. 기존완료/보류T032/F001전체/F002전체보존.
+
+분석 read-only 완료: FR011/SC009→T041~44 coverage100%, unmapped0/critical0/constitution충돌0. requirements8/8 문서품질PASS. 기존API11PASS, 신규JS 모듈미존재 RED확인. analyze complete, implement running.
+
+## 2026-10-04 T041~T044 연결·검증
+FR011/SC009 증거 E-COMM-PLANNING: validation/t044_communication_planning.md. 이번 clarify/plan/tasks/analyze/implement/verify 묶음 complete. Python325 PASS113.65s/기존경고1,Node114 PASS362.4772ms,실제8891두해상도/입력18개보존/20행/오류0/원본AST9동일/read-only review결함0. 전체feature implement/verify running; F001/F002/F004~6/T032보류유지. stacked Draft PR 게시,자동병합없음.

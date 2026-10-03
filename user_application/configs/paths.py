@@ -8,3 +8,4 @@ CATALOG_CACHE_DIR = ROOT_DIR / "data" / "workspace" / "catalog_cache"
 APP_NAME = "SpaceTwin VVP"
 APP_VERSION = "0.3.0"
 DEFAULT_HOST = "103.218.162.73"
+DEFAULT_PORT = 8891

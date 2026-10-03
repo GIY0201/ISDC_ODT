@@ -8,7 +8,7 @@ import webbrowser
 
 import uvicorn
 
-from user_application.configs.paths import DEFAULT_HOST, ROOT_DIR
+from user_application.configs.paths import DEFAULT_HOST, DEFAULT_PORT, ROOT_DIR
 
 
 WILDCARD_HOSTS = {"0.0.0.0", "::"}
@@ -21,7 +21,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=DEFAULT_HOST,
         help=f"수신 주소 (기본값: {DEFAULT_HOST})",
     )
-    parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     parser.add_argument("--no-browser", action="store_true", help="브라우저를 자동으로 열지 않음")
     parser.add_argument("--reload", action="store_true", help="개발용 자동 재시작")
     return parser.parse_args(argv)

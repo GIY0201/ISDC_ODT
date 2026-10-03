@@ -92,3 +92,10 @@ W03-A 의존성: T033→T034→T035→T036. T033의Python/Node시험은별도파
 - [x] T039 [US2] communication/browser/api.js와 user_application/web/scripts/tabs/rf_receive_profile.js 및 rf_link_budget.js에 명시 조회/주파수만 적용/원산지 표시/같은 값 무효화/창 유지 구현, project_support/tests/browser/workspace_rf_profile.test.mjs로 검증한다.
 - [x] T040 전체 pytest/Node, 실제 두해상도 UI, 기존 RF AST/GP 불변, Git 소스 배포에 모델 JSON 포함 확인 후 validation/t040_iss_receive_profile.md 및 data/development_log/CURRENT.md/HISTORY.jsonl을 기록하고 Draft PR 리뷰로 게시한다.
 의존성 T036→T037→T038→T039→T040. Python/JS RED와 공식 근거 검토는 다른 파일에서 병렬 가능, 제품 조립은 순차. MVP는 공식 주파수 부분 연결이며 장비 선정/운용 확인/도플러/복조/실제 수신은 F001 후속.
+
+## W03-C / US2 시나리오 통신 경로·접촉 계획
+- [x] T041 [US2] project_support/tests/test_communication_planning_api.py와project_support/tests/browser/communication_planning.test.mjs에 기존경로수치/장애제외/접촉provenance/상태불변 및UI역순/오류/경계 RED시험 추가.
+- [x] T042 [US2] user_application/web/scripts/tabs/communication_planning.js controller와communication/browser/api.js optional signal구현. source/target는조회graph ID,objective latency/reliability/balanced,hours정수1~72. 기존server계산/schema보존.
+- [x] T043 [US2] user_application/web/scripts/workspace_orbit.js와workspace.js 및styles/workspace.css에 실제panel/입력/결과/시나리오의미/창·원격보존을조립하고project_support/tests/browser/workspace_communication_planning.test.mjs 검증.
+- [x] T044 validation/t044_communication_planning.md에전체Python/Node/실제두해상도8891/AST/GP·RF불변 및한계를기록하고 workflow-progress.md/data/development_log를갱신후stacked Draft PR 리뷰.
+의존성T040→T041→T042→T043→T044. 서로독립Python/Node시험과읽기전용자료검토는병렬가능. MVP는기존시나리오2기능UI연결,현재ISS통신가능/예약/HIL로표현하지않는다.
