@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-03 T032 하루 조회 개선, 프레임 기준 미달 유지
+- 변경: 정확UTC 포맷 및 내부 readonly UTC/EOP/ITRF/고도각 벡터주입으로 하루중간문자열/객체비용을 줄였다. 기존scalar/wire/권위상태/1초grid/40회극값/0.01초경계/윤초·오류 유지. callback Time 사본 보호를RED→PASS로 검증. opt-in EventTiming/trial guard/UserTiming와 실제presentation trace 분석 추가. ADR0006/validation/t032_performance.md 참조.
+- 검증: 전체Python242 PASS113.49초/기존Starlette경고1, Node82 PASS351.32ms, product Cargo release locked offline integration1 PASS(공식33입력668상태), 실제TCP inputs2/samples3/visibility1/409/UTC보존/health PASS. 동일자료4구간/peak/각도/provenance exact일치. diffcheck PASS.
+- 실제두해상도: 100다른UTC/20다른24h/30초완료3trial, 실제presentation p9518.578/18.552ms FAIL. UTC32.0/32.1ms PASS, 관측EventTiming48ms(16ms threshold/8ms반올림). 최종보호후추가각20일조회 p95543.1/547.3ms PASS. 환경/전체gzip trace/GPU/hash/profile/실패표본/screenshot 로컬보존.
+- 남음: SC006/T032 부분완료이며16.7ms 및실제60Hz표시전제 재검증 필요. 환경/전원/주사율변경없음. F001실통신/F002전체선배기능/F004/F005/F006/다른PC·실제AeroDT 연결 미완료. codex/orbit-performance는 PR12에 의존한 별도 Draft 리뷰이며 자동병합없음.
+
 ## 2026-10-03 T028/T029/T030 검증 묶음 및 성능 미달
 - 변경: 정확UTC/EOP/native/geometry/극값round batch와같은지점Cesium property 재사용, opt-in실제UI계측/분석도구 및 batch15·설치2 회귀시험. dated제품wheel/선택Python DLL출처·hash/LICENSE·RECORD 검증. ADR0005 및 feature validation/t028_performance.md,t029_install.md,t030_review.md에 결과·한계 기록. 원본자료/환경/과거wheel/legacy/합의 보존.
 - 검증: 최종Python224 PASS(107.80초,기존Starlette경고1), Node77 PASS(256.24ms), 제품cargo release locked offline integration1 PASS(공식33입력668상태), 실제TCP 입력2/샘플3/구간1/409/선택UTC보존/health PASS. 새venv offline/-I 프로젝트밖 native호출2 PASS. diffcheck PASS.

@@ -8,25 +8,40 @@ export function summarizeMeasurements(raw){
     report[name]={count:values.length,p95:rank(.95),p99:rank(.99),max:values.at(-1)??null};
     if(name in targets)report.gates[name]=values.length?report[name].p95<=targets[name]:null;
   }
+  const interactions=new Map();
+  for(const entry of raw.eventTiming||[])if(entry.visible==='visible'&&entry.interactionId>0&&Number.isFinite(entry.duration))interactions.set(entry.interactionId,Math.max(entry.duration,interactions.get(entry.interactionId)??0));
+  const durations=[...interactions.values()].sort((a,b)=>a-b);
+  const rank=p=>durations.length?durations[Math.ceil(durations.length*p)-1]:null;
+  report.eventTiming={count:durations.length,p95:rank(.95),p99:rank(.99),max:durations.at(-1)??null};
+  report.gates.eventTiming=durations.length?report.eventTiming.p95<=50:null;
   return report;
 }
 export function installOrbitUiMeasurement(host=window){
-  const doc=host.document,raw={frames:[],hiddenFrames:[],feedback:[],utcResult:[],dayResult:[],events:[]};
+  const doc=host.document,raw={frames:[],hiddenFrames:[],feedback:[],utcResult:[],dayResult:[],events:[],eventTiming:[]};
   const box=doc.createElement('aside');box.id='orbit-ui-measurement';box.style.cssText='position:fixed;top:0;right:0;z-index:10000;background:#fff;color:#111;max-width:420px;max-height:200px;overflow:auto;font:12px monospace;padding:5px';
   box.innerHTML='<button id="measure-start">30초 프레임 측정</button><button id="measure-report">결과 기록</button><pre id="measure-output"></pre>';doc.body.append(box);
-  let frame=null,last=null,until=0,query=null,utcQuery=null,disposed=false;
+  let frame=null,last=null,until=0,query=null,utcQuery=null,disposed=false,trial=0,eventObserver=null,eventTimingStatus='unsupported';
+  const captureTiming=entries=>{for(const entry of entries){const id=entry.target?.closest?.('[id]')?.id;
+    if(!id||id.startsWith('measure-'))continue;
+    raw.eventTiming.push({id,name:entry.name,start:entry.startTime,duration:entry.duration,processingStart:entry.processingStart,processingEnd:entry.processingEnd,interactionId:entry.interactionId,visible:doc.visibilityState});
+  }};
+  if(host.PerformanceObserver?.supportedEntryTypes?.includes('event'))try{
+    eventObserver=new host.PerformanceObserver(list=>captureTiming(list.getEntries()));
+    eventObserver.observe({type:'event',buffered:false,durationThreshold:16});eventTimingStatus='observing';
+  }catch(error){eventTimingStatus=`unavailable: ${error.message}`;eventObserver=null;}
   function output(){
+    if(eventObserver)captureTiming(eventObserver.takeRecords());
     const canvas=doc.querySelector('#stored-orbit-globe canvas');let renderer='unavailable';try{const gl=canvas?.getContext('webgl2')||canvas?.getContext('webgl');const debug=gl?.getExtension('WEBGL_debug_renderer_info');if(debug)renderer=gl.getParameter(debug.UNMASKED_RENDERER_WEBGL);}catch{}
-    const context={renderer,feedbackMethod:'two requestAnimationFrame callbacks: conservative presentation proxy, not Event Timing',frameMethod:'foreground RAF scheduling; GPU rendered frames not inferred',userAgent:host.navigator.userAgent,viewport:[host.innerWidth,host.innerHeight],devicePixelRatio:host.devicePixelRatio,visibility:doc.visibilityState,focused:doc.hasFocus(),date:new Date().toISOString(),hardwareConcurrency:host.navigator.hardwareConcurrency};
+    const context={renderer,eventTiming:{status:eventTimingStatus,durationThresholdMs:16,roundingMs:8,method:'Event Timing next-paint duration; sub-threshold entries censored, missing observations never pass'},feedbackMethod:'two requestAnimationFrame callbacks: conservative presentation proxy, not Event Timing',frameMethod:'foreground RAF scheduling; GPU rendered frames not inferred',userAgent:host.navigator.userAgent,viewport:[host.innerWidth,host.innerHeight],devicePixelRatio:host.devicePixelRatio,visibility:doc.visibilityState,focused:doc.hasFocus(),date:new Date().toISOString(),hardwareConcurrency:host.navigator.hardwareConcurrency};
     box.querySelector('#measure-output').textContent=JSON.stringify({context,summary:summarizeMeasurements(raw),raw});
   }
   function tick(now){
     if(disposed)return;
     if(last!==null)raw[doc.visibilityState==='visible'?'frames':'hiddenFrames'].push(now-last);
     last=now;
-    if(now<until)frame=host.requestAnimationFrame(tick);else{frame=null;raw.events.push({id:'frame-trial-complete',end:now});output();}
+    if(now<until)frame=host.requestAnimationFrame(tick);else{frame=null;box.querySelector('#measure-start').disabled=false;host.performance.mark?.(`orbit-frame-trial-${trial}-end`);raw.events.push({id:'frame-trial-complete',trial,end:now});output();}
   }
-  box.querySelector('#measure-start').addEventListener('click',()=>{if(frame!==null)host.cancelAnimationFrame(frame);raw.events.push({id:'frame-trial',start:host.performance.now(),viewport:[host.innerWidth,host.innerHeight],visible:doc.visibilityState,focused:doc.hasFocus()});last=null;until=host.performance.now()+30000;frame=host.requestAnimationFrame(tick);});
+  box.querySelector('#measure-start').addEventListener('click',()=>{if(frame!==null)return;trial++;box.querySelector('#measure-start').disabled=true;host.performance.mark?.(`orbit-frame-trial-${trial}-start`);raw.events.push({id:'frame-trial',trial,start:host.performance.now(),viewport:[host.innerWidth,host.innerHeight],visible:doc.visibilityState,focused:doc.hasFocus()});last=null;until=host.performance.now()+30000;frame=host.requestAnimationFrame(tick);});
   box.querySelector('#measure-report').addEventListener('click',output);
   const click=event=>{
     const id=event.target.closest('[id]')?.id;if(!id||id.startsWith('measure-'))return;
@@ -52,6 +67,6 @@ export function installOrbitUiMeasurement(host=window){
     }
   });
   doc.addEventListener('click',click,true);observer.observe(doc.body,{subtree:true,childList:true,characterData:true});
-  host.addEventListener('pagehide',event=>{if(event.persisted)return;disposed=true;if(frame!==null)host.cancelAnimationFrame(frame);observer.disconnect();doc.removeEventListener('click',click,true);});
+  host.addEventListener('pagehide',event=>{if(event.persisted)return;disposed=true;if(frame!==null){host.cancelAnimationFrame(frame);raw.events.push({id:'frame-trial-aborted',trial,end:host.performance.now()});}observer.disconnect();eventObserver?.disconnect();doc.removeEventListener('click',click,true);});
   output();return {raw,report:output};
 }

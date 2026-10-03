@@ -11,7 +11,7 @@ import numpy as np
 import erfa
 from astropy.time import Time
 from foundation.orbit_time import UtcInstant
-from digital_twin.contracts.orbit import EarthOrientationPoint,GroundPoint
+from digital_twin.contracts.orbit import EarthOrientationPoint,EarthOrientationVector,GroundPoint
 
 @dataclass(frozen=True)
 class ItrfBatch:
@@ -80,3 +80,19 @@ def elevation_deg(positions_m,site:GroundPoint):
     result=np.degrees(np.arctan2(up,np.hypot(east,north)))
     if not np.isfinite(result).all():raise ValueError('nonfinite elevation')
     return _readonly(result)
+
+
+def teme_positions_to_itrf(positions_km,times:Time,eop:EarthOrientationVector):
+    """Position-only form of the same GMST82/polar-motion kernel on vectors."""
+    r=_vectors(positions_km);n=len(r)
+    if not isinstance(times,Time) or times.scale!='utc' or times.shape!=(n,) or not np.isfinite(times.jd).all():
+        raise ValueError('finite aligned UTC Time required')
+    if not isinstance(eop,EarthOrientationVector) or len(eop.xp_rad)!=n:raise ValueError('aligned EOP required')
+    if not n:return _readonly(r)
+    utc=times.copy();utc.delta_ut1_utc=eop.ut1_minus_utc_s
+    ut1=utc.ut1;theta=erfa.gmst82(ut1.jd1,ut1.jd2);c,s=np.cos(theta),np.sin(theta)
+    pef=np.column_stack((c*r[:,0]+s*r[:,1],-s*r[:,0]+c*r[:,1],r[:,2]))
+    polar=erfa.pom00(eop.xp_rad,eop.yp_rad,np.zeros(n))
+    position=np.einsum('nij,nj->ni',polar,pef)*1000
+    if not np.isfinite(position).all():raise ValueError('nonfinite transform result')
+    return _readonly(position)

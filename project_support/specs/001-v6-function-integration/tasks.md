@@ -72,3 +72,5 @@ R001:T001,T004,T010,T029. R002:T014,T016,T024,T025,T031. R003:T030(후속기능,
 ## Phase 7: Convergence
 
 - [ ] T032 user_application/orbit_calculation.py와 digital_twin/simulation/visibility.py의 실제 병목을 profile로 확인하고 1초dense/극값/경계/윤초/오류·provenance 정확도를 유지한 채 하루결과p95≤1000ms를 달성한다. user_application/web/scripts/orbit_ui_measurement.js 및 project_support/tooling/measure_orbit_ui.mjs에서 실제전경60Hz이상 GPU프레임제출/입력Event Timing 또는 동등한 표시증거를 보완하고, 두해상도30초완료trial3회/다른UTC100회/다른24h범위20회로 frame p95≤16.7ms/피드백≤50ms/UTC완료≤100ms 및역순덮어쓰기0을 재검증한다. 중단trial·최댓값·실패·환경/trace/hash를 보존하며 T028의미달을 PASS로재분류하지않는다. 검증보고서와전체회귀를갱신한다 per SC-006,FR-006,plan: Validation and delivery gates (partial). HIGH; F001실통신/F002전체기능은 별도후속으로유지한다.
+
+T032 2026-10-03 부분 수행: 최종 하루 p95543.1/547.3ms와 UTC32.0/32.1ms는통과, 실제presentation18.578/18.552ms는미달. 두해상도30초완료3trial/다른UTC100회/다른24h20회 및GPU/관측EventTiming/최댓값·실패원문보존. 최종Python242/Node82/native1/actualTCP PASS. validation/t032_performance.md. 남은frame16.7ms/60Hz표시전제 때문에checkbox유지하며전체제품완료로처리하지않는다.
