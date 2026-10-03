@@ -1,5 +1,15 @@
 # 현재 개발 기록
 
+## 2026-10-04 RF 최종 검토 보완
+- 변경: Unicode 링크 이름 길이를 기존 서버와 같은 code point40자로 검사. emoji40/41 RED→PASS 및 실제API/UI 확인. 서버 계산/API/schema 보존.
+- 최종검증: 전체Python304 PASS103.50초/기존경고1, Node95 PASS313.47ms. 보고서 t036_rf_workspace.md.
+- 남음: 별도Draft PR 리뷰/병합, 필수F001, 전체F002, 사용자보류T032.
+
+## 2026-10-03 W03-A RF 계산기 V6 연결
+- 변경: 선배 RF 서버 계산/API/schema를 보존하고 V6에 편집11개/출력8개/가정·실제통신미확인 패널 및취소/echo/422 처리 연결. runtime/GP/UTC 소유권 보존. AST7개 원본동일.
+- 검증: 전체Python304 PASS108.66초/기존경고1, Node95 PASS317.33ms, 실제IAB1280×720/1920×1080 HTTP정상·모델여유부족·입력오류·창복원/역할전환 확인. 새Node 모듈/패널 RED→PASS. validation/t036_rf_workspace.md 참조.
+- 남음: F001 실제통신조건 조사·적용 필수, F002 전체기능, 사용자 보류T032/SC006 유지. 별도Draft PR 리뷰/자동병합 없음. 신규native/wheel 검증 아님.
+
 ## 2026-10-03 T032 프레임 대조군 진단
 - 변경: 계산/Cesium/API 없는 10초 RAF 및 Canvas 진단 도구 추가. 제품 동작과 환경 설정은 변경하지 않았다. 원자료와 실패 기록을 로컬 보존, validation/t032_performance.md 참조.
 - 결과: 순수 RAF p95 1280 18.6ms/1920 18.2ms, 정상 Canvas 18.1~18.6ms. 앱 계산만의 병목이라고 단정할 수 없다. 비정상23표본/약1초 간격과 브라우저 제어 지연도 보존. 제품30초 수용시험 대체 아님. 회귀 종료 후 별도 재측정 추가.
@@ -279,3 +289,7 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 변경: 업무/편집값 opener 전달 및 화면재구성 보존, 활성편집 충돌 안내, 서버 선택 draft 제외, revision 힌트/snapshot 조회, 409 snapshot 재조회, channel/Viewer 종료.
 - 검증: 초기 실패 후 전체Node74 PASS/Python207 PASS(102.02초, 기존Starlette경고1), git diff --check PASS. 실제Chrome popup 입력전달/양방향편집/충돌/서버선택/닫기/부모canvas1; validation/t031_popout.md에 adapter와 실제증거 및 popup 도구제약 구분.
 - 상태/위험: 첫묶음28/31, T028/T029/T030 남음. 게임성능/F001실제통신/F002전체기능 미완료. PR리뷰/병합 별도, extension hooks 없음.
+
+## 2026-10-03 다음 구현 범위 검토
+- 사용자 지시로 T032 프레임 확인은 후속으로 보류하고 W03 RF 기능 검토 착수. rf_workspace_review.md에 선배 함수/API/UI 재사용 근거와 실제 조건 공백 기록. codex/rf-link-workspace에서 기존 작업 보존.
+- RF/route 기존 회귀1 PASS0.03초. 제품 소스 변경 및 전체 시험 없음. 질문1개/답변0개이며 첫 RF 계산기 연결과 실제 서비스 프로파일 중 범위 결정 대기. F001 실제 통신 조건 조사·적용은 필수로 유지.

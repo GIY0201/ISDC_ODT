@@ -82,3 +82,13 @@ orbit_playback.js/ orbit_utc.js/ workspace_playback.js가 서버 UTC snapshot의
 
 ### T023 구현 경로 보완
 지점 및 visibility 표시사본은 scripts/tabs/ground_visibility.js에 둔다. 설정은 기존 orbit_selection.js, wire 조회는 communication/browser/api.js를 사용한다. 단일Viewer 지점표시는 orbit_globe.js/workspace_globe.js이며 legacy 합성 globe.js를 보존한다. 계산/API 의미 변경 없음. query와 위치버퍼 수명은 분리하고 같은 서버 revision/입력/자료/지점을 검증한다. validation/t023_ground_visibility.md 참조.
+
+## W03-A 편집 가능한 RF 계산기 상세 계획
+2026-10-03 사용자 A 선택. FR009/SC007, R002/R003/R004/R007. T032 프레임 항목은 독립 후속으로 보류한다. RF 상세 계약은 contracts/rf_workspace.md를 따른다.
+- 기술: 기존 JS/Python/FastAPI 및 RF-Friis-v1 그대로. 새 Rust/라이브러리/API/default 변경 없음. legacy 보존.
+- Phase0: rf_workspace_review.md 및 독립 읽기 전용 연구에서 모든11입력/정확한 범위/반올림전status/HTTP422/시나리오contacts 위험 확인. A 범위의 미결 설계값 없음. 실제 서비스 입력은 F001 후속으로 명시적 분리.
+- Phase1: RF draft/응답 모델은 data-model.md, 기존 HTTP와UI 수명은 contracts/rf_workspace.md, 실행 검증은 quickstart.md에 추가. 서버 권위상태를 새 저장소에 복제하지 않는다.
+- 경계: user_application/web/scripts/tabs/rf_link_budget.js의 입력 검증/읽기 전용 query controller/패널, workspace_orbit.js의 조립, communication/browser/api.js의 RF 전용 오류 해석과 abort 신호. 기존 simulation/API/schema는 수정하지 않는다.
+- UI: V6 ground에 독립 패널, 시작값은 모두 빈칸. 링크 이름과10개수치 전부 편집. 단위/요청 입력/모델 분류/가정을 표시하며 실제통신미확인/거리직접입력 의미 유지. 생성 문자열은 escape, 오류/status는textContent. 새로운 Viewer 없음.
+- 검증: JS controller/transport/window 보존 및 Python 기존endpoint 수치/경계/상태불변. RED 후 구현, 전체pytest/Node, 실제브라우저1280/1920 정상/오류/창입력보존. 이번 묶음은 프레임성능이나 실제RF수신 완료 게이트가 아니다.
+- Constitution check: 독립 계층/단일상태/V6/기존계산 보존/검증 원칙5개 충돌 없음. 체크리스트8/8 유지. 기존모델의3dB는물리적상수로오인하지않고출처미확인판정기준이라고표시한다.

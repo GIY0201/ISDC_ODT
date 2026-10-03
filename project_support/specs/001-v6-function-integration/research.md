@@ -53,3 +53,7 @@ coordinate_probe_results.md 최종 묶음 참조. 확장17시험+Rust연결9+기
 
 ## Phase1 설계 정리
 plan/data-model/contracts/orbit_api 및workspace/quickstart를 현재검증조합으로갱신했다. 기술문서의미합의TS/Vite권고는backup보존후JS/Rust전파+Python좌표조합으로수정했다. 공개route는별도prefix/ADR, currentstate는runtime기존구성요소, artifact버전은plan참조. 연구gate의배포/UI미검증은제품task에서검증하는사항으로명확히분리. 제품source변경없음.
+
+## W03-A 재사용 결정
+Decision: 기존RF-Friis-v1 계산/POST API와모든11입력을편집하는새V6패널. 사용자A승인. Rationale: 선배기능을작은단위로연결하고기존계산/legacy회귀를보존하며숨겨진장비기본값을배제한다. Alternatives: legacy패널복사(숨은고정값존재), ISS전용프로파일우선(서비스/장비미선정), 새RustRF계산(실측병목근거없음).
+독립연구검토: 반올림전margin으로status결정, HTTP422배열의필드별오류표시, 정확한exclusive/inclusive경계, 전체요청echo/유한결과검증, generation/abort/사본필수. 공식ITU/ARISS는rf_workspace_review.md 조사출발점이며실조건확정자료가아니다. A구현연구게이트완료, F001실조건/모델충족구간은계속열림.

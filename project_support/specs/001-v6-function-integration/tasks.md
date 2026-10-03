@@ -76,3 +76,11 @@ R001:T001,T004,T010,T029. R002:T014,T016,T024,T025,T031. R003:T030(후속기능,
 T032 2026-10-03 부분 수행: 최종 하루 p95543.1/547.3ms와 UTC32.0/32.1ms는통과, 실제presentation18.578/18.552ms는미달. 두해상도30초완료3trial/다른UTC100회/다른24h20회 및GPU/관측EventTiming/최댓값·실패원문보존. 최종Python242/Node82/native1/actualTCP PASS. validation/t032_performance.md. 남은frame16.7ms/60Hz표시전제 때문에checkbox유지하며전체제품완료로처리하지않는다.
 
 추가 승인 후 계산 없는 RAF/Canvas 대조군에서도 약18ms로 미달을 확인했다. 제품 소스/환경 설정/목표 변경 없음, round3 미사용. 진단 도구와 실패 기록, 전체 Python242/Node82 재검증을 보고서에 추가했으며 실제 표시 경로 확인 및 재측정은 남는다.
+
+## Phase 8: W03-A RF 계산기 (US2 확장)
+- [x] T033 [P] [US2] project_support/tests/test_rf_link_budget_api.py와 project_support/tests/browser/rf_link_budget.test.mjs에 기존POST 수치/반올림전status/모든필드경계/상태불변 및11입력/늦은응답/변경/잘못된응답 시험을 작성한다. JS 새모듈 미존재 RED 확인. FR009/SC007.
+- [x] T034 [US2] user_application/web/scripts/tabs/rf_link_budget.js에 빈초기입력, contracts/rf_workspace.md의필수11개/정확한범위/유한성, 입력echo와8유한결과/model/status/가정검증,사본/generation/abort controller를구현하고 communication/browser/api.js의RF422필드별오류와signal을검증한다. 기존wire/default/계산식보존.
+- [x] T035 [US2] user_application/web/scripts/workspace_orbit.js와tabs/rf_link_budget.js 및styles/workspace.css에 RF패널을조립한다. 모든입력편집/8출력단위/요청입력/가정/실제통신미확인,창복원/화면재구성/별도창draft와종료를 project_support/tests/browser/workspace_rf.test.mjs에서검증한다. 기존GP/UTC/Viewer와legacy보존.
+- [x] T036 project_support/specs/001-v6-function-integration/validation/t036_rf_workspace.md에 전체Python/Node/실제웹두해상도/정상·실패·입력보존 증거를기록하고 workflow-progress.md 및data/development_log를갱신한다. FR009/SC007 완료와F001/T032미완료를구분하고별도PR로리뷰한다.
+
+W03-A 의존성: T033→T034→T035→T036. T033의Python/Node시험은별도파일병렬가능. 기존T032는사용자승인으로deferred이며A의선행게이트가아니다. 승인범위는이번4개task이며F001/F002및W03전체완료가아니다.

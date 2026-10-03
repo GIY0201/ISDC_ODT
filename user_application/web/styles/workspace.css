@@ -22,6 +22,8 @@
 .popup-mode #window-minimize,.popup-mode #window-expand,.popup-mode #window-popout,.popup-mode #resize-handle{display:none!important}
 .popup-mode .window-titlebar{cursor:default}
 
+#rf-link-budget{flex-shrink:0}.rf-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}.rf-fields label{display:flex;flex-direction:column;gap:4px}.rf-fields input{width:100%;min-width:0;padding:7px;background:#111c27;color:#edf4ff;border:1px solid #40566a;border-radius:4px}.rf-actions{display:flex;flex-wrap:wrap;gap:8px}.rf-metrics{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px 12px}#rf-result dd{margin-left:0;overflow-wrap:anywhere}#rf-status{min-height:24px}@media(max-width:650px){.rf-fields{grid-template-columns:1fr}}
+
 /* Stored orbit globe replaces the synthetic background; legacy cards remain labelled examples. */
 .desktop-globe{display:none}#stored-orbit-globe{position:absolute;inset:0}.orbit-globe-caption{position:absolute;z-index:3;left:18px;top:12px;max-width:calc(100% - 320px);padding:8px 12px;background:#102d3ce8;border:1px solid #87adb6;border-radius:8px;font-size:11px}.orbit-globe-caption p{margin:0 0 7px;overflow-wrap:anywhere}.orbit-globe-caption button:disabled{opacity:.5;cursor:default}.scene-credit{z-index:3}@media(max-width:900px){.orbit-globe-caption{max-width:calc(100% - 265px)}}
 
