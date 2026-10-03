@@ -67,7 +67,7 @@
 - 이번 기록 수정: 문서 구조와 요구/후속 연결 정적 확인만. 기능 시험을 새로 실행하지 않음.
 
 ## 다음 선택과 복구
-현재 선택은 speckit-converge의SC006공백 기록 이후 speckit-implement의T032다. 합의된 수치와 기존feature를 재사용한다. 아래 날짜별 초기기록은 이력이며 현재 진행단계를 되돌리는 지시가 아니다. 첫 단계 수행과 전체제품완료를 별개로 검토한다.
+현재 승인 A의 T033~T036 RF 계산기 연결과 검증을 완료했다. 다음 단계는 별도 Draft PR 리뷰 및 F001 실제 서비스·장비 조건 선정이다. T032 프레임 검증은 사용자 지시로 보류한다. 합의된 수치와 기존feature를 재사용한다. 아래 날짜별 초기기록은 이력이며 현재 진행단계를 되돌리는 지시가 아니다. 첫 단계 수행과 전체제품완료를 별개로 검토한다.
 현재 사용자에게 반복 선택을 요구하지 않음. 합의된 사항은 유지. 새로운 기술 선택과 기능 확대는 구체적 검토안을 마련하여 함께 논의한다.
 Hooks: extensions.yml 없음. 필수 hook 없음. 현재T028/verify repair count: 3. 전체 제품 완료: 아님.
 
@@ -302,3 +302,23 @@ Red: 최초module누락2개 수집실패. 누락OMM필드4시험 KeyError실패 
 - 사용자 T032 진행 승인에 따라 계산/Cesium/API 없는 10초 순수RAF/Canvas 대조군을 측정했다. 두해상도 정상 p95 약18ms로16.7ms 미달, 앱 계산만이 원인이라는 근거 부족. 일부 회귀 병행/비정상23표본/브라우저 제어 지연은 별도 기록하고 제품 수용시험으로 사용하지 않는다.
 - project_support/tooling/frame_scheduling_control.html과 validation/t032_performance.md에 재현/한계 기록. 제품 소스/정확도/표시 품질/환경 설정 변경 없음. round3 미사용, T032[ ] 및 implement/verify running 유지.
 - Python 기본 tmp setup135 PASS/107 ERROR 후 프로젝트 내부 새 basetemp242 PASS109.66초/기존경고1. Node82 PASS294.26ms. F001/F002/F004/F005/F006과 실제 표시 경로 재검증 유지. PR13 Draft 업데이트, 자동병합 없음.
+
+## 2026-10-03 사용자 프레임 후속 보류 및 W03 진입 검토
+- 사용자가 프레임 문제는 나중에 확인하고 다른 구현을 이어가도록 지시했다. T032는 deferred로 유지하며 완료/실패 해소/목표 완화로 처리하지 않는다. R009의 나머지 통과 증거와 실패 원문 보존. 초기 구현과 전체 목표/F001/F002 유지.
+- speckit-auto/clarify 및 bootstrap/prerequisite/constitution/기존 spec 확인. extensions.yml 없음. branch codex/rf-link-workspace를 PR13 HEAD에서 분리했다. W03은 첫 범위 선택을 위한 clarify running이며 상세 plan/tasks/구현은 pending이다.
+- 선배와 현재 RF 함수/API/legacy UI 및 가까운 회귀를 검토, rf_workspace_review.md 작성. 기존 RF/route 시험1 PASS0.03초. 실제 서비스/장비 출처, 3dB 판정, 숨겨진 입력 및 시나리오 contact 구분이 공백. 제품 코드 변경/전체 검증 없음.
+- 질문1개/답변0개: A 직접 설정 RF 계산기부터 연결(권고), B ISS 서비스·수신 장비 먼저 선정. 답변을 기다리며 공식 ITU/ARISS 조사와 기존 기능 검토만 진행. 자동으로 A를 승인 처리하지 않는다.
+
+
+## 2026-10-03 W03-A RF 계산기 연결 및 검증
+- 사용자 A 승인: 직접 설정 RF 계산기부터 연결. 질문1개/답변1개, 기존 feature를 확장하고 합의와 이력을 보존했다. 실제 통신 조건 F001은 반드시 후속 조사·적용하며 A로 종료하지 않는다.
+- clarify/spec/plan/tasks complete: FR009/SC007, rf_workspace 계약, research/data-model/quickstart 및 T033~T036. analyze read-only 검토에서 새 범위의 차단 충돌0; 명세 체크8/8, prerequisite PASS, extensions.yml 없음. 기존 constitution 보존. 구현/전체 검증 단계는 T032/F001/F002 때문에 전체 complete로 바꾸지 않는다.
+- T033 RED: 새 RF JS 모듈 미존재. T035 RED: V6 RF 입력 미조립으로4개 실패. 이후 controller/transport/panel/창 연결을 순서대로 구현했다. 기존 선택 회귀의 data-URL 테스트 어댑터는 새 RF import를 처리하도록 갱신했다.
+- T034/T035: 11개 입력은 모두 빈 초기값, 기존 API 범위/단위/echo/8개 유한 출력/기존 status 검증. generation/abort/종료/입력 변경으로 늦은 결과 폐기. 기존 RF 서버 계산/API/schema는 변경하지 않았다. 화면용 사본과 창 draft만 소유하며 GP/UTC/revision을 변경하지 않는다.
+- E-RF: 전체 Python304 PASS108.66초/기존 Starlette 경고1, Node95 PASS317.33ms. API62개 시험은 실제 ASGI 공개 endpoint의 독립 수치/반올림전status/경계/상태불변 확인. 실제 IAB1280×720/1920×1080에서 기존 HTTP 결과, 빈 입력/거리 경계 오류, 모델 여유 부족, 창 복원/역할 전환/스크롤·확장 확인. 별도 창 전달은 실제 assembly를 사용한 DOM 어댑터 시험 근거이며 실제 OS 창 검증으로 부풀리지 않는다.
+- 원본 HEAD1a1e00297a0301637455b0ef2cf48b2e74576b07 대비 RF 함수3/HTTP 함수3/LinkBudgetRequest AST7개 동일. 검증보고서 validation/t036_rf_workspace.md. FR009/SC007 이번 범위 완료. F001 실제 통신/F002 전체 기능과 T032/SC006 실패 기준은 열린 상태다.
+- 별도 codex/rf-link-workspace Draft PR 게시 및 리뷰. 자동 병합 없음. 네이티브/Rust/wheel 변경이나 이번 신규 native 실행 없음.
+
+
+## 2026-10-04 최종 검토 보완
+읽기 전용 검토에서 링크 이름의 Unicode 길이 차이를 확인했다. 서버는 code point40자, JS text.length/HTML maxlength는 UTF-16 단위를 세므로 emoji21~40자를 과도하게 거부했다. emoji40/41 경계 시험 RED 확인 후 [...text].length와 maxlength 제거로 서버 계약에 맞췄다. 실제 V6→기존 API에서도40자 정상/41자 오류 확인했다. 계산/API/schema는 그대로다. 수정 후 전체 Python304 PASS103.50초/기존경고1, Node95 PASS313.47ms. 최신 원자료 pytest_final.log/node_full_final.log/unicode_red.log. 이미 기록한 이전 검증은 이력으로 보존한다. 실제 통신 F001과 보류T032는 미완료 유지.

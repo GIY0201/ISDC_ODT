@@ -28,3 +28,5 @@ node --test project_support/tests/browser/*.test.mjs
 ```
 
 선배 프로그램의 기존 소개는 `project_support/docs/prototype_readme.md`에 보존했습니다.
+
+V6 지상국·통신 창의 RF 계산기는 선배 프로토타입의 기존 RF-Friis-v1 API를 사용합니다. 11개 조건을 직접 입력하면 8개 결과와 가정을 표시합니다. 이번 연결은 Python304/Node95 및 실제 두해상도 UI 검증을 통과했습니다. 근거는 `project_support/specs/001-v6-function-integration/validation/t036_rf_workspace.md`이며 실제 통신 조건 조사·적용과 프레임 기준은 계속 남습니다.

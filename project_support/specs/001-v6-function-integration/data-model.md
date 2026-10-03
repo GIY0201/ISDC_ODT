@@ -21,3 +21,7 @@
 
 자료가 잘못됐거나 필수 EOP 누락 시 결과값을 valid로 제공하지 않는다. row error가 있으면 query partial, 해당행 수치는null, 전체 실패와구간없음을구분. 범위와길이상한은 plan/configs에 명시. 실제통신 필드는 communication_status=unknown으로만 둔다.
 
+
+## W03-A RF 화면 모델
+RF draft: link_id 문자열과 contracts/rf_workspace.md의10수치에 대한 편집 문자열. 초기 빈칸, 서버선택상태와독립, 사용자입력가정. 조회입력은trim/유한성/범위검증후새object로생성.
+RF 응답사본: 기존model/link_id/inputs/8수치/status/assumptions. 변경불가능한canonical서버상태가아닌화면결과사본. idle/pending/ready/error 상태, generation 및AbortController로수명관리. 편집/취소/종료는결과소거, 동일draft복원은결과유지. snapshot은structuredClone. HTTP/DOM응답오류는error이며실제통신status로전환하지않는다.
