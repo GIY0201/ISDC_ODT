@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import json
 import math
 import numpy as np
+from astropy.time import Time
 import isdc_orbit_propagation as native
 from digital_twin.contracts.orbit import OrbitInput
 from foundation.orbit_time import UtcInstant,parse_utc,parse_utc_batch,format_utc_batch,minutes_since_epoch
@@ -42,6 +43,23 @@ def propagate_instants(orbit:OrbitInput,instants)->NativeOrbitBatch:
     if any(not isinstance(t,UtcInstant) or not math.isfinite(t.jd1) or not math.isfinite(t.jd2) for t in instants):
         raise ValueError('finite UTC instants required')
     epoch=parse_utc(orbit.epoch_utc);minutes=[minutes_since_epoch(t,epoch) for t in instants]
+    buffer,errors=_propagate_minutes(orbit,minutes)
+    return NativeOrbitBatch(orbit.input_id,format_utc_batch(instants),errors,buffer)
+
+
+def propagate_times(orbit:OrbitInput,times:Time):
+    """Owned native numeric rows for a validated UTC vector; no UTC formatting."""
+    if not isinstance(times,Time) or times.scale!='utc' or times.ndim!=1 or not np.isfinite(times.jd).all():
+        raise ValueError('finite UTC Time vector required')
+    epoch=parse_utc(orbit.epoch_utc)
+    minutes=((times.jd1-epoch.jd1)+(times.jd2-epoch.jd2))*1440
+    buffer,errors=_propagate_minutes(orbit,minutes.tolist())
+    return np.frombuffer(buffer,dtype='<f8').reshape(-1,6),errors
+
+
+def _propagate_minutes(orbit,minutes):
+    if orbit.profile!=native.calculation_profile or orbit.frame!='TEME' or orbit.time_system!='UTC':raise ValueError('unsupported native profile')
+    if len(minutes)>native.MAX_BATCH_ROWS:raise ValueError('native batch limit exceeded')
     if orbit.format=='TLE' and orbit.tle is not None:
         buffer,errors=native.propagate_tle(*orbit.tle,minutes)
     elif orbit.format=='OMM':
@@ -49,8 +67,8 @@ def propagate_instants(orbit:OrbitInput,instants)->NativeOrbitBatch:
         payload.update(NORAD_CAT_ID=orbit.satellite_id,EPOCH=orbit.epoch_utc.removesuffix('Z'),CLASSIFICATION_TYPE='U',ELEMENT_SET_NO=0,REV_AT_EPOCH=0,EPHEMERIS_TYPE=0)
         buffer,errors=native.propagate_omm(json.dumps(payload,allow_nan=False),minutes)
     else:raise ValueError('unsupported orbit format')
-    if len(buffer)!=len(instants)*48 or len(errors)!=len(instants):raise RuntimeError('invalid native batch shape')
+    if len(buffer)!=len(minutes)*48 or len(errors)!=len(minutes):raise RuntimeError('invalid native batch shape')
     rows=np.frombuffer(buffer,dtype='<f8').reshape(-1,6)
     valid=np.array([error is None for error in errors],dtype=bool)
     if not np.isfinite(rows[valid]).all():raise RuntimeError('nonfinite native success')
-    return NativeOrbitBatch(orbit.input_id,format_utc_batch(instants),tuple(errors),buffer)
+    return buffer,tuple(errors)

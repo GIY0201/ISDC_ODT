@@ -72,6 +72,58 @@ class OrbitCalculation:
     frame: str='ITRF'
     profile: str='WGS72_AFSPC'
 
+
+def _owned_numeric(values):
+    array=np.asarray(values)
+    if array.dtype.kind not in 'iuf':raise ValueError('real numeric vector required')
+    array=np.ascontiguousarray(array,dtype='<f8')
+    return np.frombuffer(array.tobytes(),dtype='<f8').reshape(array.shape)
+
+
+@dataclass(frozen=True)
+class EarthOrientationVector:
+    ut1_minus_utc_s: np.ndarray
+    xp_rad: np.ndarray
+    yp_rad: np.ndarray
+    snapshot_sha256: str
+    leap_sha256: str
+    def __post_init__(self):
+        for name in ('ut1_minus_utc_s','xp_rad','yp_rad'):
+            object.__setattr__(self,name,_owned_numeric(getattr(self,name)))
+        shape=self.ut1_minus_utc_s.shape
+        if len(shape)!=1 or any(getattr(self,k).shape!=shape or not np.isfinite(getattr(self,k)).all()
+                               for k in ('ut1_minus_utc_s','xp_rad','yp_rad')):
+            raise ValueError('finite aligned EOP vectors required')
+
+
+@dataclass(frozen=True)
+class OrbitVectorCalculation:
+    """Owned ephemeral evaluation, not runtime state or an external wire schema."""
+    jd1: np.ndarray
+    jd2: np.ndarray
+    position_m: np.ndarray
+    elevation_deg: np.ndarray
+    errors: tuple[str|None,...]
+    eop_sha256: str
+    leap_sha256: str
+    frame: str='ITRF'
+    profile: str='WGS72_AFSPC'
+    def __post_init__(self):
+        for name in ('jd1','jd2','position_m','elevation_deg'):
+            object.__setattr__(self,name,_owned_numeric(getattr(self,name)))
+        object.__setattr__(self,'errors',tuple(self.errors))
+        n=len(self.errors)
+        if self.jd1.shape!=(n,) or self.jd2.shape!=(n,) or self.position_m.shape!=(n,3) or self.elevation_deg.shape!=(n,):
+            raise ValueError('aligned orbit vectors required')
+        if not np.isfinite(self.jd1).all() or not np.isfinite(self.jd2).all():raise ValueError('finite UTC vectors required')
+        if any(e is not None and (not isinstance(e,str) or not e) for e in self.errors):raise ValueError('invalid vector error')
+        good=np.array([e is None for e in self.errors],dtype=bool)
+        if (not np.isfinite(self.position_m[good]).all() or not np.isfinite(self.elevation_deg[good]).all()
+            or np.any(np.abs(self.elevation_deg[good])>90)):
+            raise ValueError('invalid vector success row')
+        if not np.isnan(self.position_m[~good]).all() or not np.isnan(self.elevation_deg[~good]).all():
+            raise ValueError('numeric vector failure row')
+
 @dataclass(frozen=True)
 class OrbitQueryResult:
     client_request_id: str

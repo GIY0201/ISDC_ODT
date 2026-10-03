@@ -36,6 +36,7 @@ def main():
     parser.add_argument('--rows',type=int,default=86401)
     parser.add_argument('--repeat',type=int,default=3)
     parser.add_argument('--visibility',action='store_true')
+    parser.add_argument('--vector',action='store_true')
     parser.add_argument('--profile',action='store_true')
     parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args()
@@ -56,6 +57,7 @@ def main():
     def run():
         if args.visibility:
             return search_visibility(calculate=lambda times:calculate(orbit,times,ground),
+                calculate_times=(lambda times:calculate.evaluate_times(orbit,times,ground)) if args.vector else None,
                 start_utc=utc[0],end_utc=utc[-1],minimum_elevation_deg=10.)
         return calculate(orbit,utc,ground)
     elapsed=[]
@@ -68,6 +70,7 @@ def main():
             ('numpy','astropy','astropy-iers-data','isdc-orbit-propagation')},
         'input_hash':orbit.raw_sha256,'eop_hash':eop.eop_sha256,'leap_hash':eop.leap_sha256,
         'kind':'visibility' if args.visibility else 'orbit_calculation',
+        'vector_evaluator':args.vector,
         'rows':args.rows,'grid_step_seconds':1,'start_utc':utc[0],'end_utc':utc[-1],
         'seconds':elapsed,'median_seconds':float(np.median(elapsed)),
         'p95_seconds':float(np.percentile(elapsed,95)),

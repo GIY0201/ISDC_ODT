@@ -3,6 +3,8 @@ from dataclasses import dataclass
 import math
 import re
 import warnings
+import erfa
+import numpy as np
 from astropy.time import Time, TimeDelta
 
 @dataclass(frozen=True)
@@ -58,7 +60,35 @@ def format_utc_batch(instants) -> tuple[str,...]:
     if not instants:return ()
     value=Time([t.jd1 for t in instants],[t.jd2 for t in instants],
                format='jd',scale='utc',precision=9)
-    return tuple(v+'Z' for v in value.isot)
+    return format_utc_times(value)
+
+
+def format_utc_times(times: Time) -> tuple[str,...]:
+    """Format UTC vectors at nine digits using Astropy's ERFA calendar kernel.
+
+    Keep double-double quasi-JD and leap seconds; avoid per-row format dicts.
+    The input Time and its formatting precision are never changed.
+    """
+    if not isinstance(times,Time) or times.scale!='utc' or times.ndim!=1:
+        raise ValueError('one-dimensional UTC Time required')
+    if not np.isfinite(times.jd1).all() or not np.isfinite(times.jd2).all():
+        raise ValueError('finite UTC times required')
+    if not len(times):return ()
+    years,months,days,hmsf=erfa.d2dtf('UTC',9,times.jd1,times.jd2)
+    columns=[values.tolist() for values in (years,months,days,hmsf['h'],hmsf['m'],hmsf['s'],hmsf['f'])]
+    return tuple(f'{y:04d}-{m:02d}-{d:02d}T{h:02d}:{minute:02d}:{s:02d}.{fraction:09d}Z'
+                 for y,m,d,h,minute,s,fraction in zip(*columns))
+
+
+def canonical_utc_times(times: Time) -> Time:
+    """Same nine-digit UTC round trip as formatting/parsing, without strings."""
+    if not isinstance(times,Time) or times.scale!='utc' or times.ndim!=1:
+        raise ValueError('one-dimensional UTC Time required')
+    if not np.isfinite(times.jd1).all() or not np.isfinite(times.jd2).all():
+        raise ValueError('finite UTC times required')
+    y,m,d,hms=erfa.d2dtf('UTC',9,times.jd1,times.jd2)
+    a,b=erfa.dtf2d('UTC',y,m,d,hms['h'],hms['m'],hms['s']+hms['f']/1e9)
+    return Time(a,b,format='jd',scale='utc',precision=9)
 
 
 def advance_seconds(instant: UtcInstant, seconds: float) -> UtcInstant:

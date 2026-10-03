@@ -8,10 +8,10 @@ import math
 import numbers
 import numpy as np
 from astropy.time import TimeDelta
-from foundation.orbit_time import parse_utc
+from foundation.orbit_time import parse_utc,format_utc_times,canonical_utc_times
 from digital_twin.contracts.orbit import (
     OrbitCalculation, OrbitSample, VisibilityInterval, VisibilityContact,
-    VisibilityError, VisibilityResult,
+    VisibilityError, VisibilityResult,OrbitVectorCalculation,
 )
 
 CONTACT_TOLERANCE_DEG = 1e-9
@@ -19,11 +19,12 @@ BOUNDARY_BRACKET_SECONDS = .01
 
 
 def _finite(value):
+    if type(value) is float:return math.isfinite(value)
     return (not isinstance(value, (bool, np.bool_)) and
             isinstance(value, numbers.Real) and math.isfinite(value))
 
 
-def search_visibility(*, calculate, start_utc, end_utc, minimum_elevation_deg):
+def search_visibility(*, calculate, start_utc, end_utc, minimum_elevation_deg,calculate_times=None):
     """Return immutable known intervals/contacts and per-evaluation failures.
 
     calculate(tuple[UTC,...]) must return matching OrbitCalculation rows under
@@ -48,7 +49,7 @@ def search_visibility(*, calculate, start_utc, end_utc, minimum_elevation_deg):
     def timestamps_at(offsets):
         times=start_time+TimeDelta(np.asarray(offsets),format='sec',scale='tai')
         times.precision=9
-        stamps=[stamp+'Z' for stamp in times.utc.isot]
+        stamps=list(format_utc_times(times.utc))
         for i,t in enumerate(offsets):
             if t==0.:stamps[i]=start.iso_utc
             elif t==duration:stamps[i]=end.iso_utc
@@ -59,10 +60,32 @@ def search_visibility(*, calculate, start_utc, end_utc, minimum_elevation_deg):
         if t == duration: return end.iso_utc
         return timestamps_at([t])[0]
 
-    def evaluate(offsets, timestamps=None):
+    def evaluate(offsets, timestamps=None,time_vector=None):
         nonlocal provenance
         missing = [float(t) for t in offsets if float(t) not in cache]
         if not missing: return
+        if calculate_times is not None:
+            times=canonical_utc_times(time_vector if time_vector is not None else
+                (start_time+TimeDelta(np.asarray(missing),format='sec',scale='tai')).utc)
+            # Time is mutable: preserve the request reference even if an
+            # injected evaluator edits the object it receives.
+            result=calculate_times(times.copy())
+            if not isinstance(result,OrbitVectorCalculation) or len(result.errors)!=len(missing):
+                raise ValueError('invalid vector visibility calculation contract')
+            if not np.array_equal(result.jd1,times.jd1) or not np.array_equal(result.jd2,times.jd2):
+                raise ValueError('visibility calculation UTC mismatch')
+            identity=(result.eop_sha256,result.leap_sha256,result.frame,result.profile)
+            if (result.frame!='ITRF' or result.profile!='WGS72_AFSPC' or
+                not all(isinstance(v,str) and v for v in identity)):
+                raise ValueError('invalid visibility provenance')
+            if provenance is not None and identity!=provenance:raise ValueError('visibility calculation provenance changed')
+            provenance=identity
+            failed_indices=np.flatnonzero([e is not None for e in result.errors])
+            failed_stamps=dict(zip(failed_indices,format_utc_times(times[failed_indices])))
+            for i,(t,angle,error) in enumerate(zip(missing,result.elevation_deg,result.errors)):
+                if error is None:cache[t]=(float(angle)-threshold,None)
+                else:cache[t]=(None,VisibilityError(failed_stamps[i],error))
+            return
         times = tuple(timestamps) if timestamps is not None else timestamps_at(missing)
         result = calculate(times)
         if not isinstance(result, OrbitCalculation) or type(result.rows) is not tuple or len(result.rows) != len(times):
@@ -95,9 +118,11 @@ def search_visibility(*, calculate, start_utc, end_utc, minimum_elevation_deg):
     grid = np.arange(0., duration, 1.).tolist()+[duration]
     times = start.as_time()+TimeDelta(np.asarray(grid),format='sec',scale='tai')
     times.precision = 9
-    timestamps = [stamp+'Z' for stamp in times.utc.isot]
-    timestamps[0],timestamps[-1] = start.iso_utc,end.iso_utc
-    evaluate(grid,timestamps)
+    if calculate_times is None:
+        timestamps = list(format_utc_times(times.utc))
+        timestamps[0],timestamps[-1] = start.iso_utc,end.iso_utc
+        evaluate(grid,timestamps)
+    else:evaluate(grid,time_vector=times.utc)
 
     def extrema(brackets):
         # Independent unimodal brackets use the same ternary points, together

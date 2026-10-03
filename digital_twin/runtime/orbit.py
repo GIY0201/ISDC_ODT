@@ -87,7 +87,9 @@ class OrbitRuntime:
         if self._calculate is None or self._execute is None:
             raise OrbitUnavailable('orbit calculation/EOP not ready')
         def work():
+            vector_evaluator=getattr(self._calculate,'evaluate_times',None)
             return search_visibility(calculate=lambda times:self._calculate(orbit,times,selection.ground_point),
+                calculate_times=(lambda times:vector_evaluator(orbit,times,selection.ground_point)) if callable(vector_evaluator) else None,
                 start_utc=start.iso_utc,end_utc=end.iso_utc,minimum_elevation_deg=selection.minimum_elevation_deg)
         calculation=await self._execute(work)
         if calculation.profile!=orbit.profile:raise RuntimeError('visibility input profile mismatch')

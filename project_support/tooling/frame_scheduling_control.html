@@ -1,0 +1,22 @@
+<!doctype html><meta charset="utf-8"><title>Frame scheduling control</title>
+<style>body{font:16px sans-serif;background:#102637;color:white}canvas{border:1px solid #668}</style>
+<h1>Independent frame scheduling control</h1>
+<p>Ten-second diagnostics; no Cesium, API, assets or orbit calculations.</p>
+<button id="start">Start 10s</button><label><input id="paint" type="checkbox" checked>Canvas presentation</label>
+<canvas id="canvas" width="1000" height="400"></canvas><pre id="result"></pre>
+<script>
+const trials=[];let active=false;
+document.querySelector('#start').onclick=()=>{
+ if(active)return;active=true;document.querySelector('#start').disabled=true;
+ const paint=document.querySelector('#paint').checked,values=[],start=performance.now();let last=null;
+ const ctx=document.querySelector('#canvas').getContext('2d');
+ function tick(now){if(last!==null)values.push(now-last);last=now;
+  if(paint){ctx.clearRect(0,0,1000,400);ctx.fillStyle='#55eeff';ctx.fillRect((now-start)%950,180,40,40);}
+  if(now-start<10000){requestAnimationFrame(tick);return;}
+  trials.push({start,end:now,paint,visibility:document.visibilityState,focused:document.hasFocus(),viewport:[innerWidth,innerHeight],dpr:devicePixelRatio,userAgent:navigator.userAgent,values});
+  const sorted=[...values].sort((a,b)=>a-b);const percentile=p=>sorted[Math.ceil(sorted.length*p)-1];
+  document.querySelector('#result').textContent=JSON.stringify({trials,last:{count:values.length,p95:percentile(.95),p99:percentile(.99),max:sorted.at(-1)}});
+  document.querySelector('#start').disabled=false;active=false;
+ }requestAnimationFrame(tick);
+};
+</script>

@@ -7,7 +7,7 @@ import numpy as np
 from astropy import units as u
 from astropy.time import Time
 from astropy.utils import iers
-from digital_twin.contracts.orbit import EarthOrientationPoint
+from digital_twin.contracts.orbit import EarthOrientationPoint,EarthOrientationVector
 from foundation.orbit_time import UtcInstant
 
 @dataclass(frozen=True)
@@ -44,3 +44,11 @@ class EarthOrientationSnapshot:
         xp,yp=self._table.pm_xy(time)
         return tuple(EarthOrientationPoint(float(v),float(x),float(y),self.eop_sha256,self.leap_sha256)
                      for v,x,y in zip(values.to_value(u.s),xp.to_value(u.rad),yp.to_value(u.rad)))
+
+    def at_times(self,time:Time)->EarthOrientationVector:
+        if not isinstance(time,Time) or time.scale!='utc' or time.ndim!=1 or not np.isfinite(time.jd).all():
+            raise ValueError('finite UTC Time vector required')
+        value,status=self._table.ut1_utc(time,return_status=True)
+        if np.any(status<0):raise ValueError('UTC outside EOP snapshot range')
+        xp,yp=self._table.pm_xy(time)
+        return EarthOrientationVector(value.to_value(u.s),xp.to_value(u.rad),yp.to_value(u.rad),self.eop_sha256,self.leap_sha256)

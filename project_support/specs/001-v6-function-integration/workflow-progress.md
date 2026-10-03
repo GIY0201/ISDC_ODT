@@ -27,7 +27,7 @@
 | R006 | 실제 통신 조건 확인 및 적용 / S1 | 출처 있는 서비스/장비 입력과 링크 조건 적용, 정상/실패/미확인 시험 | clarify, plan, implement, verify | plan Visibility/후속 / T023,T030 + F001 | T023 실제통신미확인 표시 검증, F001 필수 조사/적용 미실행 |
 | R007 | 결과 의미 구분 / S1,S5 | 기하 가시성, 모델 통신 충족, 실제 수신 증거를 UI/산출물에서 구분 | specify, verify | plan Validation / T003,T005,T007,T011,T017,T019,T021,T026,T028,T029 | GP/가상/기하 계산과 통신 미확인 표시 검증. 실제 통신 조건 F001 미완료 |
 | R008 | JS 모듈/HTML/CSS/Cesium + Python/FastAPI / S1 | 기술 계획이 합의와 일치, 버전/현대화 선택 근거 기록 | constitution, plan | plan Technical Context / T002,T006,T008,T029 | JS/Cesium/Python FastAPI/Rust 및로컬cp314격리설치 PASS. TS/React 보류, 타환경미검증 유지 |
-| R009 | 빠르고 원활한 사용성 / S1 | 지구/시간/창 조작의 측정 조건과 합의된 목표로 실제 웹 검증 | clarify, plan, verify | plan State/Validation / T018,T024-T028,T032 | 실제두해상도100UTC/20일조회/30초3회 계측. UTC PASS/하루·frame·feedback 미달, SC006 FAIL. validation/t028_performance.md 및T032 |
+| R009 | 빠르고 원활한 사용성 / S1 | 지구/시간/창 조작의 측정 조건과 합의된 목표로 실제 웹 검증 | clarify, plan, verify | plan State/Validation / T018,T024-T028,T032 | T032 실제두해상도100UTC/20일조회/30초완료3회와 GPU/presentation 증거. 최종하루p95543.1/547.3ms,UTC32.0/32.1ms PASS. 관측EventTiming p9548ms(검열/반올림); frame18.578/18.552ms FAIL. SC006/T032 부분완료, validation/t032_performance.md. T028 이전실패보존 |
 | R010 | 기존 자료와 합의 보존 / S1 | 수정 이력 보존, 초안/합의/검증 증거 구분 | 모든 단계 | plan Summary/Phase1 / T001,T030 | V6 snapshot/합의/legacy 보존, 실제 단계별 증거와 이력 기록 |
 
 ## 결정
@@ -286,3 +286,19 @@ Red: 최초module누락2개 수집실패. 누락OMM필드4시험 KeyError실패 
 - 최종Python224 PASS(107.80초,기존Starlette경고1), Node77 PASS(256.24ms), 제품native integration1 PASS(공식33입력668상태), actualTCP inputs2/samples3/visibility1/409/UTC보존/health PASS, diffcheck PASS. 역순/실패주입은client/ASGI시험, 정상브라우저에서주입했다고주장하지않음. validation/t030_review.md에 FR8/SC6/R10 및후속을연결했다.
 - Converge: FR8/SC6/US수용10/기존task31, 계층·상태·입력·검증계획 및원칙5검토. HIGH partial1(SC006), missing/contradicts/unrequested0. append-only Phase7/T032추가, outcome tasks_appended. before/after hooks없음. verify repair3회,implement/verify running유지. 초기31개수행+T032미완료이며 fullyverified/전체제품완료 아님.
 - F001실제통신/F002전체선배기능/F004실장비·영구기록/F005실제ISS오차/F006다른PC·ABI·배포·AeroDT 연결을닫지않았다. 다음T032 성능보완, PR리뷰/병합별도. codex/orbit-validation-install은 PR11에의존하며 자동병합없음.
+
+## 2026-10-03 T032 사용자 승인 재개
+- 사용자가 남은작업 설명 후 진행을 승인했다. codex/orbit-performance에서 기존feature/목표/정확도/후속을 유지해 implement를 재개한다. T028의3회 실패이력은 보존하며 이번 승인된T032의 bounded개선은 별도 최대3회로 기록한다. 체크리스트8/8 PASS, bootstrap기존구성, prerequisite정상, hooks없음.
+- round1: 기존프로파일은 UTC ISOT dict생성/중복포맷 및generic Real검증 비용을 보여준다. 새윤초·나노초·연도경계 시험5 FAIL/1 PASS 후 동일ERFA dtfkernel의배치포맷과float검증 경로를 구현, 관련28 PASS. 실제저장자료8d7.. 하루3회 median1.678초/max2.448초로 여전히미달,4구간경계/peak는보존. t032_round1.json/.prof에 실패표본 유지.
+- 병렬승인 이력에 따라 backend추가개선과 browser실제표시·입력계측을 독립파일로 분리한다. 공유서버/기존wheel/환경을 교체하지 않는다. T032 checkbox/verify완료는 실제최종수용시험 전 변경하지 않는다. F001/F002/F004/F005/F006열림, PR12리뷰/병합별도.
+
+## 2026-10-03 T032 하루 성능 개선 및 실제 표시 검증
+- Round2 불변 내부벡터/선택주입으로 중간UTC/행객체비용제거. scalar주입/wire/권위상태/기존SIM/1초grid/극값40회/경계0.01초/윤초·오류계약 유지. 저장자료8d7.. 하루median0.48337/max0.49399초, round1 대비4구간·peak·각도·provenance exact일치. 새vector12/format6 회귀와 ADR0006; callback변이 보호1RED→PASS 포함. 추가성능round3없음.
+- 실제Chrome 두해상도100다른UTC/20다른24h/30초완료3trial, 중단0/hidden0. 실제presentation p9518.578/18.552ms FAIL; UTC32.0/32.1ms PASS; 관측EventTiming22/25개 p9548ms(16ms검열/8ms반올림). 최종callback보호후 fresh서버추가각20일조회 p95543.1/547.3ms PASS. primary/추가/probe/최댓값/전체gzip trace/GPU/hash/환경/screenshot 보존. 모니터60Hz경로 인증이나전원/주사율변경없음. validation/t032_performance.md.
+- 최종Python242 PASS113.49초/기존Starlette경고1, Node82 PASS351.32ms, product native release locked offline integration1 PASS(공식33/668), 실제TCP 입력2/샘플3/구간1/409/UTC보존/health PASS. 역순 덮어쓰기0은 client/ASGI 회귀근거이며 정상브라우저에서고장주입했다고주장하지않음.
+- implement/verify running 및T032[ ] 유지: SC006의frame16.7ms/실제60Hz표시전제가남음. 목표완화/실패표본삭제/완료재분류없음. 이번범위의계산개선과검증은리뷰용으로게시하되 Draft/자동병합없음. 최초전체목표/F001실통신/F002전체기능/F004/F005/F006은그대로열림.
+
+## 2026-10-03 T032 프레임 대조군 재개
+- 사용자 T032 진행 승인에 따라 계산/Cesium/API 없는 10초 순수RAF/Canvas 대조군을 측정했다. 두해상도 정상 p95 약18ms로16.7ms 미달, 앱 계산만이 원인이라는 근거 부족. 일부 회귀 병행/비정상23표본/브라우저 제어 지연은 별도 기록하고 제품 수용시험으로 사용하지 않는다.
+- project_support/tooling/frame_scheduling_control.html과 validation/t032_performance.md에 재현/한계 기록. 제품 소스/정확도/표시 품질/환경 설정 변경 없음. round3 미사용, T032[ ] 및 implement/verify running 유지.
+- Python 기본 tmp setup135 PASS/107 ERROR 후 프로젝트 내부 새 basetemp242 PASS109.66초/기존경고1. Node82 PASS294.26ms. F001/F002/F004/F005/F006과 실제 표시 경로 재검증 유지. PR13 Draft 업데이트, 자동병합 없음.

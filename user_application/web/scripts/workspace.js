@@ -209,4 +209,4 @@ import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t02
   const initialView=location.hash.slice(1);if(names[initialView])openView(initialView);else{showGroup(0);launcher.hidden=true}
 })();
 
-if(new URLSearchParams(location.search).get('validation')==='t028'){import('./orbit_ui_measurement.js?v=t028-r1').then(module=>module.installOrbitUiMeasurement());}
+if(['t028','t032'].includes(new URLSearchParams(location.search).get('validation'))){import('./orbit_ui_measurement.js?v=t032-r2').then(module=>module.installOrbitUiMeasurement());}
