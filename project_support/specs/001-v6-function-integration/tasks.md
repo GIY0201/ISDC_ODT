@@ -129,3 +129,9 @@ W03-A 의존성: T033→T034→T035→T036. T033의Python/Node시험은별도파
 - [x] T060 tabs/sim_workspace.js에 기존 API/직렬 명령/스트림 사본/지연·역순/정리를 연결한다.
 - [x] T061 workspace_orbit/workspace/mission_workspace에 패널/원격 초안/읽기 전용 임무 갱신을 조립하고 두해상도 assembly 검증한다.
 - [x] T062 전체 Python/Node/실제 8891 두해상도 및 원본 보존 확인, validation/t062_sim_workspace.md/ledger/dev log 갱신과 PR19 위 Draft 리뷰. 자동 병합 없음.
+
+## W06 / US8 기존 KPI/내보내기 (FR-016/SC-014)
+- [x] T063 [US8] project_support/tests/test_kpi_workspace.py 및 browser/kpi_workspace.test.mjs/kpi_report_api.test.mjs/workspace_kpi.test.mjs에 원본기준/파일/컨트롤러·조립 RED 작성.
+- [x] T064 [US8] communication/browser/api.js 원본 report bytes adapter와 tabs/kpi_workspace.js의 서버사본/필터·상세/세션이력·재생/JSONfreeze/CSVpreview/검증·정리 구현. T063 뒤.
+- [x] T065 [US8] tabs/sim_workspace.js optional observer로 기존 stream을공유하고 workspace_orbit/workspace에 panel/draft/dispose 조립, 기존 drawMultiLine 재사용. T064 뒤.
+- [x] T066 전체Python/Node/실제8891두해상도/다운로드동일값·원본보존 확인, validation/t066_kpi_workspace.md/ledger/dev logs/전체plan 갱신과 PR20 위 Draft 리뷰. T065 뒤. 기존 T032/F001/F002 보류 유지.

@@ -1,4 +1,4 @@
-import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t061-r4';
+import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t065-r1';
 (() => {
   const screen = document.getElementById('screen');
   const groups = [
@@ -81,7 +81,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t06
       showWorkspaceOrbit(state.view);
       if(pendingWorkspaceDraft.length){
         applyWorkspaceDraft(pendingWorkspaceDraft,pendingWorkspaceDraftRemote);
-        for(const item of pendingWorkspaceDraft){if(item.id.startsWith('sim-')||item.id.startsWith('mw-')||item.id.startsWith('series-')||item.id.startsWith('radio-')||item.id.startsWith('cp-')||item.id.startsWith('rf-')||item.id.startsWith('ground-')||item.id.startsWith('visibility-')||item.id==='orbit-utc'||['orbit-input','orbit-rate'].includes(item.id))continue;const field=document.getElementById(item.id);if(field&&'value' in field)field.value=item.value;}
+        for(const item of pendingWorkspaceDraft){if(item.id.startsWith('kpi-')||item.id.startsWith('sim-')||item.id.startsWith('mw-')||item.id.startsWith('series-')||item.id.startsWith('radio-')||item.id.startsWith('cp-')||item.id.startsWith('rf-')||item.id.startsWith('ground-')||item.id.startsWith('visibility-')||item.id==='orbit-utc'||['orbit-input','orbit-rate'].includes(item.id))continue;const field=document.getElementById(item.id);if(field&&'value' in field)field.value=item.value;}
         pendingWorkspaceDraft=[];pendingWorkspaceDraftRemote=false;
       }
     });
@@ -106,7 +106,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t06
   document.getElementById('rail-groups').innerHTML=groups.map(([g],i)=>`<button type="button" data-group="${i}" aria-label="${g} 작업 목록 열기">${groupLabels[i]}</button>`).join('');
   function showGroup(index){const [label,views]=groups[index];document.getElementById('launcher-title').textContent=label+' 작업공간';nav.innerHTML=views.map(([id,n])=>`<button type="button" data-view="${id}">${n}</button>`).join('');launcher.hidden=false;document.querySelectorAll('#rail-groups button').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.group)===index)));nav.querySelector('button')?.focus()}
   function openView(view){if(!names[view])return;state.view=view;workWindow.hidden=false;fitWindow();shelf.hidden=true;launcher.hidden=true;render();location.hash=view;screen.focus()}
-  function isDraftField(id){return !['mw-mission','mw-task','ground-input','orbit-input','orbit-rate'].includes(id);}
+  function isDraftField(id){return !['kpi-history','kpi-filter-PASS','kpi-filter-FAIL','kpi-filter-INVALID','mw-mission','mw-task','ground-input','orbit-input','orbit-rate'].includes(id);}
   function draftScope(id){return id.startsWith('mw-')?{mission_id:document.getElementById('mw-mission')?.value,task_id:document.getElementById('mw-task')?.value}:{};}
   function draftValues(){return [...screen.querySelectorAll('input[id],select[id],textarea[id]')].filter(el=>isDraftField(el.id)).map(el=>({id:el.id,value:el.value,...draftScope(el.id)}));}
   function transferSnapshot(){return {type:'isdc-v6-snapshot',state:{...state},view:state.view,draft:draftValues()};}

@@ -82,3 +82,6 @@ F001 실제 통신 조건, T032 성능, 실제 HIL·영구 기록, 다른 PC 배
 
 ## 2026-10-04 W04 checkpoint
 임무 관리의 기존 action/tasks/validate/replan을 V6에 연결하고 검증했다(T055~58, validation/t058_mission_workspace.md). 새 임무 생성·AI·실명령을 추가하지 않았다. 원본 재계획 한계/시간 축을 보존했다. 다음 우선순위는 W05 기존 SIM 제어/시나리오/장애/WS 텔레메트리, 이후 W06/W07/카탈로그/화면조립. 전체 목적과 F001/T032 보존.
+
+## 2026-10-04 W05/W06 checkpoint
+기존 SIM 제어/WS(T059~62)와 KPI·요구추적·CSV/JSON·세션이력(T063~66) 연결 검증. t062_sim_workspace.md/t066_kpi_workspace.md 참조. W06 Python374/Node150 및 실제8891두해상도 응답/화면내용일치. 다운로드 디스크저장완료는 미확인으로 보존. 다음 W07 MOCK-HIL, 이후 남은 catalog/교차화면. 전체 F002와 F001/F004~6/T032/다른PC·AerODT연결 미완료. 기존합의 삭제/폐기없음.

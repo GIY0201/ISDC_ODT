@@ -40,6 +40,7 @@ async function rfRequest(payload, { signal } = {}) {
 }
 
 export const api = {
+  report: reportRequest,
   orbitRadioSeries: (payload, { signal } = {}) => orbitRequest('/api/orbit/radio-series', { method: 'POST', headers: jsonHeaders, body: JSON.stringify(payload), signal }),
   orbitRadio: (payload, { signal } = {}) => orbitRequest('/api/orbit/radio-geometry', { method: 'POST', headers: jsonHeaders, body: JSON.stringify(payload), signal }),
   orbitVisibility: (payload, { signal } = {}) => orbitRequest("/api/orbit/visibility", { method: "POST", headers: jsonHeaders, body: JSON.stringify(payload), signal }),
@@ -69,6 +70,18 @@ export const api = {
   hilSequence: (sequenceId = "closed_loop") => request("/api/hil/sequence", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ sequence_id: sequenceId }) }),
   recording: (enabled) => request("/api/hil/recording", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ enabled }) }),
 };
+
+async function reportRequest(kind, { signal } = {}) {
+  const formats = {csv:{path:'/api/reports/summary.csv',type:'text/csv',filename:'spacetwin-report.csv'},json:{path:'/api/reports/snapshot.json',type:'application/json',filename:'spacetwin-snapshot.json'}};
+  const format=formats[kind];if(!format)throw new Error('보고서 형식 오류');
+  const response=await fetch(format.path,{cache:'no-store',signal});
+  if(!response.ok)throw new Error(`보고서 요청 실패 (${response.status})`);
+  const mediaType=response.headers.get('content-type')?.split(';')[0].trim().toLowerCase();
+  if(mediaType!==format.type)throw new Error('보고서 응답 형식 오류');
+  const bytes=new Uint8Array(await response.arrayBuffer());
+  if(!bytes.length||bytes.byteLength>2*1024*1024)throw new Error('보고서 크기 오류');
+  return {kind,filename:format.filename,mediaType,bytes};
+}
 
 export function telemetrySocket(onMessage, onStatus) {
   let socket;

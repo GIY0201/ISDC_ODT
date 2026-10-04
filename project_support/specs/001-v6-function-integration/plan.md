@@ -129,3 +129,6 @@ W04 후검토: 원격 임무 초안에는 mission_id/task_id scope를 붙여 같
 
 ## W05 설계
 contracts/sim_workspace.md를 따른다. 기존 backend 보존, tabs/sim_workspace.js를 workspace_orbit에 조립하고 mission_workspace의 사본 갱신 연결. Constitution I~V PASS, 새 의존성/원본 계산 변경 없음. T059→T060→T061→T062. 필수 전체 회귀/실제 UI/Draft 리뷰.
+
+## W06 기존 KPI/report 설계
+FR016/SC014→US8/R002,R003,R004,R007,R010→T063~66. contracts/kpi_workspace.md에 파일 시점/CSV 출처없음/JSON동일원본/기존지표 한계와 history를 정의한다. backend/protocol/계산 보존, 새 의존성 없음. communication/browser/api.js 원본 report adapter; tabs/kpi_workspace.js 사본/검증/필터/선택/300세션이력/220ms표시재생/다운로드; W05 observer로 기존 소켓 공유, workspace_orbit 조립, 기존 drawMultiLine 재사용. Constitution I~V PASS. 검증은 RED부터 전체pytest/Node/실제8891 두해상도/파일 일치, PR20 위 Draft.

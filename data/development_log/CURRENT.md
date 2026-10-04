@@ -1,5 +1,10 @@
 # 현재 개발 기록
 
+## 2026-10-04 W06 기존 KPI/내보내기
+- 변경: 선배 KPI/요구추적/CSV·JSON을 V6 데이터/비교에 연결, W05 단일stream 재사용 및 세션이력/상세/필터/원본응답미리보기. 서버계산/API/파일형식/chart 보존.
+- 검증: Python374 PASS126.12s/기존경고1,Node150 PASS527.8934ms, 실제8891두해상도/응답내용일치/필터·이력·복원/console0. validation/t066_kpi_workspace.md.
+- 남음: 브라우저download완료 감지timeout으로 디스크저장완료 미확인. PR20 위Draft리뷰, W07/catalog/교차화면/F001/F002/F004~6/T032 보존. 자동병합없음.
+
 ## 2026-10-04 W05 기존 SIM 제어/스트림
 - 변경: 기존 시작/정지/배속/스텝/리셋/시나리오/장애 API와 WS를 V6 지상 운용/실행에 연결. 임무 서버 사본 갱신, 네이티브 편집/초안 보존, pending/지연/역순/명령오류/정리. backend 계산/API/schema 변경없음.
 - 검증: Python372 PASS127.71s/기존경고1, Node142 PASS481.3859ms, 실제8891 두해상도/2.5초스텝/리셋/장애SIM만료/stream/단일canvas/복원. browser timer와 오류소실 보완, 초기 basetemp 부모없음148 setuperror는 경로 생성후 전체재검증. validation/t062_sim_workspace.md.
