@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 선배 최신 기능 대조
+- 변경: 최신upstreammain=로컬1a1e002와현재PR23을대조, legacy_function_audit.md/Converge T075~84 추가(기존74tasks본문보존). 임무생성/보안없음설명정정, 실제미연결module추적. 제품코드변경없음.
+- 검증: AST라우트선배53/현재31/공통23/선배만30/제품추가8, 실제8891OpenAPI HTTP30. source/readme/화면조립/기존validation근거대조. 문서정적검사/gitdiffcheck; 이번새회귀·원본실행시험아님.
+- 남음: 누락10묶음 상세설계/구현·검증/별도Draft리뷰; 위성우선T075→T076추천. F001/F002/F004~6/T032/W06저장unknown/8891보존.
+
+
 ## 2026-10-05 Catalog V6
 - 변경: 선배 groups/search/filter/page/profile/cache 재사용, V6위성카탈로그·SATCAT상세 연결,100개표시/초안/취소·역순/unknown. Backend보존.
 - 검증: Python377 PASS130.79s/Node166 PASS642.2707ms, 실제8891두해상도/active16633·stations23/ISS상세/빈검색·페이지·복원/Viewer1/console0; t074_catalog_workspace.md. 초기pytest임시경로오류149개와golden기대호출횟수수정후전체통과.

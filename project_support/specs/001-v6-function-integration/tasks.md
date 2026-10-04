@@ -149,3 +149,18 @@ Dependency T066→T067→T068→T069→T070. No new agents or parallel edits; in
 - [x] T073 [US10] workspace_orbit/workspace 및 browser fixture에 show/dispose/초안/단일Viewer 보존 조립. T072 뒤.
 - [x] T074 [US10] 전체Python/Node/실제8891두해상도/원본보존, validation/t074_catalog_workspace.md/ledger/dev log와 PR22 위 Draft 리뷰. T073 뒤.
 Dependency T070→T071→T072→T073→T074. W08/F001/F002/F004~6/T032/W06 저장완료 미확인 보존.
+
+## Phase 9: Convergence — 전체 선배 기능 대조 (2026-10-05)
+
+- [ ] T075 [HIGH] source/epoch/계산가능범위·카탈로그모델과저장GP상태를분리한계약부터작성하고 기존전파/지상국/카메라 표시를 단일Viewer에 단계별 연결·회귀검증 — FR-008, FR-018; plan: US10/W01/W02 (partial; C001). 근거: legacy_function_audit.md.
+- [ ] T076 [HIGH] 기존노드정의/검증/배치/프리셋과Kepler+J2 모델을 재사용하고 UI설정과runtime 권위상태 소유권을 명시해 scene/composer에 연결·회귀검증 — FR-008; plan: W01/W08 satellite/scene/composer (missing; C002). 근거: legacy_function_audit.md.
+- [ ] T077 [HIGH] 기존네트워크snapshot/OISL/지상국설정과ICD-02 계산을 재사용해 통신 화면에 연결; 현재 RF와별개로 모의/unknown/경로·장애·단위 회귀검증 — FR-008; plan: W03 (partial; C003). 근거: legacy_function_audit.md.
+- [ ] T078 [HIGH] 기존 missionStore와planner/ICD-03 계획·확정/일정표를 재사용하고 현재 단순임무API와구분해 mission/normal에 연결; 실패·재편성·규칙기반 결과 회귀검증 — FR-008, FR-014; plan: W04 (partial; C004). 근거: legacy_function_audit.md.
+- [ ] T079 [HIGH] 기존ICD-01 임시구현/계약/외부adapter와카탈로그·복제·무결성·복구·정책·서비스를 재사용하여 data에 연결; KPIexport와구분/미확인·실패·사본·읽기불변 회귀검증 — FR-008, FR-016; plan: W06/W08 data (partial; C005). 근거: legacy_function_audit.md.
+- [ ] T080 [HIGH] 기존보안관측·규칙판정·상태·이력을 ICD-08 어댑터와함께 security에 연결; 실제보안관제/인증구현과구분하고 판정/전환/미확인 회귀검증 — FR-008; plan: W08 security (missing; C006). 근거: legacy_function_audit.md.
+- [ ] T081 [HIGH] 기존PoC정의/runner/공유SIM시계/단계동작/KPI결과를 재사용하여 run/composer/compare에 연결; C002~6후의존성/명시실행/중복명령·복원·GPUTC분리 회귀검증 — FR-008, FR-015; plan: W05/W08 run/composer/compare (partial; C007). 근거: legacy_function_audit.md.
+- [ ] T082 [HIGH] 기존확인된source/selected IDs/SIM상태/임무/통신/데이터 결과를 주입하는 화면간계약을작성하고 예시와실값을구분해 공유맥락·인계·실패·원격초안·Viewer1 검증; source없는시설모델은발명하지않음 — FR-008; plan: W08 all V6 screens (partial; C009). 근거: legacy_function_audit.md.
+- [ ] T083 [MEDIUM] 기존모듈설정/ICD목록/probe를 communication외부경계에가두어 설정흐름에 연결; TCPconnect/UDP주소해석/내장생존 의미구분, 임의엔드포인트자동probe없이명시조회·오류 회귀검증 — FR-008; plan: W08/W09 settings (missing; C008). 근거: legacy_function_audit.md.
+- [ ] T084 [MEDIUM] 기존CSV/JSON다운로드를 실제브라우저에서 끝까지 확인하고 저장한파일bytes/단위/출처를 서버응답과대조; 완료확인불가면미확인유지 — SC-014; T066/plan: W06 (partial; C010). 근거: legacy_function_audit.md.
+
+위 목록은 구현 완료가 아닌 확인된 gap이다. 기존T001~T074 및 보류T032를 고치거나 다시번호붙이지않는다. 각묶음은 원본golden→상세계약/spec/plan/tasks→V6조립→전체회귀/실제두해상도→Draft리뷰로 세분화 후 진행한다. 추천 첫범위 T075 위성카탈로그↔공용지구, 이어 T076 위성노드. T077은노드/지상국계약,T078은노드/통신,T079는배치/데이터모듈,T080은보안계약,T081은이들모듈후,T082는완료기능부터순차,T083·T084는독립가능. 새구현은이번대조작업에서시작하지않는다.
