@@ -85,3 +85,8 @@ W06: reports.py는 별도 GET마다 새 snapshot evaluate를 호출한다. CSV U
 
 ## W07 source review
 Sources read: communication/http/hil.py/schemas.py, digital_twin/runtime/state.py183~215, simulation/mock_hil.py, model_library/devices.py, legacy tabs/hil.js. Reuse original connect health>=88, sync factors .84/.55/.65 and LOCKED, loopback +1 cap100, preflight50µs/recording/allconnected, sequence S1–4 (+S5 fault_recovery). preflight named sequence also runs4steps. Recording onlyflag; zero-offset fallback originallimitation; no actual command sequence. UI-only legacy IO estimates 3.8+throughput/100 and30+sequence%17 explicitly synthetic. No tech unknown requiring research agents or external browsing; no new dependency.
+
+## US10 기존 구현 근거
+communication/http/catalog.py의 group/q/orbit/offset/limit 및 data/catalog/access.py의 2h GP/24h SATCAT 캐시와 stale/demo-fallback/upstream-unavailable 확인. records.py의 필터/페이지/derive_orbit와 legacy tabs/orbit.js 상세 재사용 근거 확인. cache source를 사실로 표시하고 derived 궤도 수치는 서버값이며 MEAN_MOTION 부재 때 생성되는 0은 UI 미확인으로 처리한다. GP fallback fetched_at은 상세 응답시각이며 원본GP획득시각으로 표기하지 않는다. 새 stack/계산/API/schema 필요없음.
+
+US10 validation clarified: successful SATCAT responses use24h cache; GP fallback is not inserted into successful profile cache and retries SATCAT on subsequent detail query. Golden test retains original3 HTTP calls for GP1+SATCAT2.

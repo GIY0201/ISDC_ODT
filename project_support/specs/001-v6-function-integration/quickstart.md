@@ -75,3 +75,6 @@ W06: 8891 #data에서 KPI/요구 filter/detail, 세션이력 scrub/replay/live�
 
 ## W07 checks
 8891#em: select disconnected KRS-HIL, verify sync disabled; connect→sync→loopback, preflight BLOCKED→READY after all connected/synced and recording on. Test all three sequences; recording off makes preflight/sequence fail. Restore initial states after demonstration, preserve elapsed/orbit UTC. Verify two resolutions/minimize/restore/native selection, single socket/Viewer. No actual equipment or durable recording. Run test_hil_workspace.py then whole pytest with a new workspace basetemp and whole browser Node tests.
+
+## Catalog V6
+Keep fixed0.0.0.0:8891, open /?validation=t074#satellite. Edit group/search/orbit then 조건 적용·조회 button; search name/COSPAR/NORAD, navigate100row pages, click satellite for SATCAT details. Catalog selection does not select stored orbit or change UTC. Source/timestamp/warnings and missing values are shown.

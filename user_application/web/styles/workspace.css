@@ -37,3 +37,5 @@
 .cp-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .cp-table th, .cp-table td { padding: 8px; text-align: left; border-bottom: 1px solid #344452; white-space: nowrap; }
 .cp-table th { position: sticky; top: 0; background: #10212c; }
+
+.catalog-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end}.catalog-controls label{display:grid;gap:4px}.catalog-controls input{min-width:220px}#catalog-workspace .body{overflow-wrap:anywhere}#cat-detail dl{display:grid;grid-template-columns:minmax(130px,1fr) 2fr;gap:6px}#cat-detail dd{margin:0}#cat-list{max-height:350px;overflow:auto}

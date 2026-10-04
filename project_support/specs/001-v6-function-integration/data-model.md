@@ -47,3 +47,6 @@ W06: AnalyticsCopy(run/scenario/generated_at/provenance/KPI/requirements), Displ
 
 ## W07 view copies
 HilView: copied devices/runtime/events and optional telemetry; selectedDevice/sequence/localLogs<=60/chartHistory<=300, preflight with source context, sequence immutable result, pending/stale/error/connection, synchronization barrier. Server runtime remains authority. Null clock/jitter unknown. Preflight cleared on sourcecontext change; sequence preserves original run_id. Local clearing hides current displayed server event IDs without deleting server events; future events remain visible.
+
+## US10 Catalog 표시 사본
+그룹 목록/편집 조건/적용 조건/100개 페이지 응답/선택NORAD/상세 응답/각 요청 오류만 UI가 소유한다. 서버 cache 및 runtime 현재 상태를 복제한 권위 저장소를 만들지 않는다. 필터 변경시 상세 요청 취소/선택 초기화. null/빈 문자열은 미확인, 0은 유효한 수치일 때 보존한다.

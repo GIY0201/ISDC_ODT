@@ -21,7 +21,7 @@
 |---|---|---|---|---|---|
 | R001 | 독립 ISDC ODT + AeroDT 이식 가능한 구조 / S1,S5 | AeroDT 설치 의존성 없이 실행, 계층/명명/상태 소유권 검사 | constitution, plan, verify | plan File placement/Constitution / T001,T004,T010,T029 | 독립 실행/계층/로컬격리wheel 설치 PASS. T029는 실제AeroDT 재통합 증거가 아니며 연결·다른PC는 후속 |
 | R002 | 확정 V6 UI 유지 / S1,S2 | 공용 지구와 역할별 작업 창에서 연결 기능 사용, 기존 UI 결정 추적 | specify, plan, verify | plan State/Workspace / T014,T016,T024,T025,T031 | V6 원본 SHA/단일 지구/창·다중창 검증 PASS; 두해상도 성능 계측 완료, SC006 미달 |
-| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030,T033~T070 + F002 | 저장 궤도/UTC/기하가시/RF/시나리오경로·접촉/단일·구간 도플러 연결 검증. 임무 연결 검증 완료. SIM 연결 검증 완료. KPI/내보내기 연결 검증 완료. MOCK-HIL 연결 검증 완료. 남은 catalog/교차화면 포함 전체 선배 기능 F002는 미완료 |
+| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030,T033~T074 + F002 | 저장 궤도/UTC/기하가시/RF/시나리오경로·접촉/단일·구간 도플러 연결 검증. 임무 연결 검증 완료. SIM 연결 검증 완료. KPI/내보내기 연결 검증 완료. MOCK-HIL 연결 검증 완료. 카탈로그 검색/목록/상세 T071~74 검증 완료. 남은 교차화면 및 legacy 대조 포함 전체 선배 기능 F002는 미완료 |
 | R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | 단계별 승인/실패·해소 및 개별PR 유지. T028~T030 결과 검토, 다음T032 성능미달 보완 |
 | R005 | 첫 위성 1개 + 지상국 1개 / S1 | 저장된 실제 TLE/OMM, UTC 조작, 위치/고도각/가시 구간, 오류/출처 표시 검증 | specify, plan, implement, verify | plan Input/State/Geometry / T003-T023 | ISS 저장 입력/제주 가상/위치/고도각/UTC 검증. 가시 구간 계산/API/UI T019~T023 검증. validation/t023_ground_visibility.md에 실제24h4구간/설정/오류/두해상도 증거 |
 | R006 | 실제 통신 조건 확인 및 적용 / S1 | 출처 있는 서비스/장비 입력과 링크 조건 적용, 정상/실패/미확인 시험 | clarify, plan, implement, verify | plan Visibility/후속 / T023,T030 + F001 | T023/T040 공식 주파수 부분 조사·적용 및 T049/T054 모델 Doppler 검증. 장비 미선정/실제운용·수신unknown, F001 전체 미완료 |
@@ -393,3 +393,9 @@ W07 readonly analyze report: FR017/SC015 mappedT067~70,2requirements/4tasks,cove
 
 ## 2026-10-05 W07 complete
 FR017/SC015→T067~70→validation/t070_hil_workspace.md. W07 specify/plan/tasks/analyze/implement/verify complete: Python376PASS135.64s/기존경고1,Node159PASS583.0478ms,실제8891두해상도동작/성공·실패/복원/console0. Source original5files diff0. Controller최종readonlyreview추가결함0. 전체feature implement/verify running, F001~6/T032/W06disk-saveunknown 보존. 다음 남은catalog흐름,이후교차화면. PR21 stacked Draft/no merge. 서버0.0.0.0:8891 유지.
+
+## 2026-10-05 US10 Catalog 재개
+사용자 승인 다음단계: 기존 카탈로그 검색/그룹/목록/상세의 V6연결. 최초 목적과 R003/F002 유지, T071~74 추가. spec→plan→tasks의 US10 수정 후 읽기 전용 분석: FR018/SC016/US10/T071~74 계약과 책임 방향 일치, constitution1.2.0보존, 새stack/schema없음, 명시조회 선택은 routine UX 결정. prerequisites 통과 후 implement running. clarify/checklist는 기존합의 재사용(미해결 질문 없음); extensions hook 없음. 이전완료작업삭제없음; verify running.
+
+## 2026-10-05 US10 결과
+T071~74/FR018/SC016 complete; validation/t074_catalog_workspace.md: Python377/Node166/actual8891두해상도. Initialpytestpath/setup와golden fallback횟수오류 보존/수정후전체통과. Local catalogue lookup complete, feature-level implement/verify running because F002/W08 and other deferred requirements remain. Next skill: speckit-converge to audit all legacy functions/V6 screen mappings before scoped W08 tasks; no full-feature completion claim. Draft PR22 위 게시/자동병합없음. R001~10/원래목표/장비미선정/0.0.0.0:8891/기존승인 보존.

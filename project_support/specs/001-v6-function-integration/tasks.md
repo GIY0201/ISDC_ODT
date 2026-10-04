@@ -142,3 +142,10 @@ W03-A 의존성: T033→T034→T035→T036. T033의Python/Node시험은별도파
 - [x] T069 [US9] workspace_orbit/workspace/sim_workspace fanout/show/draft/dispose and browser fixture two resolutions shared stream/retention. T068 first.
 - [x] T070 whole Python/Node/actual8891 two resolutions success/failure/readonly preservation, validation/t070_hil_workspace.md/ledger/dev logs/full plan and PR21 stacked Draft. T069 first.
 Dependency T066→T067→T068→T069→T070. No new agents or parallel edits; independent read/test may batch. F001/F002/F004~6/T032/W06 disk save unknown preserved.
+
+## US10 Catalog (FR-018/SC-016)
+- [x] T071 [US10] tests/test_catalog_workspace.py와 browser/catalog_workspace.test.mjs에 기존 필터/캐시/상세 및 late/error/unknown RED 회귀 작성.
+- [x] T072 [US10] communication/browser/api.js optional signals와 tabs/catalog_workspace.js의 읽기 전용 controller/panel 구현. T071 뒤.
+- [x] T073 [US10] workspace_orbit/workspace 및 browser fixture에 show/dispose/초안/단일Viewer 보존 조립. T072 뒤.
+- [x] T074 [US10] 전체Python/Node/실제8891두해상도/원본보존, validation/t074_catalog_workspace.md/ledger/dev log와 PR22 위 Draft 리뷰. T073 뒤.
+Dependency T070→T071→T072→T073→T074. W08/F001/F002/F004~6/T032/W06 저장완료 미확인 보존.

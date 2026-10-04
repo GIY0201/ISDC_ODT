@@ -1,0 +1,2 @@
+# US10 기존 Catalog HTTP 표시 계약
+GET /api/satellite-groups items(id,label,upstream,cached_total,cached_at). GET /api/satellites group/q/orbit/offset/limit=100; source/group/label/items/count/total/filtered_total/offset/limit/truncated/fetched_at 및 optional stale/warning. GET /api/satellites/{NORAD} source/fetched_at/catalog/gp/optional warning. source는 celestrak-live/cache/stale/demo-fallback/upstream-unavailable; 상세는 celestrak-satcat/gp-cache. API/cache/schema 변경없음. fetched_at은 list획득시각/detail응답시각으로 각각 표기. 필터와 pagination은 기존 서버의 범위 사용. 원격초안은 HTTP나 GP명령을 발생시키지 않는다.
