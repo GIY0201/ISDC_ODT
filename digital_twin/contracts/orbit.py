@@ -142,6 +142,34 @@ class OrbitUnavailable(RuntimeError):pass
 class OrbitBusy(RuntimeError):pass
 
 @dataclass(frozen=True)
+class OrbitRadioCalculation:
+    utc: str
+    frequency_hz: float
+    position_m: tuple[float,float,float] | None
+    velocity_m_s: tuple[float,float,float] | None
+    elevation_deg: float | None
+    range_m: float | None
+    range_rate_m_s: float | None
+    doppler_hz: float | None
+    received_frequency_hz: float | None
+    error_code: str | None
+    eop_sha256: str
+    leap_sha256: str
+    frame: str='ITRF'
+    profile: str='WGS72_AFSPC'
+
+@dataclass(frozen=True)
+class OrbitRadioQueryResult:
+    client_request_id: str
+    revision: int
+    input_id: str
+    input_hash: str
+    ground_point: GroundPoint
+    minimum_elevation_deg: float
+    calculation: OrbitRadioCalculation
+    stale: bool
+
+@dataclass(frozen=True)
 class VisibilityInterval:
     start_utc: str
     end_utc: str

@@ -99,3 +99,11 @@ W03-A 의존성: T033→T034→T035→T036. T033의Python/Node시험은별도파
 - [x] T043 [US2] user_application/web/scripts/workspace_orbit.js와workspace.js 및styles/workspace.css에 실제panel/입력/결과/시나리오의미/창·원격보존을조립하고project_support/tests/browser/workspace_communication_planning.test.mjs 검증.
 - [x] T044 validation/t044_communication_planning.md에전체Python/Node/실제두해상도8891/AST/GP·RF불변 및한계를기록하고 workflow-progress.md/data/development_log를갱신후stacked Draft PR 리뷰.
 의존성T040→T041→T042→T043→T044. 서로독립Python/Node시험과읽기전용자료검토는병렬가능. MVP는기존시나리오2기능UI연결,현재ISS통신가능/예약/HIL로표현하지않는다.
+
+## W03-D / US1 저장 ISS 거리·도플러
+- [x] T045 [US1] project_support/tests/test_orbit_radio.py와tests/browser/orbit_radio.test.mjs에 analytic/기존원본식/속도oracle/미분/실패/readonly/stale/transport/controller RED시험 작성.
+- [x] T046 [US1] digital_twin/simulation/orbit_radio.py, contracts/orbit.py, user_application/orbit_calculation.py 및runtime/orbit.py에 순수기하/typed조회/기존 bounded 실행 연결. samples/visibility 변경없음.
+- [x] T047 [US1] communication/http/orbit_schemas.py와orbit.py 및browser/api.js에 신규radio-geometry계약 추가, ADR0008/compatibility/422/503 검증.
+- [x] T048 [US1] user_application/web/scripts/tabs/orbit_radio.js를workspace_orbit.js/workspace.js/index.html에조립하고 browser/workspace_orbit_radio.test.mjs에 실제assembly RED→복원/원격/GP·RF보존시험.
+- [x] T049 전체Python/Node/독립속도·원본대조/실제8891두해상도/정상·오류·출처/자신의서버재시작/로그를 validation/t049_orbit_radio.md에기록하고 stacked Draft PR 리뷰.
+의존성T044→T045→T046→T047→T048→T049. 초기단일시점모델계산이며F001전체/F002/T032보류미완료유지.

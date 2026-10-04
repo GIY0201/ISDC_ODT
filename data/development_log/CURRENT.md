@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-04 W03-D ISS 거리·도플러
+- 변경: 선배 상대속도식과 기존 Rust 전파/ITRF 속도 변환을 재사용해 읽기 전용 단일UTC 조회 및 V6 위성 패널 연결. 공식 주파수 명시 적용, 취소/출처/늦은 결과 방어. ADR0008.
+- 검증: 전체 Python349 PASS116.61s/기존경고1, Node122 PASS393.7302ms, 실제8891 두해상도/입력오류/복원/GP·RF16입력보존/console0, 읽기 전용 최종 리뷰 결함0. validation/t049_orbit_radio.md.
+- 남음: 실제 수신·장비 unknown, F001전체/F002/F004~6/T032보류. PR16 위 stacked Draft PR 리뷰, 자동병합없음.
+
+
 ## 2026-10-04 RF 최종 검토 보완
 - 변경: Unicode 링크 이름 길이를 기존 서버와 같은 code point40자로 검사. emoji40/41 RED→PASS 및 실제API/UI 확인. 서버 계산/API/schema 보존.
 - 최종검증: 전체Python304 PASS103.50초/기존경고1, Node95 PASS313.47ms. 보고서 t036_rf_workspace.md.

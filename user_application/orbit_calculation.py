@@ -51,5 +51,26 @@ def create_orbit_calculation(eop_provider):
         positions[valid]=teme_positions_to_itrf(values[valid,:3],times[valid],valid_eop)
         angles[valid]=elevation_deg(positions[valid],ground_point)
         return OrbitVectorCalculation(times.jd1,times.jd2,positions,angles,errors,eop_provider.eop_sha256,eop_provider.leap_sha256)
+    def radio(orbit,utc,ground_point,frequency_hz):
+        from digital_twin.contracts.orbit import OrbitRadioCalculation
+        from digital_twin.simulation.orbit_radio import radio_geometry,validate_frequency
+        try:
+            from communication.native.orbit_adapter import propagate_instants
+        except (ImportError,OSError) as exc:
+            raise OrbitUnavailable('Orbit native calculation module unavailable') from exc
+        validate_frequency(frequency_hz)
+        instant=parse_utc_batch([utc])[0];point=eop_provider.at(instant)
+        if point.snapshot_sha256!=eop_provider.eop_sha256 or point.leap_sha256!=eop_provider.leap_sha256:
+            raise ValueError('EOP radio provenance mismatch')
+        native=propagate_instants(orbit,[instant]);_,values=native.valid_rows()
+        if native.errors[0] is not None:
+            return OrbitRadioCalculation(utc,float(frequency_hz),None,None,None,None,None,None,None,native.errors[0],eop_provider.eop_sha256,eop_provider.leap_sha256)
+        geometry=teme_to_itrf(values[:,:3],[instant],[point],velocities_km_s=values[:,3:])
+        position=tuple(float(x) for x in geometry.position_m[0]);velocity=tuple(float(x) for x in geometry.velocity_m_s[0])
+        distance,rate,shift,received=radio_geometry(position,velocity,ground_point,frequency_hz)
+        return OrbitRadioCalculation(utc,float(frequency_hz),position,velocity,float(elevation_deg([position],ground_point)[0]),distance,rate,shift,received,None,geometry.eop_sha256,geometry.leap_sha256)
+    radio.eop_sha256=eop_provider.eop_sha256
+    radio.leap_sha256=eop_provider.leap_sha256
+    calculate.radio=radio
     calculate.evaluate_times=evaluate_times
     return calculate
