@@ -14,6 +14,8 @@ test('empty UI choice restores server selection without clearing its result or s
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
     .replace(/import \{createWorkspaceRevisionSync\} from [^;]+;/,'const createWorkspaceRevisionSync=()=>({observe(){},destroy(){}});')
     .replace(/import \{createGroundPanel\} from [^;]+;/,'const createGroundPanel=()=>({show(){},update(){},destroy(){}});')
+    .replace(/import \{createKpiPanel\} from [^;]+;/,'const createKpiPanel=()=>({show(){},update(){},receive(){},connection(){},applyDraft(){},destroy(){}});')
+    .replace(/import \{drawMultiLine\} from [^;]+;/,'const drawMultiLine=()=>{};')
     .replace(/import \{createSimPanel\} from [^;]+;/,'const createSimPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createMissionPanel\} from [^;]+;/,'const createMissionPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createRadioSeriesPanel\} from [^;]+;/,'const createRadioSeriesPanel=()=>({show(){},update(){},applyDraft(){},choose(){},clearInterval(){},destroy(){}});')

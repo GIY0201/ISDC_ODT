@@ -17,10 +17,10 @@ function number(value, low, high, integer=false) {
   return Number(value);
 }
 
-export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()=>{}, timers={setTimer:(fn,ms)=>setTimeout(fn,ms),clearTimer:id=>clearTimeout(id)}) {
+export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()=>{}, timers={setTimer:(fn,ms)=>setTimeout(fn,ms),clearTimer:id=>clearTimeout(id)}, observers={}) {
   let state={runtime:null,scenarios:[],events:[],metrics:null,wallTime:'',busy:false,stale:true,connection:'idle',status:'서버 SIM 연결 대기',error:'',draft:{speed:'',scenario_id:'',target:'',kind:'link_loss',severity:'medium',duration_seconds:'60'}};
   let ended=false,close=null,connected=false,timer=null,barrier=null,received=0,initialized=false;
-  function watch() { timers.clearTimer(timer); timer=timers.setTimer(()=>{if(!ended){state.stale=true;changed('stream');}},3500);timer?.unref?.(); }
+  function watch() { timers.clearTimer(timer); timer=timers.setTimer(()=>{if(!ended){state.stale=true;observers.status?.('stale');changed('stream');}},3500);timer?.unref?.(); }
   function installBootstrap(value, keepStream=false) {
     const r=runtime(value?.runtime), list=value.scenarios;
     if (!Array.isArray(list) || list.some(s=>!s || typeof s.id!=='string' || !s.id || typeof s.name!=='string') || new Set(list.map(s=>s.id)).size!==list.length || !Array.isArray(value.missions)) throw Error('SIM 목록 응답 오류');
@@ -43,7 +43,8 @@ export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()
       onMissions(copy(value.missions));
       state.runtime=r;state.events=e;state.metrics=copy(value.telemetry);state.wallTime=value.wall_time;
       state.stale=false;if(!state.error)state.status='서버 SIM 스트림 수신';barrier=null;received++;watch();changed('stream');
-    } catch(error) {state.stale=true;state.error=error.message;changed('stream');}
+      observers.frame?.(copy(value));
+    } catch(error) {state.stale=true;state.error=error.message;observers.status?.('invalid');changed('stream');}
   }
   async function command(work,label) {
     if(ended || state.busy)return;
@@ -59,7 +60,7 @@ export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()
   }
   const controller={
     snapshot:()=>copy(state),
-    connect(){if(ended || connected)return;connected=true;watch();close=connector(receive,status=>{if(!ended){state.connection=status;state.stale=true;changed('stream');}});},
+    connect(){if(ended || connected)return;connected=true;watch();close=connector(receive,status=>{if(!ended){state.connection=status;state.stale=true;observers.status?.(status);changed('stream');}});},
     async load(){if(ended || state.busy)return;state.busy=true;state.error='';changed('controls');const start=received;
       try{const value=await api.bootstrap();if(!ended){installBootstrap(value,received!==start);barrier=null;state.status='서버 상태 조회 · 지표는 스트림 표본';}}
       catch(error){if(!ended)state.error=error.message;}
@@ -75,10 +76,10 @@ export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()
   return controller;
 }
 
-export function createSimPanel(api, connector, onMissions) {
+export function createSimPanel(api, connector, onMissions, observers={}) {
   let view=null,loaded=false;
   const visible=()=>['operations','run','initial','exception'].includes(view);
-  const controller=createSimWorkspace(api,connector,draw,onMissions);
+  const controller=createSimWorkspace(api,connector,draw,onMissions,undefined,observers);
   function draw(reason) {
     if(!visible())return;
     const screen=document.getElementById('screen');let panel=document.getElementById('sim-workspace');
@@ -117,5 +118,5 @@ export function createSimPanel(api, connector, onMissions) {
     panel.querySelector('#sim-faults').innerHTML=`<h3>활성 SIM 장애 ${(r?.active_faults||[]).length}개</h3><ul>${(r?.active_faults||[]).map(f=>`<li>${esc(f.id)} · ${esc(f.target)} · ${esc(f.kind)} · ${esc(f.severity)} · 만료 ${f.expires_at} SIM s</li>`).join('')}</ul>`;
     panel.querySelector('#sim-events').innerHTML=`<h3>서버 최근 사건 (SIM)</h3><ul>${s.events.slice(0,12).map(e=>`<li>${e.simulation_time} s · ${esc(e.type)} · ${esc(e.message)}</li>`).join('')}</ul>`;
   }
-  return {show(next){view=next;if(visible()||view==='mission')controller.connect();if(visible()){draw('controls');if(!loaded){loaded=true;controller.load();}}},update:()=>draw('stream'),applyDraft(items){for(const item of items){if(typeof item?.value!=='string'||!item.id?.startsWith('sim-'))continue;const key=item.id.slice(4);if(Object.keys(controller.snapshot().draft).includes(key)){controller.edit({[key]:item.value});const field=document.getElementById(item.id);if(field&&!controller.snapshot().busy)field.value=item.value;}}},destroy:()=>controller.destroy(),controller};
+  return {show(next){view=next;if(visible()||['mission','data','compare'].includes(view))controller.connect();if(visible()){draw('controls');if(!loaded){loaded=true;controller.load();}}},update:()=>draw('stream'),applyDraft(items){for(const item of items){if(typeof item?.value!=='string'||!item.id?.startsWith('sim-'))continue;const key=item.id.slice(4);if(Object.keys(controller.snapshot().draft).includes(key)){controller.edit({[key]:item.value});const field=document.getElementById(item.id);if(field&&!controller.snapshot().busy)field.value=item.value;}}},destroy:()=>controller.destroy(),controller};
 }
