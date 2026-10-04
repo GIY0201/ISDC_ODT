@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 Catalog V6
+- 변경: 선배 groups/search/filter/page/profile/cache 재사용, V6위성카탈로그·SATCAT상세 연결,100개표시/초안/취소·역순/unknown. Backend보존.
+- 검증: Python377 PASS130.79s/Node166 PASS642.2707ms, 실제8891두해상도/active16633·stations23/ISS상세/빈검색·페이지·복원/Viewer1/console0; t074_catalog_workspace.md. 초기pytest임시경로오류149개와golden기대호출횟수수정후전체통과.
+- 남음: PR22위Draft리뷰/W08전체대조/F001/F002/F004~6/T032/W06disk-saveunknown. 전체카탈로그globe·legacypass선택연결 주장없음;포트0.0.0.0:8891/SIM보존.
+
+
 ## 2026-10-05 W07 MOCK-HIL
 - 변경: 기존모의장비/사전점검/3시퀀스/recording을 V6 EM창에연결, 단일WS/상태사본/구성도/통계/차트/부분실패·취소·점검무효화/선택복원. backend5files diff0.
 - 검증: Python376 PASS135.64s/기존경고1,Node159 PASS583.0478ms,실제8891두해상도 READY/BLOCKED/성공·실패/복원/console0, t070_hil_workspace.md. 초기navigation 도구timeout은재바인딩후검증. 서버0.0.0.0:8891 유지.

@@ -88,3 +88,6 @@ F001 실제 통신 조건, T032 성능, 실제 HIL·영구 기록, 다른 PC 배
 
 ## 2026-10-05 W07 checkpoint
 기존 MOCK-HIL 전기능을 EM창에 연결/검증(T067~70). 원본장비함수/사전점검/세시퀀스/recording보존. Python376/Node159/실제8891두해상도, t070_hil_workspace.md. 실제HIL·영구기록 주장없음. 다음 남은위성catalog 검색/그룹/목록/상세/stale, 이후W08교차화면점검. F001/F002/F004~6/T032 및 W06파일저장완료미확인보존.
+
+## 2026-10-05 Catalog checkpoint
+US10/T071~74 existing groups/search/orbit filter/paged list/SATCAT-GP detail/stale-demo-unavailable now V6 connected and tested: validation/t074_catalog_workspace.md. W08 cross-screen and all legacy feature audit next, including all-catalog globe/pass/selection not implied complete here. F002 remains incomplete. F001/F004~6/T032/W06 disk-saveunknown unchanged.
