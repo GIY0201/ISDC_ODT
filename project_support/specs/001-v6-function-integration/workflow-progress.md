@@ -21,7 +21,7 @@
 |---|---|---|---|---|---|
 | R001 | 독립 ISDC ODT + AeroDT 이식 가능한 구조 / S1,S5 | AeroDT 설치 의존성 없이 실행, 계층/명명/상태 소유권 검사 | constitution, plan, verify | plan File placement/Constitution / T001,T004,T010,T029 | 독립 실행/계층/로컬격리wheel 설치 PASS. T029는 실제AeroDT 재통합 증거가 아니며 연결·다른PC는 후속 |
 | R002 | 확정 V6 UI 유지 / S1,S2 | 공용 지구와 역할별 작업 창에서 연결 기능 사용, 기존 UI 결정 추적 | specify, plan, verify | plan State/Workspace / T014,T016,T024,T025,T031 | V6 원본 SHA/단일 지구/창·다중창 검증 PASS; 두해상도 성능 계측 완료, SC006 미달 |
-| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030,T033~T054 + F002 | 저장 궤도/UTC/기하가시/RF/시나리오경로·접촉/단일·구간 도플러 연결 검증. 임무/SIM/KPI/MOCK-HIL 등 전체 선배 기능 F002는 미완료 |
+| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030,T033~T058 + F002 | 저장 궤도/UTC/기하가시/RF/시나리오경로·접촉/단일·구간 도플러 연결 검증. 임무 연결 검증 완료. SIM/KPI/MOCK-HIL 등 전체 선배 기능 F002는 미완료 |
 | R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | 단계별 승인/실패·해소 및 개별PR 유지. T028~T030 결과 검토, 다음T032 성능미달 보완 |
 | R005 | 첫 위성 1개 + 지상국 1개 / S1 | 저장된 실제 TLE/OMM, UTC 조작, 위치/고도각/가시 구간, 오류/출처 표시 검증 | specify, plan, implement, verify | plan Input/State/Geometry / T003-T023 | ISS 저장 입력/제주 가상/위치/고도각/UTC 검증. 가시 구간 계산/API/UI T019~T023 검증. validation/t023_ground_visibility.md에 실제24h4구간/설정/오류/두해상도 증거 |
 | R006 | 실제 통신 조건 확인 및 적용 / S1 | 출처 있는 서비스/장비 입력과 링크 조건 적용, 정상/실패/미확인 시험 | clarify, plan, implement, verify | plan Visibility/후속 / T023,T030 + F001 | T023/T040 공식 주파수 부분 조사·적용 및 T049/T054 모델 Doppler 검증. 장비 미선정/실제운용·수신unknown, F001 전체 미완료 |
@@ -67,6 +67,8 @@
 - 이번 기록 수정: 문서 구조와 요구/후속 연결 정적 확인만. 기능 시험을 새로 실행하지 않음.
 
 ## 다음 선택과 복구
+최신 사용자 steering(2026-10-04): 선배가 이미 구현한 기능을 전부 V6에 연결하는 것을 우선한다. W03-E 검증과 Draft PR #18 생성 완료 후, 다음은 W04 임무 관리의 기존 action/tasks/validate/replan 재사용이다. 이어 W05 SIM/WS, W06 KPI/export, W07 MOCK-HIL, 남은 카탈로그 흐름과 W08 화면 간 조립을 확인한다. full_integration_plan.md의 최신 우선순위 표가 이 순서를 추적한다. 새로운 위성 기능 확장은 후순위이며 F001/T032/F004~6는 유지한다. 아래 기존 선택 문장은 날짜별 이력으로 보존한다.
+
 현재 승인 A의 T033~T036 RF 계산기 연결과 검증을 완료했다. 다음 단계는 별도 Draft PR 리뷰 및 F001 실제 서비스·장비 조건 선정이다. T032 프레임 검증은 사용자 지시로 보류한다. 합의된 수치와 기존feature를 재사용한다. 아래 날짜별 초기기록은 이력이며 현재 진행단계를 되돌리는 지시가 아니다. 첫 단계 수행과 전체제품완료를 별개로 검토한다.
 현재 사용자에게 반복 선택을 요구하지 않음. 합의된 사항은 유지. 새로운 기술 선택과 기능 확대는 구체적 검토안을 마련하여 함께 논의한다.
 Hooks: extensions.yml 없음. 필수 hook 없음. 현재T028/verify repair count: 3. 전체 제품 완료: 아님.
@@ -361,3 +363,11 @@ W03-E plan/tasks complete: research agent 검토와계약/data-model/quickstart 
 
 ## 2026-10-04 T050~T054 구현·검증 완료
 FR013/SC011→R003/R005/R006/R007 증거 E-ORBIT-RADIO-SERIES: validation/t054_orbit_radio_series.md. 이번묶음 clarify불필요/specify/plan/tasks/analyze/implement/verify complete, hooks없음/8체크PASS. 처음Python363PASS1FAIL architecture→수정 후369PASS125.17s/기존경고1, Node129PASS432.6794ms. 읽기전용marker결함RED→PASS/최종추가결함0. 실제8891두해상도3그래프/복원/오류/clip/none/RF·GP·조회18입력보존/canvas1/error0. 원래17정의AST/물리식보존. 구현검증 repair2(marker/계층), 명세분석repair0. 전체feature implement/verify running. F001전체/F002/F004~6/T032보류와처음목표유지. PR17 위stacked Draft PR리뷰, 자동병합없음.
+
+
+## 2026-10-04 W04 시작
+사용자 임무 연결 순서 수용(좋아). 기존 feature/bootstrap/prerequisites/setup-plan/setup-tasks 실행, constitution1.2.0과 기존 결정 보존. hooks 없음. FR-014/SC-012→R003/R004/R007/R010→T055~58. clarify 불필요(기존 기능 연결 승인), 질문0. specify/plan/tasks complete; 전체 기능/F001/T032 미완료 유지. 현재 구현/검증 pending.
+
+
+## 2026-10-04 W04 검증 완료
+FR-014/SC-012→R003/R004/R007/R010→T055~58 evidence validation/t058_mission_workspace.md. clarify불필요/질문0, specify/plan/tasks/analyze/implement/verify 이번묶음 complete, hooks없음/checklist8/8. Read-only 일관성 분석 coverage100%,추가충돌0. 기존 API4파일 diff0, 요청직렬화/scoped초안/소수native입력노드유지. Python371PASS125.76s(기존경고1),Node134PASS457.4237ms. 첫전체pytest Temp권한오류는 workspace새basetemp로해소하고실패기록보존. 실제8891두해상도 CRUD/충돌/preview/apply/상태실패/소수키/복원/입력18개/canvas1/예상치못한error0 확인. 전체 feature implement/verify running, F001/F002/W05~09/T032 보존. 다음 W05 기존 SIM 제어/WS. PR18위 Draft PR 리뷰, 자동병합없음.

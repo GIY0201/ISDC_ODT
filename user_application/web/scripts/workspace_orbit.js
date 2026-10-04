@@ -1,5 +1,6 @@
 import {createWorkspaceRevisionSync} from './workspace_revision_sync.js';
 import {api} from '/static/communication/api.js';
+import {createMissionPanel} from './tabs/mission_workspace.js?v=t057-r4';
 import {createOrbitSelection} from './orbit_selection.js?v=t031-r1';
 import {createWorkspaceGlobe} from './workspace_globe.js?v=t028-r1';
 import {createWorkspacePlayback} from './workspace_playback.js';
@@ -19,13 +20,14 @@ const groundPanel=createGroundPanel(client,api,{onInterval:(source,index)=>serie
 const rfPanel=createRfPanel(api);
 const planningPanel=createCommunicationPlanningPanel(api);
 const radioPanel=createOrbitRadioPanel(client,api);
+const missionPanel=createMissionPanel(api);
 const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   displayUtc=utc;displayElevation=row?`${row.elevation_deg.toFixed(4)}°`:'자료 준비 중 / 위치 미표시';globe.update(error?{...snapshot,status:'error',error}:snapshot,row,utc);
   const clock=document.getElementById('orbit-display-utc');if(clock)clock.textContent=utc||'미선택';
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   revisionSync.observe(client.snapshot());
@@ -35,6 +37,7 @@ function render(){
   planningPanel.update();
   radioPanel.update();
   seriesPanel.update();
+  missionPanel.update();
   if(view!=='satellite')return;
   const screen=document.getElementById('screen');let panel=document.getElementById('stored-orbit');
   if(!panel){panel=document.createElement('section');panel.id='stored-orbit';panel.className='panel';screen.prepend(panel);}
@@ -54,10 +57,11 @@ function render(){
   panel.querySelector('#orbit-seek').addEventListener('click',()=>{const field=panel.querySelector('#orbit-utc'),utc=field.value.trim();delete field.dataset.dirty;command(()=>client.seek(utc));});
   panel.querySelector('#orbit-epoch').addEventListener('click',()=>{delete panel.querySelector('#orbit-utc').dataset.dirty;command(()=>client.seek(record.epoch_utc));});
 }
-export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);render();}
+export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);render();}
 client.load();
 
 export function applyWorkspaceDraft(items,remote=false){
+  missionPanel.applyDraft(items,remote);
   groundPanel.applyDraft(items);
   rfPanel.applyDraft(items,remote);
   planningPanel.applyDraft(items,remote);

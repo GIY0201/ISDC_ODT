@@ -64,3 +64,7 @@ V6 지상국 창에서 RF 패널을 연다. 모든 필드가 빈칸이며 실제
 
 ## W03-E 검증
 8891 저장orbit app에서 지상국 창→24h 가시 구간 조회→구간 선택→MHz 직접 입력 또는 공식프로파일 명시 적용→구간 거리·도플러 계산. 그래프3개/표본간격/접근·이탈/표본최근접/절대최대shift/clip 표시 확인. 취소·주파수0·선택변경·창복원/RF보존도 확인. 전체pytest 및 node --test project_support/tests/browser/*.test.mjs. 생성 근거는 ignored data/workspace/validation/radio_series, 소스 보고서 validation/t054_orbit_radio_series.md.
+
+
+## W04 임무 화면
+8891/#mission에서 서버 임무를 불러온다. 작업 선택→편집/추가/삭제, 충돌 검사, 재계획 미리보기→최신 계획에 재계산·적용, 상태 변경을 확인한다. 실패 시 오류를 읽고 서버 새로고침으로 적용 여부를 확인한다. SIM, 기존 계획 축, 현재 충돌과 미리보기의 구분을 확인하고 satellite/ground 입력이 보존되는지 점검한다.

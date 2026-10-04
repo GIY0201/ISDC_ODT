@@ -115,3 +115,14 @@ T045 RED→T046 geometry/assembly/runtime→T047 wire→T048 V6→T049 전체검
 신규 POST /api/orbit/radio-series: 기존 RadioGeometryRequest의 request/revision/input/frequency 및 start/end UTC. 0<SI duration<=86400초, count=min(601,ceil(duration)+1), 시작/종료 포함 균등 SI 간격. 클라이언트는 기존 가시결과 사본에서 interval 선택, 서버는 해당 범위의 기하 계산만하며 가시 경계를 재확정하지 않는다. 실제수신 unknown. 일부 native 오류는 numeric null 행 보존/partial, 전부 오류 error. graph gaps와 전체 요약 미확인으로 표시한다.
 contracts/orbit.py에 immutable series/query typed 계약. communication/http/orbit_schemas.py+orbit.py와communication/browser/api.js의 신규 명시 경로; 기존 wire 보존, ADR0009. user_application/web/scripts/tabs/orbit_radio_series.js controller/panel을 workspace_orbit.js에 조립. ground_visibility.js는 optional onInterval callback으로 실제 조회 결과와 선택행 사본을 전달, 기존 단독 호출 호환. panel은 ground/satellite에서 보이며 raw 가시결과 provenance를 검사, 재조회/편집은 구간 선택과 결과 폐기. 공식 주파수 controller 재사용/직접 MHz 적용. visualization/orbit_radio_series.js는 주입 데이터의 SVG 3개와 표본요약만 표현하며 API/runtime 소유 없음. 그래프 시간축 SI초와 양끝 UTC, 단위별 독립축, 실패행 gaps. 모든 실제값 escape.
 단일UTC/series 모두 같은 성능 제한 executor를 사용한다. UI no timers/replay/continuous polling, 최대601 SVG표본. import IO없음/native wheel변경없음/독립계층 지킴. Constitution gate I~V PASS. 검증은 Python batch/scalar equality+native1회/경계/윤초/partial/readonly/stale/기존wire, Node source/UTC/formula/abort/창/원격/graph gaps, 실제8891두해상도. PR17 위 별도stacked Draft 리뷰, 자동병합없음.
+
+
+## W04 임무 연결 설계
+FR-014/SC-012 → R003/R004/R007/R010 → T055~T058. JS/Cesium/Python 기존 환경, 새 의존성 없음. MissionRuntime/HTTP/schema/API 계산은 변경하지 않는다.
+user_application/web/scripts/tabs/mission_workspace.js는 주입 API와 화면용 사본/선택/편집 초안/현재 검증/변경 제안을 관리한다. API bootstrap에서 실제 임무 목록을 읽고 기존 missionAction/missionTask/validateMission/replanMission을 호출한다. 요청은 직렬화하고 pending 중 변경·선택을 막는다. 실패는 명시하며 명령을 자동 재시도하지 않는다. 성공 응답과 새로고침은 서버 사본만 반영하고 결과가 다른 임무를 가리키면 거부한다.
+V6 workspace_orbit 조립이 임무 panel을 show/destroy/applyDraft한다. mission 보기의 기존 예시 카드를 실제 연결 패널로 대체한다. 입력 초안은 화면 전환/복원에도 보존한다. 별도 창에서 전송된 입력은 초안만 반영하고 명령/검증/적용을 자동 실행하지 않는다. 서버 상태는 runtime 단독 소유; UI는 사본. WS/SIM제어 상세는 W05에서 연결하며 이번 화면에는 서버 새로고침을 제공한다.
+Constitution I~V: 기존 계층/명명, 상태 소유권, 계산 보존, V6/SIM 표시, RED→PASS 및 전체 Python/Node/실제 8891 두해상도 게이트 모두 유지. 기존 ignore와 hooks 없음 확인.
+검증: test_mission_workspace.py에 기존 API 정상/실패/preview 의미/사본 회귀, browser mission_workspace 및 V6 assembly 시험을 먼저 작성. 최종 전체 시험과 실제 UI, 원본 파일 diff 보존 확인.
+
+
+W04 후검토: 원격 임무 초안에는 mission_id/task_id scope를 붙여 같은 임무/작업에만 적용한다. native 입력 노드를 편집 중 교체하지 않고 기존 V6 button/form/table 스타일을 사용한다. 실제 서버/API 변경 없음. validation/t058_mission_workspace.md에 최종 게이트 결과와 원본 한계를 기록했다.

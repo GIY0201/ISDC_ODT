@@ -72,3 +72,9 @@ Decision: 기존 Rust native 위치·속도 및 scalar TEME→ITRF를 재사용�
 
 ## W03-E research
 읽기 전용 연구 agent 검토: native propagate_instants 1회 Nx6, SI TAI TimeDelta 균등grid+UTC9digits/endpoints, 기존 속도 변환/내적식 재사용. 대안 601 HTTP 또는 scalar601회는 경계비용 때문에 제외. 결정 count=min(601,ceil(duration)+1), 요청 count 없음/서버통제. 오류 행은 변환에서 제외/gap, 부분실패 전체 요약 없음으로 보수 표시. 동률 가장 이른 표본, abs최대는 부호/UTC도 표시. clip은 조회잘림이고 radio 서버는 가시 경계 재확정 안함. 기존 물리 근사 및 단일 모델 그대로, 외부 신규 이론/라이브러리 도입 없음. 조사만이며 성능/통신정확도 근거 아님. NEEDS CLARIFICATION0.
+
+
+## W04 기존 코드 조사
+Decision: communication/http/missions.py의 네 경로와 MissionRuntime을 그대로 호출한다. API를 새로 만들거나 legacy store 전체를 V6에 복제하지 않는다. bootstrap의 missions 사본을 사용한다.
+근거: 기존 tabs/mission.js는 고정 selector와 legacy global store에 결합되어 있으므로 화면 흐름만 독립 패널로 연결하고 서버 로직을 재사용한다. 작업 predecessor는 null이면 보존되지만 빈 문자열이면 해제 가능하다. 미리보기는 diff만 반환하며 mission.tasks와 validation은 현재 계획이고 이벤트는 생성한다. 적용은 현재 계획 재계산으로 exact preview CAS가 없다. 표시로 의미를 구분하며 계산 변경은 이번 범위 밖이다.
+Alternatives rejected: 새로운 재계획 알고리즘/AI, 서버 현재 상태 중복, 원본 UI 전체 이식, 기존 퍼센트 축을 분으로 변환. 모두 사용자 재사용 목적과 맞지 않는다.

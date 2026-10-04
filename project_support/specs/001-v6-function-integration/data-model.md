@@ -36,3 +36,7 @@ W03-D: OrbitRadioCalculation immutable 단일 UTC의 ITRF position_m/velocity_m_
 
 ## W03-E
 OrbitRadioSeriesCalculation: start_utc,end_utc,duration_seconds,step_seconds,rows tuple[OrbitRadioCalculation,...],eop_sha256,leap_sha256. OrbitRadioSeriesQueryResult: request/revision/input/hash/ground/minimum_elevation/calculation/stale. UTC grid와 rows immutable, 오류행 전 numeric null. UI interval 사본(start/end/peak/clip와조회 metadata)은 서버 현재 상태를 소유하지 않는다. Graph 요약은 모든 행 유효할 때 표본 중 min range/abs max shift, 부분실패이면 전체 요약 없음.
+
+
+## W04 UI 사본과 초안
+Mission은 기존 id/name/status/progress/plan_version/tasks/resources/success_conditions 사본. Task는 기존 id/lane/name/start/duration/status/predecessor/priority. Validation은 mission_id/plan_version/valid/conflict_count/conflicts. Preview는 mission/applied:false/diff/validation으로 현재 검증과 분리한다. UI 선택과 편집 초안은 서버 현재 상태가 아니며 저장 요청 전까지 runtime에 영향이 없다.
