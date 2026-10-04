@@ -1,5 +1,10 @@
 # 현재 개발 기록
 
+## 2026-10-04 W05 기존 SIM 제어/스트림
+- 변경: 기존 시작/정지/배속/스텝/리셋/시나리오/장애 API와 WS를 V6 지상 운용/실행에 연결. 임무 서버 사본 갱신, 네이티브 편집/초안 보존, pending/지연/역순/명령오류/정리. backend 계산/API/schema 변경없음.
+- 검증: Python372 PASS127.71s/기존경고1, Node142 PASS481.3859ms, 실제8891 두해상도/2.5초스텝/리셋/장애SIM만료/stream/단일canvas/복원. browser timer와 오류소실 보완, 초기 basetemp 부모없음148 setuperror는 경로 생성후 전체재검증. validation/t062_sim_workspace.md.
+- 남음: PR19 위 Draft 리뷰/자동병합없음. wire command revision없음/지표캐시 장애해제지연은 원본한계 표시. KPI/export/MOCK-HIL/catalog/교차화면,F001/F002/F004~6/T032 미완료.
+
 ## 2026-10-04 W03-E 구간 거리·도플러
 - 변경: 기존가시구간 선택/시간별거리·고도각·도플러3그래프/표본요약. native1회/최대601 SI grid, 기존단일물리식·API보존, ADR0009.
 - 검증: 전체Python369 PASS125.17s/기존경고1, Node129 PASS432.6794ms. 실제8891두해상도/clip/none/복원/오류/입력18개보존. 초기계층위반/고립표본표시결함수정후최종리뷰추가결함0. validation/t054_orbit_radio_series.md.

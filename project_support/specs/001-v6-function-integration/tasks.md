@@ -123,3 +123,9 @@ W03-A 의존성: T033→T034→T035→T036. T033의Python/Node시험은별도파
 - [x] T057 [US6] user_application/web/scripts/workspace_orbit.js와 workspace.js에 V6 show/destroy/초안 복원을 조립하고 project_support/tests/browser/workspace_mission.test.mjs에서 두해상도/복원/입력보존을 검증한다. T056 뒤 수행.
 - [x] T058 전체 Python/Node와 실제 8891 두해상도 화면을 확인하고 validation/t058_mission_workspace.md, data/development_log/CURRENT.md 및 HISTORY.jsonl에 기록한다. 기존 API/계산 보존과 Draft PR 리뷰. T057 뒤 수행.
 의존성: T055 → T056 → T057 → T058. 기존 T032 보류 유지. 새 스택과 병렬 파일 수정을 도입하지 않는다. US6 독립 시험은 기존 SIM 임무/편집/검증/재계획 흐름이며 전체 기능 완료가 아니다.
+
+## W05 / US7 기존 SIM 제어와 텔레메트리 (FR-015/SC-013)
+- [x] T059 기존 서버 의미와 새 SIM controller RED 회귀를 test_sim_workspace.py/browser/sim_workspace.test.mjs에 작성한다.
+- [x] T060 tabs/sim_workspace.js에 기존 API/직렬 명령/스트림 사본/지연·역순/정리를 연결한다.
+- [x] T061 workspace_orbit/workspace/mission_workspace에 패널/원격 초안/읽기 전용 임무 갱신을 조립하고 두해상도 assembly 검증한다.
+- [x] T062 전체 Python/Node/실제 8891 두해상도 및 원본 보존 확인, validation/t062_sim_workspace.md/ledger/dev log 갱신과 PR19 위 Draft 리뷰. 자동 병합 없음.

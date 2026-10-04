@@ -21,7 +21,7 @@
 |---|---|---|---|---|---|
 | R001 | 독립 ISDC ODT + AeroDT 이식 가능한 구조 / S1,S5 | AeroDT 설치 의존성 없이 실행, 계층/명명/상태 소유권 검사 | constitution, plan, verify | plan File placement/Constitution / T001,T004,T010,T029 | 독립 실행/계층/로컬격리wheel 설치 PASS. T029는 실제AeroDT 재통합 증거가 아니며 연결·다른PC는 후속 |
 | R002 | 확정 V6 UI 유지 / S1,S2 | 공용 지구와 역할별 작업 창에서 연결 기능 사용, 기존 UI 결정 추적 | specify, plan, verify | plan State/Workspace / T014,T016,T024,T025,T031 | V6 원본 SHA/단일 지구/창·다중창 검증 PASS; 두해상도 성능 계측 완료, SC006 미달 |
-| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030,T033~T058 + F002 | 저장 궤도/UTC/기하가시/RF/시나리오경로·접촉/단일·구간 도플러 연결 검증. 임무 연결 검증 완료. SIM/KPI/MOCK-HIL 등 전체 선배 기능 F002는 미완료 |
+| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030,T033~T062 + F002 | 저장 궤도/UTC/기하가시/RF/시나리오경로·접촉/단일·구간 도플러 연결 검증. 임무 연결 검증 완료. SIM 연결 검증 완료. KPI/MOCK-HIL 등 전체 선배 기능 F002는 미완료 |
 | R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | 단계별 승인/실패·해소 및 개별PR 유지. T028~T030 결과 검토, 다음T032 성능미달 보완 |
 | R005 | 첫 위성 1개 + 지상국 1개 / S1 | 저장된 실제 TLE/OMM, UTC 조작, 위치/고도각/가시 구간, 오류/출처 표시 검증 | specify, plan, implement, verify | plan Input/State/Geometry / T003-T023 | ISS 저장 입력/제주 가상/위치/고도각/UTC 검증. 가시 구간 계산/API/UI T019~T023 검증. validation/t023_ground_visibility.md에 실제24h4구간/설정/오류/두해상도 증거 |
 | R006 | 실제 통신 조건 확인 및 적용 / S1 | 출처 있는 서비스/장비 입력과 링크 조건 적용, 정상/실패/미확인 시험 | clarify, plan, implement, verify | plan Visibility/후속 / T023,T030 + F001 | T023/T040 공식 주파수 부분 조사·적용 및 T049/T054 모델 Doppler 검증. 장비 미선정/실제운용·수신unknown, F001 전체 미완료 |
@@ -371,3 +371,9 @@ FR013/SC011→R003/R005/R006/R007 증거 E-ORBIT-RADIO-SERIES: validation/t054_o
 
 ## 2026-10-04 W04 검증 완료
 FR-014/SC-012→R003/R004/R007/R010→T055~58 evidence validation/t058_mission_workspace.md. clarify불필요/질문0, specify/plan/tasks/analyze/implement/verify 이번묶음 complete, hooks없음/checklist8/8. Read-only 일관성 분석 coverage100%,추가충돌0. 기존 API4파일 diff0, 요청직렬화/scoped초안/소수native입력노드유지. Python371PASS125.76s(기존경고1),Node134PASS457.4237ms. 첫전체pytest Temp권한오류는 workspace새basetemp로해소하고실패기록보존. 실제8891두해상도 CRUD/충돌/preview/apply/상태실패/소수키/복원/입력18개/canvas1/예상치못한error0 확인. 전체 feature implement/verify running, F001/F002/W05~09/T032 보존. 다음 W05 기존 SIM 제어/WS. PR18위 Draft PR 리뷰, 자동병합없음.
+
+## 2026-10-04 W05 승인 및 재개
+사용자 좋음 승인: 선배 기존 SIM 제어/시나리오/장애/텔레메트리 연결. 기존 전체 R001~R010/F001~F006/T032 보존. specify/plan/tasks W05 갱신, 계약 sim_workspace.md. clarify 추가 질문 불필요(기존 서버 의미 재사용). analyze 읽기 전용: FR015/SC013→T059~T062 및 기존 계층/상태/포트/검증 일관, blocking 0. checklist 기존 완료 항목 재검토. implement running, RED 시험 먼저. 후속 KPI/export/MOCK-HIL/catalog/교차화면 남음.
+
+## 2026-10-04 W05 검증 완료
+T059~T062 checked. FR015/SC013→validation/t062_sim_workspace.md: 기존 SIM API/계산 보존, controller RED→PASS, Python372/Node142, 실제8891 두해상도/단일canvas/스텝·리셋·시나리오·장애/초안/임무 확인. 초기 timer 오류/오류메시지 소실/old-run 지표 보완 및 회귀, 분석 blocking0/checklist8of8. specify/plan/tasks/analyze/implement W05 complete; verify 승인단위complete. 최초전체R003/F002 및F001/F004~6/T032 미완료 유지. 다음 사용자검토: 기존 KPI/내보내기 연결. PR19 위 독립 Draft 게시 진행, 자동병합없음.

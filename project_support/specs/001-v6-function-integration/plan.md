@@ -126,3 +126,6 @@ Constitution I~V: 기존 계층/명명, 상태 소유권, 계산 보존, V6/SIM 
 
 
 W04 후검토: 원격 임무 초안에는 mission_id/task_id scope를 붙여 같은 임무/작업에만 적용한다. native 입력 노드를 편집 중 교체하지 않고 기존 V6 button/form/table 스타일을 사용한다. 실제 서버/API 변경 없음. validation/t058_mission_workspace.md에 최종 게이트 결과와 원본 한계를 기록했다.
+
+## W05 설계
+contracts/sim_workspace.md를 따른다. 기존 backend 보존, tabs/sim_workspace.js를 workspace_orbit에 조립하고 mission_workspace의 사본 갱신 연결. Constitution I~V PASS, 새 의존성/원본 계산 변경 없음. T059→T060→T061→T062. 필수 전체 회귀/실제 UI/Draft 리뷰.
