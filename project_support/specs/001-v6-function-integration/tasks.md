@@ -164,3 +164,11 @@ Dependency T070→T071→T072→T073→T074. W08/F001/F002/F004~6/T032/W06 저�
 - [ ] T084 [MEDIUM] 기존CSV/JSON다운로드를 실제브라우저에서 끝까지 확인하고 저장한파일bytes/단위/출처를 서버응답과대조; 완료확인불가면미확인유지 — SC-014; T066/plan: W06 (partial; C010). 근거: legacy_function_audit.md.
 
 위 목록은 구현 완료가 아닌 확인된 gap이다. 기존T001~T074 및 보류T032를 고치거나 다시번호붙이지않는다. 각묶음은 원본golden→상세계약/spec/plan/tasks→V6조립→전체회귀/실제두해상도→Draft리뷰로 세분화 후 진행한다. 추천 첫범위 T075 위성카탈로그↔공용지구, 이어 T076 위성노드. T077은노드/지상국계약,T078은노드/통신,T079는배치/데이터모듈,T080은보안계약,T081은이들모듈후,T082는완료기능부터순차,T083·T084는독립가능. 새구현은이번대조작업에서시작하지않는다.
+
+## US11 / T075 첫 묶음: selected catalog position
+- [x] T085 원본OMM bytes/기존Rustgolden 및IERS-Aquality/APIreadonly/late controller RED 회귀를 tests/test_catalog_position.py와 browser/catalog_geometry.test.mjs에작성.
+- [x] T086 data/orbit_inputs bytes parser, earth_orientation explicitA/quality, data/catalog/geometry_snapshot.py 및 tooling/prepare_catalog_geometry.py/configs/catalog_geometry.py에별도hash고정 준비.
+- [x] T087 contracts/catalog_geometry.py/user_application/catalog_geometry.py/http/catalog_geometry.py/application.py/browserapi 및ADR0010로bounded readonly Rustquery연결.
+- [x] T088 browser/catalog_geometry.js/catalog_workspace/workspace_orbit/workspace_globe/orbit_globe에선택hook/단일Viewer/표시해제/latefence 조립, 실제assembly시험.
+- [x] T089 전체Python/Node/실제8891두해상도/원본계산·storedGP불변과validation/t089_catalog_position.md/ledger/log/DraftPR리뷰.
+Dependency T085→T086→T087→T088→T089. T075partial유지;원본전체범위/재생/지상국목록/모델/성능T032보존. 새agent없음.

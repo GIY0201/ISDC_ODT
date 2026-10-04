@@ -17,12 +17,13 @@ class EarthOrientationSnapshot:
     _table: object=field(repr=False,compare=False)
 
     @classmethod
-    def load(cls,eop_path,leap_path,*,eop_sha256,leap_sha256):
+    def load(cls,eop_path,leap_path,*,eop_sha256,leap_sha256,table_kind="IERS_B"):
+        if table_kind not in ("IERS_B","IERS_A"):raise ValueError("unsupported EOP table kind")
         for path,digest in [(eop_path,eop_sha256),(leap_path,leap_sha256)]:
             if hashlib.sha256(Path(path).read_bytes()).hexdigest()!=digest.lower():raise ValueError('Earth orientation hash mismatch')
         # Explicit initialization of static time-scale data, never at import time.
         iers.LeapSeconds.open(str(leap_path)).update_erfa_leap_seconds(initialize_erfa=True)
-        return cls(eop_sha256.lower(),leap_sha256.lower(),iers.IERS_B.open(str(eop_path)))
+        return cls(eop_sha256.lower(),leap_sha256.lower(),getattr(iers,table_kind).open(str(eop_path)))
 
     def at(self,instant:UtcInstant)->EarthOrientationPoint:
         time=instant.as_time()
@@ -52,3 +53,11 @@ class EarthOrientationSnapshot:
         if np.any(status<0):raise ValueError('UTC outside EOP snapshot range')
         xp,yp=self._table.pm_xy(time)
         return EarthOrientationVector(value.to_value(u.s),xp.to_value(u.rad),yp.to_value(u.rad),self.eop_sha256,self.leap_sha256)
+
+    def quality(self,instant:UtcInstant)->dict:
+        time=instant.as_time()
+        _,ut=self._table.ut1_utc(time,return_status=True)
+        _,_,pm=self._table.pm_xy(time,return_status=True)
+        labels={iers.FROM_IERS_B:'final_b',iers.FROM_IERS_A:'observed_a',iers.FROM_IERS_A_PREDICTION:'predicted_a'}
+        if int(ut) not in labels or int(pm) not in labels:raise ValueError('UTC outside EOP snapshot range')
+        return {'ut1':labels[int(ut)],'polar_motion':labels[int(pm)]}

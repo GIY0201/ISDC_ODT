@@ -94,3 +94,8 @@ US10/T071~74 existing groups/search/orbit filter/paged list/SATCAT-GP detail/sta
 
 ## 2026-10-05 최신 원본 전체 대조 정정
 legacy_function_audit.md와 Phase9 T075~84 참조. 최신선배main 1a1e002와현재PR23 대조: 핵심기능 일부완료이나 노드편집·배치/편대, OISL/data-fabric, service mission/군집planning, data-management, security, PoCscenario runner, integration settings는미연결 또는부분이다. W08만남은상태로설명하지않는다. 과거 W04의새임무없음 설명은현재전체원본에적용불가: missionStore.add 및ICD-03서비스임무등록있음. security기능은존재하고facility전용모듈은미확인이다. 원본operations_software를루트에그대로복사하지않고기존계층/adapter계약설계를거친다. 사용자위성우선에따라카탈로그↔공용지구/지상국(T075)와노드(T076)부터상세설계권장. 첫상세설계/기존완료task/원칙삭제없음; 총완료율이나전체 task개수로해석하지않는다.
+
+## 2026-10-05 US11 selected catalog position complete
+FR019/SC017/T085–89 → validation/t089_catalog_position.md. Python380PASS135.43s plus catalogmodule4PASS; Node170PASS633.3169ms; actual8891twores/singleViewer/clear/native precise IERS-A predictions/sourcehash/live readonly/Astropy oracle0m. Initial cache/allow-list/temp-path failures corrected. ADR0010 additive contract. Scoped verify complete; overall implement/verify running, T075/C001 partial and T076–84/F001/F002/F004–6/T032/W06diskunknown retained. Draft PR above24/no merge. 0.0.0.0:8891 preserved, verified process restart reset in-memory SIM only.
+
+Final US11 review: malformed manifest startup isolation hardened; historical testfixture independent from ignoreddeployment inputs. Full Python384PASS133.29s and target7PASS;Node170PASS. Earlier380-run retained above as intermediate. Final artifacts t089_catalog_position.md; no scoped/overall completion boundary changed.

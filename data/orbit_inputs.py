@@ -41,9 +41,13 @@ def _tle(lines):
 
 
 def load_orbit_input(path,*,format:str,source:str,fetched_utc:str,expected_sha256:str)->OrbitInput:
+    return load_orbit_input_bytes(Path(path).read_bytes(),format=format,source=source,fetched_utc=fetched_utc,expected_sha256=expected_sha256)
+
+
+def load_orbit_input_bytes(raw:bytes,*,format:str,source:str,fetched_utc:str,expected_sha256:str)->OrbitInput:
     if not isinstance(source,str) or not source.strip():raise ValueError('source is required')
     fetched=parse_utc(fetched_utc).iso_utc
-    raw=Path(path).read_bytes();digest=hashlib.sha256(raw).hexdigest()
+    digest=hashlib.sha256(raw).hexdigest()
     if digest!=expected_sha256.lower():raise ValueError('orbit input hash mismatch')
     text=raw.decode('utf-8-sig');defaults=()
     if format=='TLE':

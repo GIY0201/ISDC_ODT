@@ -50,3 +50,6 @@ HilView: copied devices/runtime/events and optional telemetry; selectedDevice/se
 
 ## US10 Catalog 표시 사본
 그룹 목록/편집 조건/적용 조건/100개 페이지 응답/선택NORAD/상세 응답/각 요청 오류만 UI가 소유한다. 서버 cache 및 runtime 현재 상태를 복제한 권위 저장소를 만들지 않는다. 필터 변경시 상세 요청 취소/선택 초기화. null/빈 문자열은 미확인, 0은 유효한 수치일 때 보존한다.
+
+## US11 표시사본
+serverquery는normalizedGP의canonicalJSONhash, epoch, source, listfetched_at, typedOrbitInput 및명시IERS-A/윤초hash를가진일회읽기전용사본. UI는선택요청과검증된고정ITRF행만보유하며현재상태권위는기존runtime. Viewer표시모드는clock권위아님.

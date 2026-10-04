@@ -1,14 +1,15 @@
-import {createCatalogPanel} from './tabs/catalog_workspace.js?v=t073-r2';
+import {createCatalogGeometry} from './catalog_geometry.js?v=t088-r1';
+import {createCatalogPanel} from './tabs/catalog_workspace.js?v=t088-r1';
 import {createHilPanel} from './tabs/hil_workspace.js?v=t069-r2';
 import {hilTopology} from '/static/visualization/hil_topology.js';
 import {createWorkspaceRevisionSync} from './workspace_revision_sync.js';
-import {api,telemetrySocket} from '/static/communication/api.js';
+import {api,telemetrySocket} from '/static/communication/api.js?v=t088-r1';
 import {createKpiPanel} from './tabs/kpi_workspace.js?v=t069-r2';
 import {drawMultiLine,drawSparkline} from '/static/visualization/charts.js';
 import {createSimPanel} from './tabs/sim_workspace.js?v=t069-r2';
 import {createMissionPanel} from './tabs/mission_workspace.js?v=t069-r2';
 import {createOrbitSelection} from './orbit_selection.js?v=t031-r1';
-import {createWorkspaceGlobe} from './workspace_globe.js?v=t028-r1';
+import {createWorkspaceGlobe} from './workspace_globe.js?v=t088-r1';
 import {createWorkspacePlayback} from './workspace_playback.js';
 import {createGroundPanel} from './tabs/ground_visibility.js?v=t053-r1';
 import {createRadioSeriesPanel} from './tabs/orbit_radio_series.js?v=t053-r1';
@@ -28,7 +29,9 @@ const planningPanel=createCommunicationPlanningPanel(api);
 const radioPanel=createOrbitRadioPanel(client,api);
 const missionPanel=createMissionPanel(api);
 const kpiPanel=createKpiPanel(api,drawMultiLine);
-const catalogPanel=createCatalogPanel(api);
+let catalogPanel;
+const catalogGeometry=createCatalogGeometry(api,value=>globe.catalog(value),()=>catalogPanel?.update());
+catalogPanel=createCatalogPanel(api,catalogGeometry);
 const hilPanel=createHilPanel(api,hilTopology,drawSparkline);
 const simPanel=createSimPanel(api,telemetrySocket,values=>missionPanel.controller.receiveMissions(values),{frame:value=>{kpiPanel.receive(value);hilPanel.receive(value);},status:value=>{kpiPanel.connection(value);hilPanel.connection(value);}});
 const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
@@ -37,7 +40,7 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   revisionSync.observe(client.snapshot());

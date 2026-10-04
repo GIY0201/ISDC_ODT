@@ -90,3 +90,6 @@ Sources read: communication/http/hil.py/schemas.py, digital_twin/runtime/state.p
 communication/http/catalog.py의 group/q/orbit/offset/limit 및 data/catalog/access.py의 2h GP/24h SATCAT 캐시와 stale/demo-fallback/upstream-unavailable 확인. records.py의 필터/페이지/derive_orbit와 legacy tabs/orbit.js 상세 재사용 근거 확인. cache source를 사실로 표시하고 derived 궤도 수치는 서버값이며 MEAN_MOTION 부재 때 생성되는 0은 UI 미확인으로 처리한다. GP fallback fetched_at은 상세 응답시각이며 원본GP획득시각으로 표기하지 않는다. 새 stack/계산/API/schema 필요없음.
 
 US10 validation clarified: successful SATCAT responses use24h cache; GP fallback is not inserted into successful profile cache and retries SATCAT on subsequent detail query. Golden test retains original3 HTTP calls for GP1+SATCAT2.
+
+## US11 사전검증
+실제기존Rust에카탈로그ISS OMM(epoch2026-10-04T01:53:16.268928000Z)주입/native성공. 기존IERS-B끝MJD61273, installedIERS-A끝61673;현재epochUT1/극운동status2(예측). 공식Astropy IERS docs https://docs.astropy.org/en/stable/utils/iers.html 및 IERS API 의 FROM_IERS_A_PREDICTION 구분확인. noauto-download/기존Bhash보존/별도Ahash로정밀계산 가능;실측위치의증거아님.

@@ -1,19 +1,21 @@
-import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t028-r1';
+import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t088-r1';
 
 /** Render-only copy, never a clock/selection authority. One controller per document. */
 export function createWorkspaceGlobe(container,status,focusButton,host=window){
-  let globe=null,latest=null,groundPoint=null,disposed=false,failed=false,removeError=null,focused=false;
+  let globe=null,latest=null,catalog=null,groundPoint=null,disposed=false,failed=false,removeError=null,focused=false;
   const describe=message=>{status.textContent=message;};
   function paint(){
     focusButton.disabled=true;
     if(!globe){if(!failed)describe('Cesium 준비 중 · 계산 위치는 아직 표시하지 않습니다.');return;}
     try{
-      const shown=globe.update(latest);
+      const display=catalog??latest;
+      const shown=globe.update(display);
       globe.setGroundPoint(groundPoint);
       container.dataset.orbitVisible=String(shown);
       if(shown){
         if(!focused){globe.focus();focused=true;}
         focusButton.disabled=false;
+        if(catalog){describe(`카탈로그 ${catalog.name} (${catalog.catalog_number}) · epoch 정지 모델/실측 아님 | UTC ${catalog.utc} | ITRF m ${catalog.position_m.map(x=>x.toFixed(2)).join(', ')} | IERS-A UT1 ${catalog.eop_quality.ut1} / 극운동 ${catalog.eop_quality.polar_motion} | 실제 통신 미확인`);return;}
         describe(`ISS · GP 예측 / 실측 아님 | 표시 UTC ${latest.utc} | ITRF m ${latest.position_m.map(v=>v.toFixed(2)).join(', ')} | 고도각 ${latest.elevation_deg?.toFixed(4)??'미확인'}° | revision ${latest.revision} | 실제 통신 미확인`);
       }else describe('표시할 현재 UTC 계산 결과가 없습니다. 위성 창에서 저장 입력을 선택하고 계산하세요.');
     }catch{fail();}
@@ -39,6 +41,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   if(host.Cesium)boot();else host.addEventListener('load',boot,{once:true});
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
+    catalog(sample){if(disposed)return;catalog=sample?structuredClone(sample):null;focused=false;paint();},
     update(snapshot,display,displayUtc){
       if(disposed)return;
       const {state,result,status:phase}=snapshot;
@@ -48,7 +51,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       const valid=phase==='ready'&&!result?.stale&&row?.status==='valid'&&matchingUtc&&result.input_id===state?.input_id&&result.revision===state?.revision&&result.input_hash===state?.input_hash;
       latest=valid?structuredClone({...row,frame:result.frame,revision:result.revision}):null;
       paint();
-      if(!latest&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
+      if(!catalog&&!latest&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
     },
     destroy(){if(disposed)return;disposed=true;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;},
   };

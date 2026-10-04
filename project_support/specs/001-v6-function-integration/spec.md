@@ -153,3 +153,7 @@ SC-014: 서버 기준값/판정과 읽기 불변, CSV/JSON 값·단위 일치, �
 ## US10 / Catalog 검색·목록·상세 (P1)
 FR-018: 기존 satellite-groups/satellites/profile API와 서버 캐시/필터/SATCAT 의미를 재사용한다. V6 위성 화면에서 그룹, 이름/COSPAR/NORAD 검색, 궤도 분류, 100개 페이지, 상세를 표시한다. source/fetched_at/stale/warning/demo/unknown을 보존하고 조회는 저장 GP/UTC/Viewer 상태를 변경하지 않는다.
 SC-016: 그룹 응답 기반 선택, 검색·페이지·상세 정상/빈 결과/실패/늦은 응답/출처/초안 보존을 자동시험과 실제8891두해상도로 검증한다. 장비 미선정/실통신/T032와 전체 F002 미완료를 보존한다.
+
+## US11 카탈로그 선택 위치 (T075의 첫 묶음)
+FR-019: 카탈로그 위성 하나를 선택하면 원본서버GP와Rust전파/정밀ITRF변환으로 epoch위치를 동일공용Viewer에 표시한다. 공식IERS-A 보정값의확정/관측/예측상태, 출처/hash/epoch/표시UTC를표시한다. storedGP/UTC/runtime선택은수정하지않는다. 카탈로그표시해제하면현재저장계산표시로돌아간다. demo/손상/기한밖/EOP범위밖/실패/늦은결과는위치미표시.
+SC-017: 원본SGP4/기존좌표변환 재사용/정규화OMM검증, IERS-A/B경계·예측표시·hash/숫자/readonly·422/503·busy/취소, 실제8891두해상도/단일Viewer/선택·해제·오류/GP보존을검증한다. 이번은epoch정지위치표시이며카탈로그재생/다중표시/3D모델/지상국전체선택은T075잔여로남긴다.
