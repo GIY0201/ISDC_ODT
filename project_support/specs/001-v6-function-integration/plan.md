@@ -103,3 +103,9 @@ Constitution: 독립계층/단일권위상태/실측구분/V6보존/TDD 충돌0.
 FR011/SC009,US2,R002/R003/R004/R007. 기존JS/Python/FastAPI/서버계산/schema 보존. Phase0 재사용 검토: bootstrap.communication의 실제 시나리오 그래프와 route/contacts endpoint를 그대로 호출한다. contact_plan은 벽시계/링크index/quality로 만든 예시 일정이며 hours 안으로 end를 엄밀히 제한하지 않는다. 표시에서 시간 파라미터와 생성 시각/실제기하·수신미확인을 구분하며 임의보정/필터없음. 신규 장비기본값/예시망→ISS 대체없음.
 Phase1 contracts/communication_planning.md, data-model/quickstart. user_application/web/scripts/tabs/communication_planning.js의 표시사본/controller와workspace_orbit.js 조립, transport는communication/browser/api.js의기존bootstrap/route/contacts에optionalAbort signal추가(기존인자호환). server/domain는변경하지않는다. API·model format변경없으므로 신규ADR불필요. 노드와link는API사본에서조회하고UI상수로하드코딩하지않는다. 네트워크명시조회→사용자선택→독립route/contacts조회, 입력별무효화, 취소/종료/역순generation. 창보존/원격draft재조회필요.
 T041 RED→T042 controller/transport→T043 실제V6조립→T044 전체회귀/실제두해상도/로그/stacked Draft PR. Constitution 독립계층/현재상태단일소유/선배보존/V6/검증5원칙 충돌0.8891 고정, 현재서버변경없으면재시작불필요. 기존T032보류/F001/F002전체미완료유지.
+
+## W03-D 저장 ISS 거리·도플러
+동일 JS/Python/Rust stack, native Nx6 속도를 버리지 않고 scalar TEME→ITRF 함수의 속도 인자를 사용한다. 기존 빠른 samples/visibility 실행 경로는 변경하지 않는다. orbit_calculation의 선택적 radio calculator, typed OrbitRadioCalculation/OrbitRadioQueryResult, runtime의 기존 잠금·bounded executor를 재사용한 read-only 조회를 추가한다. wire는 /api/orbit/radio-geometry 단일 UTC/양수 주파수Hz, 기존 endpoint unchanged. ADR0008에 추가 계약과 근사 한계를 기록한다.
+선배 optical pointingTo의 range/range_rate 내적식을 Python 순수 계산에 필요한 만큼만 옮긴다. optical LOS100km/포인팅/renderer는 복사하지 않는다. deltaf=-f0*range_rate/c, 양수rate는이탈/음수shift, ITRF지상속도0. LOD0/polar rate무시/lighttime·relativity·media·oscillator무시를표시한다. 모델계산이며수신확인아님.
+V6 위성panel은 UTC와MHz draft, 서버UTC 가져오기/명시조회/취소. 기존 공식프로파일 controller를재사용해명시주파수적용, 수동·원격값은가정으로표시. 입력선택/revision/provenance 변경·재조회·편집·취소·종료에세대무효화. 창복원은사본보존. queriedUTC와displayUTC별도이며재생이자동재계산하지않음. Viewer추가없음,8891고정.
+T045 RED→T046 geometry/assembly/runtime→T047 wire→T048 V6→T049 전체검증/원본비교/실제두해상도/로그/DraftPR. Constitution5원칙 충돌0,계층추가없음. F001전체/F002/T032보류유지.

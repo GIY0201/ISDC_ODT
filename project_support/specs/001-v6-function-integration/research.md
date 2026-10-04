@@ -64,3 +64,8 @@ ARISS https://www.ariss.org/current-status-of-iss-stations.html 확인 UTC2026-1
 
 ## W03-C 재사용 결정
 사용자는 거리/도플러 대신 선배 경로·접촉 계획을 선택했다. 원본 rf_network.py calculate_route/contact_plan 및 HTTP route/contacts, network.communication은 기존시나리오기능으로재사용한다. 읽기전용연구는정적graph/quality/장애제외와벽시계합성일정의의미를확인했다. 대안: ISS 지상거리/도플러는공식자료와현재위치·속도계약추가검증이필요하므로F001후속. oisl.js는별도원본의위성간LVLH전제라그대로UHF지상수신으로이식하지않는다. actual ISS/GP2020시간과시나리오계획2026벽시계분리. source runtime복제없이결과사본만표시한다.
+
+## W03-D 재사용 및 근사 결정
+Decision: 기존 Rust native 위치·속도 및 scalar TEME→ITRF를 재사용하고 원본 oisl.js pointingTo의 range_rate=dot(relativeVelocity,displacement)/range를 순수Python으로 이식한다. Rationale: 기존본체에 지상링크 Doppler API는 없으므로 optical 전체모듈 복사·renderer접속은 맞지않으며 검증된 기하/계산 경계를 유지한다. Alternative: 브라우저 새SGP4/finite-difference만으로속도생성/기존sample wire변경은 거절. 공식profile는 기존 controller검증을재사용하며 기존신호프로파일을 현시점운용으로해석하지않는다.
+
+독립 research agent read-only 확인: ITRF 지상속도0/회전속도 ω×r 차감/단방향 계수1/received−transmitted 부호 타당. 근거 https://celestrak.org/publications/AIAA/2006-6753/faq.php 와 https://ipnpr.jpl.nasa.gov/progress_report/42-121/121B.pdf (후자는counter측정량부호를우리Δf와혼동하지않음). 검증은analytic 및Astropy별도변환(공유이론/ERFA),거리central difference h=1/.1/.01초. 측정정확도증거아님. 미결과학설계0.

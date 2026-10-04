@@ -54,6 +54,21 @@ class SamplesRequest(OrbitRequest):
         if not value.strip():raise ValueError('nonblank string required')
         return value
 
+class RadioGeometryRequest(OrbitRequest):
+    client_request_id: str=Field(min_length=1,max_length=128)
+    selection_revision: int=Field(ge=0)
+    input_id: str=Field(min_length=1,max_length=100)
+    utc: str
+    frequency_hz: float=Field(gt=0,le=300000000000)
+    @field_validator('utc')
+    @classmethod
+    def utc_value(cls,value):return parse_utc(value).iso_utc
+    @field_validator('client_request_id','input_id')
+    @classmethod
+    def nonblank(cls,value):
+        if not value.strip():raise ValueError('nonblank string required')
+        return value
+
 class VisibilityRequest(OrbitRequest):
     client_request_id: str=Field(min_length=1,max_length=128)
     selection_revision: int=Field(ge=0)

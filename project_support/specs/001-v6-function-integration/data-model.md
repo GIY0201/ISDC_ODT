@@ -31,3 +31,5 @@ RF 응답사본: 기존model/link_id/inputs/8수치/status/assumptions. 변경�
 
 ## 시나리오 경로와 접촉 표시 사본
 communication graph: bootstrap가반환한nodes(id,type)와links(id,source,target,quality,protocol). draft: source/target는graph내ID,objective latency/reliability/balanced,hours정수1~72. route response:echo3개,path/link_ids/hops/finitecost 또는unavailable/null,active_fault_targets. contacts response:hours/count/items와scenario-contact-plan-v1, 각item UTC start/end/duration/quality/capacity_mb/graphlink. 조회브라우저UTC를별도기록하며실제수신증거아님. network/route/contacts 각각idle/pending/ready/error, route/contacts 세대독립. 편집/재조회/취소/종료는관련과거결과폐기.
+
+W03-D: OrbitRadioCalculation immutable 단일 UTC의 ITRF position_m/velocity_m_s, elevation_deg, range_m/range_rate_m_s/frequency_hz/doppler_hz/received_frequency_hz와error_code 및EOP/leap/frame/profile. 실패시 기하·주파수결과metric는None, 입력주파수echo는보존. OrbitRadioQueryResult는requestID/revision/inputID/hash/ground/minimum_elevation/calculation/stale를보존. Browser draft UTC/MHz, 공식프로파일은화면출처사본이고서버권위아님.

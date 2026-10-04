@@ -340,3 +340,16 @@ FR010/SC008→R006/R007 부분 증거 E-ISS-PROFILE: validation/t040_iss_receive
 
 ## 2026-10-04 T041~T044 연결·검증
 FR011/SC009 증거 E-COMM-PLANNING: validation/t044_communication_planning.md. 이번 clarify/plan/tasks/analyze/implement/verify 묶음 complete. Python325 PASS113.65s/기존경고1,Node114 PASS362.4772ms,실제8891두해상도/입력18개보존/20행/오류0/원본AST9동일/read-only review결함0. 전체feature implement/verify running; F001/F002/F004~6/T032보류유지. stacked Draft PR 게시,자동병합없음.
+
+## 2026-10-04 다음 기능 범위 확인
+사용자 이어서 진행 지시. 바로 앞 응답의 두 후보(ISS 거리·도플러 / 선배 임무 관리) 중 어느 기능인지 아직 특정되지 않아 clarify 질문1/답변0 대기. 기존 완료T041~44 및보류T032 보존. 기존feature/bootstrap/prerequisite/constitution/hooks(없음) 확인. 읽기 전용 조사: 원본 simulation/browser/oisl.js는 상대 위치·속도의 range_rate_km_s 계산을 제공하지만 현재 product orbit_calculation.py는 속도를 결과에 넘기지 않아 ISS 거리·도플러는 추가 typed 계약과 검증이 필요. 임무는 기존 MissionRuntime/HTTP4경로가 있어 해당 함수 재사용 가능. 제품 소스·계산·API 수정 없음, 새 구현 검증 실행 없음. 범위 답변 후 해당 부분만 spec/plan/tasks/analyze를 보완한다.
+
+## 2026-10-04 W03-D 범위 확정
+clarify 질문1/답변1: 위성관련먼저 → ISS 거리·도플러 후보선택. 기존기능·최초목적·8891/T032보류보존. FR012/SC010→R003/R005/R006/R007→T045~49. 기존feature bootstrap/setup-plan/setup-tasks 실제실행,extensions없음. clarify complete, plan research running. 기존임무API는F002후속유지. 단일시점 모델 계산, 실제수신증거미확인.
+
+W03-D plan/tasks complete: research agent 물리식·좌표·근사 검토, 기존scalar/native 재사용,단일UTC계약/ADR계획/5task. analyze pending. clarify1/1,기존requirements8/8 재검토PASS(문서품질). hooks없음.
+
+분석 read-only 1회: 기존 전체이식표 W04가임무인데 신규범위를W04로명명한 불일치1(MEDIUM)발견. authoring단계에서신규범위를W03-D로수정,기존임무W04보존. 재분석 FR012/SC010→T045~49 coverage100%,미연결0/충돌0/모호0/constitution위반0. analyze complete,repair1. Implement gate requirements8/8 checked/0unchecked,문서품질이며기능검증아님.
+
+## 2026-10-04 T045~T049 구현·검증 완료
+FR012/SC010 → R003/R005/R006/R007 증거 E-ORBIT-RADIO: validation/t049_orbit_radio.md. 기존 선배 내적식/네이티브 속도/좌표 변환 재사용. 신규 범위 clarify/plan/tasks/analyze/implement/verify complete. 전체 Python349 PASS116.61s/기존경고1, Node122 PASS393.7302ms. 실제8891두해상도/복원/입력오류/공식 출처/GP·RF16입력보존/canvas1/error0. 리뷰 boundary 보완 및 실제화면 주파수 provenance 보완 RED→PASS, 최종 리뷰 추가결함0. 기존 전체 feature implement/verify running; F001전체/F002/F004~6 및 T032보류/SC006미달 유지. 사용자 질문1/답변1 모두 해소. 다음은 Draft PR 리뷰, 자동병합없음.

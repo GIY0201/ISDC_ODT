@@ -58,3 +58,6 @@ V6 지상국 창에서 RF 패널을 연다. 모든 필드가 빈칸이며 실제
 
 ## W03-C 검증
 기존서버8891의ground에서시나리오통신망불러오기→출발/도착/목적선택→경로조회, 시간파라미터1~72→접촉일정조회. 실제ISS/예약/가시성아닌예시표시와조회UTC를확인한다. 입력변경후결과폐기/취소/오류/복원, 두해상도접근, RF/GP 보존. 전체pytest및Node,원본AST대조. 새서버포트생성금지.
+
+## W03-D 검증
+8891 satellite에서 저장 ISS 입력 선택. 서버UTC 가져오기, 주파수MHz 직접입력 또는 ISS 공식프로파일 명시적용 후 거리·도플러 계산. 출력UTC/거리km/거리변화율m/s/DopplerHz/예측수신MHz/고도각/근사조건/실제수신미확인을 확인. 주파수빈값/0/윤초/변경/revision/취소/복원을시험하고RF·GP불변을확인. 전용 project_support/.venv/Scripts/python.exe -m pytest -q 및node --test project_support/tests/browser/*.test.mjs.
