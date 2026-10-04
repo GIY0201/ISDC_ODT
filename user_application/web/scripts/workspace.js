@@ -1,4 +1,4 @@
-import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t048-r1';
+import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t053-r1';
 (() => {
   const screen = document.getElementById('screen');
   const groups = [
@@ -81,7 +81,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t04
       showWorkspaceOrbit(state.view);
       if(pendingWorkspaceDraft.length){
         applyWorkspaceDraft(pendingWorkspaceDraft,pendingWorkspaceDraftRemote);
-        for(const item of pendingWorkspaceDraft){if(item.id.startsWith('radio-')||item.id.startsWith('cp-')||item.id.startsWith('rf-')||item.id.startsWith('ground-')||item.id.startsWith('visibility-')||item.id==='orbit-utc'||['orbit-input','orbit-rate'].includes(item.id))continue;const field=document.getElementById(item.id);if(field&&'value' in field)field.value=item.value;}
+        for(const item of pendingWorkspaceDraft){if(item.id.startsWith('series-')||item.id.startsWith('radio-')||item.id.startsWith('cp-')||item.id.startsWith('rf-')||item.id.startsWith('ground-')||item.id.startsWith('visibility-')||item.id==='orbit-utc'||['orbit-input','orbit-rate'].includes(item.id))continue;const field=document.getElementById(item.id);if(field&&'value' in field)field.value=item.value;}
         pendingWorkspaceDraft=[];pendingWorkspaceDraftRemote=false;
       }
     });

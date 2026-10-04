@@ -3,8 +3,9 @@ import {api} from '/static/communication/api.js';
 import {createOrbitSelection} from './orbit_selection.js?v=t031-r1';
 import {createWorkspaceGlobe} from './workspace_globe.js?v=t028-r1';
 import {createWorkspacePlayback} from './workspace_playback.js';
-import {createGroundPanel} from './tabs/ground_visibility.js?v=t031-r1';
-import {createOrbitRadioPanel} from './tabs/orbit_radio.js?v=t048-r2';
+import {createGroundPanel} from './tabs/ground_visibility.js?v=t053-r1';
+import {createRadioSeriesPanel} from './tabs/orbit_radio_series.js?v=t053-r1';
+import {createOrbitRadioPanel} from './tabs/orbit_radio.js?v=t048-r3';
 import {createCommunicationPlanningPanel} from './tabs/communication_planning.js?v=t043-r1';
 import {createRfPanel} from './tabs/rf_link_budget.js?v=t039-r1';
 
@@ -13,7 +14,8 @@ let view=null,displayUtc=null,displayElevation='자료 준비 중';
 const globe=createWorkspaceGlobe(document.getElementById('stored-orbit-globe'),document.getElementById('orbit-globe-status'),document.getElementById('orbit-globe-focus'));
 const client=createOrbitSelection(api,render);
 const revisionSync=createWorkspaceRevisionSync(client);
-const groundPanel=createGroundPanel(client,api);
+const seriesPanel=createRadioSeriesPanel(client,api);
+const groundPanel=createGroundPanel(client,api,{onInterval:(source,index)=>seriesPanel.choose(source,index),onInvalidate:()=>seriesPanel.clearInterval()});
 const rfPanel=createRfPanel(api);
 const planningPanel=createCommunicationPlanningPanel(api);
 const radioPanel=createOrbitRadioPanel(client,api);
@@ -23,7 +25,7 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   revisionSync.observe(client.snapshot());
@@ -32,6 +34,7 @@ function render(){
   rfPanel.update();
   planningPanel.update();
   radioPanel.update();
+  seriesPanel.update();
   if(view!=='satellite')return;
   const screen=document.getElementById('screen');let panel=document.getElementById('stored-orbit');
   if(!panel){panel=document.createElement('section');panel.id='stored-orbit';panel.className='panel';screen.prepend(panel);}
@@ -51,7 +54,7 @@ function render(){
   panel.querySelector('#orbit-seek').addEventListener('click',()=>{const field=panel.querySelector('#orbit-utc'),utc=field.value.trim();delete field.dataset.dirty;command(()=>client.seek(utc));});
   panel.querySelector('#orbit-epoch').addEventListener('click',()=>{delete panel.querySelector('#orbit-utc').dataset.dirty;command(()=>client.seek(record.epoch_utc));});
 }
-export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);render();}
+export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);render();}
 client.load();
 
 export function applyWorkspaceDraft(items,remote=false){
@@ -59,5 +62,6 @@ export function applyWorkspaceDraft(items,remote=false){
   rfPanel.applyDraft(items,remote);
   planningPanel.applyDraft(items,remote);
   radioPanel.applyDraft(items,remote);
+  seriesPanel.applyDraft(items,remote);
   for(const item of items){if(item.id!=='orbit-utc'||typeof item.value!=='string')continue;const field=document.getElementById(item.id);if(field){field.value=item.value;field.dataset.dirty='true';}}
 }

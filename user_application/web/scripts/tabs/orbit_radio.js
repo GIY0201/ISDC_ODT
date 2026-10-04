@@ -5,7 +5,7 @@ const c=299792458;
 const units={position:'m',velocity:'m/s',range:'m',range_rate:'m/s',frequency:'Hz',doppler:'Hz',elevation:'deg',time:'UTC'};
 const metrics=['elevation_deg','range_m','range_rate_m_s','doppler_hz','received_frequency_hz'];
 const close=(a,b)=>Math.abs(a-b)<=Math.max(1e-5,Math.abs(b)*1e-12);
-function validate(r,p,s){
+export function validateRadioResponse(r,p,s){
   const mismatch=!r||r.stale!==false||r.client_request_id!==p.client_request_id||r.revision!==p.selection_revision||r.input_id!==p.input_id||r.input_hash!==s.input_hash||r.utc!==p.utc||r.frequency_hz!==p.frequency_hz||r.minimum_elevation_deg!==s.minimum_elevation_deg||r.model!=='one_way_first_order_v1'||r.communication_status!=='unknown'||!['valid','error'].includes(r.status)||['eop_sha256','leap_sha256','frame','profile'].some(k=>r[k]!==s[k])||['latitude_deg','longitude_deg','ellipsoid_height_m'].some(k=>r.ground_point?.[k]!==s.ground_point?.[k])||r.ground_point?.virtual!==true||r.ground_point?.ellipsoid!=='WGS84'||Object.entries(units).some(([k,v])=>r.units?.[k]!==v)||!Array.isArray(r.assumptions)||r.assumptions.some(x=>typeof x!=='string');
   if(mismatch)throw Error('선택·시각·주파수·출처와 일치하지 않는 응답을 폐기했습니다.');
   if(r.status==='error'){
@@ -31,7 +31,7 @@ export function createOrbitRadio(client,api,notify=()=>{},requestId=()=>crypto.r
       payload={client_request_id:requestId(),selection_revision:state.revision,input_id:state.input_id,utc,frequency_hz:frequency*1e6};
       abort=new AbortController();status='pending';notify();const response=await api.orbitRadio(payload,{signal:abort.signal});
       if(destroyed||ticket!==generation)return;
-      update();if(ticket!==generation)return;validate(response,payload,state);result=structuredClone(response);status='ready';
+      update();if(ticket!==generation)return;validateRadioResponse(response,payload,state);result=structuredClone(response);status='ready';
     }catch(exc){if(destroyed||ticket!==generation)return;result=null;status=exc.name==='AbortError'?'idle':'error';error=status==='error'?exc.message:'';}
     if(!destroyed&&ticket===generation){abort=null;notify();}
   }

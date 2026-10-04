@@ -69,3 +69,6 @@ ARISS https://www.ariss.org/current-status-of-iss-stations.html 확인 UTC2026-1
 Decision: 기존 Rust native 위치·속도 및 scalar TEME→ITRF를 재사용하고 원본 oisl.js pointingTo의 range_rate=dot(relativeVelocity,displacement)/range를 순수Python으로 이식한다. Rationale: 기존본체에 지상링크 Doppler API는 없으므로 optical 전체모듈 복사·renderer접속은 맞지않으며 검증된 기하/계산 경계를 유지한다. Alternative: 브라우저 새SGP4/finite-difference만으로속도생성/기존sample wire변경은 거절. 공식profile는 기존 controller검증을재사용하며 기존신호프로파일을 현시점운용으로해석하지않는다.
 
 독립 research agent read-only 확인: ITRF 지상속도0/회전속도 ω×r 차감/단방향 계수1/received−transmitted 부호 타당. 근거 https://celestrak.org/publications/AIAA/2006-6753/faq.php 와 https://ipnpr.jpl.nasa.gov/progress_report/42-121/121B.pdf (후자는counter측정량부호를우리Δf와혼동하지않음). 검증은analytic 및Astropy별도변환(공유이론/ERFA),거리central difference h=1/.1/.01초. 측정정확도증거아님. 미결과학설계0.
+
+## W03-E research
+읽기 전용 연구 agent 검토: native propagate_instants 1회 Nx6, SI TAI TimeDelta 균등grid+UTC9digits/endpoints, 기존 속도 변환/내적식 재사용. 대안 601 HTTP 또는 scalar601회는 경계비용 때문에 제외. 결정 count=min(601,ceil(duration)+1), 요청 count 없음/서버통제. 오류 행은 변환에서 제외/gap, 부분실패 전체 요약 없음으로 보수 표시. 동률 가장 이른 표본, abs최대는 부호/UTC도 표시. clip은 조회잘림이고 radio 서버는 가시 경계 재확정 안함. 기존 물리 근사 및 단일 모델 그대로, 외부 신규 이론/라이브러리 도입 없음. 조사만이며 성능/통신정확도 근거 아님. NEEDS CLARIFICATION0.

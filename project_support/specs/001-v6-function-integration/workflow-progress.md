@@ -21,10 +21,10 @@
 |---|---|---|---|---|---|
 | R001 | 독립 ISDC ODT + AeroDT 이식 가능한 구조 / S1,S5 | AeroDT 설치 의존성 없이 실행, 계층/명명/상태 소유권 검사 | constitution, plan, verify | plan File placement/Constitution / T001,T004,T010,T029 | 독립 실행/계층/로컬격리wheel 설치 PASS. T029는 실제AeroDT 재통합 증거가 아니며 연결·다른PC는 후속 |
 | R002 | 확정 V6 UI 유지 / S1,S2 | 공용 지구와 역할별 작업 창에서 연결 기능 사용, 기존 UI 결정 추적 | specify, plan, verify | plan State/Workspace / T014,T016,T024,T025,T031 | V6 원본 SHA/단일 지구/창·다중창 검증 PASS; 두해상도 성능 계측 완료, SC006 미달 |
-| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030 + F002 | 저장 궤도/UTC/기하가시 첫 연결 및T030기록 완료. 전체 선배 기능 F002는 미완료 |
+| R003 | 선배 기능의 단계별 연결 / S1 | 궤도, 통신, 임무, 분석/내보내기, MOCK-HIL 및 SIM 제어 각각 범위/시험/출처 추적 | specify, tasks, verify | plan Summary/Validation / T030,T033~T054 + F002 | 저장 궤도/UTC/기하가시/RF/시나리오경로·접촉/단일·구간 도플러 연결 검증. 임무/SIM/KPI/MOCK-HIL 등 전체 선배 기능 F002는 미완료 |
 | R004 | 핵심 기능부터 확장하고 함께 검토 / S1 | 각 단계의 범위와 검증 결과를 제시하고 다음 범위 논의 | 모든 경계 | plan Delivery gates / T018,T023,T030 | 단계별 승인/실패·해소 및 개별PR 유지. T028~T030 결과 검토, 다음T032 성능미달 보완 |
 | R005 | 첫 위성 1개 + 지상국 1개 / S1 | 저장된 실제 TLE/OMM, UTC 조작, 위치/고도각/가시 구간, 오류/출처 표시 검증 | specify, plan, implement, verify | plan Input/State/Geometry / T003-T023 | ISS 저장 입력/제주 가상/위치/고도각/UTC 검증. 가시 구간 계산/API/UI T019~T023 검증. validation/t023_ground_visibility.md에 실제24h4구간/설정/오류/두해상도 증거 |
-| R006 | 실제 통신 조건 확인 및 적용 / S1 | 출처 있는 서비스/장비 입력과 링크 조건 적용, 정상/실패/미확인 시험 | clarify, plan, implement, verify | plan Visibility/후속 / T023,T030 + F001 | T023 실제통신미확인 표시 검증, F001 필수 조사/적용 미실행 |
+| R006 | 실제 통신 조건 확인 및 적용 / S1 | 출처 있는 서비스/장비 입력과 링크 조건 적용, 정상/실패/미확인 시험 | clarify, plan, implement, verify | plan Visibility/후속 / T023,T030 + F001 | T023/T040 공식 주파수 부분 조사·적용 및 T049/T054 모델 Doppler 검증. 장비 미선정/실제운용·수신unknown, F001 전체 미완료 |
 | R007 | 결과 의미 구분 / S1,S5 | 기하 가시성, 모델 통신 충족, 실제 수신 증거를 UI/산출물에서 구분 | specify, verify | plan Validation / T003,T005,T007,T011,T017,T019,T021,T026,T028,T029 | GP/가상/기하 계산과 통신 미확인 표시 검증. 실제 통신 조건 F001 미완료 |
 | R008 | JS 모듈/HTML/CSS/Cesium + Python/FastAPI / S1 | 기술 계획이 합의와 일치, 버전/현대화 선택 근거 기록 | constitution, plan | plan Technical Context / T002,T006,T008,T029 | JS/Cesium/Python FastAPI/Rust 및로컬cp314격리설치 PASS. TS/React 보류, 타환경미검증 유지 |
 | R009 | 빠르고 원활한 사용성 / S1 | 지구/시간/창 조작의 측정 조건과 합의된 목표로 실제 웹 검증 | clarify, plan, verify | plan State/Validation / T018,T024-T028,T032 | T032 실제두해상도100UTC/20일조회/30초완료3회와 GPU/presentation 증거. 최종하루p95543.1/547.3ms,UTC32.0/32.1ms PASS. 관측EventTiming p9548ms(검열/반올림); frame18.578/18.552ms FAIL. SC006/T032 부분완료, validation/t032_performance.md. T028 이전실패보존 |
@@ -41,7 +41,7 @@
 ## 후속 필수 / 보류 기록
 | ID | 연결 요구 | 사유 | 담당 / 진입 조건 | 상태 |
 |---|---|---|---|---|
-| F001 | R006,R007 | 기하 가시성만으로 통신 판정 불가 | 통신 clarify/plan, 대상 서비스와 장비 특정 및 공식 출처 조사 | 필수 대기, 선택 기능 아님 |
+| F001 | R006,R007 | 기하 가시성만으로 통신 판정 불가 | 통신 clarify/plan, 대상 서비스와 장비 특정 및 공식 출처 조사 | 공식 주파수와 모델 Doppler 부분 연결. 장비/운용/수신 확인 남음, 전체 필수 미완료 |
 | F002 | R003 | 한 번에 모든 기능 이식하지 않음 | 각 기능 specify/plan, 첫 단계 결과 공동 검토 후 우선순위 결정 | 필수 대기 |
 | F003 | R008,R009 | 현대화와 성능 목표를 아직 세부 선정하지 않음 | plan/clarify, 합의된 JS 기준에서 버전/측정 환경/목표 검토 | 대기 |
 | F004 | R003,R007 | 실제 HIL, 실측, 영구 기록/재생은 기존 구현으로 보장되지 않음 | 후속 요구 검토, 입력/장비/범위 명시 시 | 현재 구현 범위 미포함, 전체 목적에서 필요 여부 보고 |
@@ -353,3 +353,11 @@ W03-D plan/tasks complete: research agent 물리식·좌표·근사 검토, 기�
 
 ## 2026-10-04 T045~T049 구현·검증 완료
 FR012/SC010 → R003/R005/R006/R007 증거 E-ORBIT-RADIO: validation/t049_orbit_radio.md. 기존 선배 내적식/네이티브 속도/좌표 변환 재사용. 신규 범위 clarify/plan/tasks/analyze/implement/verify complete. 전체 Python349 PASS116.61s/기존경고1, Node122 PASS393.7302ms. 실제8891두해상도/복원/입력오류/공식 출처/GP·RF16입력보존/canvas1/error0. 리뷰 boundary 보완 및 실제화면 주파수 provenance 보완 RED→PASS, 최종 리뷰 추가결함0. 기존 전체 feature implement/verify running; F001전체/F002/F004~6 및 T032보류/SC006미달 유지. 사용자 질문1/답변1 모두 해소. 다음은 Draft PR 리뷰, 자동병합없음.
+
+## 2026-10-04 W03-E 승인 및 설계
+사용자 “좋아”로 가시구간의 거리/고도각/도플러 그래프와 표본 요약 승인. 추가 clarify 불필요(제안 그대로), 질문0. FR013/SC011 → R003/R005/R006/R007. 기존feature/bootstrap/prerequisite/setup-plan/setup-tasks 실제실행, constitution1.2.0보존,hooks없음. specify complete, requirements 기존8/8 재검토; plan research running. T032 보류/F001전체/F002/F004~6 보존. 신규 범위 downstream tasks/analyze/implement/verify pending.
+
+W03-E plan/tasks complete: research agent 검토와계약/data-model/quickstart 및5task. Read-only analyze: FR013/SC011 coverage100%(T050~54), unmapped0/duplication0/ambiguity0/critical0,constitution I~V충돌0. 기존 W03-D 단일시점 범위는 이력이며 신규구간 승인으로확장, 기존 wire와scope보존. 분석 repair0. implementation gate requirements8/8 checked/0unchecked(문서품질), hooks없음/ignore검증PASS. implement running.
+
+## 2026-10-04 T050~T054 구현·검증 완료
+FR013/SC011→R003/R005/R006/R007 증거 E-ORBIT-RADIO-SERIES: validation/t054_orbit_radio_series.md. 이번묶음 clarify불필요/specify/plan/tasks/analyze/implement/verify complete, hooks없음/8체크PASS. 처음Python363PASS1FAIL architecture→수정 후369PASS125.17s/기존경고1, Node129PASS432.6794ms. 읽기전용marker결함RED→PASS/최종추가결함0. 실제8891두해상도3그래프/복원/오류/clip/none/RF·GP·조회18입력보존/canvas1/error0. 원래17정의AST/물리식보존. 구현검증 repair2(marker/계층), 명세분석repair0. 전체feature implement/verify running. F001전체/F002/F004~6/T032보류와처음목표유지. PR17 위stacked Draft PR리뷰, 자동병합없음.
