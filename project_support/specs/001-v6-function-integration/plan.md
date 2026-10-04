@@ -138,3 +138,6 @@ FR017/SC015→US9/T067~T070. Same JS/FastAPI stack, existing hil endpoints/runti
 
 ## US10 Catalog 구현 계획
 기존 communication/http/catalog.py → data/catalog/access.py/records.py/cache.py → CelesTrakSource 흐름은 변경하지 않는다. communication/browser/api.js에 optional AbortSignal만 더한다. tabs/catalog_workspace.js controller/panel을 workspace_orbit의 satellite에 조립한다. 기존 대량목록+virtualization 대신 서버지원100개 페이지로 DOM/전송량을 제한한다. 검색은 명시 조회 버튼으로 적용하여 초안과 조회 조건을 구분한다. 응답 generation과 AbortController로 역순을 차단하고 상세도 별도 generation으로 막는다. 원격 초안은 조회를 실행하지 않는다. API 실패는 유지한 마지막 결과와 오류를 함께 표시하며 다른 조건의 결과임을 표시한다. 카탈로그는 조회이며 저장 궤도/브라우저 전체 위성 SGP4/접촉계산 연결은 이 단계의 신규 범위가 아니다. 전체 카탈로그 globe/legacy 선택 흐름은 W08 대조에 남긴다.
+
+## US11 상세설계
+사용자정밀좌표선택승인. 기존data/orbit_inputs parsing을 bytes진입점으로추출하고 기존path진입점을보존한다. data/earth_orientation에명시IERS-A loader/UT1및극운동quality 조회를더하며 기존Bloader와동일scalar/vector계산보존. catalog_geometry snapshot은별도manifest/hash고정, 기존stored manifest불변. user_application/catalog_geometry query는기존CatalogReader에서해당그룹/번호를조회해normalizedOMM 사본/Rust native/create_orbit_calculation 재사용; shared boundedexecutor, runtime변경없음. HTTPstrictPOST /api/catalog/position은server보존epoch한시점만계산(다른UTC입력은이번범위제외),source/fetched_at/GPepoch/hash/EOPquality와ITRFm 반환. browser/catalog_geometry.js 늦은결과검증, 기존catalog선택hook, workspaceglobe 단일Viewer 표시모드전환. 새로운globe/newSGP4/합성fallback 없음. T085~89 상세화, T075완료로닫지않는다.

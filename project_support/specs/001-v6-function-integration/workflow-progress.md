@@ -402,3 +402,11 @@ T071~74/FR018/SC016 complete; validation/t074_catalog_workspace.md: Python377/No
 
 ## 2026-10-05 전체 기능 대조 / Converge
 사용자 “좋아 대조해보자”에 따라 최신선배GitHubmain과로컬HEAD 1a1e002 일치확인. legacy_function_audit.md에현재PR23/원본/API53↔31/공통23/원본만30/현재추가8 및 browser-only 누락 추적. current liveHTTP30 확인. missing3/partial7/HIGH8/MEDIUM2, tasks_appended T075~84(Phase9, 기존74task bytes보존). 별도controller기록은converge append후수행. 임무생성없음/보안기능없음 설명을최신원본근거로정정; 기존결정/성과폐기없음. Feature implement/verify running/F002미완료. 새묶음상세spec/plan은stale/pending: 다음 specify/plan을T075 위성카탈로그↔공용지구부터 수행하고 실제구현은별도단계. 이번은정적/읽기전용API대조, 제품코드수정/새기능실행없음. F001/F004~6/T032/다운로드완료unknown/8891보존.
+
+## 2026-10-05 US11 시작
+사용자T075첫묶음승인및정밀EOP방식선택. FR019/SC017/US11/T085~89 추가; 원래R003/F002/T075잔여와다른9묶음보존. 최초goal축소없음. clarification완료(officialEOP지원확장), spec/plan/tasks 해당묶음갱신, constitution1.2.0/8of8checklist보존/hooks없음. 읽기전용일관성검토:의존성 userapp→data/native/simulation/contracts,HTTP→contract,renderer데이터주입만; 신규wireADR0010필요. 충돌0, implement/verifyrunning;catalogrenderer가IERS예측을실측으로표현하지않음.
+
+## 2026-10-05 US11 selected catalog position complete
+FR019/SC017/T085–89 → validation/t089_catalog_position.md. Python380PASS135.43s plus catalogmodule4PASS; Node170PASS633.3169ms; actual8891twores/singleViewer/clear/native precise IERS-A predictions/sourcehash/live readonly/Astropy oracle0m. Initial cache/allow-list/temp-path failures corrected. ADR0010 additive contract. Scoped verify complete; overall implement/verify running, T075/C001 partial and T076–84/F001/F002/F004–6/T032/W06diskunknown retained. Draft PR above24/no merge. 0.0.0.0:8891 preserved, verified process restart reset in-memory SIM only.
+
+Final US11 review: malformed manifest startup isolation hardened; historical testfixture independent from ignoreddeployment inputs. Full Python384PASS133.29s and target7PASS;Node170PASS. Earlier380-run retained above as intermediate. Final artifacts t089_catalog_position.md; no scoped/overall completion boundary changed.

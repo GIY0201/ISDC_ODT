@@ -25,7 +25,7 @@
 ## 확인된 누락과 후속 작업
 | ID | 유형 | 중요도 | 기능 | 현재 차이 | 작업 |
 |---|---|---|---|---|---|
-| C001 | partial | HIGH | 위성 카탈로그 선택과 공용 지구/지상국 표시 | 카탈로그 상세만 연결; 다중 위성 표시·카메라 추적·지상국 목록/선택·3D 모델/일조 표시 미연결 | T075 |
+| C001 | partial | HIGH | 위성 카탈로그 선택과 공용 지구/지상국 표시 | 카탈로그 상세와 선택한 epoch 정밀 위치 연결(T085–89); 다중 위성 표시·카메라 추적·지상국 목록/선택·3D 모델/일조 표시 미연결 | T075 |
 | C002 | missing | HIGH | 위성 노드 편집·배치·편대 | 노드 편집/버스/장비/전력/운용모드·단일/열차/Walker Δ/★ 배치와 localStorage 초안/배치기록 없음 | T076 |
 | C003 | partial | HIGH | OISL·데이터 패브릭·지상 구간 | 기존 RF/route/contact는 연결; data-fabric 3 API와 OISL 포착/지향/경로/DTN·지상국 운용 설정 없음 | T077 |
 | C004 | partial | HIGH | 서비스 임무 등록·군집 작업 배정 | 현재 단순시나리오 missions API4만연결; 최신 선배 UI의서비스임무등록/계획/위성별UTC일정·군집배정·확정 없음 | T078 |
@@ -74,3 +74,5 @@ W04에서 “새 임무 생성 기능은 원본에 없음”이라고 한 것은
 ## Converge 결과와 다음 순서
 `tasks_appended`: missing3/partial7, HIGH8/MEDIUM2, CRITICAL0/contradicts0/unrequested0. 집중추적 FR008/014/015/016/018, SC012/013/014/016, fullplan W01~W09 및 constitution5원칙. 기존74tasks의완료/보류와validation26개 연결을 확인했고 T032는기존사용자보류라중복task로추가하지 않았다. T075~84 10개는 기능 묶음 수준의후속task로, 상세 구현task개수나 전체완료율이 아니다.
 추천: 위성우선지시를따라 T075(카탈로그선택↔공용지구·지상국)→T076(노드배치)부터 상세설계와원본golden을진행한후 통신/임무/데이터/보안/시나리오/설정/화면조립 확장. 자동으로모든기능을한번에이식하지않는다. F001/F004~6/T032/W06저장미확인과독립repo/향후AerODT연계/8891고정은보존.
+
+US11 증거 갱신: validation/t089_catalog_position.md. C001은 일부 위치 표시만 추가되었으며 partial을 유지한다. 이전 API counts는 PR23 audit 시점의 값으로 현재 route는 ADR0010 하나 추가되었다.

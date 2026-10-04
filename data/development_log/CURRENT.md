@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 Selected catalog epoch globe
+- 변경: 기존catalog/Rust/정밀ITRF+별도IERS-A snapshot/readonlyAPI/단일Viewer 선택·해제/quality·hash 연결; ADR0010/T085–89.
+- 검증: Python384PASS133.29s+target7PASS,Node170PASS633.3169ms,실제8891두해상도/readonly/singlecanvas/console0/Astropyoracle0m, t089_catalog_position.md. 초기cache/allowlist/temp오류수정후통과. 최종manifest형식손상시기존API보존/fixture독립성보완후전체재검증.
+- 남음: T075partial/T076–84/F001/F002/F004–6/T032/W06diskunknown, DraftPR24위검토/병합없음. 8891정확한서버재시작으로SIM메모리초기화, 저장GP/B자료보존.
+
+
 ## 2026-10-05 선배 최신 기능 대조
 - 변경: 최신upstreammain=로컬1a1e002와현재PR23을대조, legacy_function_audit.md/Converge T075~84 추가(기존74tasks본문보존). 임무생성/보안없음설명정정, 실제미연결module추적. 제품코드변경없음.
 - 검증: AST라우트선배53/현재31/공통23/선배만30/제품추가8, 실제8891OpenAPI HTTP30. source/readme/화면조립/기존validation근거대조. 문서정적검사/gitdiffcheck; 이번새회귀·원본실행시험아님.

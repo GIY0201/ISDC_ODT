@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from communication.external.celestrak import CelesTrakSource
 from communication.http import system, catalog, runtime, rf_network, missions, hil, reports, telemetry
+from communication.http import catalog_geometry as catalog_geometry_http
 from communication.http import orbit as orbit_http
 from data.catalog.access import Catalog
 from data.catalog.cache import CatalogCache
@@ -21,7 +22,7 @@ from user_application.bootstrap import create_runtime
 from user_application.configs.paths import APP_NAME, APP_VERSION, WEB_DIR, VISUALIZATION_DIR, CLIENT_DIR, CATALOG_CACHE_DIR
 
 
-def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None) -> FastAPI:
+def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None) -> FastAPI:
     from communication.native.orbit_execution import BoundedOrbitExecutor
     from digital_twin.runtime.orbit import OrbitRuntime
     from digital_twin.contracts.orbit import GroundPoint
@@ -50,6 +51,15 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
                     state.orbit=OrbitRuntime(lookup_input=records.get,calculate=create_orbit_calculation(bundle.eop),execute=executor.run,ground_point=GroundPoint(orbit_config.JEJU_LATITUDE_DEG,orbit_config.JEJU_LONGITUDE_DEG,orbit_config.JEJU_ELLIPSOID_HEIGHT_M),minimum_elevation_deg=orbit_config.MINIMUM_ELEVATION_DEG,max_samples=orbit_config.MAX_POSITION_SAMPLES)
                     app.state.orbit_inputs=bundle.inputs
                     app.state.orbit_provenance={'eop_sha256':bundle.eop.eop_sha256,'leap_sha256':bundle.eop.leap_sha256}
+            if catalog_geometry_manifest_path is not None:
+                import asyncio
+                from data.catalog.geometry_snapshot import load_geometry_snapshot
+                from user_application.catalog_geometry import CatalogGeometryQuery
+                try:
+                    catalog_eop=await asyncio.to_thread(load_geometry_snapshot,catalog_geometry_manifest_path)
+                    app.state.catalog_geometry_query=CatalogGeometryQuery(app.state.catalog,catalog_eop,create_orbit_calculation(catalog_eop),executor.run)
+                except (OSError,ValueError,KeyError,TypeError):
+                    app.state.catalog_geometry_error='snapshot_invalid'
             yield
         finally:
             try:
@@ -58,6 +68,9 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
                 await executor.close()
 
     app = FastAPI(title=APP_NAME, version=APP_VERSION, lifespan=lifespan)
+    app.state.catalog_geometry_query=catalog_geometry_query
+    app.state.catalog_geometry_error=None
+    app.include_router(catalog_geometry_http.router)
     app.state.runtime = state
     app.state.orbit_executor = executor
     app.state.orbit_inputs = tuple(records.values())
@@ -112,4 +125,5 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
 def create_stored_orbit_app() -> FastAPI:
     """Explicit local orbit profile; IO happens in lifespan, never at import."""
     from user_application.configs.orbit import ORBIT_MANIFEST_PATH
-    return create_app(orbit_manifest_path=ORBIT_MANIFEST_PATH)
+    from user_application.configs.catalog_geometry import CATALOG_GEOMETRY_MANIFEST
+    return create_app(orbit_manifest_path=ORBIT_MANIFEST_PATH,catalog_geometry_manifest_path=CATALOG_GEOMETRY_MANIFEST)

@@ -14,6 +14,7 @@ test('empty UI choice restores server selection without clearing its result or s
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
     .replace(/import \{createWorkspaceRevisionSync\} from [^;]+;/,'const createWorkspaceRevisionSync=()=>({observe(){},destroy(){}});')
     .replace(/import \{createGroundPanel\} from [^;]+;/,'const createGroundPanel=()=>({show(){},update(){},destroy(){}});')
+    .replace(/import \{createCatalogGeometry\} from [^;]+;/,'const createCatalogGeometry=()=>({select(){},clear(){},snapshot(){return {}},destroy(){}});')
     .replace(/import \{createCatalogPanel\} from [^;]+;/,'const createCatalogPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createHilPanel\} from [^;]+;/,'const createHilPanel=()=>({show(){},update(){},receive(){},connection(){},applyDraft(){},destroy(){}});')
     .replace(/import \{hilTopology\} from [^;]+;/,'const hilTopology=()=>{};')
@@ -28,7 +29,7 @@ test('empty UI choice restores server selection without clearing its result or s
     .replace(/import \{api,telemetrySocket\} from [^;]+;/,'const api={},telemetrySocket=()=>()=>{};')
     .replace(/import \{createOrbitSelection\} from [^;]+;/,'const createOrbitSelection=()=>globalThis.testOrbitClient;')
     .replace(/import \{createWorkspacePlayback\} from [^;]+;/,'const createWorkspacePlayback=()=>({update(){},destroy(){}});')
-    .replace(/import \{createWorkspaceGlobe\} from [^;]+;/,'const createWorkspaceGlobe=()=>({update(){},destroy(){}});');
+    .replace(/import \{createWorkspaceGlobe\} from [^;]+;/,'const createWorkspaceGlobe=()=>({update(){},catalog(){},destroy(){}});');
   try {
     const ui=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
     ui.showWorkspaceOrbit('satellite');
