@@ -40,3 +40,5 @@ OrbitRadioSeriesCalculation: start_utc,end_utc,duration_seconds,step_seconds,row
 
 ## W04 UI 사본과 초안
 Mission은 기존 id/name/status/progress/plan_version/tasks/resources/success_conditions 사본. Task는 기존 id/lane/name/start/duration/status/predecessor/priority. Validation은 mission_id/plan_version/valid/conflict_count/conflicts. Preview는 mission/applied:false/diff/validation으로 현재 검증과 분리한다. UI 선택과 편집 초안은 서버 현재 상태가 아니며 저장 요청 전까지 runtime에 영향이 없다.
+
+W05: runtime/status/metrics/events/missions는 서버 사본. 편집 draft만 브라우저 소유. metrics 마지막 snapshot과 SIM runtime 시간을 별도 표시. contracts/sim_workspace.md.

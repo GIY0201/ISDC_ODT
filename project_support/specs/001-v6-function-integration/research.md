@@ -78,3 +78,5 @@ Decision: 기존 Rust native 위치·속도 및 scalar TEME→ITRF를 재사용�
 Decision: communication/http/missions.py의 네 경로와 MissionRuntime을 그대로 호출한다. API를 새로 만들거나 legacy store 전체를 V6에 복제하지 않는다. bootstrap의 missions 사본을 사용한다.
 근거: 기존 tabs/mission.js는 고정 selector와 legacy global store에 결합되어 있으므로 화면 흐름만 독립 패널로 연결하고 서버 로직을 재사용한다. 작업 predecessor는 null이면 보존되지만 빈 문자열이면 해제 가능하다. 미리보기는 diff만 반환하며 mission.tasks와 validation은 현재 계획이고 이벤트는 생성한다. 적용은 현재 계획 재계산으로 exact preview CAS가 없다. 표시로 의미를 구분하며 계산 변경은 이번 범위 밖이다.
 Alternatives rejected: 새로운 재계획 알고리즘/AI, 서버 현재 상태 중복, 원본 UI 전체 이식, 기존 퍼센트 축을 분으로 변환. 모두 사용자 재사용 목적과 맞지 않는다.
+
+W05: runtime.py/telemetry.py/state.py/browser/api.js 기존 경로 확인. 계산은 fault kind만 전역 반영, target/severity는 metadata. reset/scenario는 임무 보존, step=max(speed,1). wire command revision 없으므로 HTTP 확인 뒤 stream matching barrier와 명시 재조회 사용.
