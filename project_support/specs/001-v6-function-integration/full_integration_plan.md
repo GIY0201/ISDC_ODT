@@ -58,3 +58,6 @@ W03-A 범용 RF UI와W03-B ISS 공식 주파수 부분프로파일 연결/검증
 
 ## 2026-10-04 W03-D checkpoint
 W03-C 시나리오 경로·접촉 계획과 W03-D 저장 ISS 단일시점 거리·도플러 V6 연결/검증 완료. validation/t044_communication_planning.md 및 t049_orbit_radio.md 참조. 기존 W04 임무 순서·전체 목적 보존. F001 전체 실제통신조건/F002 전체 기능/W04~08/다른PC·실제AerODT연계 미완료, T032 보류 유지.
+
+## 2026-10-04 W03-E checkpoint
+가시구간→거리/고도각/도플러 변화와표본요약 연결 검증완료(T050~54). 선배 상대속도식 및 기존 batch/가시조회 재사용. validation/t054_orbit_radio_series.md. 실제 수신/장비/조건 전체와임무/SIM/KPI/다른 후속범위는미완료, T032보류유지.

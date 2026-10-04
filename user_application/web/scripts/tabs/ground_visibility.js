@@ -31,16 +31,17 @@ export function visibilityMarkup(result){
   if(!result)return '';
   const labels={complete:'계산 완료',none:'가시 구간 없음',partial:'부분 결과 · 실패 시각에서는 가시 여부 미확인',error:'계산 실패 · 가시 여부 미확인'};
   return `<p><strong>${escape(labels[result.status]||result.status)}</strong> · 실제 통신 미확인</p><p>조회 UTC ${escape(result.query_start_utc)} → ${escape(result.query_end_utc)}<br>최소 고도각 ${escape(result.minimum_elevation_deg)}° · revision ${escape(result.revision)}</p>
-    ${(result.intervals||[]).length?`<div class="visibility-table"><table><caption>기하학적 가시 구간 · UTC</caption><thead><tr><th>시작</th><th>종료</th><th>최대 시각 / 고도각</th><th>조회 경계</th></tr></thead><tbody>${result.intervals.map(row=>`<tr><td>${escape(row.start_utc)}</td><td>${escape(row.end_utc)}</td><td>${escape(row.peak_utc)}<br>${Number(row.max_elevation_deg).toFixed(4)}°</td><td>${row.start_clipped?'시작 잘림 ':''}${row.end_clipped?'종료 잘림':''}${!row.start_clipped&&!row.end_clipped?'양쪽 경계 확인':''}</td></tr>`).join('')}</tbody></table></div>`:''}
+    ${(result.intervals||[]).length?`<div class="visibility-table"><table><caption>기하학적 가시 구간 · UTC</caption><thead><tr><th>시작</th><th>종료</th><th>최대 시각 / 고도각</th><th>조회 경계</th><th>구간 분석</th></tr></thead><tbody>${result.intervals.map((row,index)=>`<tr><td>${escape(row.start_utc)}</td><td>${escape(row.end_utc)}</td><td>${escape(row.peak_utc)}<br>${Number(row.max_elevation_deg).toFixed(4)}°</td><td>${row.start_clipped?'시작 잘림 ':''}${row.end_clipped?'종료 잘림':''}${!row.start_clipped&&!row.end_clipped?'양쪽 경계 확인':''}</td><td><button type="button" id="visibility-series-${index}">이 구간 선택</button></td></tr>`).join('')}</tbody></table></div>`:''}
     <p>구간 ${(result.intervals||[]).length}개 / 접점 ${(result.contacts||[]).length}개</p>
     ${(result.contacts||[]).map(row=>`<p>접점 ${escape(row.utc)} / ${escape(row.elevation_deg)}° / 지속 0초 · 통신 시간으로 해석하지 않습니다.</p>`).join('')}
     ${(result.errors||[]).length?`<ul>${result.errors.map(row=>`<li>실패 UTC ${escape(row.utc)} / ${escape(row.error_code)}</li>`).join('')}</ul>`:''}
     <details><summary>입력 및 계산 자료 SHA256</summary><dl>${['input_hash','eop_sha256','leap_sha256','frame','profile'].map(field=>`<dt>${field}</dt><dd>${escape(result[field])}</dd>`).join('')}</dl></details>`;
 }
 
-export function createGroundPanel(client,api){
+export function createGroundPanel(client,api,{onInterval=()=>{},onInvalidate=()=>{}}={}){
   let active=false,panel=null,draft=null,rangeInput=null,working=false,message='',dirty=false,pointKey=null;
   const controller=createGroundVisibility(client,api,render);
+  function cancelVisibility(){controller.cancel();onInvalidate();}
   function render(){
     controller.update();if(!active)return;
     const {inputs,state,status:selectionStatus,error:selectionError}=client.snapshot();
@@ -48,12 +49,12 @@ export function createGroundPanel(client,api){
     if(!panel?.isConnected){
       panel=document.createElement('section');panel.id='ground-visibility';panel.className='panel';screen.prepend(panel);
       panel.innerHTML=`<header><h2>가상 지점 · 가시 구간</h2><small>SGP4 기하학적 예측 / 실제 통신 미확인</small></header><div class="body"><p>위성 창과 같은 저장 입력·지점·고도각을 사용합니다. 지점은 가상 위치이며 시설·안테나·RF 측정은 연결되지 않았습니다.</p><label>저장 입력 <select id="ground-input"></select></label><div class="ground-fields"><label>위도 ° <input id="ground-lat" type="number" min="-90" max="90" step="any"></label><label>경도 ° <input id="ground-lon" type="number" min="-180" max="180" step="any"></label><label>WGS84 타원체 높이 m <input id="ground-height" type="number" step="any"></label><label>최소 고도각 ° <input id="ground-angle" type="number" min="0" max="90" step="any"></label><label>조회 시작 UTC <input id="visibility-start" type="text"></label><label>조회 종료 UTC <input id="visibility-end" type="text"></label></div><p>높이는 평균 해수면 고도가 아닙니다. UTC는 Z로 끝나며 조회 길이는 최대 24시간입니다.</p><div class="ground-actions"><button id="ground-apply" type="button">지점 적용·정지</button><button id="visibility-day" type="button">입력 epoch부터 24시간</button><button id="visibility-query" type="button">설정 적용 후 구간 계산</button><button id="visibility-cancel" type="button">조회 취소</button></div><p id="visibility-status" role="status" aria-live="polite"></p><div id="visibility-result"></div></div>`;
-      panel.querySelector('#ground-input').addEventListener('change',async event=>{if(!event.target.value){event.target.value=client.snapshot().state?.input_id||'';return;}controller.cancel();message='';await client.select(event.target.value);rangeInput=null;draft=null;dirty=false;pointKey=null;render();});
-      for(const id of ['ground-lat','ground-lon','ground-height','ground-angle','visibility-start','visibility-end'])panel.querySelector('#'+id).addEventListener('input',()=>{dirty=true;draft=readFields();controller.cancel();message='설정 변경됨 · 계산을 눌러 적용하세요.';render();});
+      panel.querySelector('#ground-input').addEventListener('change',async event=>{if(!event.target.value){event.target.value=client.snapshot().state?.input_id||'';return;}cancelVisibility();message='';await client.select(event.target.value);rangeInput=null;draft=null;dirty=false;pointKey=null;render();});
+      for(const id of ['ground-lat','ground-lon','ground-height','ground-angle','visibility-start','visibility-end'])panel.querySelector('#'+id).addEventListener('input',()=>{dirty=true;draft=readFields();cancelVisibility();message='설정 변경됨 · 계산을 눌러 적용하세요.';render();});
       panel.querySelector('#ground-apply').addEventListener('click',()=>run(false));
       panel.querySelector('#visibility-query').addEventListener('click',()=>run(true));
-      panel.querySelector('#visibility-cancel').addEventListener('click',()=>{controller.cancel();message='조회 취소됨 · 실행 중 계산의 즉시 중단은 보장하지 않습니다.';render();});
-      panel.querySelector('#visibility-day').addEventListener('click',()=>{try{setRange(client.snapshot().state);draft=readFields();controller.cancel();message='입력 epoch 기준 24시간 · 계산을 눌러 조회하세요.';}catch(exc){message=exc.message;}render();});
+      panel.querySelector('#visibility-cancel').addEventListener('click',()=>{cancelVisibility();message='조회 취소됨 · 실행 중 계산의 즉시 중단은 보장하지 않습니다.';render();});
+      panel.querySelector('#visibility-day').addEventListener('click',()=>{try{setRange(client.snapshot().state);draft=readFields();cancelVisibility();message='입력 epoch 기준 24시간 · 계산을 눌러 조회하세요.';}catch(exc){message=exc.message;}render();});
       writeFields(draft||{lat:state?.ground_point?.latitude_deg??33.4996,lon:state?.ground_point?.longitude_deg??126.5312,height:state?.ground_point?.ellipsoid_height_m??0,angle:state?.minimum_elevation_deg??10,start:'',end:''});
     }
     const nextPoint=JSON.stringify([state?.ground_point,state?.minimum_elevation_deg]);
@@ -63,7 +64,7 @@ export function createGroundPanel(client,api){
     const query=controller.snapshot();
     panel.querySelector('#visibility-status').textContent=working?'설정 적용 중…':query.status==='pending'?'가시 구간 계산 중… 지구와 작업창을 계속 사용할 수 있습니다.':query.error||message||selectionError||'계산할 설정과 UTC 범위를 확인하세요.';
     const markup=visibilityMarkup(query.result);
-    const output=panel.querySelector('#visibility-result');if(output._visibilityMarkup!==markup){output.innerHTML=markup;output._visibilityMarkup=markup;}
+    const output=panel.querySelector('#visibility-result');if(output._visibilityMarkup!==markup){output.innerHTML=markup;output._visibilityMarkup=markup;for(const [index] of (query.result?.intervals||[]).entries())panel.querySelector('#visibility-series-'+index)?.addEventListener('click',()=>onInterval(structuredClone(query.result),index));}
     for(const id of ['ground-apply','visibility-query','ground-input'])panel.querySelector('#'+id).disabled=working||selectionStatus==='pending'||(id!=='ground-input'&&!state?.input_id);
     for(const id of ['ground-lat','ground-lon','ground-height','ground-angle','visibility-start','visibility-end','visibility-day'])panel.querySelector('#'+id).disabled=working||selectionStatus==='pending';
     panel.querySelector('#visibility-cancel').disabled=query.status!=='pending';
@@ -72,7 +73,7 @@ export function createGroundPanel(client,api){
   function writeFields(values){for(const [index,key] of ['lat','lon','height','angle','start','end'].entries())panel.querySelector('#'+['ground-lat','ground-lon','ground-height','ground-angle','visibility-start','visibility-end'][index]).value=values[key];}
   function setRange(state){const record=client.snapshot().inputs.find(row=>row.input_id===state?.input_id);if(!record)return;const codec=createUtcCodec(state.leap_sha256);panel.querySelector('#visibility-start').value=record.epoch_utc;panel.querySelector('#visibility-end').value=codec.advance(record.epoch_utc,86400);}
   async function run(query){
-    if(working)return;controller.cancel();working=true;message='';draft=readFields();render();
+    if(working)return;cancelVisibility();working=true;message='';draft=readFields();render();
     try{
       const state=client.snapshot().state,codec=createUtcCodec(state.leap_sha256);
       const values=['lat','lon','height','angle'].map(key=>draft[key].trim()===''?NaN:Number(draft[key]));
@@ -91,7 +92,7 @@ export function createGroundPanel(client,api){
     const ids=['ground-lat','ground-lon','ground-height','ground-angle','visibility-start','visibility-end'];
     let changed=false;
     for(const item of items){if(!ids.includes(item.id)||typeof item.value!=='string')continue;const field=panel.querySelector('#'+item.id);if(field&&field.value!==item.value){field.value=item.value;changed=true;}}
-    if(changed){dirty=true;draft=readFields();controller.cancel();message='별도 창에서 전달된 편집값 · 적용 전입니다.';render();}
+    if(changed){dirty=true;draft=readFields();cancelVisibility();message='별도 창에서 전달된 편집값 · 적용 전입니다.';render();}
   }
-  return {applyDraft,show(view){active=view==='ground';render();},update:render,destroy:()=>controller.cancel()};
+  return {applyDraft,show(view){active=view==='ground';render();},update:render,destroy:()=>cancelVisibility()};
 }

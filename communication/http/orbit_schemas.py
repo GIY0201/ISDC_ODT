@@ -93,3 +93,24 @@ class VisibilityRequest(OrbitRequest):
         elapsed=float((parse_utc(self.end_utc).as_time().tai-parse_utc(self.start_utc).as_time().tai).sec)
         if not 0<elapsed<=86400+1e-8:raise ValueError('visibility range must be >0 and <=24h SI')
         return self
+
+class RadioSeriesRequest(OrbitRequest):
+    client_request_id: str=Field(min_length=1,max_length=128)
+    selection_revision: int=Field(ge=0)
+    input_id: str=Field(min_length=1,max_length=100)
+    start_utc: str
+    end_utc: str
+    frequency_hz: float=Field(gt=0,le=300000000000)
+    @field_validator('start_utc','end_utc')
+    @classmethod
+    def utc_value(cls,value):return parse_utc(value).iso_utc
+    @field_validator('client_request_id','input_id')
+    @classmethod
+    def nonblank(cls,value):
+        if not value.strip():raise ValueError('nonblank string required')
+        return value
+    @model_validator(mode='after')
+    def range(self):
+        elapsed=round(float((parse_utc(self.end_utc).as_time().tai-parse_utc(self.start_utc).as_time().tai).sec),9)
+        if not 0<elapsed<=86400:raise ValueError('radio series range must be >0 and <=24h SI')
+        return self

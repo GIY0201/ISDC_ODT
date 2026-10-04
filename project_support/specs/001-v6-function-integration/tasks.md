@@ -107,3 +107,11 @@ W03-A 의존성: T033→T034→T035→T036. T033의Python/Node시험은별도파
 - [x] T048 [US1] user_application/web/scripts/tabs/orbit_radio.js를workspace_orbit.js/workspace.js/index.html에조립하고 browser/workspace_orbit_radio.test.mjs에 실제assembly RED→복원/원격/GP·RF보존시험.
 - [x] T049 전체Python/Node/독립속도·원본대조/실제8891두해상도/정상·오류·출처/자신의서버재시작/로그를 validation/t049_orbit_radio.md에기록하고 stacked Draft PR 리뷰.
 의존성T044→T045→T046→T047→T048→T049. 초기단일시점모델계산이며F001전체/F002/T032보류미완료유지.
+
+## W03-E / US1 가시 구간 거리·도플러 변화
+- [x] T050 [US1] project_support/tests/test_orbit_radio_series.py와tests/browser/orbit_radio_series.test.mjs에 batch/scalar/native1회/구간/윤초/실패/stale/graph/controller RED시험 작성.
+- [x] T051 [US1] user_application/orbit_calculation.py와digital_twin/contracts/orbit.py/runtime/orbit.py/simulation/orbit_radio.py에 immutable series/601 bound/strict shared row validation/기존계산 batch 재사용 구현.
+- [x] T052 [US1] communication/http/orbit_schemas.py/orbit.py/browser/api.js와docs/adr/0009_orbit_radio_series.md에 신규strict endpoint/compatibility 구현.
+- [x] T053 [US1] user_application/web/scripts/tabs/orbit_radio_series.js와ground_visibility.js/workspace_orbit.js 및digital_twin/visualization/orbit_radio_series.js에 interval선택/3그래프/표본요약/출처/gap/취소 조립, tests/browser/workspace_orbit_radio_series.test.mjs RED→PASS검증.
+- [x] T054 validation/t054_orbit_radio_series.md에전체pytest/Node/실제8891두해상도/정상·오류·보존·readonlyreview 증거 기록, workflow-progress.md 및data/development_log 갱신/PR17 위Draft PR리뷰.
+의존성T049→T050→T051→T052→T053→T054. Python/Node시험과읽기전용research는다른파일병렬가능. 승인MVP는이5task,전체F001/F002/T032보류보존.

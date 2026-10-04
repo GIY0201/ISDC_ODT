@@ -211,3 +211,24 @@ class OrbitVisibilityQueryResult:
     ground_point: GroundPoint
     calculation: VisibilityResult
     stale: bool
+
+@dataclass(frozen=True)
+class OrbitRadioSeriesCalculation:
+    start_utc: str
+    end_utc: str
+    duration_seconds: float
+    step_seconds: float
+    rows: tuple[OrbitRadioCalculation,...]
+    eop_sha256: str
+    leap_sha256: str
+
+@dataclass(frozen=True)
+class OrbitRadioSeriesQueryResult:
+    client_request_id: str
+    revision: int
+    input_id: str
+    input_hash: str
+    ground_point: GroundPoint
+    minimum_elevation_deg: float
+    calculation: OrbitRadioSeriesCalculation
+    stale: bool

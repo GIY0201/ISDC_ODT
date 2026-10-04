@@ -69,6 +69,29 @@ def create_orbit_calculation(eop_provider):
         position=tuple(float(x) for x in geometry.position_m[0]);velocity=tuple(float(x) for x in geometry.velocity_m_s[0])
         distance,rate,shift,received=radio_geometry(position,velocity,ground_point,frequency_hz)
         return OrbitRadioCalculation(utc,float(frequency_hz),position,velocity,float(elevation_deg([position],ground_point)[0]),distance,rate,shift,received,None,geometry.eop_sha256,geometry.leap_sha256)
+    def radio_series(orbit,start_utc,end_utc,ground_point,frequency_hz):
+        from digital_twin.contracts.orbit import OrbitRadioCalculation,OrbitRadioSeriesCalculation
+        from digital_twin.simulation.orbit_radio import radio_geometry,validate_frequency,radio_time_grid
+        try:
+            from communication.native.orbit_adapter import propagate_instants
+        except (ImportError,OSError) as exc:
+            raise OrbitUnavailable('Orbit native calculation module unavailable') from exc
+        validate_frequency(frequency_hz);utc,duration,step=radio_time_grid(start_utc,end_utc)
+        instants=parse_utc_batch(utc);lookup=getattr(eop_provider,'at_many',None)
+        points=tuple(lookup(instants)) if callable(lookup) else tuple(eop_provider.at(t) for t in instants)
+        if len(points)!=len(utc) or any(p.snapshot_sha256!=eop_provider.eop_sha256 or p.leap_sha256!=eop_provider.leap_sha256 for p in points):
+            raise ValueError('EOP radio series provenance mismatch')
+        native=propagate_instants(orbit,instants);indices,values=native.valid_rows()
+        geometry=teme_to_itrf(values[:,:3],[instants[i] for i in indices],[points[i] for i in indices],velocities_km_s=values[:,3:])
+        angles=elevation_deg(geometry.position_m,ground_point);valid={}
+        for index,position,velocity,angle in zip(indices,geometry.position_m,geometry.velocity_m_s,angles):
+            distance,rate,shift,received=radio_geometry(position,velocity,ground_point,frequency_hz)
+            valid[index]=OrbitRadioCalculation(utc[index],float(frequency_hz),tuple(float(x) for x in position),tuple(float(x) for x in velocity),float(angle),distance,rate,shift,received,None,eop_provider.eop_sha256,eop_provider.leap_sha256)
+        rows=tuple(valid[i] if i in valid else OrbitRadioCalculation(t,float(frequency_hz),None,None,None,None,None,None,None,native.errors[i],eop_provider.eop_sha256,eop_provider.leap_sha256) for i,t in enumerate(utc))
+        return OrbitRadioSeriesCalculation(utc[0],utc[-1],duration,step,rows,eop_provider.eop_sha256,eop_provider.leap_sha256)
+    radio_series.eop_sha256=eop_provider.eop_sha256
+    radio_series.leap_sha256=eop_provider.leap_sha256
+    calculate.radio_series=radio_series
     radio.eop_sha256=eop_provider.eop_sha256
     radio.leap_sha256=eop_provider.leap_sha256
     calculate.radio=radio

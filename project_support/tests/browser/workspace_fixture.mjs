@@ -2,6 +2,7 @@ import vm from 'node:vm';
 import {readFile} from 'node:fs/promises';
 import {createWorkspaceRevisionSync} from '../../../user_application/web/scripts/workspace_revision_sync.js';
 import {createGroundPanel} from '../../../user_application/web/scripts/tabs/ground_visibility.js';
+import {createRadioSeriesPanel} from './orbit_radio_series_fixture.mjs';
 import {createOrbitRadioPanel} from '../../../user_application/web/scripts/tabs/orbit_radio.js';
 import {createCommunicationPlanningPanel} from '../../../user_application/web/scripts/tabs/communication_planning.js';
 import {createRfPanel} from '../../../user_application/web/scripts/tabs/rf_link_budget.js';
@@ -64,10 +65,12 @@ export function fixture(width=1280,height=720,options={}){
   api.bootstrap=options.planningBootstrap??(async()=>{throw Error("Planning transport not supplied");});
   api.route=options.planningRoute;api.contacts=options.planningContacts;
   api.orbitRadio=options.radioRequest;
+  api.orbitRadioSeries=options.seriesRequest;
+  if(options.visibilityRequest)api.orbitVisibility=options.visibilityRequest;
   api.linkBudget=options.rfRequest??(async()=>{throw new Error('RF transport not supplied by fixture');});
   const schedule=set=>()=>{const id=++nextId;set.add(id);return id;};
   Object.assign(win,{Cesium,setTimeout:()=>++nextId,clearTimeout(){},BroadcastChannel:Channel,opener:options.opener??null,open:options.open??(()=>null),close:()=>{win.closed=true;}});
-  context=vm.createContext({document:doc,window:win,innerWidth:width,innerHeight:height,location:{hash:options.hash??'#ground',search:options.popout?'?popout=1':'',origin:'http://localhost',href:'http://localhost/#ground'},URL,URLSearchParams,structuredClone,performance:{now:()=>0},crypto:{randomUUID:()=>String(++nextId)},queueMicrotask:fn=>jobs.push(fn),api,createGroundPanel,createRfPanel,createCommunicationPlanningPanel,createOrbitRadioPanel,createWorkspaceRevisionSync:c=>createWorkspaceRevisionSync(c,win),createOrbitSelection:()=>client,createWorkspaceGlobe:(container,status,button)=>createWorkspaceGlobe(container,status,button,win),createWorkspacePlayback:(c,show)=>createWorkspacePlayback(c,show,{now:()=>0,requestFrame:schedule(frames),cancelFrame:id=>frames.delete(id),setTimer:schedule(timers),clearTimer:id=>timers.delete(id)}),BroadcastChannel:Channel});
+  context=vm.createContext({document:doc,window:win,innerWidth:width,innerHeight:height,location:{hash:options.hash??'#ground',search:options.popout?'?popout=1':'',origin:'http://localhost',href:'http://localhost/#ground'},URL,URLSearchParams,structuredClone,performance:{now:()=>0},crypto:{randomUUID:()=>String(++nextId)},queueMicrotask:fn=>jobs.push(fn),api,createRadioSeriesPanel,createGroundPanel,createRfPanel,createCommunicationPlanningPanel,createOrbitRadioPanel,createWorkspaceRevisionSync:c=>createWorkspaceRevisionSync(c,win),createOrbitSelection:()=>client,createWorkspaceGlobe:(container,status,button)=>createWorkspaceGlobe(container,status,button,win),createWorkspacePlayback:(c,show)=>createWorkspacePlayback(c,show,{now:()=>0,requestFrame:schedule(frames),cancelFrame:id=>frames.delete(id),setTimer:schedule(timers),clearTimer:id=>timers.delete(id)}),BroadcastChannel:Channel});
   // Imported ground UI uses the same adapted document as the VM assembly.
   globalThis.document=doc;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();

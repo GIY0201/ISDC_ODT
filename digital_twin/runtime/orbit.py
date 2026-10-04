@@ -113,22 +113,28 @@ class OrbitRuntime:
         calculator=getattr(self._calculate,'radio',None)
         if not callable(calculator) or self._execute is None:raise OrbitUnavailable('orbit radio calculation/EOP not ready')
         result=await self._execute(lambda:calculator(orbit,utc,selection.ground_point,frequency_hz))
-        if not isinstance(result,OrbitRadioCalculation) or result.utc!=utc or result.frequency_hz!=frequency_hz or result.frame!='ITRF' or result.profile!=orbit.profile:
-            raise RuntimeError('invalid orbit radio contract')
-        for key in ('eop_sha256','leap_sha256'):
-            expected=getattr(calculator,key,None)
-            if not isinstance(expected,str) or re.fullmatch('[a-f0-9]{64}',expected) is None or getattr(result,key)!=expected:
-                raise RuntimeError('invalid orbit radio provenance')
-        metrics=(result.elevation_deg,result.range_m,result.range_rate_m_s,result.doppler_hz,result.received_frequency_hz)
-        if result.error_code is None:
-            if (type(result.position_m) is not tuple or type(result.velocity_m_s) is not tuple or len(result.position_m)!=3 or len(result.velocity_m_s)!=3
-                or not all(isinstance(x,(int,float)) and not isinstance(x,bool) and math.isfinite(x) for x in (*result.position_m,*result.velocity_m_s,*metrics))
-                or abs(result.elevation_deg)>90):raise RuntimeError('invalid orbit radio success row')
-            expected=radio_geometry(result.position_m,result.velocity_m_s,selection.ground_point,frequency_hz)
-            if not all(math.isclose(a,b,rel_tol=1e-12,abs_tol=1e-6) for a,b in zip(metrics[1:],expected)):raise RuntimeError('inconsistent orbit radio metrics')
-            if not math.isclose(result.elevation_deg,float(elevation_deg([result.position_m],selection.ground_point)[0]),rel_tol=0,abs_tol=1e-8):
-                raise RuntimeError('inconsistent orbit radio elevation')
-        elif (not isinstance(result.error_code,str) or not result.error_code or result.position_m is not None or result.velocity_m_s is not None or any(x is not None for x in metrics)):
-            raise RuntimeError('invalid orbit radio error row')
+        from digital_twin.simulation.orbit_radio import validate_radio_calculation
+        validate_radio_calculation(result,utc,selection.ground_point,frequency_hz,orbit.profile,calculator)
         async with self._lock:stale=selection.revision!=self._selection.revision
         return OrbitRadioQueryResult(client_request_id,selection.revision,input_id,orbit.raw_sha256,selection.ground_point,selection.minimum_elevation_deg,result,stale)
+
+    async def radio_series(self,*,client_request_id,selection_revision,input_id,start_utc,end_utc,frequency_hz):
+        from digital_twin.contracts.orbit import OrbitRadioSeriesCalculation,OrbitRadioSeriesQueryResult
+        from digital_twin.simulation.orbit_radio import validate_frequency,radio_time_grid,validate_radio_calculation
+        _request_id(client_request_id);_integer(selection_revision,0);validate_frequency(frequency_hz)
+        utc,duration,step=radio_time_grid(start_utc,end_utc)
+        async with self._lock:
+            selection=self._selection
+            if selection_revision!=selection.revision or input_id!=selection.input_id:raise OrbitConflict('orbit radio series context conflict')
+            orbit=self._lookup_input(input_id)
+            if orbit is None:raise ValueError('orbit input not found')
+        calculator=getattr(self._calculate,'radio_series',None)
+        if not callable(calculator) or self._execute is None:raise OrbitUnavailable('orbit radio series calculation/EOP not ready')
+        result=await self._execute(lambda:calculator(orbit,utc[0],utc[-1],selection.ground_point,frequency_hz))
+        if (not isinstance(result,OrbitRadioSeriesCalculation) or type(result.rows) is not tuple or len(result.rows)!=len(utc)
+            or result.start_utc!=utc[0] or result.end_utc!=utc[-1] or result.duration_seconds!=duration or result.step_seconds!=step
+            or result.eop_sha256!=getattr(calculator,'eop_sha256',None) or result.leap_sha256!=getattr(calculator,'leap_sha256',None)):
+            raise RuntimeError('invalid orbit radio series contract')
+        for instant,row in zip(utc,result.rows):validate_radio_calculation(row,instant,selection.ground_point,frequency_hz,orbit.profile,calculator)
+        async with self._lock:stale=selection.revision!=self._selection.revision
+        return OrbitRadioSeriesQueryResult(client_request_id,selection.revision,input_id,orbit.raw_sha256,selection.ground_point,selection.minimum_elevation_deg,result,stale)
