@@ -82,3 +82,6 @@ Alternatives rejected: 새로운 재계획 알고리즘/AI, 서버 현재 상태
 W05: runtime.py/telemetry.py/state.py/browser/api.js 기존 경로 확인. 계산은 fault kind만 전역 반영, target/severity는 metadata. reset/scenario는 임무 보존, step=max(speed,1). wire command revision 없으므로 HTTP 확인 뒤 stream matching barrier와 명시 재조회 사용.
 
 W06: reports.py는 별도 GET마다 새 snapshot evaluate를 호출한다. CSV UTF8 BOM/6열에 provenance가 없음. JSON은 generated_at/runtime/analytics/events. 따라서 CSV원문미리보기, JSON동일응답표시·freeze 후 원본바이트저장. 기존 KPI02는현재 delay cache, KPI03활성장애경과, KPI04모의auth. samples/missing은원본seq/상수, 실측아님. analysis.js에 filters/detail/trace/recentevents/300 history/220ms재생과 chart50/60이 있으므로 기능 연결에 포함하고 reference60은표시용으로설명.
+
+## W07 source review
+Sources read: communication/http/hil.py/schemas.py, digital_twin/runtime/state.py183~215, simulation/mock_hil.py, model_library/devices.py, legacy tabs/hil.js. Reuse original connect health>=88, sync factors .84/.55/.65 and LOCKED, loopback +1 cap100, preflight50µs/recording/allconnected, sequence S1–4 (+S5 fault_recovery). preflight named sequence also runs4steps. Recording onlyflag; zero-offset fallback originallimitation; no actual command sequence. UI-only legacy IO estimates 3.8+throughput/100 and30+sequence%17 explicitly synthetic. No tech unknown requiring research agents or external browsing; no new dependency.

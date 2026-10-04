@@ -85,3 +85,6 @@ F001 실제 통신 조건, T032 성능, 실제 HIL·영구 기록, 다른 PC 배
 
 ## 2026-10-04 W05/W06 checkpoint
 기존 SIM 제어/WS(T059~62)와 KPI·요구추적·CSV/JSON·세션이력(T063~66) 연결 검증. t062_sim_workspace.md/t066_kpi_workspace.md 참조. W06 Python374/Node150 및 실제8891두해상도 응답/화면내용일치. 다운로드 디스크저장완료는 미확인으로 보존. 다음 W07 MOCK-HIL, 이후 남은 catalog/교차화면. 전체 F002와 F001/F004~6/T032/다른PC·AerODT연결 미완료. 기존합의 삭제/폐기없음.
+
+## 2026-10-05 W07 checkpoint
+기존 MOCK-HIL 전기능을 EM창에 연결/검증(T067~70). 원본장비함수/사전점검/세시퀀스/recording보존. Python376/Node159/실제8891두해상도, t070_hil_workspace.md. 실제HIL·영구기록 주장없음. 다음 남은위성catalog 검색/그룹/목록/상세/stale, 이후W08교차화면점검. F001/F002/F004~6/T032 및 W06파일저장완료미확인보존.

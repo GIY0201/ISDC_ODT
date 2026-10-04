@@ -132,3 +132,6 @@ contracts/sim_workspace.md를 따른다. 기존 backend 보존, tabs/sim_workspa
 
 ## W06 기존 KPI/report 설계
 FR016/SC014→US8/R002,R003,R004,R007,R010→T063~66. contracts/kpi_workspace.md에 파일 시점/CSV 출처없음/JSON동일원본/기존지표 한계와 history를 정의한다. backend/protocol/계산 보존, 새 의존성 없음. communication/browser/api.js 원본 report adapter; tabs/kpi_workspace.js 사본/검증/필터/선택/300세션이력/220ms표시재생/다운로드; W05 observer로 기존 소켓 공유, workspace_orbit 조립, 기존 drawMultiLine 재사용. Constitution I~V PASS. 검증은 RED부터 전체pytest/Node/실제8891 두해상도/파일 일치, PR20 위 Draft.
+
+## W07 MOCK-HIL implementation
+FR017/SC015→US9/T067~T070. Same JS/FastAPI stack, existing hil endpoints/runtime/mock_hil/models unchanged. communication/browser/api.js optional signals; tabs/hil_workspace.js owns only display copies/selection/serial pending/local logs. Pure visualization/hil_topology.js adapts existing six-node geometry. Existing drawSparkline renders real received SIM throughput. workspace_orbit fans the one W05 socket to KPI/HIL; sim panel connects lazily for em. Drafts select only device/sequence. No changes to clocks or runtime state ownership. contracts/hil_workspace.md contains errors/legacy semantics/barrier. Constitution I–V passed pre/post-design; no new dependencies/public wire contract/ADR. Whole regression and actual8891 preserve current0.0.0.0 binding.

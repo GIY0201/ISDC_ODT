@@ -1,0 +1,7 @@
+const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Adapt the existing legacy hil.js six-node geometry; render copied device data only.
+export function hilTopology(devices,selected){
+ const positions=[[150,115],[150,280],[150,445],[850,115],[850,280],[850,445]];
+ const rows=devices.map((d,i)=>{const [x,y]=positions[i]||[i%2?850:150,115+Math.floor(i/2)*165];return `<line x1="${x+(x<500?100:-100)}" y1="${y}" x2="${500+(x<500?-105:105)}" y2="300" stroke="${d.connected?'#12a36d':'#e75555'}"/><g data-hil-device="${escape(d.id)}" role="button" tabindex="0" aria-label="모의 장비 선택 ${escape(d.id)}" transform="translate(${x},${y})"><rect x="-100" y="-38" width="200" height="76" rx="6" fill="#15303e" stroke="${d.id===selected?'#7acaff':'#4d7283'}"/><circle cx="-76" cy="0" r="7" fill="${d.connected?'#12a36d':'#e75555'}"/><text x="-58" y="-3" fill="white" font-size="12">${escape(d.name)}</text><text x="-58" y="17" fill="#b7d0dc" font-size="10">${escape(d.role)}</text></g>`;});
+ return `<svg viewBox="0 0 1000 ${Math.max(590,devices.length>6?Math.ceil(devices.length/2)*165+100:590)}" style="width:100%;max-height:320px" role="img" aria-label="MOCK-HIL 장비 연결 모의 구성">${rows.join('')}<rect x="395" y="236" width="210" height="128" rx="8" fill="#15303e" stroke="#7acaff"/><text x="500" y="290" fill="white" text-anchor="middle">MOCK-HIL</text><text x="500" y="320" fill="#b7d0dc" text-anchor="middle">모의 상태 표시</text></svg>`;
+}

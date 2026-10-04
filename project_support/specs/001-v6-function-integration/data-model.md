@@ -44,3 +44,6 @@ Mission은 기존 id/name/status/progress/plan_version/tasks/resources/success_c
 W05: runtime/status/metrics/events/missions는 서버 사본. 편집 draft만 브라우저 소유. metrics 마지막 snapshot과 SIM runtime 시간을 별도 표시. contracts/sim_workspace.md.
 
 W06: AnalyticsCopy(run/scenario/generated_at/provenance/KPI/requirements), DisplayFrame(runtime/analytics/events/telemetry/wall_time), bounded300 History, filter/selectedKpi/displayMode/live-or-history-or-json, ReportBytes/CSVRows가 화면 사본이다. server runtime은 변경하지 않음. JSONfreeze와CSV별도preview로 동일원본다운로드를 검증. 기존wire불변.
+
+## W07 view copies
+HilView: copied devices/runtime/events and optional telemetry; selectedDevice/sequence/localLogs<=60/chartHistory<=300, preflight with source context, sequence immutable result, pending/stale/error/connection, synchronization barrier. Server runtime remains authority. Null clock/jitter unknown. Preflight cleared on sourcecontext change; sequence preserves original run_id. Local clearing hides current displayed server event IDs without deleting server events; future events remain visible.
