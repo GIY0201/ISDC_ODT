@@ -61,3 +61,24 @@ W03-C 시나리오 경로·접촉 계획과 W03-D 저장 ISS 단일시점 거리
 
 ## 2026-10-04 W03-E checkpoint
 가시구간→거리/고도각/도플러 변화와표본요약 연결 검증완료(T050~54). 선배 상대속도식 및 기존 batch/가시조회 재사용. validation/t054_orbit_radio_series.md. 실제 수신/장비/조건 전체와임무/SIM/KPI/다른 후속범위는미완료, T032보류유지.
+
+## 2026-10-04 우선순위 변경: 선배 구현 기능의 V6 연결 우선
+
+사용자 지시: “일단 선배가 구현해놓은것들을 전부 연결하는걸 우선으로 하자.” 기존 승인과 검증 결과를 보존하고, 새로운 위성 계산 확장보다 아직 V6에 연결하지 않은 기존 기능의 재사용을 우선한다. 아래 목록은 현재 제품 소스의 HTTP router와 기존 탭, V6 조립 코드로 확인했다. API의 존재나 `/legacy`에서 동작하는 것은 V6 연결 완료 증거가 아니다.
+
+| 순서 | 남은 연결 묶음 | 확인한 기존 구현 | V6 연결과 완료 기준 |
+|---|---|---|---|
+| 1 | W04 임무 관리 | `communication/http/missions.py`의 action/tasks/validate/replan, `digital_twin/runtime/missions.py`의 MissionRuntime | 임무 선택, 작업 생성·수정·삭제, 실행 상태 변경, 충돌 검사, 재계획 미리보기·적용. 기존 규칙과 수치 보존, 변경 전후 및 실패 검증 |
+| 2 | W05 SIM 제어와 상태 | `communication/http/runtime.py`, `telemetry.py`, `digital_twin/runtime/state.py` | 정지·재개·배속·스텝·시나리오 선택·장애 주입, WS 상태/사건 표시. GP UTC와 SIM 시간을 구분하고 임무 화면과 같은 서버 상태 사용 |
+| 3 | W06 KPI와 내보내기 | `digital_twin/verification/kpis.py`, `data/exports.py`, `communication/http/reports.py` | KPI와 요구사항 판정, CSV/JSON 다운로드. 화면과 산출물의 값·단위·출처 일치. 기존 SIM 지표를 저장 궤도나 실측 지표로 바꾸지 않음 |
+| 4 | W07 MOCK-HIL | `digital_twin/simulation/mock_hil.py`, `communication/http/hil.py` | 장비 동작, preflight, sequence, recording 상태 표시. 성공·실패 결과 검증. recording은 기존 플래그이며 영구 기록이 아님 |
+| 5 | 기존 위성 카탈로그의 남은 흐름 | `communication/http/catalog.py`, `data/catalog`, 기존 `tabs/orbit.js` | 그룹·검색·필터·목록·상세 정보·stale/미제공 표시를 V6에 연결. 이미 연결한 저장 궤도 입력 및 정밀 계산과 자료 종류를 구분 |
+| 6 | W08 및 V6 나머지 업무의 조립 점검 | 기존 scenario/tasks/fault/control/KPI와 V6 wall/normal/initial/exception/scene/composer/run/compare | 연결된 기존 기능으로 화면 간 흐름을 구성하고 누락을 점검. 별도 기능이 없는 security/facility 카드나 예약 사건·영구 replay를 완료로 처리하지 않음 |
+
+W01/W02와 W03의 RF·경로·접촉·단일/구간 도플러 연결은 검증 완료한 기반으로 유지한다. 기존 시각화나 브라우저 계산에도 남은 기능이 있는지는 각 묶음 진입 시 기존 탭 호출과 비교해 점검한다. 모든 묶음에 대해 실제 함수 재사용, 기존 결과 보존, V6 실제 화면 검증을 완료 기준으로 삼는다. 위 목록은 상세 task 개수나 전체 완료율이 아니며, 각 묶음의 기존 기능을 확인한 뒤 같은 feature에 계약과 task를 추가한다.
+
+F001 실제 통신 조건, T032 성능, 실제 HIL·영구 기록, 다른 PC 배포와 실제 AeroDT 연결은 삭제하지 않는다. 장비가 필요한 후속 작업은 기존 기능 연결과 병행 추적하되 미선정 장비 값을 임의로 채우지 않는다. 다음 상세 범위는 W04 임무 기능 연결이며 새 계산 기능을 먼저 확장하지 않는다.
+
+
+## 2026-10-04 W04 checkpoint
+임무 관리의 기존 action/tasks/validate/replan을 V6에 연결하고 검증했다(T055~58, validation/t058_mission_workspace.md). 새 임무 생성·AI·실명령을 추가하지 않았다. 원본 재계획 한계/시간 축을 보존했다. 다음 우선순위는 W05 기존 SIM 제어/시나리오/장애/WS 텔레메트리, 이후 W06/W07/카탈로그/화면조립. 전체 목적과 F001/T032 보존.

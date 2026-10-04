@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {fixture} from './workspace_fixture.mjs';
+for(const [w,h] of [[1280,720],[1920,1080]])test(`V6 mission assembly, drafts, refresh and restore ${w}x${h}`,async()=>{
+ const m={id:'server-mission',name:'SIM loaded',status:'planned',progress:0,plan_version:1,tasks:[],resources:{},success_conditions:[]},calls=[];
+ const f=fixture(w,h,{hash:'#mission',planningBootstrap:async()=>({missions:[m]}),missionTask:async p=>{calls.push(p);return {mission:{...m,plan_version:2,tasks:[{id:'T-01',name:p.name,lane:p.lane,start:p.start,duration:p.duration,status:p.status}]},validation:{mission_id:m.id,plan_version:2,valid:true,conflict_count:0,conflicts:[]}};}});
+ await Promise.resolve();await Promise.resolve();f.flush();
+ assert.ok(f.doc.getElementById('mission-workspace'));
+ assert.match(f.get('mission-workspace').innerHTML,/SIM loaded/);
+ const number=f.get('mw-start');number.value='0.5';await number.dispatch('input');
+ assert.equal(f.get('mw-start'),number,'decimal typing must preserve the native input node');
+ f.context.applyWorkspaceDraft([{id:'mw-name',value:'wrong mission',mission_id:'another',task_id:''}],true);
+ assert.equal(f.get('mw-name').value,'');
+ f.context.applyWorkspaceDraft([{id:'mw-name',value:'same scope',mission_id:m.id,task_id:''}],true);
+ assert.equal(f.get('mw-name').value,'same scope');
+ f.get('mw-name').value='V6 task';await f.get('mw-name').dispatch('input');
+ await f.get('mw-form').dispatch('submit');assert.equal(calls[0].mission_id,m.id);assert.equal(calls[0].name,'V6 task');
+ assert.equal(calls[0].start,0.5);
+ f.get('mw-name').value='preserve';await f.get('mw-name').dispatch('input');
+ await f.get('window-minimize').dispatch('click');await f.get('shelf-restore').dispatch('click');
+ assert.equal(f.get('mw-name').value,'preserve');assert.equal(f.viewers.length,1);assert.equal(f.counts().commands,0);
+ await f.win.dispatch('pagehide',{persisted:false});f.dispose();
+});

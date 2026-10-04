@@ -115,3 +115,11 @@ W03-A 의존성: T033→T034→T035→T036. T033의Python/Node시험은별도파
 - [x] T053 [US1] user_application/web/scripts/tabs/orbit_radio_series.js와ground_visibility.js/workspace_orbit.js 및digital_twin/visualization/orbit_radio_series.js에 interval선택/3그래프/표본요약/출처/gap/취소 조립, tests/browser/workspace_orbit_radio_series.test.mjs RED→PASS검증.
 - [x] T054 validation/t054_orbit_radio_series.md에전체pytest/Node/실제8891두해상도/정상·오류·보존·readonlyreview 증거 기록, workflow-progress.md 및data/development_log 갱신/PR17 위Draft PR리뷰.
 의존성T049→T050→T051→T052→T053→T054. Python/Node시험과읽기전용research는다른파일병렬가능. 승인MVP는이5task,전체F001/F002/T032보류보존.
+
+
+## W04 / US6 임무 관리 (FR-014/SC-012)
+- [x] T055 [US6] project_support/tests/test_mission_workspace.py와 project_support/tests/browser/mission_workspace.test.mjs에 기존 서버 의미/실패/사본 및 새 UI 컨트롤러 RED 회귀를 작성한다.
+- [x] T056 [US6] user_application/web/scripts/tabs/mission_workspace.js에서 기존 API 호출과 서버 사본/편집/검증/미리보기/적용을 연결한다. T055 뒤 수행.
+- [x] T057 [US6] user_application/web/scripts/workspace_orbit.js와 workspace.js에 V6 show/destroy/초안 복원을 조립하고 project_support/tests/browser/workspace_mission.test.mjs에서 두해상도/복원/입력보존을 검증한다. T056 뒤 수행.
+- [x] T058 전체 Python/Node와 실제 8891 두해상도 화면을 확인하고 validation/t058_mission_workspace.md, data/development_log/CURRENT.md 및 HISTORY.jsonl에 기록한다. 기존 API/계산 보존과 Draft PR 리뷰. T057 뒤 수행.
+의존성: T055 → T056 → T057 → T058. 기존 T032 보류 유지. 새 스택과 병렬 파일 수정을 도입하지 않는다. US6 독립 시험은 기존 SIM 임무/편집/검증/재계획 흐름이며 전체 기능 완료가 아니다.

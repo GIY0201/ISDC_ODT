@@ -1,4 +1,4 @@
-import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t053-r1';
+import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t057-r4';
 (() => {
   const screen = document.getElementById('screen');
   const groups = [
@@ -81,7 +81,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t05
       showWorkspaceOrbit(state.view);
       if(pendingWorkspaceDraft.length){
         applyWorkspaceDraft(pendingWorkspaceDraft,pendingWorkspaceDraftRemote);
-        for(const item of pendingWorkspaceDraft){if(item.id.startsWith('series-')||item.id.startsWith('radio-')||item.id.startsWith('cp-')||item.id.startsWith('rf-')||item.id.startsWith('ground-')||item.id.startsWith('visibility-')||item.id==='orbit-utc'||['orbit-input','orbit-rate'].includes(item.id))continue;const field=document.getElementById(item.id);if(field&&'value' in field)field.value=item.value;}
+        for(const item of pendingWorkspaceDraft){if(item.id.startsWith('mw-')||item.id.startsWith('series-')||item.id.startsWith('radio-')||item.id.startsWith('cp-')||item.id.startsWith('rf-')||item.id.startsWith('ground-')||item.id.startsWith('visibility-')||item.id==='orbit-utc'||['orbit-input','orbit-rate'].includes(item.id))continue;const field=document.getElementById(item.id);if(field&&'value' in field)field.value=item.value;}
         pendingWorkspaceDraft=[];pendingWorkspaceDraftRemote=false;
       }
     });
@@ -106,8 +106,9 @@ import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t05
   document.getElementById('rail-groups').innerHTML=groups.map(([g],i)=>`<button type="button" data-group="${i}" aria-label="${g} 작업 목록 열기">${groupLabels[i]}</button>`).join('');
   function showGroup(index){const [label,views]=groups[index];document.getElementById('launcher-title').textContent=label+' 작업공간';nav.innerHTML=views.map(([id,n])=>`<button type="button" data-view="${id}">${n}</button>`).join('');launcher.hidden=false;document.querySelectorAll('#rail-groups button').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.group)===index)));nav.querySelector('button')?.focus()}
   function openView(view){if(!names[view])return;state.view=view;workWindow.hidden=false;fitWindow();shelf.hidden=true;launcher.hidden=true;render();location.hash=view;screen.focus()}
-  function isDraftField(id){return !['ground-input','orbit-input','orbit-rate'].includes(id);}
-  function draftValues(){return [...screen.querySelectorAll('input[id],select[id],textarea[id]')].filter(el=>isDraftField(el.id)).map(el=>({id:el.id,value:el.value}));}
+  function isDraftField(id){return !['mw-mission','mw-task','ground-input','orbit-input','orbit-rate'].includes(id);}
+  function draftScope(id){return id.startsWith('mw-')?{mission_id:document.getElementById('mw-mission')?.value,task_id:document.getElementById('mw-task')?.value}:{};}
+  function draftValues(){return [...screen.querySelectorAll('input[id],select[id],textarea[id]')].filter(el=>isDraftField(el.id)).map(el=>({id:el.id,value:el.value,...draftScope(el.id)}));}
   function transferSnapshot(){return {type:'isdc-v6-snapshot',state:{...state},view:state.view,draft:draftValues()};}
   function applySnapshot(data){
     if(!data||!names[data.view]||!data.state)return;
@@ -117,12 +118,12 @@ import {showWorkspaceOrbit,applyWorkspaceDraft} from './workspace_orbit.js?v=t05
     openView(data.view);applyingRemote=false;awaitingInitial=false;
   }
   syncChannel?.addEventListener('message',event=>{const data=event.data;if(data?.sender===windowId||awaitingInitial)return;
-    if(data?.type==='draft'&&data.view===state.view&&isDraftField(data.id)){const field=document.getElementById(data.id);if(field&&typeof data.value==='string'&&'value' in field){if(field===document.activeElement&&field.value!==data.value){const feedback=document.getElementById('popout-feedback');feedback.hidden=false;feedback.textContent='다른 창에서도 이 항목을 수정했습니다. 현재 편집값을 유지합니다.';}else{applyWorkspaceDraft([{id:data.id,value:data.value}],true);field.value=data.value;}}return;}
+    if(data?.type==='draft'&&data.view===state.view&&isDraftField(data.id)){const field=document.getElementById(data.id);if(field&&typeof data.value==='string'&&'value' in field){const scope=draftScope(data.id);if(data.id.startsWith('mw-')&&(scope.mission_id!==data.mission_id||scope.task_id!==data.task_id))return;if(field===document.activeElement&&field.value!==data.value){const feedback=document.getElementById('popout-feedback');feedback.hidden=false;feedback.textContent='다른 창에서도 이 항목을 수정했습니다. 현재 편집값을 유지합니다.';}else{applyWorkspaceDraft([{id:data.id,value:data.value,mission_id:data.mission_id,task_id:data.task_id}],true);field.value=data.value;}}return;}
     if(data?.type!=='state'||!data.state)return;
     applyingRemote=true;const currentView=state.view;Object.assign(state,data.state,{view:currentView});render();applyingRemote=false;
   });
-  screen.addEventListener('input',event=>{const field=event.target;if(!applyingRemote&&field.id&&isDraftField(field.id)&&'value' in field)syncChannel?.postMessage({type:'draft',sender:windowId,view:state.view,id:field.id,value:field.value});});
-  screen.addEventListener('change',event=>{const field=event.target;if(!applyingRemote&&field.id&&isDraftField(field.id)&&'value' in field)syncChannel?.postMessage({type:'draft',sender:windowId,view:state.view,id:field.id,value:field.value});});
+  screen.addEventListener('input',event=>{const field=event.target;if(!applyingRemote&&field.id&&isDraftField(field.id)&&'value' in field)syncChannel?.postMessage({type:'draft',sender:windowId,view:state.view,id:field.id,value:field.value,...draftScope(field.id)});});
+  screen.addEventListener('change',event=>{const field=event.target;if(!applyingRemote&&field.id&&isDraftField(field.id)&&'value' in field)syncChannel?.postMessage({type:'draft',sender:windowId,view:state.view,id:field.id,value:field.value,...draftScope(field.id)});});
   window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const data=event.data;if(data?.type==='isdc-v6-ready'&&!isPopout&&childWindows.has(event.source)){event.source.postMessage(transferSnapshot(),event.origin);}else if(data?.type==='isdc-v6-snapshot'&&isPopout&&event.source===window.opener){applySnapshot(data);}});
   if(isPopout){document.body.classList.add('popup-mode');workWindow.classList.add('expanded');window.addEventListener('load',()=>window.opener?.postMessage({type:'isdc-v6-ready'},location.origin));}
   let savedRect=null;

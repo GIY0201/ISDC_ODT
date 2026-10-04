@@ -319,3 +319,9 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 선배 기존 bootstrap/route/contacts를V6 지상국에연결. 서버함수/API/schema보존,노드API조회,시나리오의미/UTC/전체행/시간범위한계표시. optional signal과독립세대로늦은응답폐기,복원과원격편집처리.
 - RED후구현,Python325 PASS113.65초/기존경고1,Node114 PASS362.4772ms,실제8891두해상도20행/GP·RF입력18개보존/error0/원본AST9동일/read-only리뷰결함0. PATH Python 의존성없음 collection오류를전용venv로해결. report validation/t044_communication_planning.md.
 - 이묶음완료. 실제ISS수신/예약/HIL아님,F001전체/F002/F004~6/T032보류유지. PR15위stacked Draft PR,8891고정변경포함,자동병합없음.
+
+## 2026-10-04 기존 선배 기능 연결 우선순위
+사용자 지시에 따라 새 계산 확장보다 기존 기능의 V6 연결을 우선한다. HTTP router와 기존 탭 및 V6 조립 소스를 확인했고, 전체 계획과 지속 추적 기록에 임무 → SIM/WS → KPI/export → MOCK-HIL → 카탈로그 남은 흐름 → 화면 간 조립 순서를 기록했다. 기존 W03-E 검증/Draft PR #18 및 F001/T032 등 미완료 항목은 보존했다. 이번 변경은 문서만이며 기능 시험을 새로 실행하지 않았다. 검증: `git diff --check` 통과(줄바꿈 정규화 경고). 다음 W04의 상세 계약/task와 코드·화면 검증은 아직 미실행이다.
+
+## 2026-10-04 W04 임무 관리 V6 연결
+기존 임무 API/계산을 변경하지 않고 V6 서버 목록/작업 CRUD/상태/충돌/재계획 preview·apply를 연결했다. 전체 Python371PASS125.76s(기존경고1),Node134PASS457.4237ms,실제8891두해상도/소수키/복원/입력18개 보존 확인. 최초pytest Temp권한148setup오류는workspace새basetemp로해소했고원본실패로그보존. 원본lane재계획은의존충돌전체해소를보장하지않으며preview현재검증/최신재계산을구분. W05후속/F001/T032보류 유지. 상세 validation/t058_mission_workspace.md. Draft PR 리뷰, 자동병합없음.
