@@ -65,10 +65,10 @@ export const api = {
   missionTask: (payload) => request("/api/missions/tasks", { method: "POST", headers: jsonHeaders, body: JSON.stringify(payload) }),
   validateMission: (missionId) => request(`/api/missions/${encodeURIComponent(missionId)}/validate`),
   replanMission: (missionId, apply = true) => request("/api/missions/replan", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ mission_id: missionId, apply }) }),
-  deviceAction: (deviceId, action) => request("/api/hil/device", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ device_id: deviceId, action }) }),
-  hilPreflight: () => request("/api/hil/preflight"),
-  hilSequence: (sequenceId = "closed_loop") => request("/api/hil/sequence", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ sequence_id: sequenceId }) }),
-  recording: (enabled) => request("/api/hil/recording", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ enabled }) }),
+  deviceAction: (deviceId, action, {signal} = {}) => request("/api/hil/device", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ device_id: deviceId, action }), signal }),
+  hilPreflight: ({signal} = {}) => request("/api/hil/preflight", {signal}),
+  hilSequence: (sequenceId = "closed_loop", {signal} = {}) => request("/api/hil/sequence", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ sequence_id: sequenceId }), signal }),
+  recording: (enabled, {signal} = {}) => request("/api/hil/recording", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ enabled }), signal }),
 };
 
 async function reportRequest(kind, { signal } = {}) {

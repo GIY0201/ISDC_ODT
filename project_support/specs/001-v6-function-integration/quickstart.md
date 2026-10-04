@@ -72,3 +72,6 @@ V6 지상국 창에서 RF 패널을 연다. 모든 필드가 빈칸이며 실제
 W05: 8891 #operations 또는 #run에서 서버 새로고침/정지/배속/스텝/시나리오 적용/장애 주입. 장애는 SIM 시간 만료이며 target별 물리 계산이 아님. #mission 상태는 같은 stream으로 갱신. reset은 임무를 삭제하지 않음.
 
 W06: 8891 #data에서 KPI/요구 filter/detail, 세션이력 scrub/replay/live복귀, CSV/JSON 내려받기. 파일 조회는 새 서버시점. CSV는파일행만 표시하며 run/출처없음, JSON다운로드의 동일응답을화면에고정. 세션이력은최대300 수신표본, 실제기록/재생아님.
+
+## W07 checks
+8891#em: select disconnected KRS-HIL, verify sync disabled; connect→sync→loopback, preflight BLOCKED→READY after all connected/synced and recording on. Test all three sequences; recording off makes preflight/sequence fail. Restore initial states after demonstration, preserve elapsed/orbit UTC. Verify two resolutions/minimize/restore/native selection, single socket/Viewer. No actual equipment or durable recording. Run test_hil_workspace.py then whole pytest with a new workspace basetemp and whole browser Node tests.

@@ -135,3 +135,10 @@ W03-A 의존성: T033→T034→T035→T036. T033의Python/Node시험은별도파
 - [x] T064 [US8] communication/browser/api.js 원본 report bytes adapter와 tabs/kpi_workspace.js의 서버사본/필터·상세/세션이력·재생/JSONfreeze/CSVpreview/검증·정리 구현. T063 뒤.
 - [x] T065 [US8] tabs/sim_workspace.js optional observer로 기존 stream을공유하고 workspace_orbit/workspace에 panel/draft/dispose 조립, 기존 drawMultiLine 재사용. T064 뒤.
 - [x] T066 전체Python/Node/실제8891두해상도/다운로드동일값·원본보존 확인, validation/t066_kpi_workspace.md/ledger/dev logs/전체plan 갱신과 PR20 위 Draft 리뷰. T065 뒤. 기존 T032/F001/F002 보류 유지.
+
+## W07 / US9 MOCK-HIL (FR-017/SC-015)
+- [x] T067 [US9] project_support/tests/test_hil_workspace.py and browser/hil_workspace.test.mjs/hil_api.test.mjs/workspace_hil.test.mjs golden/RED tests.
+- [x] T068 [US9] communication/browser/api.js optional signals, tabs/hil_workspace.js controller/panel and visualization/hil_topology.js existing geometry; server calls and semantic evidence only. T067 first.
+- [x] T069 [US9] workspace_orbit/workspace/sim_workspace fanout/show/draft/dispose and browser fixture two resolutions shared stream/retention. T068 first.
+- [x] T070 whole Python/Node/actual8891 two resolutions success/failure/readonly preservation, validation/t070_hil_workspace.md/ledger/dev logs/full plan and PR21 stacked Draft. T069 first.
+Dependency T066→T067→T068→T069→T070. No new agents or parallel edits; independent read/test may batch. F001/F002/F004~6/T032/W06 disk save unknown preserved.
