@@ -10,6 +10,13 @@ function fixture(){const collections=[],handlers=[],viewers=[],allocations={colo
 }
 const utc='2020-07-12T21:16:01.000416000Z';
 const scene=(n=16633)=>({frame:'ITRF',utc,scene_sha256:'a'.repeat(64),count:n,valid_count:n,error_count:0,rows:Array.from({length:n},(_,i)=>({catalog_number:i+1,name:'sat'+i,status:'valid',normalized_gp_sha256:'b'.repeat(64),epoch_utc:utc,orbit_regime:['LEO','MEO','GEO','HEO'][i%4],position_m:[7000000,i+1,0]}))});
+test('theme repaint preserves native positions/UTC and original palette with selection dim',()=>{
+ const {globe}=fixture(),data=scene(4);globe.setCatalogScene(data);const positions=[...globe.catalogPoints.values()].map(p=>p.position);
+ globe.setViewStyle('light',true);assert.equal(globe.catalogPoints.get(1).color.css,'#c9651a');assert.equal(globe.catalogPoints.get(2).color.css,'#8f8a12');assert.equal(globe.catalogLabels.get(1).outlineColor.css,'#ffffff');
+ globe.update({...data.rows[0],frame:'ITRF',utc});assert.equal(globe.entity.point.color.css,'#d35400');assert.equal(globe.entity.label.fillColor.css,'#d35400');assert.equal(globe.catalogPoints.get(2).color.alpha,.98*.65);
+ const current=globe.viewer.clock.currentTime;globe.setViewStyle('dark',false);assert.equal(globe.entity.point.color.css,'#efff62');assert.equal(globe.catalogPoints.get(2).color.css,'#e6ed55');assert.equal(globe.viewer.clock.currentTime,current);assert.deepEqual([...globe.catalogPoints.values()].map(p=>p.position),positions);
+ globe.update(null);assert.equal(globe.catalogPoints.get(2).color.alpha,.98);globe.destroy();
+});
 test('whole16633 point primitives use original colors/size/occlusion and one Viewer/pick handler',()=>{
  const {globe,collections,viewers,handlers}=fixture(),picked=[];const data=scene();globe.setCatalogScene(data,n=>picked.push(n));
  assert.equal(globe.catalogPoints.size,16633);assert.equal(viewers.length,1);assert.equal(handlers.length,1);

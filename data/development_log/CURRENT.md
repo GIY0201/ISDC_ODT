@@ -431,3 +431,8 @@ T111–T116 scopedcomplete: attached DraftPR30 https://github.com/GIY0201/ISDC_O
 - 변경: 원본2D/3D/지도/테마 표시 요구를US17로세분화. 단일Viewer 주입 렌더러의전환취소/지도최신응답/원본NaturalEarth대체/소유레이어·리스너정리/명암값 구현. 모델·태양연구결과와Terra텍스처누락후속수용기준보존.
 - 검증: REDmissingmodule확인후6behaviorPASS,전체Node230PASS1117.1831ms/Python423PASS5warnings174.32s/gitdiffcheck. 초기Python기본temp권한오류269PASS154setupERROR는별도보존;새projectbasetemp재검증통과. validation/t118_globe_view_renderer.md.
 - 남음: OrbitGlobe위임/provider주입/표식색·UI설정/실제8891두해상도/Draft검토. 이번새UI/지도실행완료아님;포트변경·서버재시작없음. T075partial/T076–84/GLB·태양·성능·실수신·저장파일검증보존,자동병합없음.
+
+## 2026-10-05 Globe view V6 connection progress
+- 변경: 단일OrbitGlobe에표시모듈위임,원본팔레트/선택색/비선택0.65/궤적outline,provider주입과preboot사본·상태. V6위성/지상국창최상단2D3D/지도/지도테마/위성강조와초안·복원연결. 기존좌표·시계·계산보존.
+- 검증: REDmissingstyle/observe/provider/controls→PASS,최종Node235PASS992.32ms/Python423PASS5warnings176.61s. 실제8891두해상도/지도4종ready/2D3D/빠른전환/복원/canvas1/console0/저장state readonly. validation/t120_globe_view_ui.md와스크린샷·JSON보존. initialmockimport/복원버튼이름오류수정후재검증.
+- 남음: T119원본hover강조/T120DOMlistener재생성정리/T121전체위성·궤적공존/실제failure주입/Draft. T117/T118완료외다른체크유지. T075전체/T076–84/모델·태양·성능·실수신·저장파일미확인보존. 포트8891,staticreload만,자동병합없음.

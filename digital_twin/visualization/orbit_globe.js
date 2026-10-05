@@ -1,6 +1,8 @@
-/** Static GP display only. Caller supplies ITRF metres and UTC; no propagation or transport. */
+import {GlobeView} from './globe_view.js';
+const PALETTES={dark:{LEO:'#ff9f43',MEO:'#e6ed55',GEO:'#5ee277',HEO:'#53c8ff',selected:'#efff62',outline:'#061528'},light:{LEO:'#c9651a',MEO:'#8f8a12',GEO:'#1f8a55',HEO:'#1f7fa8',selected:'#d35400',outline:'#ffffff'}};
+/** Native GP display only. Caller supplies ITRF metres and UTC; no propagation or transport. */
 export class OrbitGlobe {
-  constructor(Cesium,container){
+  constructor(Cesium,container,options={}){
     this.C=Cesium;this.position=null;this.destroyed=false;this.stationEntities=new Map();this.stationSites=new Map();this.stationIds=new Map();this.selectedStation=null;this.catalogPoints=new Map();this.catalogLabels=new Map();this.catalogHashes=new Map();this.catalogStyles=new Map();this.catalogEpochs=new Map();this.catalogValid=new Set();this.selectedCatalog=null;
     this.viewer=new Cesium.Viewer(container,{
       baseLayer:false,terrainProvider:new Cesium.EllipsoidTerrainProvider(),
@@ -11,6 +13,8 @@ export class OrbitGlobe {
     });
     this.viewer.scene.globe.baseColor=Cesium.Color.fromCssColorString('#225c77');
     this.viewer.clock.shouldAnimate=false;
+    this.catalogVisuals=new Map();
+    this.viewControls=new GlobeView(Cesium,this.viewer,options.createProvider,options.onStatus);
   }
   update(sample){
     if(this.destroyed)throw new Error('OrbitGlobe destroyed');
@@ -32,6 +36,7 @@ export class OrbitGlobe {
     });
     this.entity.name=sample.name?`${sample.name} · SGP4 모델`:'ISS · SGP4 모델';
     this.entity.label.text=sample.name?`${sample.name} · GP 모델`:'ISS · GP 예측';
+    this._styleSelected();
     viewer.scene.requestRender();return true;
   }
   clearSatellite(){
@@ -46,16 +51,18 @@ export class OrbitGlobe {
     this.trackEntities=[];
     if(value){
       if(value.frame!=='ITRF'||!Array.isArray(value.segments)||value.segments.some(segment=>!Array.isArray(segment)||segment.length<2||segment.some(position=>!Array.isArray(position)||position.length!==3||!position.every(Number.isFinite))))throw Error('Invalid native track segments');
-      for(const [index,segment]of value.segments.entries())this.trackEntities.push(this.viewer.entities.add({id:`catalog-track-${index}`,name:'카탈로그 궤적 · GP 모델',polyline:{positions:segment.map(position=>new this.C.Cartesian3(...position)),width:3,arcType:this.C.ArcType.NONE,material:this.C.Color.fromCssColorString('#5edfff')}}));
+      for(const [index,segment]of value.segments.entries())this.trackEntities.push(this.viewer.entities.add({id:`catalog-track-${index}`,name:'카탈로그 궤적 · GP 모델',polyline:{positions:segment.map(position=>new this.C.Cartesian3(...position)),width:3,arcType:this.C.ArcType.NONE,material:this._trackMaterial()}}));
     }
     this.viewer.scene.requestRender();return true;
   }
   _selectCatalogMarker(number,gpHash){
+    const oldSelection=this.selectedCatalog;
     const previous=this.catalogPoints.get(this.selectedCatalog);if(previous)previous.show=this.catalogValid.has(this.selectedCatalog);
     const previousLabel=this.catalogLabels.get(this.selectedCatalog);if(previousLabel)previousLabel.show=this.catalogValid.has(this.selectedCatalog);
     this.selectedCatalog=this.catalogHashes.get(number)===gpHash&&this.catalogPoints.has(number)?number:null;
     const selected=this.catalogPoints.get(this.selectedCatalog);if(selected)selected.show=false;
     const label=this.catalogLabels.get(this.selectedCatalog);if(label)label.show=false;
+    if(oldSelection!==this.selectedCatalog)this._repaintCatalog();
   }
   setCatalogScene(value,onSelect=()=>{}){
     if(this.destroyed)return false;this.onCatalogSelect=onSelect;
@@ -64,7 +71,7 @@ export class OrbitGlobe {
       if(this.catalogCollection)viewer.scene.primitives.remove(this.catalogCollection);
       if(this.catalogLabelCollection)viewer.scene.primitives.remove(this.catalogLabelCollection);
       this.catalogCollection=null;this.catalogLabelCollection=null;this.catalogSignature=null;
-      this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogValid.clear();this.selectedCatalog=null;
+      this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.catalogValid.clear();this.selectedCatalog=null;
       viewer.scene.requestRender();return true;
     }
     if(value.frame!=='ITRF'||!Array.isArray(value.rows)||value.count!==value.rows.length||value.rows.some(row=>row.status==='valid'&&(!Array.isArray(row.position_m)||row.position_m.length!==3||!row.position_m.every(Number.isFinite))))throw Error('Invalid catalog scene positions');
@@ -76,7 +83,7 @@ export class OrbitGlobe {
       this.catalogSignature=value.scene_sha256;
     }
     const size=value.count>10000?2.4:value.count>2000?3:value.count>200?4.5:6.5;
-    const colors={LEO:'#ff9f43',MEO:'#e6ed55',GEO:'#5ee277',HEO:'#53c8ff'};
+    const colors=PALETTES[this.viewControls.theme];
     const seen=new Set(),palette=new Map(),utcMilliseconds=Date.parse(value.utc);
     // Cesium copies option values into each primitive. Share immutable styles,
     // while keeping independently owned positions and point identities.
@@ -88,14 +95,16 @@ export class OrbitGlobe {
       let epoch=this.catalogEpochs.get(row.catalog_number);
       if(!epoch||epoch.hash!==row.normalized_gp_sha256||epoch.utc!==row.epoch_utc){epoch={hash:row.normalized_gp_sha256,utc:row.epoch_utc,milliseconds:Date.parse(row.epoch_utc)};this.catalogEpochs.set(row.catalog_number,epoch);}
       const age=(utcMilliseconds-epoch.milliseconds)/3600000;
-      const alpha=Number.isFinite(age)&&age>72?.56:value.count>1000?.9:.98,css=colors[row.orbit_regime]||'#ff9f43',style=`${css}:${alpha}`;
+      const baseAlpha=Number.isFinite(age)&&age>72?.56:value.count>1000?.9:.98;
+      this.catalogVisuals.set(row.catalog_number,{regime:row.orbit_regime,alpha:baseAlpha});
+      const alpha=baseAlpha*(this.selectedCatalog!==null&&this.selectedCatalog!==row.catalog_number ? .65 : 1),css=colors[row.orbit_regime]||colors.LEO,style=`${css}:${alpha}`;
       let point=this.catalogPoints.get(row.catalog_number);
       if(!point){
         const id={catalogNumber:row.catalog_number};
         pointScale??=new C.NearFarScalar(1e6,1.35,5e8,.58);
         point=this.catalogCollection.add({position,pixelSize:size,color:color(style,css,alpha),outlineColor:C.Color.TRANSPARENT,outlineWidth:0,scaleByDistance:pointScale,disableDepthTestDistance:0,id,show:true});
         this.catalogPoints.set(row.catalog_number,point);
-        if(value.count<=80){labelScale??=new C.NearFarScalar(1e6,1,8e7,.38);labelOutline??=C.Color.fromCssColorString('#061528');this.catalogLabels.set(row.catalog_number,this.catalogLabelCollection.add({position,text:row.name,font:'600 12px Segoe UI',fillColor:C.Color.WHITE,outlineColor:labelOutline,outlineWidth:3,style:C.LabelStyle.FILL_AND_OUTLINE,pixelOffset:new C.Cartesian2(0,-18),scaleByDistance:labelScale,show:true,id}));}
+        if(value.count<=80){labelScale??=new C.NearFarScalar(1e6,1,8e7,.38);labelOutline??=C.Color.fromCssColorString(colors.outline);this.catalogLabels.set(row.catalog_number,this.catalogLabelCollection.add({position,text:row.name,font:'600 12px Segoe UI',fillColor:color('label',this.viewControls.theme==='light'?'#1c2833':'#ffffff',1),outlineColor:labelOutline,outlineWidth:3,style:C.LabelStyle.FILL_AND_OUTLINE,pixelOffset:new C.Cartesian2(0,-18),scaleByDistance:labelScale,show:true,id}));}
       }else{point.position=position;point.show=true;if(this.catalogStyles.get(row.catalog_number)!==style)point.color=color(style,css,alpha);}
       this.catalogStyles.set(row.catalog_number,style);
       this.catalogHashes.set(row.catalog_number,row.normalized_gp_sha256);
@@ -177,5 +186,16 @@ export class OrbitGlobe {
     if(this.destroyed)return;
     this.viewer.imageryLayers.addImageryProvider(provider);this.viewer.scene.requestRender();
   }
-  destroy(){if(this.destroyed)return;this.destroyed=true;this.position=null;this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.viewer.destroy();}
+  setViewMode(mode){return this.viewControls.setMode(mode);}
+  setViewImagery(mode){return this.viewControls.setImagery(mode);}
+  setViewStyle(theme,emphasis){if(!this.viewControls.setStyle(theme,emphasis))return false;this._repaintCatalog();this._styleSelected();for(const entity of this.trackEntities??[])entity.polyline.material=this._trackMaterial();return true;}
+  _trackMaterial(){const palette=PALETTES[this.viewControls.theme],C=this.C,color=C.Color.fromCssColorString(palette.selected);return C.PolylineOutlineMaterialProperty?new C.PolylineOutlineMaterialProperty({color,outlineColor:C.Color.fromCssColorString(palette.outline),outlineWidth:1.4}):color;}
+  _styleSelected(){if(this.entity){const selected=this.selectedCatalog!==null,color=selected?this.C.Color.fromCssColorString(PALETTES[this.viewControls.theme].selected):this.C.Color.CYAN;this.entity.point.color=color;this.entity.label.fillColor=selected?color:this.C.Color.WHITE;}}
+  _repaintCatalog(){
+    const palette=PALETTES[this.viewControls.theme],colors=new Map(),C=this.C;
+    const outline=C.Color.fromCssColorString(palette.outline),labelColor=C.Color.fromCssColorString(this.viewControls.theme==='light'?'#1c2833':'#ffffff');
+    for(const [number,point]of this.catalogPoints){const visual=this.catalogVisuals.get(number);if(!visual)continue;const alpha=visual.alpha*(this.selectedCatalog!==null&&this.selectedCatalog!==number ? .65 : 1),css=palette[visual.regime]||palette.LEO,style=`${css}:${alpha}`;if(!colors.has(style))colors.set(style,C.Color.fromCssColorString(css).withAlpha(alpha));point.color=colors.get(style);this.catalogStyles.set(number,style);const label=this.catalogLabels.get(number);if(label){label.fillColor=labelColor;label.outlineColor=outline;}}
+    this.viewer.scene.requestRender();
+  }
+  destroy(){if(this.destroyed)return;this.destroyed=true;this.position=null;this.viewControls.destroy();this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.viewer.destroy();}
 }
