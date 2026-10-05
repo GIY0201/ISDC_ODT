@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-06 T147 분할 요청·전체 수락 부분 구현
+- 변경: createNodeTimeline에 명시 정의/공용UTC를 전달, 240기 83/83/74순차요청. generation/고유requestID/knownhash/UTC검사·실제abort, 모든묶음검증후단일교체. 백그라운드중이전완료buffer만유지·중복요청억제, 명시seek/정의변경/종료/부분실패/역순응답차단. sync/async버퍼 동일validator·노드별 주입executor, 조회는HTTP/clock/storage/deploy 없음.
+- 검증: missingexport RED→target11PASS1546.0412ms; 240×601/3requests/240executor calls/마지막묶음대기·두번째실패·취소·과거UTC·observer 보존. 최종Node478PASS2681.996ms/전체Python545PASS8기존warnings149.83s(session12194exit0)/syntax. validation/t147_node_requests.md. 즉시Promise test executor는 실제render yield·게임성능 증거 아님.
+- 남음: T147unchecked 공용display prefetch/갱신·121점/30s track·실제transport/스케줄링/성능. T148/T079실제수락/T149–153/N001/N003/전체T076/T075–84/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. 서버8891/native설치/사용자화면/원격PR·병합 변경 없음.
+
+
 ## 2026-10-06 T147 native 조회 버퍼 부분 구현
 - 변경: schema/metadata/request/node/hash/정의/UTC/finite/error 검사와 사본 기반 readonly geometry 조회. 기존 SI UTC·binary 표본 보간 재사용, native velocity/geodetic/각도 보간 표시·Sun 선행표본 유지; 오류 구간 연결·외삽·새 시계/HTTP/궤도전파 없음. 기본 GP 경로 유지, custom predicate readonly/투영 사본 보호.
 - 검증: missingmodule RED 및 추가10PASS2FAIL 후 보완. 원본20상태 wire→buffer 값보존/240×601 전체 유지. 최종Node467PASS2136.8524ms/전체Python545PASS8기존warnings147.16s(session79187exit0)/syntax. validation/t147_node_sample_buffer.md. 대형 동기 생성 약0.85–0.96s는 게임 frame/UTC PASS 증거 아님.
