@@ -91,12 +91,12 @@ function trackCenterMillis(utc){
   return date.getTime()+Number('0.'+(match[7]??'0'))*1000;
 }
 
-export function createNodeTrackBuffer(request,response,{periodFor,expectedHashes={}}={}){
+function* prepareNodeTrackBuffer(request,response,{periodFor,expectedHashes={}}={}){
   if(typeof periodFor!=='function')throw new TypeError('source static period resolver required');
   if(!request||typeof request.request_id!=='string'||!request.request_id.trim()||request.request_id.length>128||!Array.isArray(request.nodes)||request.nodes.length<1||request.nodes.length>240)throw new Error('invalid node track request');
   const center=trackCenterMillis(request.center_utc);
   if(!response||response.schema_version!==1||response.request_id!==request.request_id||!['valid','partial','error'].includes(response.status)||Object.entries(metadata).some(([key,value])=>response[key]!==value)||!Array.isArray(response.nodes)||response.nodes.length!==request.nodes.length)throw new Error('node track metadata mismatch');
-  const entries=new Map(),catalogs=new Set();let errors=0;
+  const responseStatus=response.status,entries=new Map(),catalogs=new Set();let errors=0;
   for(const [index,node]of request.nodes.entries()){
     const key=definitionKeyFor(node,entries,catalogs),period=periodFor(structuredClone(node)),result=response.nodes[index];
     if(!Number.isFinite(period)||period<=0||!result||result.period_minutes!==period||result.node_id!==node.id||typeof result.definition_hash!=='string'||!/^[0-9a-f]{64}$/.test(result.definition_hash)||Object.hasOwn(expectedHashes,node.id)&&expectedHashes[node.id]!==result.definition_hash||!Array.isArray(result.rows)||result.rows.length!==121)throw new Error('node track identity/hash/period mismatch');
@@ -113,9 +113,69 @@ export function createNodeTrackBuffer(request,response,{periodFor,expectedHashes
     const visible=failures.length===0;
     if(result.path_visible!==visible)throw new Error('node track visibility mismatch');
     catalogs.add(node.catalog_number);entries.set(node.id,{key,path:{...metadata,node_id:node.id,node_definition:structuredClone(node),definition_hash:result.definition_hash,center_utc:request.center_utc,period_minutes:period,visible,positions_m:visible?positions:[],errors:failures}});
+    yield;
   }
-  if(response.status!==(errors===request.nodes.length*121?'error':errors?'partial':'valid'))throw new Error('node track aggregate status mismatch');
+  if(responseStatus!==(errors===request.nodes.length*121?'error':errors?'partial':'valid'))throw new Error('node track aggregate status mismatch');
   return Object.freeze({pathFor(node){const entry=entries.get(node?.id);if(!entry)return null;try{return identity(node)===entry.key?structuredClone(entry.path):null;}catch{return null;}},nodeIds:()=>[...entries.keys()],definitionHashes:()=>Object.fromEntries([...entries].map(([id,entry])=>[id,entry.path.definition_hash]))});
+}
+
+export function createNodeTrackBuffer(request,response,options){
+  const work=prepareNodeTrackBuffer(request,response,options);let next=work.next();while(!next.done)next=work.next();return next.value;
+}
+
+export async function createNodeTrackBufferAsync(request,response,{yieldControl,signal,...options}={}){
+  if(typeof yieldControl!=='function')throw new TypeError('node track cooperative executor required');
+  const work=prepareNodeTrackBuffer(structuredClone(request),response,options);
+  for(;;){if(signal?.aborted)throw signal.reason??new Error('node track aborted');const next=work.next();if(next.done)return next.value;await yieldControl({signal});}
+}
+
+// Separate request generation from sample queries: their refreshes cannot cancel each other.
+// The application still serializes native calls and supplies the existing display UTC.
+export function createNodeTrackTimeline({api,periodFor,requestId,yieldControl,onChange=()=>{},onError=()=>{}}={}){
+  if(typeof api?.nodeTrack!=='function'||typeof periodFor!=='function'||typeof requestId!=='function'||typeof yieldControl!=='function')throw new TypeError('node track dependencies required');
+  let disposed=false,generation=0,sequence=0,definitions=[],definitionKey='[]',active=null,buffer=null,centerUtc=null,hashes={},error='';
+  const requireOpen=()=>{if(disposed)throw new Error('node track timeline disposed');};
+  const snapshot=()=>({generation,pending:active!==null,centerUtc,error,nodeIds:definitions.map(n=>n.id),definitionHashes:structuredClone(hashes)});
+  const emit=()=>{if(disposed)return;try{onChange(snapshot());}catch(e){try{onError(e instanceof Error?e.message:String(e));}catch{/* Observer does not own the receipt. */}}};
+  function invalidate(clear){generation++;active?.controller.abort();active=null;if(clear){buffer=null;centerUtc=null;}error='';}
+  function setDefinitions(nodes){
+    requireOpen();if(!Array.isArray(nodes)||nodes.length>240)throw new Error('node definition limit0..240');
+    const key=identity(nodes),ids=new Set(),catalogs=new Set();for(const node of nodes){definitionKeyFor(node,ids,catalogs);ids.add(node.id);catalogs.add(node.catalog_number);}
+    if(key===definitionKey)return false;invalidate(true);definitions=structuredClone(nodes);definitionKey=key;hashes={};emit();return true;
+  }
+  function calculate(utc,{background=false,expectedHashes={}}={}){
+    requireOpen();let canonical;
+    try{trackCenterMillis(utc);canonical=codec.advance(utc,0);}catch(e){invalidate(true);error=e instanceof Error?e.message:String(e);emit();return Promise.resolve(false);}
+    if(!definitions.length)return Promise.resolve(false);
+    invalidate(!background);const ticket=generation,controller=new AbortController(),scope=structuredClone(definitions),known=structuredClone(expectedHashes),previous=structuredClone(hashes);
+    const task={center:canonical,controller,promise:null};active=task;emit();
+    const current=()=>!disposed&&generation===ticket&&!controller.signal.aborted;
+    async function run(){
+      try{
+        // Both sources constrain the response independently; conflicting bindings fail closed.
+        for(const id of Object.keys(previous)){if(Object.hasOwn(known,id)&&known[id]!==previous[id])throw new Error('node track known hash conflict');Object.defineProperty(known,id,{value:previous[id],enumerable:true,configurable:true});}
+        const base=requestId();if(typeof base!=='string'||!base.trim())throw new Error('node track request identity required');
+        const p={request_id:`${base}-track-${ticket}-${++sequence}`,nodes:scope,center_utc:canonical};if(p.request_id.length>128)throw new Error('node track request identity exceeds128');
+        const receipt=await api.nodeTrack(structuredClone(p),{signal:controller.signal});if(!current())return false;
+        const candidate=await createNodeTrackBufferAsync(p,receipt,{periodFor,expectedHashes:known,yieldControl,signal:controller.signal});if(!current())return false;
+        buffer=candidate;centerUtc=canonical;hashes=candidate.definitionHashes();error='';return true;
+      }catch(e){if(!current())return false;buffer=null;centerUtc=null;error=e instanceof Error?e.message:String(e);return false;}
+      finally{if(current()){active=null;emit();}}
+    }
+    task.promise=run();return task.promise;
+  }
+  function refresh(utc,options={}){
+    requireOpen();if(error)return Promise.resolve(false);
+    try{
+      const center=trackCenterMillis(utc);
+      if(active)return active.promise??Promise.resolve(false);
+      if(!active&&centerUtc&&Math.abs(center-trackCenterMillis(centerUtc))<30000)return Promise.resolve(false);
+    }catch{return calculate(utc,options);}
+    return calculate(utc,{...options,background:true});
+  }
+  function cancel(){requireOpen();invalidate(true);emit();}
+  function destroy(){if(disposed)return;invalidate(true);disposed=true;definitions=[];hashes={};}
+  return Object.freeze({setDefinitions,calculate,refresh,pathFor:node=>disposed?null:buffer?.pathFor(node)??null,snapshot,cancel,destroy});
 }
 
 // Application owns when to ask for a new shared UTC. This object owns only readonly sample buffers.

@@ -653,3 +653,8 @@ Actualowned31524/3780 CIMconfirmed (standarddenied/read-onlyescalation), freshly
 - 변경: 원본121점/공전주기/밀리초TimeClip/한점실패시전체숨김을 native 응답 decoder에 적용. 입력정의·hash·출처·UTC·실패·사본경계 보존, 새 시계·JS전파 없음.
 - 검증: missingexport RED; Node485PASS2832.0123ms/Python546PASS8기존warnings149.55s/session15231exit0. 실제Pythonquery와JSdecoder/sourceperiod 대조33PASS; native행은 주입값으로 live/GPU 증거 아님. validation/t147_node_track_buffer.md.
 - 남음: T147 공용UTC미리받기/30초갱신/표본·궤적취소소유권, T148/T079/T149–153 및전체T075–84/T032/장비/다운로드. 8891서버/native/browser/remotePR/병합 변경없음.
+
+## 2026-10-06 T147 궤적 갱신 요청 부분 진행
+- 변경: 표본과 독립적인 궤적 요청세대·취소·hash·원자적121점수용, 공용UTC30초앞뒤갱신·고속재생중복병합·실패명시재시도. 전체240노드29040행/240yield 보존, 새 시계·전파 없음.
+- 검증: missingexport RED와고속재생9PASS1FAIL 수정. 최종Node495PASS2835.6891ms/Python546PASS8기존warnings153.70s/session91714exit0/syntax. validation/t147_node_track_requests.md. 주입executor는실제프레임yield증거아님.
+- 남음: T147 표본·궤적직렬조정/앞뒤미리받기, T148/T079/T149–153 및전체T075–84/T032/장비/다운로드. 8891서버/native/browser/remotePR/병합 변경없음.
