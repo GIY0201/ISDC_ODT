@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 T143 조회 API와 요청 처리 검증 완료
+- 변경: strict readonly samples/track router 및 브라우저 요청/취소/응답형식 오류 처리. 공통 정의검사·hash를 계약으로 이동해 HTTP→native 경계위반 해소. model_profile 공개계약 일치. 실제앱 조립은 T151 유지.
+- 검증: missingmodule/functions RED, 경계1FAIL2PASS 후 대상74PASS1기존warning104.99s. 전체Python542PASS8기존warnings215.38s(session66026exit0)/Node371PASS1397.285ms/syntax/diffcheck/원본fixturehash동일. HTTP 실제query/decoder 주입시험에서 기존 궤도·SIM 사본 보존. validation/t143_node_http.md.
+- 남음: T144 실제 additive wheel old/new export 검증, T145–153 editor/store/scene/T079실제수락/8891두해상도/리뷰. T143만 완료, T076/전체T075–84/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. 현재8891서버/설치native/사용자화면/병합 변경 없음.
+
+
 ## 2026-10-05 T143 노드 조회 부분 구현
 - 변경: 노드별 UTC grid/단일 native배치, 공통 Gregorian Unix-ms, 원본 정적주기/121점 Date TimeClip 궤적 준비 및 readonly NodeGeometryQuery. 요청 사본/ID/hash/UTC/profile/frame/time/행 검증, 윤초 오류와 실패 경로 숨김. Python 시간별 궤도 재계산 없음.
 - 검증: missingmodule RED 후 target52PASS0.62s, 전체Python523PASS8기존warnings219.71s(session27785exit0)/Node369PASS1399.0046ms/diffcheck. validation/t143_node_query.md. query 주입시험은 새wheel 설치나 실제물리 정확성 증거 아님.

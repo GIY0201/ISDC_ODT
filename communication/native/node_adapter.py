@@ -1,5 +1,4 @@
 """Validate/own native source-node rows. No Python orbital propagation or runtime state."""
-import hashlib
 import importlib
 import json
 import math
@@ -7,45 +6,13 @@ import re
 import numpy as np
 from digital_twin.contracts.satellite_nodes import (PreparedNodeDefinition,NativeNodeBatch,
     NODE_PROFILE,NODE_FRAME,NODE_INERTIAL_FRAME,NODE_TIME_MODEL,NODE_ROW_WIDTH,
-    MAX_NODE_DEFINITIONS,MAX_NODE_ROWS,MAX_NODE_SAMPLES)
+    MAX_NODE_DEFINITIONS,MAX_NODE_ROWS,MAX_NODE_SAMPLES,prepare_node_definitions)
 from digital_twin.contracts.orbit import OrbitUnavailable
-from foundation.orbit_time import UtcInstant,parse_utc,format_utc_batch,unix_millis_without_leap_seconds as node_unix_millis
+from foundation.orbit_time import UtcInstant,format_utc_batch,unix_millis_without_leap_seconds as node_unix_millis
 
 
 
 
-def prepare_node_definitions(nodes):
-    if isinstance(nodes,(str,bytes,dict)):raise ValueError('node definition sequence required')
-    nodes=tuple(nodes)
-    if not 1<=len(nodes)<=MAX_NODE_DEFINITIONS:raise ValueError('node definition limit1..240')
-    ids=set();catalogs=set();prepared=[]
-    for node in nodes:
-        if not isinstance(node,dict) or type(node.get('schema')) is not int or node['schema']!=1:raise ValueError('node schema1 required')
-        identity=node.get('id');catalog=node.get('catalog_number')
-        if not isinstance(identity,str) or not identity.strip() or len(identity)>80 or identity in ids:raise ValueError('unique node IDs required')
-        if type(catalog) is not int or not 900000<=catalog<=9007199254740991 or catalog in catalogs:raise ValueError('unique virtual catalog numbers required')
-        ids.add(identity);catalogs.add(catalog)
-        try:encoded=json.dumps(node,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False)
-        except (TypeError,ValueError) as error:raise ValueError('finite JSON node definition required') from error
-        orbit=node.get('orbit')
-        if not isinstance(orbit,dict):raise ValueError('node orbit required')
-        values={}
-        for key in ['altitude_km','eccentricity','inclination','raan','argp','mean_anomaly']:
-            value=orbit.get(key,0 if key not in ('altitude_km','inclination') else None)
-            if type(value) not in (int,float) or not math.isfinite(value):raise ValueError('finite numeric node orbital fields required')
-            values[key]=value
-        epoch=orbit.get('epoch');epoch_error=None
-        if isinstance(epoch,str):
-            parse_utc(epoch) # Valid leap epochs are distinguishable from malformed timestamps.
-            try:epoch=node_unix_millis(epoch)
-            except ValueError as error:
-                if str(error)!='unsupported_node_time':raise
-                epoch_error='unsupported_node_time'
-        elif type(epoch) not in (int,float) or not math.isfinite(epoch) or abs(epoch)>8.64e15:raise ValueError('finite explicit node epoch required')
-        values['epoch']=epoch
-        prepared.append(PreparedNodeDefinition(identity,hashlib.sha256(encoded.encode('utf-8')).hexdigest(),
-            None if epoch_error else json.dumps(values,allow_nan=False,separators=(',',':')),epoch_error))
-    return tuple(prepared)
 
 
 def _native_port(port):

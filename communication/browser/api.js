@@ -39,7 +39,19 @@ async function rfRequest(payload, { signal } = {}) {
   return data;
 }
 
+async function nodeRequest(path,payload,{signal}={}) {
+  const response=await fetch(path,{cache:'no-store',method:'POST',headers:jsonHeaders,body:JSON.stringify(payload),signal});
+  const mediaType=response.headers.get('content-type')?.split(';')[0].trim().toLowerCase();
+  if(mediaType!=='application/json')throw new OrbitApiError(response.status,'노드 응답 형식 오류');
+  let data;
+  try{data=await response.json();}catch(_){throw new OrbitApiError(response.status,'노드 응답을 읽을 수 없습니다');}
+  if(!response.ok)throw new OrbitApiError(response.status,data?.detail);
+  return data;
+}
+
 export const api = {
+  nodeSamples: (payload,options={}) => nodeRequest('/api/nodes/samples',payload,options),
+  nodeTrack: (payload,options={}) => nodeRequest('/api/nodes/track',payload,options),
   solarSamples: (payload,{signal}={}) => orbitRequest('/api/solar/samples',{method:'POST',headers:jsonHeaders,body:JSON.stringify(payload),signal}),
   satelliteModelManifest: ({signal}={}) => request('/static/satellite_display/manifest.json',{signal}),
   report: reportRequest,

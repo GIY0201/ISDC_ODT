@@ -78,5 +78,5 @@ class NodeGeometryQuery:
             if periods is not None:value.update(period_minutes=periods[index],path_visible=all(r['status']=='valid' for r in rows))
             nodes.append(value);offset+=len(grid)
         return {'schema_version':1,'request_id':request_id,'status':'valid' if successes==count else 'partial' if successes else 'error',
-            'profile':NODE_PROFILE,'frame':NODE_FRAME,'inertial_frame':NODE_INERTIAL_FRAME,'time_model':NODE_TIME_MODEL,
+            'model_profile':NODE_PROFILE,'frame':NODE_FRAME,'inertial_frame':NODE_INERTIAL_FRAME,'time_model':NODE_TIME_MODEL,
             'source_commit':SOURCE_COMMIT,'quality':'engineering_assumption','nodes':nodes}

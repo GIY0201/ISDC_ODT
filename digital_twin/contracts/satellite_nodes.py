@@ -2,6 +2,10 @@
 from dataclasses import dataclass
 from typing import Protocol
 import struct
+import hashlib
+import json
+import math
+from foundation.orbit_time import parse_utc,unix_millis_without_leap_seconds
 
 NODE_PROFILE='SOURCE_KEPLER_J2_V1'
 NODE_FRAME='EARTH_FIXED_GMST_UTC_APPROX'
@@ -43,3 +47,37 @@ class NativeNodeBatch:
 class NodeGeometryPort(Protocol):
     async def samples(self,nodes,start_utc:str,count:int,step_seconds:int,request_id:str)->dict: ...
     async def track(self,nodes,center_utc:str,request_id:str)->dict: ...
+
+
+def prepare_node_definitions(nodes):
+    if isinstance(nodes,(str,bytes,dict)):raise ValueError('node definition sequence required')
+    nodes=tuple(nodes)
+    if not 1<=len(nodes)<=MAX_NODE_DEFINITIONS:raise ValueError('node definition limit1..240')
+    ids=set();catalogs=set();prepared=[]
+    for node in nodes:
+        if not isinstance(node,dict) or type(node.get('schema')) is not int or node['schema']!=1:raise ValueError('node schema1 required')
+        identity=node.get('id');catalog=node.get('catalog_number')
+        if not isinstance(identity,str) or not identity.strip() or len(identity)>80 or identity in ids:raise ValueError('unique node IDs required')
+        if type(catalog) is not int or not 900000<=catalog<=9007199254740991 or catalog in catalogs:raise ValueError('unique virtual catalog numbers required')
+        ids.add(identity);catalogs.add(catalog)
+        try:encoded=json.dumps(node,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False)
+        except (TypeError,ValueError) as error:raise ValueError('finite JSON node definition required') from error
+        orbit=node.get('orbit')
+        if not isinstance(orbit,dict):raise ValueError('node orbit required')
+        values={}
+        for key in ['altitude_km','eccentricity','inclination','raan','argp','mean_anomaly']:
+            value=orbit.get(key,0 if key not in ('altitude_km','inclination') else None)
+            if type(value) not in (int,float) or not math.isfinite(value):raise ValueError('finite numeric node orbital fields required')
+            values[key]=value
+        epoch=orbit.get('epoch');epoch_error=None
+        if isinstance(epoch,str):
+            parse_utc(epoch) # Valid leap epochs are distinguishable from malformed timestamps.
+            try:epoch=unix_millis_without_leap_seconds(epoch)
+            except ValueError as error:
+                if str(error)!='unsupported_node_time':raise
+                epoch_error='unsupported_node_time'
+        elif type(epoch) not in (int,float) or not math.isfinite(epoch) or abs(epoch)>8.64e15:raise ValueError('finite explicit node epoch required')
+        values['epoch']=epoch
+        prepared.append(PreparedNodeDefinition(identity,hashlib.sha256(encoded.encode('utf-8')).hexdigest(),
+            None if epoch_error else json.dumps(values,allow_nan=False,separators=(',',':')),epoch_error))
+    return tuple(prepared)
