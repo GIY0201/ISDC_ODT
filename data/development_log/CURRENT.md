@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 T144 additive Rust wheel 격리 설치 검증 완료
+- 변경: 제품 crate/lock/Python metadata0.3.0 및 native버전 Cargo참조. cleanvenv/-I 실제 old/new export 검증 확대. 제품manifest release/locked wheel과 DLL출처·license·RECORD 영수증 보존. 실행환경0.2.0 유지.
+- 검증: oldwheel/version RED2FAIL1PASS5.41s 후 실제새wheel target3PASS6.11s; 원본62상태/공식33입력668상태/OMM scalar-many bytes/240nodes/50000rows/오류·소유버퍼 확인. Rust9PASS/전체Python543PASS8기존warnings226.35s(session19156exit0)/diffcheck. JS미변경으로 기존Node371PASS 재사용. 첫build maturin없음실패 보존, 기존전용builder1.15.0 명시로 성공. validation/t144_node_native.md.
+- 남음: T145store→T146editor/T147timeline/T148scene/T079→T149–150실제수락/T1518891조립·restore/T152두해상도/T153리뷰. T144만 완료, 전체T076/T075–84/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. 서버8891/설치native/사용자화면/병합 변경 없음.
+
+
 ## 2026-10-05 T143 조회 API와 요청 처리 검증 완료
 - 변경: strict readonly samples/track router 및 브라우저 요청/취소/응답형식 오류 처리. 공통 정의검사·hash를 계약으로 이동해 HTTP→native 경계위반 해소. model_profile 공개계약 일치. 실제앱 조립은 T151 유지.
 - 검증: missingmodule/functions RED, 경계1FAIL2PASS 후 대상74PASS1기존warning104.99s. 전체Python542PASS8기존warnings215.38s(session66026exit0)/Node371PASS1397.285ms/syntax/diffcheck/원본fixturehash동일. HTTP 실제query/decoder 주입시험에서 기존 궤도·SIM 사본 보존. validation/t143_node_http.md.

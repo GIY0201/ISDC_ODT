@@ -3,5 +3,5 @@ requires = ["maturin==1.15.0"]
 build-backend = "maturin"
 [project]
 name = "isdc-orbit-propagation"
-version = "0.2.0"
+version = "0.3.0"
 requires-python = ">=3.14,<3.15"

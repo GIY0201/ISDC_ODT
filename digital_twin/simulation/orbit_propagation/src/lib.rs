@@ -79,5 +79,5 @@ fn isdc_orbit_propagation(m:&Bound<'_,PyModule>)->PyResult<()> {
     m.add("MAX_NODE_DEFINITIONS",node_dynamics::MAX_NODE_DEFINITIONS)?;
     m.add("MAX_NODE_ROWS",node_dynamics::MAX_NODE_ROWS)?;
     m.add("MAX_NODE_SAMPLES",node_dynamics::MAX_NODE_SAMPLES)?;
-    m.add("calculation_profile","WGS72_AFSPC")?;m.add("__version__","0.2.0")?;m.add("MAX_BATCH_ROWS",MAX_BATCH_ROWS)?;m.add("MAX_CATALOG_BATCH_ROWS",MAX_CATALOG_BATCH_ROWS)?;Ok(())
+    m.add("calculation_profile","WGS72_AFSPC")?;m.add("__version__",env!("CARGO_PKG_VERSION"))?;m.add("MAX_BATCH_ROWS",MAX_BATCH_ROWS)?;m.add("MAX_CATALOG_BATCH_ROWS",MAX_CATALOG_BATCH_ROWS)?;Ok(())
 }

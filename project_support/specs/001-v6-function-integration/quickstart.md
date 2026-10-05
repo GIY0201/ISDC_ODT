@@ -127,3 +127,15 @@ project_support/.venv/Scripts/python.exe -m pytest -q --basetemp $validationPath
 ```
 
 Node adapter preparation/row validation is tested with pinned original source rows. Actual new export installation is still gated by T144; a passing old-wheel test does not establish new-node native installation or UI/server acceptance.
+
+### T144 additive wheel verified in isolation
+
+Product0.3.0 adds propagate_nodes while preserving WGS72_AFSPC TLE/OMM/catalog exports. Actual isolated calls match62source states and668official SGP4 states; metadata/owned rows/errors/50000boundary are recorded in validation/t144_node_native.md. Current server environment remains0.2.0 until T151's owned8891 integration/restore gate. Isolated package validation is not actual UI/accepted deployment or another platform's installation proof.
+
+Runtime .venv intentionally has no build tooling. Use the established separate pinned builder for product builds:
+
+```powershell
+& project_support/tooling/build_orbit_wheel.ps1 -PythonPath (Join-Path (Get-Location) 'project_support/.venv_orbit_build_t029/Scripts/python.exe')
+```
+
+Set ISDC_ORBIT_INSTALL_WHEEL to the exact produced product wheel and run test_orbit_install.py with a fresh short basetemp as described above. The test creates its own isolated environment; it does not install into the running application environment. Inspect build_receipt.json and isolated_call.json before claiming an installation gate. Build and other-platform distributions remain explicit workflows rather than startup actions.
