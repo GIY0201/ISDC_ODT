@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-06 T147 native 조회 버퍼 부분 구현
+- 변경: schema/metadata/request/node/hash/정의/UTC/finite/error 검사와 사본 기반 readonly geometry 조회. 기존 SI UTC·binary 표본 보간 재사용, native velocity/geodetic/각도 보간 표시·Sun 선행표본 유지; 오류 구간 연결·외삽·새 시계/HTTP/궤도전파 없음. 기본 GP 경로 유지, custom predicate readonly/투영 사본 보호.
+- 검증: missingmodule RED 및 추가10PASS2FAIL 후 보완. 원본20상태 wire→buffer 값보존/240×601 전체 유지. 최종Node467PASS2136.8524ms/전체Python545PASS8기존warnings147.16s(session79187exit0)/syntax. validation/t147_node_sample_buffer.md. 대형 동기 생성 약0.85–0.96s는 게임 frame/UTC PASS 증거 아님.
+- 남음: T147unchecked 분할≤83·원자적수락/취소·역순/generation/hash·공용UTC갱신·121점/30s track. T148/T079실제수락/T149–153/N001/N003/전체T076/T075–84/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. 서버8891/native설치/사용자화면/원격PR·병합 변경 없음.
+
+
 ## 2026-10-06 T146 위성 작업 패널 구성요소 이식 완료
 - 변경: 원본 편대·상세 HTML/CSS를 공용지구 작업창으로 이식, fleet/status/editor/formation/tooltip 조립. 기존 scene/display owner에 뷰·궤적·링크·모델·음영·zoom·재생·±60s·배속·Escape 위임. 현재 위치를 다시 검사한 명시 focus, 미래 입력에만 원본 live 기본값 적용, 생성/종료/늦은동작 cleanup. 배치/회수는 수락 경로까지 비활성·미확인.
 - 검증: original3hash static fixture 두19842bytes/SHA1d2d6405… 동일, 원본 markup/style/wheel 대조. RED→보완 후target11PASS120.1238ms/전체Node455PASS1476.4104ms/전체Python545PASS8기존warnings144.54s(session31888exit0)/syntax. 실제8891브라우저/layout/통신/native공급 증거 아님. validation/t146_node_work_panel.md.
