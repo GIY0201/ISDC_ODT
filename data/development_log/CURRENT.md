@@ -1,5 +1,10 @@
 # 현재 개발 기록
 
+## 2026-10-05 T136 태양 통합 수용 검증 완료
+- 변경: 제품 코드 변경 없이 나머지 실제 두해상도 UTC/60x/우선순위/오류·복구/theme/두창 preference·복원 증거를 추가하고 T136만 완료 처리.
+- 검증: 52DOM 사본/canvas1/601요청·480초선행 약8초간격/pairedUTC/응답200, orbit observedclock 외 동일·SIM elapsed/sequence만 증가. 기존 최종471Python/350Node 유지. validation/t137_solar_display.md.
+- 남음: T137 exact-tree Draft/US18Terra/all50/전체T075–84/T032/장비·통신·HIL/다운로드·AerODT. catalog paused 문구/복원초안 가독성 T082 추적. 포트8891/서버/API/native/병합 변경 없음.
+
 ## 2026-10-05 T136 태양 실제 표시와 지구 가림
 - 변경: 제품 코드 변경 없이 실제 8891 두해상도 태양 표식 보임/지구 가림 숨김 증거 확보.
 - 검증: 실제 픽셀과 DOM/native ray 양의 교차/UTC·품질/canvas1/console0, 서버 궤도 상태 observedclock 외 동일. validation/t136_solar_visual.md. 기존 전체471Python/350Node 검증 재사용.
