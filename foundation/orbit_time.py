@@ -1,5 +1,6 @@
 """Stateless UTC input and SGP4 time convention."""
 from dataclasses import dataclass
+from datetime import date
 import math
 import re
 import warnings
@@ -100,3 +101,16 @@ def advance_seconds(instant: UtcInstant, seconds: float) -> UtcInstant:
 def minutes_since_epoch(instant: UtcInstant, epoch: UtcInstant) -> float:
     # UTC quasi-Julian dates match SGP4 library convention; not a TAI duration.
     return ((instant.jd1-epoch.jd1)+(instant.jd2-epoch.jd2))*1440
+
+
+def unix_millis_without_leap_seconds(text):
+    """Gregorian Unix milliseconds, no quasi-JD leap-day stretch or leap collapse."""
+    if not isinstance(text,str):raise ValueError('explicit node UTC required')
+    match=re.fullmatch(r'(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?(?:Z|\+00:00)',text)
+    if match is None:raise ValueError('explicit node UTC required')
+    year,month,day,hour,minute,second=map(int,match.groups()[:6])
+    if second==60:raise ValueError('unsupported_node_time')
+    if hour>23 or minute>59 or second>59:raise ValueError('invalid node UTC calendar')
+    days=(date(year,month,day)-date(1970,1,1)).days
+    fraction=float('0.'+(match[7] or '0'))
+    return days*86400000+(hour*3600+minute*60+second)*1000+fraction*1000

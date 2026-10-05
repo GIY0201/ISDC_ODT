@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 T143 노드 조회 부분 구현
+- 변경: 노드별 UTC grid/단일 native배치, 공통 Gregorian Unix-ms, 원본 정적주기/121점 Date TimeClip 궤적 준비 및 readonly NodeGeometryQuery. 요청 사본/ID/hash/UTC/profile/frame/time/행 검증, 윤초 오류와 실패 경로 숨김. Python 시간별 궤도 재계산 없음.
+- 검증: missingmodule RED 후 target52PASS0.62s, 전체Python523PASS8기존warnings219.71s(session27785exit0)/Node369PASS1399.0046ms/diffcheck. validation/t143_node_query.md. query 주입시험은 새wheel 설치나 실제물리 정확성 증거 아님.
+- 남음: T143 HTTP/browser/readonly 조립검증, T144 실제새wheel, T145–153 UI/store/scene/T079수락. T143unchecked/전체T075–84/T076/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. 서버8891/API/설치native/사용자화면/병합 변경 없음.
+
+
 ## 2026-10-05 T143 native 어댑터 부분 구현
 - 변경: 불변 노드 정의/전체입력hash/31float64 decoder와 profile/frame/time 검증, km→m 단일변환, UTC 달력→Unix-ms 및 윤초 행/epoch 명시실패. Python 궤도 재계산/서버조립 없음.
 - 검증: RED missingmodule/준비metadata/잘못된JSON 후 target20PASS0.33s, Node369PASS1423.3499ms. 첫Python490PASS1FAIL(기존wheel 격리설치 Windows 긴경로) 기록보존; 짧은 새workspace경로 설치2PASS5.28s/전체491PASS8기존warnings216.03s(session52016exit0)/syntax/diffcheck. validation/t143_node_adapter.md.

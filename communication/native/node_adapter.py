@@ -1,5 +1,4 @@
 """Validate/own native source-node rows. No Python orbital propagation or runtime state."""
-from datetime import date
 import hashlib
 import importlib
 import json
@@ -10,20 +9,9 @@ from digital_twin.contracts.satellite_nodes import (PreparedNodeDefinition,Nativ
     NODE_PROFILE,NODE_FRAME,NODE_INERTIAL_FRAME,NODE_TIME_MODEL,NODE_ROW_WIDTH,
     MAX_NODE_DEFINITIONS,MAX_NODE_ROWS,MAX_NODE_SAMPLES)
 from digital_twin.contracts.orbit import OrbitUnavailable
-from foundation.orbit_time import UtcInstant,parse_utc,format_utc_batch
+from foundation.orbit_time import UtcInstant,parse_utc,format_utc_batch,unix_millis_without_leap_seconds as node_unix_millis
 
 
-def node_unix_millis(text):
-    """Gregorian Unix milliseconds, no quasi-JD leap-day stretch or leap collapse."""
-    if not isinstance(text,str):raise ValueError('explicit node UTC required')
-    match=re.fullmatch(r'(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?(?:Z|\+00:00)',text)
-    if match is None:raise ValueError('explicit node UTC required')
-    year,month,day,hour,minute,second=map(int,match.groups()[:6])
-    if second==60:raise ValueError('unsupported_node_time')
-    if hour>23 or minute>59 or second>59:raise ValueError('invalid node UTC calendar')
-    days=(date(year,month,day)-date(1970,1,1)).days
-    fraction=float('0.'+(match[7] or '0'))
-    return days*86400000+(hour*3600+minute*60+second)*1000+fraction*1000
 
 
 def prepare_node_definitions(nodes):
@@ -88,22 +76,25 @@ def _validate_rows(buffer,errors,count):
     return rows
 
 
-def propagate_nodes(prepared,instants,*,native_port=None):
-    prepared=tuple(prepared);instants=tuple(instants)
-    if not 1<=len(prepared)<=MAX_NODE_DEFINITIONS or not 1<=len(instants)<=MAX_NODE_SAMPLES or len(prepared)*len(instants)>MAX_NODE_ROWS:
+def propagate_node_grids(prepared,grids,*,native_port=None):
+    prepared=tuple(prepared);grids=tuple(tuple(grid) for grid in grids)
+    if not 1<=len(prepared)<=MAX_NODE_DEFINITIONS or len(grids)!=len(prepared) or any(not 1<=len(grid)<=MAX_NODE_SAMPLES for grid in grids) or sum(map(len,grids))>MAX_NODE_ROWS:
         raise ValueError('node batch limits exceeded')
     if any(not isinstance(p,PreparedNodeDefinition) or not isinstance(p.node_id,str) or not p.node_id.strip() or len(p.node_id)>80 or not isinstance(p.definition_hash,str) or not re.fullmatch(r'[0-9a-f]{64}',p.definition_hash) for p in prepared) or len({p.node_id for p in prepared})!=len(prepared):
         raise ValueError('unique prepared node definitions required')
+    instants=tuple(t for grid in grids for t in grid)
     if any(not isinstance(t,UtcInstant) or not math.isfinite(t.jd1) or not math.isfinite(t.jd2) for t in instants):raise ValueError('finite UTC instants required')
-    stamps=format_utc_batch(instants);times=[]
-    for stamp in stamps:
-        try:times.append(node_unix_millis(stamp))
+    # Request-local preparation deduplicates shared sample grids, never current states.
+    unique=tuple(dict.fromkeys(instants));formatted=format_utc_batch(unique)
+    by_instant=dict(zip(unique,formatted));times={}
+    for stamp in set(formatted):
+        try:times[stamp]=node_unix_millis(stamp)
         except ValueError as error:
             if str(error)!='unsupported_node_time':raise
-            times.append(None)
-    rows=np.full((len(prepared)*len(stamps),NODE_ROW_WIDTH),np.nan,dtype='<f8');errors=['unsupported_node_time']*len(rows)
+            times[stamp]=None
+    rows=np.full((len(instants),NODE_ROW_WIDTH),np.nan,dtype='<f8');errors=['unsupported_node_time']*len(rows)
     definitions=[];indices=[];native_times=[];destinations=[];node_ids=[];hashes=[];utc=[]
-    for item in prepared:
+    for item,grid in zip(prepared,grids):
         slot=len(definitions)
         if item.epoch_error is None:
             if not isinstance(item.orbit_json,str):raise ValueError('prepared node orbit required')
@@ -113,7 +104,8 @@ def propagate_nodes(prepared,instants,*,native_port=None):
                 raise ValueError('finite prepared orbital fields required')
             definitions.append(orbital)
         elif item.epoch_error!='unsupported_node_time':raise ValueError('invalid prepared epoch error')
-        for stamp,time in zip(stamps,times):
+        for instant in grid:
+            stamp=by_instant[instant];time=times[stamp]
             destination=len(node_ids);node_ids.append(item.node_id);hashes.append(item.definition_hash);utc.append(stamp)
             if item.epoch_error is None and time is not None:indices.append(slot);native_times.append(time);destinations.append(destination)
     if indices:
@@ -123,3 +115,8 @@ def propagate_nodes(prepared,instants,*,native_port=None):
         rows[destinations]=native_rows
         for destination,error in zip(destinations,native_errors):errors[destination]=error
     return NativeNodeBatch(tuple(node_ids),tuple(hashes),tuple(utc),tuple(errors),rows.tobytes())
+
+
+def propagate_nodes(prepared,instants,*,native_port=None):
+    prepared=tuple(prepared);instants=tuple(instants)
+    return propagate_node_grids(prepared,[instants]*len(prepared),native_port=native_port)

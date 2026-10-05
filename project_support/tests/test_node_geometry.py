@@ -102,3 +102,17 @@ def test_corrupt_prepared_orbital_payload_is_rejected_before_native_call():
  def calculate(*args):pytest.fail('invalid prepared orbit must not enter native')
  for payload in ['[]','{}','null','{"epoch":true,"altitude_km":550,"inclination":53,"eccentricity":0,"raan":0,"argp":0,"mean_anomaly":0}']:
   with pytest.raises(ValueError):propagate_nodes([replace(prepared,orbit_json=payload)],[instant()],native_port=port(calculate))
+
+def test_per_node_grids_preserve_order_and_use_one_native_call():
+ from communication.native.node_adapter import propagate_node_grids
+ calls=[]
+ def calculate(payload,indices,times):calls.append((indices,times));return success(payload,indices,times)
+ prepared=prepare_node_definitions([node(),node(id='N-2',catalog_number=900002)])
+ grids=[[instant('2016-12-31T23:59:59Z'),instant('2016-12-31T23:59:60Z'),instant('2017-01-01T00:00:00Z')],[instant(),instant('2026-10-04T22:01:13Z')]]
+ result=propagate_node_grids(prepared,grids,native_port=port(calculate))
+ assert result.node_ids==('N-1',)*3+('N-2',)*2
+ assert result.errors==(None,'unsupported_node_time',None,None,None)
+ assert len(calls)==1 and calls[0][0]==[0,0,1,1]
+ assert calls[0][1]==[1483228799000,1483228800000,1791151272000,1791151273000]
+ for bad in [[],[[]],[[instant()]],[[instant()]*602,[instant()]],[[instant()],['bad']]]:
+  with pytest.raises(ValueError):propagate_node_grids(prepared,bad,native_port=port(calculate))
