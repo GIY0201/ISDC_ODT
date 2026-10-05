@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 T139 위성 노드 연결 계약
+- 변경: 기존feature US20/FR030·31/SC026과 node계약/ADR0017/설계·데이터·검증가이드/T140–153 추가. Rust원본Kepler+J2/근사frame·Unix시간/31float64 ABI, 순수JS정의주입, 서버수락·T079 활성화/restoreGET만/원본120구간121점 정밀화. 제품 코드 변경 없음.
+- 검증: 기존setup-plan보존/setup-tasks/prerequisites, checklist8/8/hooks없음/constitution1.2.0; readonly범위분석 요구3/3·세부14task·기존139행보존, source본문/whitespace. validation/t139_node_design.md. 새동작시험아님; 기존471Python/355Node 증거 유지.
+- 후속착수: T140원본62순수receipt/8정적element/domain 및 입력/사본/검사 회귀를 먼저 추가. 새두suite는 미구현module로예상RED(exit1), individualassertion 아직미실행. node --check PASS. 확대된전체suite green주장없음; T140unchecked/T141port다음.
+- 남음: T140회귀→T141원본순수정의 및 T142–153/native/UI/서버T079수락/실제두해상도/Draft. T076전체/T075Terra/all50/T137인증/전체T075–84/T032/장비·RF·HIL/다운로드/AeroDT 유지. 8891서버/API/native/브라우저/병합 변경 없음.
+
 ## 2026-10-05 T138 원본 노드 실행 비교 자료
 - 변경: 원본 hash 고정/명시시계 VM capture 도구, 91golden 및 source 변경 거부·결과 단위/배치 검증5시험. 원본 배치 버튼의 서버수락 경로를 추가 확인해 T076/T079 의존성 기록. 로컬store만의 설명을 전체흐름으로 확대하지 않음. 제품 코드 변경 없음.
 - 검증: RED missingmodule→target5PASS, 실제원본두실행499478bytes/hashbaaad063… 동일. 전체Node355PASS1588.4173ms/Python471PASS8기존warnings229.27s/session62273exit0/diffcheck. validation/t138_original_nodes.md 및 t076_source_boundaries.md.
