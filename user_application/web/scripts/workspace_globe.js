@@ -5,6 +5,22 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let globe=null,latest=null,catalog=null,sceneInput=null,sceneMetadata=null,trackInput=null,onCatalogSelect=()=>{},groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
   let choice={mode:'3d',imagery:'blue_marble',theme:'dark',emphasis:true},imagery={requestedImagery:'blue_marble',displayedImagery:null,phase:'pending',error:null},mode={phase:'ready',error:null},modeRevision=0;
   const viewObservers=new Set();
+  let modelDescription=null,modelSource=null,modelRevision=0,modelStatus={phase:'unassigned'};
+  const modelObservers=new Set();
+  const modelState=()=>structuredClone({selected:modelDescription?{catalog_number:modelDescription.satelliteId,normalized_gp_sha256:modelDescription.normalized_gp_sha256}:null,match:modelDescription?.url?modelDescription:null,status:modelStatus,tracking:Boolean(globe?.modelLayer?.tracking)});
+  const notifyModel=()=>{if(!disposed)for(const fn of modelObservers)fn(modelState());};
+  function applyModel(){
+    if(!globe||disposed||!modelDescription||!modelSource)return;
+    const revision=modelRevision,description=structuredClone(modelDescription);
+    const report=value=>{
+      if(disposed||revision!==modelRevision)return;
+      if(value.satelliteId!=null&&String(value.satelliteId)!==String(description.satelliteId))return;
+      modelStatus=structuredClone(value);notifyModel();
+    };
+    try{
+      Promise.resolve(globe.setSatelliteModel(description,{...modelSource,onStatus:report})).then(()=>{if(!disposed&&revision===modelRevision)notifyModel();}).catch(error=>report({phase:'error',errorKind:'renderer',error:String(error?.message||error),satelliteId:description.satelliteId}));
+    }catch(error){report({phase:'error',errorKind:'renderer',error:String(error?.message||error),satelliteId:description.satelliteId});}
+  }
   const viewState=()=>structuredClone({choice,imagery,mode,available:Boolean(globe)&&!failed&&!disposed});
   const notifyView=()=>{if(!disposed)for(const fn of viewObservers)fn(viewState());};
   function applyView(fields){
@@ -60,12 +76,26 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       applyView(['theme','emphasis','imagery',...(choice.mode==='2d'?['mode']:[])]);
       notifyView();
       paint();
+      applyModel();
     }catch{fail();}
   }
   const timer=host.setTimeout(boot,12000);
   if(host.Cesium)boot();else host.addEventListener('load',boot,{once:true});
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
+    modelState,
+    observeModel(fn){if(disposed)return()=>{};modelObservers.add(fn);fn(modelState());return()=>modelObservers.delete(fn);},
+    setSatelliteModel(description,source){
+      if(disposed)return;
+      ++modelRevision;modelDescription=description?structuredClone(description):null;modelSource=source?{...source}:null;
+      modelStatus={phase:description?.url?'loading':'unassigned'};
+      if(!description){globe?.clearSatelliteModel();notifyModel();return;}
+      applyModel();notifyModel();
+    },
+    clearSatelliteModel(){if(disposed)return;++modelRevision;modelDescription=null;modelSource=null;modelStatus={phase:'unassigned'};globe?.clearSatelliteModel();notifyModel();},
+    focusSatelliteModel(options={}){if(disposed||!modelDescription)return false;const result=globe?.focusSatelliteModel(options)??false;notifyModel();return result;},
+    releaseSatelliteModel(){if(disposed)return;globe?.releaseSatelliteModel();notifyModel();},
+    retrySatelliteModel(){if(disposed)return Promise.resolve(null);return Promise.resolve(globe?.retrySatelliteModel()).finally(notifyModel);},
     viewState,
     observeView(fn){if(disposed)return()=>{};viewObservers.add(fn);fn(viewState());return()=>viewObservers.delete(fn);},
     changeView(patch){
@@ -98,6 +128,6 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       paint();
       if(!catalog&&!latest&&!sceneMetadata&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
     },
-    destroy(){if(disposed)return;disposed=true;viewObservers.clear();++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
+    destroy(){if(disposed)return;disposed=true;viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
   };
 }

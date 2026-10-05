@@ -48,7 +48,29 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
   }catch(e){if(dead||ticket!==generation)return;s.buffer=null;sampleBuffer=null;s.error=String(e.message||e);pause();display(null);}
   if(!dead&&ticket===generation){abort=null;s.pending=false;emit();}
  }
+ // Readonly display-model projection. Never fetch, paint, seek or create a
+ // clock: native samples and the existing leap codec remain the only sources.
+ function advanceUtc(utc,seconds){
+  if(dead||!codec||!Number.isFinite(seconds))return null;
+  try{return codec.advance(utc,seconds);}catch{return null;}
+ }
+ function sampleAt(utc){
+  if(dead||!codec||!s.selected)return null;
+  const canonical=advanceUtc(utc,0);if(!canonical||canonical!==utc)return null;
+  if(sampleBuffer&&s.buffer){
+   const row=sampleBuffer.sampleAt(utc);if(!row)return null;
+   const index=Math.floor(codec.difference(utc,s.buffer.start_utc)+1e-9),observed=s.buffer.rows[index];
+   if(observed?.status!=='valid')return null;
+   return copy({...s.selected,...row,eop_quality:observed.eop_quality,interpolated:utc!==observed.utc});
+  }
+  const row=s.display;
+  if(!row||row.utc!==utc||row.frame!=='ITRF'||row.status==='error'||row.error_code||
+   row.catalog_number!==s.selected.catalog_number||row.normalized_gp_sha256!==s.selected.normalized_gp_sha256||
+   !Array.isArray(row.position_m)||row.position_m.length!==3||!row.position_m.every(Number.isFinite))return null;
+  return copy({...row,interpolated:false});
+ }
  return{snapshot:()=>copy({...s,buffer:s.buffer?{start_utc:s.buffer.start_utc,count:s.buffer.count,status:s.buffer.status}:null}),
+  sampleAt,advanceUtc,currentUtc:()=>dead?null:s.utc||null,
   select(base,pin=null){if(dead)return;cancel();s.selected=base?copy(base):null;codec=null;let first=base;try{codec=base?createUtcCodec(base.leap_sha256):null;
    if(base&&pin){if(pin.normalized_gp_sha256!==base.normalized_gp_sha256||!Array.isArray(pin.position_m)||pin.position_m.length!==3||!pin.position_m.every(Number.isFinite))throw Error('지구 선택 GP/위치가 일치하지 않습니다.');const utc=codec.advance(pin.utc,0);first={...base,utc,position_m:copy(pin.position_m)};}
   }catch(e){s.error=e.message;first=pin?null:base;}s.utc=first?.utc??base?.epoch_utc??'';anchorUtc=s.utc;display(first);emit();},

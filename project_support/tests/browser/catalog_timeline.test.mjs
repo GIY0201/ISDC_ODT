@@ -36,3 +36,27 @@ test('rate switches preserve elapsed UTC and background failure stops replay and
  assert.equal(f.c.snapshot().utc,codec.advance(base.utc,11));f.c.rate(60);f.tick(7000);await new Promise(r=>setImmediate(r));
  assert.equal(f.requests.length,2);assert.equal(f.c.snapshot().playing,false);assert.equal(f.c.snapshot().buffer,null);assert.equal(f.shown.at(-1),null);assert.match(f.c.snapshot().error,/EOP unavailable/);f.c.destroy();
 });
+
+test('model sampling is readonly, identity pinned, copied and limited to available native times',async()=>{
+ const f=fixture();f.c.select(base);const before=f.c.snapshot(),shown=f.shown.length;
+ assert.equal(f.c.currentUtc(),base.utc);assert.deepEqual(f.c.sampleAt(base.utc).position_m,base.position_m);
+ assert.equal(f.c.sampleAt(codec.advance(base.utc,1)),null);
+ assert.equal(f.c.advanceUtc(base.utc,1),codec.advance(base.utc,1));assert.deepEqual(f.c.snapshot(),before);assert.equal(f.shown.length,shown);
+ f.c.observer(point,5);await f.c.calculate();const state=f.c.snapshot(),count=f.shown.length;
+ const utc=codec.advance(base.utc,.5),sample=f.c.sampleAt(utc);assert.equal(sample.position_m[0],7000000.5);assert.equal(sample.utc,utc);assert.equal(sample.frame,'ITRF');assert.equal(sample.catalog_number,25544);assert.equal(sample.normalized_gp_sha256,H);assert.equal(sample.interpolated,true);
+ sample.position_m[0]=0;assert.equal(f.c.sampleAt(utc).position_m[0],7000000.5);assert.equal(f.c.sampleAt(codec.advance(base.utc,601)),null);assert.equal(f.c.sampleAt('invalid'),null);assert.equal(f.c.advanceUtc(base.utc,NaN),null);
+ assert.deepEqual(f.c.snapshot(),state);assert.equal(f.shown.length,count);assert.equal(f.requests.length,1);
+ f.c.seek(utc);assert.equal(f.c.currentUtc(),utc);assert.equal(f.c.sampleAt(base.utc),null);f.c.clear();assert.equal(f.c.currentUtc(),null);assert.equal(f.c.sampleAt(base.utc),null);assert.equal(f.c.advanceUtc(base.utc,1),null);f.c.destroy();assert.equal(f.c.currentUtc(),null);
+});
+
+test('model sampler does not bridge failed rows and uses leap SI seconds without browser clock',async()=>{
+ const leap={...base,utc:'2016-12-31T23:59:59.000000000Z',epoch_utc:'2016-12-31T23:59:59.000000000Z'};
+ const f=fixture(p=>{const v=response(p);v.epoch_utc=leap.epoch_utc;v.status='partial';v.rows[1]={...v.rows[1],status:'error',error_code:'decayed',position_m:null,elevation_deg:null,range_m:null,azimuth_deg:null,visible:null};return Promise.resolve(v);});f.c.select(leap);f.c.observer(point,5);await f.c.calculate();
+ assert.equal(f.c.advanceUtc(leap.utc,1),'2016-12-31T23:59:60.000000000Z');assert.equal(f.c.sampleAt(f.c.advanceUtc(leap.utc,1)),null);assert.equal(f.c.sampleAt(f.c.advanceUtc(leap.utc,.5)),null);
+ const sample=f.c.sampleAt(f.c.advanceUtc(leap.utc,2));assert.equal(sample.utc,'2017-01-01T00:00:00.000000000Z');assert.equal(sample.interpolated,false);f.c.destroy();assert.equal(f.c.sampleAt(sample.utc),null);assert.equal(f.c.advanceUtc(leap.utc,1),null);
+});
+
+test('epoch pin sample belongs to current selection only and old GP buffer cannot survive selection',async()=>{
+ const f=fixture();f.c.select(base);f.c.observer(point,5);await f.c.calculate();const next={...base,catalog_number:123,normalized_gp_sha256:'b'.repeat(64)},utc=codec.advance(base.utc,50),pin={normalized_gp_sha256:next.normalized_gp_sha256,utc,position_m:[8e6,4,5]};
+ f.c.select(next,pin);assert.equal(f.c.sampleAt(base.utc),null);assert.equal(f.c.sampleAt(utc).catalog_number,123);assert.equal(f.c.sampleAt(utc).normalized_gp_sha256,next.normalized_gp_sha256);assert.deepEqual(f.c.sampleAt(utc).position_m,pin.position_m);pin.position_m[0]=0;assert.equal(f.c.sampleAt(utc).position_m[0],8e6);f.c.destroy();
+});
