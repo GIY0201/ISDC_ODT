@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {OrbitGlobe} from '../../../digital_twin/visualization/orbit_globe.js';
 function fixture(){const collections=[],handlers=[],viewers=[],allocations={colors:0,scales:0};
  class Collection{constructor(){this.items=[];collections.push(this);}add(v){this.items.push(v);return v;}removeAll(){this.items=[];}}
- class Handler{constructor(){handlers.push(this);}setInputAction(fn){this.pick=fn;}destroy(){this.dead=true;}}
+ class Handler{constructor(){handlers.push(this);this.actions=new Map();}setInputAction(fn,type){this.actions.set(type,fn);if(type===1)this.pick=fn;}destroy(){this.dead=true;}}
  class Viewer{constructor(){this.clock={};this.items=[];this.entities={add:v=>(this.items.push(v),v),remove:v=>this.items.splice(this.items.indexOf(v),1)};this.scene={canvas:{},globe:{},pick:()=>this.picked,requestRender(){},primitives:{add:v=>v,remove:v=>{v.removed=true;}}};this.camera={};viewers.push(this);}destroy(){this.dead=true;}}
  class Color{constructor(css,alpha=1){allocations.colors++;Object.assign(this,{css,alpha});}withAlpha(alpha){return new Color(this.css,alpha);}static fromCssColorString(css){return new Color(css);}}
  const C={Viewer,Color,Cartesian3:class{constructor(x,y,z){Object.assign(this,{x,y,z});}},Cartesian2:class{},ConstantPositionProperty:class{constructor(value){this.value=value;}},ReferenceFrame:{FIXED:'fixed'},JulianDate:{fromIso8601:v=>v},EllipsoidTerrainProvider:class{},PointPrimitiveCollection:Collection,LabelCollection:Collection,NearFarScalar:class{constructor(){allocations.scales++;}},LabelStyle:{FILL_AND_OUTLINE:1},ScreenSpaceEventHandler:Handler,ScreenSpaceEventType:{LEFT_CLICK:1}};
@@ -10,6 +10,28 @@ function fixture(){const collections=[],handlers=[],viewers=[],allocations={colo
 }
 const utc='2020-07-12T21:16:01.000416000Z';
 const scene=(n=16633)=>({frame:'ITRF',utc,scene_sha256:'a'.repeat(64),count:n,valid_count:n,error_count:0,rows:Array.from({length:n},(_,i)=>({catalog_number:i+1,name:'sat'+i,status:'valid',normalized_gp_sha256:'b'.repeat(64),epoch_utc:utc,orbit_regime:['LEO','MEO','GEO','HEO'][i%4],position_m:[7000000,i+1,0]}))});
+test('hover restores exact original size/color, changes only two points and survives theme/selection',()=>{
+ const {globe,allocations}=fixture();globe.setCatalogScene(scene());const other=globe.catalogPoints.get(9000).color;
+ globe.hoverCatalog(1);assert.equal(globe.catalogPoints.get(1).pixelSize,7);assert.equal(globe.catalogPoints.get(1).color.css,'#ffffff');
+ const count=allocations.colors;for(let i=0;i<100;i++)globe.hoverCatalog(1);assert.equal(allocations.colors,count);
+ globe.hoverCatalog(2);assert.equal(globe.catalogPoints.get(1).pixelSize,2.4);assert.equal(globe.catalogPoints.get(1).color.css,'#ff9f43');assert.equal(globe.catalogPoints.get(9000).color,other);assert.ok(allocations.colors-count<8);
+ globe.setViewStyle('light',true);assert.equal(globe.catalogPoints.get(2).color.css,'#1c2833');
+ globe.update({...scene(3).rows[0],frame:'ITRF',utc});assert.equal(globe.catalogPoints.get(2).color.alpha,1);globe.hoverCatalog(null);assert.equal(globe.catalogPoints.get(2).color.alpha,.9*.65);
+ globe.hoverCatalog(999999);assert.equal(globe.hoveredCatalog,null);globe.setCatalogScene(null);globe.destroy();assert.equal(globe.hoverCatalog(1),false);
+});
+test('mouse hover and leave use one handler, clear failed rows, and never issue selection',()=>{
+ const {globe,handlers}=fixture(),listeners=new Map(),selected=[];globe.C.ScreenSpaceEventType.MOUSE_MOVE=2;globe.container.addEventListener=(name,fn)=>listeners.set(name,fn);globe.container.removeEventListener=name=>listeners.delete(name);globe.container.style={};globe.viewer.scene.canvas.style={};
+ globe.setCatalogScene(scene(3),number=>selected.push(number));globe.viewer.picked={id:{catalogNumber:2}};handlers[0].actions.get(2)({endPosition:{}});assert.equal(globe.hoveredCatalog,2);assert.equal(globe.container.style.cursor,'pointer');assert.deepEqual(selected,[]);assert.equal(handlers.length,1);
+ listeners.get('mouseleave')();assert.equal(globe.hoveredCatalog,null);assert.equal(globe.viewer.scene.canvas.style.cursor,'');handlers[0].actions.get(2)({endPosition:{}});
+ const data=scene(3);data.rows[1]={...data.rows[1],status:'error',position_m:null};globe.setCatalogScene(data);assert.equal(globe.hoveredCatalog,null);globe.destroy();assert.equal(listeners.size,0);assert.equal(handlers[0].dead,true);
+});
+test('theme repaint preserves native positions/UTC and original palette with selection dim',()=>{
+ const {globe}=fixture(),data=scene(4);globe.setCatalogScene(data);const positions=[...globe.catalogPoints.values()].map(p=>p.position);
+ globe.setViewStyle('light',true);assert.equal(globe.catalogPoints.get(1).color.css,'#c9651a');assert.equal(globe.catalogPoints.get(2).color.css,'#8f8a12');assert.equal(globe.catalogLabels.get(1).outlineColor.css,'#ffffff');
+ globe.update({...data.rows[0],frame:'ITRF',utc});assert.equal(globe.entity.point.color.css,'#d35400');assert.equal(globe.entity.label.fillColor.css,'#d35400');assert.equal(globe.catalogPoints.get(2).color.alpha,.98*.65);
+ const current=globe.viewer.clock.currentTime;globe.setViewStyle('dark',false);assert.equal(globe.entity.point.color.css,'#efff62');assert.equal(globe.catalogPoints.get(2).color.css,'#e6ed55');assert.equal(globe.viewer.clock.currentTime,current);assert.deepEqual([...globe.catalogPoints.values()].map(p=>p.position),positions);
+ globe.update(null);assert.equal(globe.catalogPoints.get(2).color.alpha,.98);globe.destroy();
+});
 test('whole16633 point primitives use original colors/size/occlusion and one Viewer/pick handler',()=>{
  const {globe,collections,viewers,handlers}=fixture(),picked=[];const data=scene();globe.setCatalogScene(data,n=>picked.push(n));
  assert.equal(globe.catalogPoints.size,16633);assert.equal(viewers.length,1);assert.equal(handlers.length,1);

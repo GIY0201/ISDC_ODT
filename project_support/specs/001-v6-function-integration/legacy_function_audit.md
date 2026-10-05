@@ -83,3 +83,7 @@ US13: validation/t098_station_observer.md connects explicit station preset lat/l
 
 
 US14: validation/t103_catalog_time.md connects selected catalog UTC observation/local playback, native range/azimuth/elevation and station draft. C001 remains partial for original multiple-satellite/3D/sun functions. T075–T084 full goal unchanged. HTTP counts above are historical audit values; ADR0013 adds samples independently.
+
+
+## 2026-10-05 original model audit correction
+The earlier US15 statement excluding actualGLB assets was a source-review error and is superseded by catalog_view_source_audit.md:50GLB/37,202,844bytes,56manifest mappings, actual SatelliteModelLayer glTF rendering/follow and mapping-quality/thumbnail/credits. Preserve originalfunction scope, including those functions. The historical statement is retained as superseded evidence, not a design decision or an exclusion. Next specify/plan/tasks owner must cover GLBmodel lifecycle plus scene/sun/imagery/labels/camera; runtime unchanged at this audit.
