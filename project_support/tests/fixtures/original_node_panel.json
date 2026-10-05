@@ -1,0 +1,92 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_hashes": {
+    "digital_twin/simulation/browser/satellite_dynamics.js": "5580263519e45f6b3e1f7d2a5dbceae097d99d6949f8190ce8c87fe2145f6eb5",
+    "digital_twin/model_library/browser/satellite_nodes.js": "722323b356b8c0937896aff45f919300099aed789372054ec142148520eadafb",
+    "user_application/web/scripts/orbit/catalog.js": "90f98da034d2e6f8f44c35dc1c980828f177f23af6a8f435b18a9545ecbe4007",
+    "user_application/web/scripts/tabs/nodes.js": "cfd4bd6ab4e58deaf312c6de7b8e30adac462041d4a042457793cb4b5da7ab1a"
+  },
+  "epoch": 1791151272000,
+  "formations": [
+    {
+      "params": {
+        "preset": "single",
+        "planes": 1,
+        "per_plane": 1,
+        "altitude_km": 550,
+        "inclination": 53,
+        "phasing": 0,
+        "spacing_deg": 30,
+        "raan_start": 0,
+        "raan_spread": 360,
+        "anomaly_start": 0,
+        "eccentricity": 0,
+        "prefix": "ODT",
+        "bus": "comms_small",
+        "link_policy": "grid"
+      },
+      "markup": "<label class=\"ns-slider\" data-control=\"planes\" aria-disabled=\"true\" data-tip=\"Walker 배치에서 승교점 적경을 나눠 갖는 궤도면의 개수입니다. 현재 프리셋에서는 사용하지 않습니다.\">\n    <span>궤도면 수</span>\n    <input type=\"range\" min=\"1\" max=\"12\" step=\"1\" value=\"1\" aria-label=\"궤도면 수\" disabled>\n    <input type=\"number\" min=\"1\" max=\"12\" step=\"1\" value=\"1\" aria-label=\"궤도면 수 입력\" disabled>\n    <em>면</em></label><label class=\"ns-slider\" data-control=\"per_plane\" aria-disabled=\"true\" data-tip=\"한 궤도면 안에 두는 위성 수입니다. Walker는 360°를 이 수로 균등하게 나눕니다. 현재 프리셋에서는 사용하지 않습니다.\">\n    <span>면당 위성 수</span>\n    <input type=\"range\" min=\"1\" max=\"16\" step=\"1\" value=\"1\" aria-label=\"면당 위성 수\" disabled>\n    <input type=\"number\" min=\"1\" max=\"16\" step=\"1\" value=\"1\" aria-label=\"면당 위성 수 입력\" disabled>\n    <em>기</em></label><label class=\"ns-slider\" data-control=\"altitude_km\" aria-disabled=\"false\" data-tip=\"평균 고도입니다. 장반경에서 적도 반지름을 뺀 값이며 숫자 칸에는 2,000 km 이상도 입력할 수 있습니다.\">\n    <span>고도</span>\n    <input type=\"range\" min=\"200\" max=\"2000\" step=\"10\" value=\"550\" aria-label=\"고도\" >\n    <input type=\"number\" min=\"200\" max=\"60000\" step=\"10\" value=\"550\" aria-label=\"고도 입력\" >\n    <em>km</em></label><label class=\"ns-slider\" data-control=\"inclination\" aria-disabled=\"false\" data-tip=\"궤도면과 적도면 사이의 각입니다. 53°는 저궤도 통신망, 97~98°는 태양동기, 0°는 적도 궤도에 해당합니다.\">\n    <span>경사각</span>\n    <input type=\"range\" min=\"0\" max=\"120\" step=\"0.5\" value=\"53\" aria-label=\"경사각\" >\n    <input type=\"number\" min=\"0\" max=\"120\" step=\"0.5\" value=\"53\" aria-label=\"경사각 입력\" >\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"phasing\" aria-disabled=\"true\" data-tip=\"인접 궤도면 사이의 위상차를 F × 360° / 전체 위성 수로 둡니다. 0이면 모든 면의 위성이 같은 위상에 놓입니다. 현재 프리셋에서는 사용하지 않습니다.\">\n    <span>위상 계수 F</span>\n    <input type=\"range\" min=\"0\" max=\"11\" step=\"1\" value=\"0\" aria-label=\"위상 계수 F\" disabled>\n    <input type=\"number\" min=\"0\" max=\"11\" step=\"1\" value=\"0\" aria-label=\"위상 계수 F 입력\" disabled>\n    <em></em></label><label class=\"ns-slider\" data-control=\"spacing_deg\" aria-disabled=\"true\" data-tip=\"열차형에서 앞뒤 위성 사이의 평균 근점 이각 차이입니다. 550 km에서 10°는 직선 거리 약 1,200 km입니다. 현재 프리셋에서는 사용하지 않습니다.\">\n    <span>위성 간 위상 간격</span>\n    <input type=\"range\" min=\"1\" max=\"180\" step=\"1\" value=\"30\" aria-label=\"위성 간 위상 간격\" disabled>\n    <input type=\"number\" min=\"1\" max=\"180\" step=\"1\" value=\"30\" aria-label=\"위성 간 위상 간격 입력\" disabled>\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"raan_start\" aria-disabled=\"false\" data-tip=\"첫 궤도면이 적도를 북쪽으로 지나는 점의 적경입니다. 나머지 면은 분포 폭을 면 수로 나눈 간격으로 이어집니다.\">\n    <span>첫 궤도면 승교점 적경</span>\n    <input type=\"range\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 궤도면 승교점 적경\" >\n    <input type=\"number\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 궤도면 승교점 적경 입력\" >\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"raan_spread\" aria-disabled=\"true\" data-tip=\"궤도면을 펼치는 적경 범위입니다. Walker Δ는 360°, Walker ★(극궤도)는 180°로 고정됩니다. 현재 프리셋에서는 사용하지 않습니다.\">\n    <span>궤도면 분포 폭</span>\n    <input type=\"range\" min=\"30\" max=\"360\" step=\"5\" value=\"360\" aria-label=\"궤도면 분포 폭\" disabled>\n    <input type=\"number\" min=\"30\" max=\"360\" step=\"5\" value=\"360\" aria-label=\"궤도면 분포 폭 입력\" disabled>\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"anomaly_start\" aria-disabled=\"false\" data-tip=\"첫 위성의 궤도상 위상입니다. 편대 전체의 위상을 통째로 돌립니다.\">\n    <span>첫 위성 평균 근점 이각</span>\n    <input type=\"range\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 위성 평균 근점 이각\" >\n    <input type=\"number\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 위성 평균 근점 이각 입력\" >\n    <em>°</em></label>",
+      "summary": "단일 위성 · 총 1기 · LEO · 주기 95.6 min"
+    },
+    {
+      "params": {
+        "preset": "train",
+        "planes": 1,
+        "per_plane": 10,
+        "altitude_km": 550,
+        "inclination": 53,
+        "phasing": 0,
+        "spacing_deg": 30,
+        "raan_start": 0,
+        "raan_spread": 360,
+        "anomaly_start": 0,
+        "eccentricity": 0,
+        "prefix": "ODT",
+        "bus": "comms_small",
+        "link_policy": "grid"
+      },
+      "markup": "<label class=\"ns-slider\" data-control=\"planes\" aria-disabled=\"true\" data-tip=\"Walker 배치에서 승교점 적경을 나눠 갖는 궤도면의 개수입니다. 현재 프리셋에서는 사용하지 않습니다.\">\n    <span>궤도면 수</span>\n    <input type=\"range\" min=\"1\" max=\"12\" step=\"1\" value=\"1\" aria-label=\"궤도면 수\" disabled>\n    <input type=\"number\" min=\"1\" max=\"12\" step=\"1\" value=\"1\" aria-label=\"궤도면 수 입력\" disabled>\n    <em>면</em></label><label class=\"ns-slider\" data-control=\"per_plane\" aria-disabled=\"false\" data-tip=\"한 궤도면 안에 두는 위성 수입니다. Walker는 360°를 이 수로 균등하게 나눕니다.\">\n    <span>면당 위성 수</span>\n    <input type=\"range\" min=\"1\" max=\"16\" step=\"1\" value=\"10\" aria-label=\"면당 위성 수\" >\n    <input type=\"number\" min=\"1\" max=\"16\" step=\"1\" value=\"10\" aria-label=\"면당 위성 수 입력\" >\n    <em>기</em></label><label class=\"ns-slider\" data-control=\"altitude_km\" aria-disabled=\"false\" data-tip=\"평균 고도입니다. 장반경에서 적도 반지름을 뺀 값이며 숫자 칸에는 2,000 km 이상도 입력할 수 있습니다.\">\n    <span>고도</span>\n    <input type=\"range\" min=\"200\" max=\"2000\" step=\"10\" value=\"550\" aria-label=\"고도\" >\n    <input type=\"number\" min=\"200\" max=\"60000\" step=\"10\" value=\"550\" aria-label=\"고도 입력\" >\n    <em>km</em></label><label class=\"ns-slider\" data-control=\"inclination\" aria-disabled=\"false\" data-tip=\"궤도면과 적도면 사이의 각입니다. 53°는 저궤도 통신망, 97~98°는 태양동기, 0°는 적도 궤도에 해당합니다.\">\n    <span>경사각</span>\n    <input type=\"range\" min=\"0\" max=\"120\" step=\"0.5\" value=\"53\" aria-label=\"경사각\" >\n    <input type=\"number\" min=\"0\" max=\"120\" step=\"0.5\" value=\"53\" aria-label=\"경사각 입력\" >\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"phasing\" aria-disabled=\"true\" data-tip=\"인접 궤도면 사이의 위상차를 F × 360° / 전체 위성 수로 둡니다. 0이면 모든 면의 위성이 같은 위상에 놓입니다. 현재 프리셋에서는 사용하지 않습니다.\">\n    <span>위상 계수 F</span>\n    <input type=\"range\" min=\"0\" max=\"11\" step=\"1\" value=\"0\" aria-label=\"위상 계수 F\" disabled>\n    <input type=\"number\" min=\"0\" max=\"11\" step=\"1\" value=\"0\" aria-label=\"위상 계수 F 입력\" disabled>\n    <em></em></label><label class=\"ns-slider\" data-control=\"spacing_deg\" aria-disabled=\"false\" data-tip=\"열차형에서 앞뒤 위성 사이의 평균 근점 이각 차이입니다. 550 km에서 10°는 직선 거리 약 1,200 km입니다.\">\n    <span>위성 간 위상 간격</span>\n    <input type=\"range\" min=\"1\" max=\"180\" step=\"1\" value=\"30\" aria-label=\"위성 간 위상 간격\" >\n    <input type=\"number\" min=\"1\" max=\"180\" step=\"1\" value=\"30\" aria-label=\"위성 간 위상 간격 입력\" >\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"raan_start\" aria-disabled=\"false\" data-tip=\"첫 궤도면이 적도를 북쪽으로 지나는 점의 적경입니다. 나머지 면은 분포 폭을 면 수로 나눈 간격으로 이어집니다.\">\n    <span>첫 궤도면 승교점 적경</span>\n    <input type=\"range\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 궤도면 승교점 적경\" >\n    <input type=\"number\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 궤도면 승교점 적경 입력\" >\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"raan_spread\" aria-disabled=\"true\" data-tip=\"궤도면을 펼치는 적경 범위입니다. Walker Δ는 360°, Walker ★(극궤도)는 180°로 고정됩니다. 현재 프리셋에서는 사용하지 않습니다.\">\n    <span>궤도면 분포 폭</span>\n    <input type=\"range\" min=\"30\" max=\"360\" step=\"5\" value=\"360\" aria-label=\"궤도면 분포 폭\" disabled>\n    <input type=\"number\" min=\"30\" max=\"360\" step=\"5\" value=\"360\" aria-label=\"궤도면 분포 폭 입력\" disabled>\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"anomaly_start\" aria-disabled=\"false\" data-tip=\"첫 위성의 궤도상 위상입니다. 편대 전체의 위상을 통째로 돌립니다.\">\n    <span>첫 위성 평균 근점 이각</span>\n    <input type=\"range\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 위성 평균 근점 이각\" >\n    <input type=\"number\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 위성 평균 근점 이각 입력\" >\n    <em>°</em></label>",
+      "summary": "열차형 (동일 궤도면) · 총 10기 · 위성 간 위상 30.0° (직선 거리 3,586 km) · LEO · 주기 95.6 min"
+    },
+    {
+      "params": {
+        "preset": "walker_delta",
+        "planes": 4,
+        "per_plane": 10,
+        "altitude_km": 550,
+        "inclination": 53,
+        "phasing": 1,
+        "spacing_deg": 30,
+        "raan_start": 0,
+        "raan_spread": 360,
+        "anomaly_start": 0,
+        "eccentricity": 0,
+        "prefix": "ODT",
+        "bus": "comms_small",
+        "link_policy": "grid"
+      },
+      "markup": "<label class=\"ns-slider\" data-control=\"planes\" aria-disabled=\"false\" data-tip=\"Walker 배치에서 승교점 적경을 나눠 갖는 궤도면의 개수입니다.\">\n    <span>궤도면 수</span>\n    <input type=\"range\" min=\"1\" max=\"12\" step=\"1\" value=\"4\" aria-label=\"궤도면 수\" >\n    <input type=\"number\" min=\"1\" max=\"12\" step=\"1\" value=\"4\" aria-label=\"궤도면 수 입력\" >\n    <em>면</em></label><label class=\"ns-slider\" data-control=\"per_plane\" aria-disabled=\"false\" data-tip=\"한 궤도면 안에 두는 위성 수입니다. Walker는 360°를 이 수로 균등하게 나눕니다.\">\n    <span>면당 위성 수</span>\n    <input type=\"range\" min=\"1\" max=\"16\" step=\"1\" value=\"10\" aria-label=\"면당 위성 수\" >\n    <input type=\"number\" min=\"1\" max=\"16\" step=\"1\" value=\"10\" aria-label=\"면당 위성 수 입력\" >\n    <em>기</em></label><label class=\"ns-slider\" data-control=\"altitude_km\" aria-disabled=\"false\" data-tip=\"평균 고도입니다. 장반경에서 적도 반지름을 뺀 값이며 숫자 칸에는 2,000 km 이상도 입력할 수 있습니다.\">\n    <span>고도</span>\n    <input type=\"range\" min=\"200\" max=\"2000\" step=\"10\" value=\"550\" aria-label=\"고도\" >\n    <input type=\"number\" min=\"200\" max=\"60000\" step=\"10\" value=\"550\" aria-label=\"고도 입력\" >\n    <em>km</em></label><label class=\"ns-slider\" data-control=\"inclination\" aria-disabled=\"false\" data-tip=\"궤도면과 적도면 사이의 각입니다. 53°는 저궤도 통신망, 97~98°는 태양동기, 0°는 적도 궤도에 해당합니다.\">\n    <span>경사각</span>\n    <input type=\"range\" min=\"0\" max=\"120\" step=\"0.5\" value=\"53\" aria-label=\"경사각\" >\n    <input type=\"number\" min=\"0\" max=\"120\" step=\"0.5\" value=\"53\" aria-label=\"경사각 입력\" >\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"phasing\" aria-disabled=\"false\" data-tip=\"인접 궤도면 사이의 위상차를 F × 360° / 전체 위성 수로 둡니다. 0이면 모든 면의 위성이 같은 위상에 놓입니다.\">\n    <span>위상 계수 F</span>\n    <input type=\"range\" min=\"0\" max=\"11\" step=\"1\" value=\"1\" aria-label=\"위상 계수 F\" >\n    <input type=\"number\" min=\"0\" max=\"11\" step=\"1\" value=\"1\" aria-label=\"위상 계수 F 입력\" >\n    <em></em></label><label class=\"ns-slider\" data-control=\"spacing_deg\" aria-disabled=\"true\" data-tip=\"열차형에서 앞뒤 위성 사이의 평균 근점 이각 차이입니다. 550 km에서 10°는 직선 거리 약 1,200 km입니다. 현재 프리셋에서는 사용하지 않습니다.\">\n    <span>위성 간 위상 간격</span>\n    <input type=\"range\" min=\"1\" max=\"180\" step=\"1\" value=\"30\" aria-label=\"위성 간 위상 간격\" disabled>\n    <input type=\"number\" min=\"1\" max=\"180\" step=\"1\" value=\"30\" aria-label=\"위성 간 위상 간격 입력\" disabled>\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"raan_start\" aria-disabled=\"false\" data-tip=\"첫 궤도면이 적도를 북쪽으로 지나는 점의 적경입니다. 나머지 면은 분포 폭을 면 수로 나눈 간격으로 이어집니다.\">\n    <span>첫 궤도면 승교점 적경</span>\n    <input type=\"range\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 궤도면 승교점 적경\" >\n    <input type=\"number\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 궤도면 승교점 적경 입력\" >\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"raan_spread\" aria-disabled=\"false\" data-tip=\"궤도면을 펼치는 적경 범위입니다. Walker Δ는 360°, Walker ★(극궤도)는 180°로 고정됩니다.\">\n    <span>궤도면 분포 폭</span>\n    <input type=\"range\" min=\"30\" max=\"360\" step=\"5\" value=\"360\" aria-label=\"궤도면 분포 폭\" >\n    <input type=\"number\" min=\"30\" max=\"360\" step=\"5\" value=\"360\" aria-label=\"궤도면 분포 폭 입력\" >\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"anomaly_start\" aria-disabled=\"false\" data-tip=\"첫 위성의 궤도상 위상입니다. 편대 전체의 위상을 통째로 돌립니다.\">\n    <span>첫 위성 평균 근점 이각</span>\n    <input type=\"range\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 위성 평균 근점 이각\" >\n    <input type=\"number\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 위성 평균 근점 이각 입력\" >\n    <em>°</em></label>",
+      "summary": "Walker Δ · 총 40기 · 4면 × 10기 · 면 간 승교점 90.0° · 위성 간 위상 36.0° (직선 거리 4,282 km) · 면 간 위상차 9.0° · LEO · 주기 95.6 min"
+    },
+    {
+      "params": {
+        "preset": "walker_star",
+        "planes": 4,
+        "per_plane": 10,
+        "altitude_km": 550,
+        "inclination": 53,
+        "phasing": 1,
+        "spacing_deg": 30,
+        "raan_start": 0,
+        "raan_spread": 180,
+        "anomaly_start": 0,
+        "eccentricity": 0,
+        "prefix": "ODT",
+        "bus": "comms_small",
+        "link_policy": "grid"
+      },
+      "markup": "<label class=\"ns-slider\" data-control=\"planes\" aria-disabled=\"false\" data-tip=\"Walker 배치에서 승교점 적경을 나눠 갖는 궤도면의 개수입니다.\">\n    <span>궤도면 수</span>\n    <input type=\"range\" min=\"1\" max=\"12\" step=\"1\" value=\"4\" aria-label=\"궤도면 수\" >\n    <input type=\"number\" min=\"1\" max=\"12\" step=\"1\" value=\"4\" aria-label=\"궤도면 수 입력\" >\n    <em>면</em></label><label class=\"ns-slider\" data-control=\"per_plane\" aria-disabled=\"false\" data-tip=\"한 궤도면 안에 두는 위성 수입니다. Walker는 360°를 이 수로 균등하게 나눕니다.\">\n    <span>면당 위성 수</span>\n    <input type=\"range\" min=\"1\" max=\"16\" step=\"1\" value=\"10\" aria-label=\"면당 위성 수\" >\n    <input type=\"number\" min=\"1\" max=\"16\" step=\"1\" value=\"10\" aria-label=\"면당 위성 수 입력\" >\n    <em>기</em></label><label class=\"ns-slider\" data-control=\"altitude_km\" aria-disabled=\"false\" data-tip=\"평균 고도입니다. 장반경에서 적도 반지름을 뺀 값이며 숫자 칸에는 2,000 km 이상도 입력할 수 있습니다.\">\n    <span>고도</span>\n    <input type=\"range\" min=\"200\" max=\"2000\" step=\"10\" value=\"550\" aria-label=\"고도\" >\n    <input type=\"number\" min=\"200\" max=\"60000\" step=\"10\" value=\"550\" aria-label=\"고도 입력\" >\n    <em>km</em></label><label class=\"ns-slider\" data-control=\"inclination\" aria-disabled=\"false\" data-tip=\"궤도면과 적도면 사이의 각입니다. 53°는 저궤도 통신망, 97~98°는 태양동기, 0°는 적도 궤도에 해당합니다.\">\n    <span>경사각</span>\n    <input type=\"range\" min=\"0\" max=\"120\" step=\"0.5\" value=\"53\" aria-label=\"경사각\" >\n    <input type=\"number\" min=\"0\" max=\"120\" step=\"0.5\" value=\"53\" aria-label=\"경사각 입력\" >\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"phasing\" aria-disabled=\"false\" data-tip=\"인접 궤도면 사이의 위상차를 F × 360° / 전체 위성 수로 둡니다. 0이면 모든 면의 위성이 같은 위상에 놓입니다.\">\n    <span>위상 계수 F</span>\n    <input type=\"range\" min=\"0\" max=\"11\" step=\"1\" value=\"1\" aria-label=\"위상 계수 F\" >\n    <input type=\"number\" min=\"0\" max=\"11\" step=\"1\" value=\"1\" aria-label=\"위상 계수 F 입력\" >\n    <em></em></label><label class=\"ns-slider\" data-control=\"spacing_deg\" aria-disabled=\"true\" data-tip=\"열차형에서 앞뒤 위성 사이의 평균 근점 이각 차이입니다. 550 km에서 10°는 직선 거리 약 1,200 km입니다. 현재 프리셋에서는 사용하지 않습니다.\">\n    <span>위성 간 위상 간격</span>\n    <input type=\"range\" min=\"1\" max=\"180\" step=\"1\" value=\"30\" aria-label=\"위성 간 위상 간격\" disabled>\n    <input type=\"number\" min=\"1\" max=\"180\" step=\"1\" value=\"30\" aria-label=\"위성 간 위상 간격 입력\" disabled>\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"raan_start\" aria-disabled=\"false\" data-tip=\"첫 궤도면이 적도를 북쪽으로 지나는 점의 적경입니다. 나머지 면은 분포 폭을 면 수로 나눈 간격으로 이어집니다.\">\n    <span>첫 궤도면 승교점 적경</span>\n    <input type=\"range\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 궤도면 승교점 적경\" >\n    <input type=\"number\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 궤도면 승교점 적경 입력\" >\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"raan_spread\" aria-disabled=\"true\" data-tip=\"궤도면을 펼치는 적경 범위입니다. Walker Δ는 360°, Walker ★(극궤도)는 180°로 고정됩니다. 현재 프리셋에서는 사용하지 않습니다.\">\n    <span>궤도면 분포 폭</span>\n    <input type=\"range\" min=\"30\" max=\"360\" step=\"5\" value=\"180\" aria-label=\"궤도면 분포 폭\" disabled>\n    <input type=\"number\" min=\"30\" max=\"360\" step=\"5\" value=\"180\" aria-label=\"궤도면 분포 폭 입력\" disabled>\n    <em>°</em></label><label class=\"ns-slider\" data-control=\"anomaly_start\" aria-disabled=\"false\" data-tip=\"첫 위성의 궤도상 위상입니다. 편대 전체의 위상을 통째로 돌립니다.\">\n    <span>첫 위성 평균 근점 이각</span>\n    <input type=\"range\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 위성 평균 근점 이각\" >\n    <input type=\"number\" min=\"0\" max=\"360\" step=\"1\" value=\"0\" aria-label=\"첫 위성 평균 근점 이각 입력\" >\n    <em>°</em></label>",
+      "summary": "Walker ★ (극궤도) · 총 40기 · 4면 × 10기 · 면 간 승교점 45.0° · 위성 간 위상 36.0° (직선 거리 4,282 km) · 면 간 위상차 9.0° · LEO · 주기 95.6 min"
+    }
+  ]
+}

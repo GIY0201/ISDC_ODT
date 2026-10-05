@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-06 T146 원본 편대 조절 부분 이식
+- 변경: 원본4preset/전체슬라이더/단위·힌트·비활성입력·pairedfield/phasingbound, scopedroot와store/time/ID/timer주입. 120ms마지막값반영, 기존편대ID재사용/prospectiveID, 개별분리위성보존, 선택·종료시예약작업차단. 빈/비유한입력은보존하고예약취소·명시생성차단.
+- 검증: 원본4hash+정확한3함수body capture, 4preset markup/summary동일; 두21925bytecapture SHA364fc05b… 동일. missingmodule RED/safety10PASS1FAIL후target11PASS175.9561ms/전체Node411PASS1616.6545ms/전체Python543PASS8기존warnings225.10s(session69780exit0)/syntax/stageddiffcheck. validation/t146_node_formation.md.
+- 남음: T146unchecked; 선택목록/상태·모델credits/live전력·통신/actions/tooltipbubble/전체조립. N002query각도DTO(native22/24/25) 다음, N001동시창쓰기유지. T147–153/T079실제수락/전체T076/T075–84/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. fakeDOM/명시timer시험은 실제8891UI·성능증거아님; 서버/native설치/브라우저/원격PR·병합 변경없음.
+
+
 ## 2026-10-06 T146 원본 편집기 부분 이식
 - 변경: 원본 필드/장비/모드/버스/모델표시/궤도요약 편집기, library/정적요약/time 주입. 잘못된 날짜·빈 숫자·저장오류/미응답 시 편집 유지, 비동기저장 취소/늦은응답 차단, 소유listener정리/사본/복원focus:false. 사라진모델·상대는 선택값을미확인으로보존.
 - 검증: pinned원본4module hash검사, 실제5bus markup/summary 동일; 두63539bytecapture SHA3a7ad626… 동일. missingmodule RED 및 safety9PASS1FAIL 후target10PASS125.5196ms, 전체Node400PASS1482.8903ms/전체Python543PASS8기존warnings229.18s(session83298exit0)/syntax/stageddiffcheck. validation/t146_node_editor.md.
