@@ -25,7 +25,9 @@ function jsonCopy(value){
  check(value);return JSON.parse(JSON.stringify(value));
 }
 
-export async function createOriginalNodeGolden({sourceRoot}={}){
+export async function createOriginalNodeGolden({sourceRoot,stateOffsetsSeconds=[-86400,0,1,600,86400],additionalOrbits=[]}={}){
+ if(!Array.isArray(stateOffsetsSeconds)||!stateOffsetsSeconds.length||stateOffsetsSeconds.length>100||stateOffsetsSeconds.some(x=>typeof x!=='number'||!Number.isFinite(x)))throw new Error('invalid_state_offsets');
+ if(!Array.isArray(additionalOrbits)||additionalOrbits.length>20||additionalOrbits.some(x=>!x||typeof x!=='object'||Array.isArray(x)))throw new Error('invalid_additional_orbits');
  if(typeof sourceRoot!=='string'||!sourceRoot.trim())throw new Error('source_root_required');
  const raw=[];
  // Validate every byte before creating or evaluating any original module.
@@ -74,9 +76,9 @@ export async function createOriginalNodeGolden({sourceRoot}={}){
   {altitude_km:35786,eccentricity:0,inclination:0,raan:0,argp:0,mean_anomaly:0,epoch:EPOCH},
   {altitude_km:800,eccentricity:0.001,inclination:98,raan:180,argp:20,mean_anomaly:90,epoch:EPOCH},
  ];
- for(const [index,orbit] of orbitalInputs.entries()){
+ for(const [index,orbit] of [...orbitalInputs,...additionalOrbits].entries()){
   capture(`elements:${index}`,{orbit},dynamics.orbitElements(orbit));
-  for(const seconds of [-86400,0,1,600,86400]){
+  for(const seconds of stateOffsetsSeconds){
    const millis=EPOCH+seconds*1000;
    capture(`state:${index}:${seconds}`,{orbit,millis},dynamics.nodeStateAt(orbit,millis));
   }

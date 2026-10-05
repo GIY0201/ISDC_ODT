@@ -19,3 +19,8 @@ test('source root is explicit and reference access is confined to the two approv
  await assert.rejects(createOriginalNodeGolden({}), /source_root_required/);
  await assert.rejects(createOriginalNodeGolden({sourceRoot:''}), /source_root_required/);
 });
+test('additional native source captures require bounded explicit finite time grids and orbital inputs', async()=>{
+ const sourceRoot='unused';
+ for(const stateOffsetsSeconds of [[],[Infinity],Array(101).fill(0)])await assert.rejects(createOriginalNodeGolden({sourceRoot,stateOffsetsSeconds}),/invalid_state_offsets/);
+ await assert.rejects(createOriginalNodeGolden({sourceRoot,additionalOrbits:{}}),/invalid_additional_orbits/);
+});

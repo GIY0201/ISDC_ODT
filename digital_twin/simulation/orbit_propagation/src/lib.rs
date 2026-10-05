@@ -1,3 +1,4 @@
+pub mod node_dynamics;
 use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
 use pyo3::types::PyBytes;
@@ -60,9 +61,23 @@ fn propagate_omm_many(py:Python<'_>,payloads:Vec<String>,minutes:Vec<f64>)->PyRe
     let (buffer, errors) = py.detach(move || calculate_many(payloads, minutes)).map_err(PyValueError::new_err)?;
     Ok((PyBytes::new(py, &buffer).unbind(), errors))
 }
+#[pyfunction]
+fn propagate_nodes(py:Python<'_>,definitions_json:String,node_indices:Vec<usize>,unix_millis:Vec<f64>)->PyResult<(Py<PyBytes>,Vec<Option<String>>)> {
+    let (buffer,errors)=py.detach(move||node_dynamics::calculate_nodes(definitions_json,node_indices,unix_millis)).map_err(PyValueError::new_err)?;
+    Ok((PyBytes::new(py,&buffer).unbind(),errors))
+}
 #[pymodule]
 fn isdc_orbit_propagation(m:&Bound<'_,PyModule>)->PyResult<()> {
     m.add_function(wrap_pyfunction!(propagate_tle,m)?)?;m.add_function(wrap_pyfunction!(propagate_omm,m)?)?;
     m.add_function(wrap_pyfunction!(propagate_omm_many,m)?)?;
+    m.add_function(wrap_pyfunction!(propagate_nodes,m)?)?;
+    m.add("node_calculation_profile",node_dynamics::NODE_PROFILE)?;
+    m.add("node_frame",node_dynamics::NODE_FRAME)?;
+    m.add("node_inertial_frame",node_dynamics::NODE_INERTIAL_FRAME)?;
+    m.add("node_time_model",node_dynamics::NODE_TIME_MODEL)?;
+    m.add("NODE_ROW_WIDTH",node_dynamics::NODE_ROW_WIDTH)?;
+    m.add("MAX_NODE_DEFINITIONS",node_dynamics::MAX_NODE_DEFINITIONS)?;
+    m.add("MAX_NODE_ROWS",node_dynamics::MAX_NODE_ROWS)?;
+    m.add("MAX_NODE_SAMPLES",node_dynamics::MAX_NODE_SAMPLES)?;
     m.add("calculation_profile","WGS72_AFSPC")?;m.add("__version__","0.2.0")?;m.add("MAX_BATCH_ROWS",MAX_BATCH_ROWS)?;m.add("MAX_CATALOG_BATCH_ROWS",MAX_CATALOG_BATCH_ROWS)?;Ok(())
 }

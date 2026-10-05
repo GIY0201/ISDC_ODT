@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 T142 원본 노드 Rust 계산
+- 변경: 선배 Kepler+J2/GMST/WGS84/Sun/일조/LVLH 식과 additive propagate_nodes, 명시 근사 frame/time/profile, 소유31float64/오류 정렬·240/601/50000한도. 기존SGP4 식·profile·export 유지.
+- 검증: 원본20+추가42상태 허용오차 내 동일, 확장capture2회byte동일/기존91capture 보존. RED module/frame/tool 후 Rust9PASS/Node369PASS1438.2249ms/Python471PASS8기존warnings219.57s(session66925exit0)/diffcheck. validation/t142_node_native_source.md. rustfmt component없음/format성공 주장없음.
+- 남음: T143 Python/HTTP 및 T144 versionedwheel 격리설치 후 T145–153/UI/store/scene/실제T079수락/리뷰. 새wheel미설치/서버8891/API/화면유지. T076/전체T075–84/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지.
+
+
 ## 2026-10-05 T140–T141 노드 순수 정의 이식
 - 변경: 선배 노드/버스/장비/모드/편대/전력 함수와 정적 궤도 요소 도메인 이식. epoch/ID/요약 주입, 원본 정상값 보존; 유한성/깊은 사본/상속 enum/날짜/메타데이터/손상 복원 검사 개선.
 - 검증: 원본62순수/8정적 결과 동일, fixture hash 보존. 초기 missingmodule 및 실제 RED2/3/1 후 최종 Node368PASS1402.9604ms/Python471PASS8기존warnings227.61s(session27519exit0)/syntax/diffcheck. validation/t141_node_library.md.
