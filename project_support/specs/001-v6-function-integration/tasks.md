@@ -195,3 +195,14 @@ Dependency T095→96→97→98. T075 remains partial for catalog live geometry/p
 - [x] T102 [US14] Connect selected catalog observer/display time to shared globe and existing station selection in workspace_orbit/workspace_globe; preserve stored/SIM/Viewer and render errors.
 - [x] T103 [US14] Full Python/Node and actual8891twores/epoch equality/replay/observer/errors/restore/readonly; validation/t103_catalog_time.md, audit/ledger/log and Draft PR27base.
 Dependency T099→100→101→102→103. T075 remains open until remaining original multi/3D/sun also connected. Goal T075–T084 unchanged.
+
+
+## US15 whole-group precise display (T075)
+- [x] T104 [US15] Add RED many-orbit Rust/export/adapter and full-scene tests in digital_twin/simulation/orbit_propagation/tests/catalog.rs, project_support/tests/test_catalog_scene.py and browser/catalog_scene.test.mjs; scalarofficial33/668/full16633/alignment/hash/readonly.
+- [x] T105 [US15] Implement propagate_omm_many with aligned finite offsets and max50000 percall/rowfailure in digital_twin/simulation/orbit_propagation/src/lib.rs, retain oldexports and build+cleaninstall product0.2.0 via project_support/tooling/build_orbit_wheel.ps1.
+- [x] T106 [US15] Add immutable preparedcatalog/epochhash cache, many-orbit adapter and sharedUTC/EOP transform in user_application/catalog_geometry.py, communication/native/orbit_adapter.py and digital_twin/simulation/orbit_geometry.py; wholegroup limit0/chunk50000/no truncation. Evidence: validation/t107_catalog_scene_api.md.
+- [x] T107 [US15] Add strict sceneHTTP/API contract in communication/http/catalog_geometry.py and communication/browser/api.js, ADR0014/profile/hash/errors/units/source/failurecounts/readonly. Evidence: validation/t107_catalog_scene_api.md.
+- [x] T108 [US15] Add full scene controller/panel and sharedselection handoff in user_application/web/scripts/catalog_scene.js, tabs/catalog_workspace.js and workspace_orbit.js; latestUTCcoalescing/late/context/clear/ownedcopies/wholecounts.
+- [x] T109 [US15] Connect original pointprimitive/color/size/pick/label semantics to singleviewer in digital_twin/visualization/orbit_globe.js and user_application/web/scripts/workspace_globe.js; selectedGPpin/ownUTC/no16kframecopy.
+- [ ] T110 [US15] Run full Python/Node/native/wheel and actual8891twores/fullactive16633/readonly/filter/pick/restore/error; record cold/warm/HTTP/render in validation/t110_catalog_scene.md, ledger/audit/log and DraftPR28base.
+Dependency: T104 native RED→T105; T104 backend RED→T106→T107; T104 browser RED→T108→T109→T110. T104 aggregate RED categories complete; evidence validation/t109_catalog_scene_ui.md. WholeT075 remains open for selectedtrack/pass/sun/modes/imagery/representativeSVG, wholeT075–T084 unchanged.

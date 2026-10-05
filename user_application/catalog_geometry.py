@@ -1,19 +1,111 @@
 """Readonly catalog/native/precise-frame query assembly; no runtime ownership."""
-import hashlib,json,math
+import hashlib,json,math,re
+from collections import OrderedDict
+from dataclasses import dataclass
+from threading import Lock
 import numpy as np
 from astropy.time import TimeDelta
 from data.orbit_inputs import load_orbit_input_bytes
 from digital_twin.contracts.orbit import GroundPoint,OrbitUnavailable
 from digital_twin.contracts.catalog_geometry import CatalogGpChanged
-from digital_twin.simulation.orbit_geometry import observation_geometry
+from digital_twin.simulation.orbit_geometry import observation_geometry,teme_positions_at_utc
+from communication.native.orbit_adapter import prepare_catalog_orbits,propagate_catalog
 from foundation.orbit_time import parse_utc,parse_utc_batch,format_utc_times
+
+
+@dataclass(frozen=True)
+class PreparedSceneRow:
+    catalog_number: int
+    name: str
+    orbit_regime: str
+    normalized_gp_sha256: str
+    epoch_utc: str|None
+    error_code: str|None
+
+
+@dataclass(frozen=True)
+class PreparedScene:
+    rows: tuple[PreparedSceneRow,...]
+    valid_indices: tuple[int,...]
+    native_inputs: tuple
 
 class CatalogGeometryQuery:
     def __init__(self,catalog,eop,calculate,execute):
         self.catalog=catalog;self.eop=eop;self.calculate=calculate;self.execute=execute
+        # GP preparation only: no propagated/current runtime states are cached.
+        self._scene_prepared=OrderedDict();self._scene_lock=Lock()
+
+    async def scene(self,group,query,orbit,utc,client_request_id,expected_scene_sha256=None):
+        if group not in {g['id'] for g in self.catalog.catalog_groups()}:raise ValueError('unknown catalog group')
+        if not isinstance(query,str) or len(query)>100:raise ValueError('catalog query outside limits')
+        if orbit not in ('all','LEO','MEO','GEO','HEO'):raise ValueError('unknown orbit filter')
+        if not isinstance(client_request_id,str) or not client_request_id.strip() or len(client_request_id)>128:raise ValueError('invalid request id')
+        if expected_scene_sha256 is not None and (not isinstance(expected_scene_sha256,str) or not re.fullmatch('[a-f0-9]{64}',expected_scene_sha256)):
+            raise ValueError('invalid scene hash')
+        instant=parse_utc(utc)
+        values=await self.catalog.get_satellites(group=group,limit=0,query=query,orbit=orbit)
+        if values.get('source') not in ('celestrak-live','celestrak-cache','celestrak-stale'):
+            raise OrbitUnavailable('current catalog GP unavailable; demo is not propagated')
+        def compute():
+            items=values['items']
+            if values.get('truncated') or values.get('filtered_total',len(items))!=len(items):
+                raise ValueError('incomplete catalog snapshot')
+            numbers=[item.get('NORAD_CAT_ID') for item in items]
+            if any(type(number) is not int or not 1<=number<=999999999 for number in numbers):raise ValueError('invalid catalog identity')
+            if len(set(numbers))!=len(numbers):raise ValueError('duplicate catalog identities')
+            # Same normalized serialization as selected position/samples hashes.
+            # Invalid nonfinite GP still gets an identity/hash and a masked error.
+            raw=[json.dumps(item,sort_keys=True).encode() for item in items]
+            hashes=[hashlib.sha256(payload).hexdigest() for payload in raw]
+            digest=hashlib.sha256(json.dumps([group,query,orbit,hashes],ensure_ascii=True).encode()).hexdigest()
+            if expected_scene_sha256 is not None and digest!=expected_scene_sha256:
+                raise CatalogGpChanged('catalog scene GP changed; reload before calculating')
+            quality=self.eop.quality(instant);point=self.eop.at(instant)
+            with self._scene_lock:
+                prepared=self._scene_prepared.get(digest)
+                if prepared is None:
+                    rows=[];indices=[];native_inputs=[]
+                    for index,(item,payload,gp_hash) in enumerate(zip(items,raw,hashes)):
+                        epoch=None;error=None
+                        try:
+                            if item.get('demo'):raise ValueError('demo is not propagated')
+                            parsed=load_orbit_input_bytes(payload,format='OMM',source=values['source'],
+                                fetched_utc=values['fetched_at'],expected_sha256=gp_hash)
+                            native_inputs.extend(prepare_catalog_orbits((parsed,)))
+                            indices.append(index);epoch=parsed.epoch_utc
+                        except ValueError:error='invalid catalog GP'
+                        rows.append(PreparedSceneRow(numbers[index],str(item.get('OBJECT_NAME','')),
+                            str(item.get('ORBIT_REGIME','')),gp_hash,epoch,error))
+                    prepared=PreparedScene(tuple(rows),tuple(indices),tuple(native_inputs))
+                    self._scene_prepared[digest]=prepared
+                self._scene_prepared.move_to_end(digest)
+                while len(self._scene_prepared)>2:self._scene_prepared.popitem(last=False)
+            batch=propagate_catalog(prepared.native_inputs,instant)
+            expected_ids=tuple(row.input_id for row in prepared.native_inputs)
+            if batch.input_ids!=expected_ids or len(batch.errors)!=len(expected_ids) or batch.frame!='TEME' or batch.profile!='WGS72_AFSPC' or batch.utc!=instant.iso_utc:
+                raise ValueError('catalog native identity or provenance mismatch')
+            valid,teme=batch.valid_rows()
+            positions=teme_positions_at_utc(teme[:,:3],instant,point)
+            transformed={prepared.valid_indices[i]:list(map(float,p)) for i,p in zip(valid,positions)}
+            failures={prepared.valid_indices[i]:error for i,error in enumerate(batch.errors) if error is not None}
+            rows=[]
+            for index,row in enumerate(prepared.rows):
+                error=row.error_code or failures.get(index)
+                rows.append(dict(catalog_number=row.catalog_number,name=row.name,orbit_regime=row.orbit_regime,
+                    normalized_gp_sha256=row.normalized_gp_sha256,epoch_utc=row.epoch_utc,
+                    status='error' if error else 'valid',error_code=error,position_m=transformed.get(index)))
+            failed=sum(row['status']=='error' for row in rows);count=len(rows)
+            return dict(version=1,status='error' if count and failed==count else 'partial' if failed else 'valid',
+                client_request_id=client_request_id,group=group,query=query,orbit=orbit,utc=instant.iso_utc,
+                scene_sha256=digest,source=values['source'],fetched_at=values['fetched_at'],warning=values.get('warning',''),
+                stale=bool(values.get('stale',False)),count=count,valid_count=count-failed,error_count=failed,
+                frame='ITRF',profile=batch.profile,eop_kind='IERS_A',eop_quality=quality,
+                eop_sha256=point.snapshot_sha256,leap_sha256=point.leap_sha256,
+                units={'position':'m','time':'UTC'},rows=rows)
+        return await self.execute(compute)
     async def _input(self,group,catalog_number):
         if group not in {g['id'] for g in self.catalog.catalog_groups()}:raise ValueError('unknown catalog group')
-        values=await self.catalog.get_satellites(group=group,limit=100,query=str(catalog_number))
+        values=await self.catalog.get_satellites(group=group,limit=0,query=str(catalog_number))
         if values.get('source') not in ('celestrak-live','celestrak-cache','celestrak-stale'):raise ValueError('current catalog GP unavailable; demo is not propagated')
         item=next((x for x in values['items'] if x.get('NORAD_CAT_ID')==catalog_number),None)
         if not item or item.get('demo'):raise ValueError('catalog GP not found')

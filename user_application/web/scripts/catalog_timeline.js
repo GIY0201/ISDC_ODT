@@ -49,7 +49,9 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
   if(!dead&&ticket===generation){abort=null;s.pending=false;emit();}
  }
  return{snapshot:()=>copy({...s,buffer:s.buffer?{start_utc:s.buffer.start_utc,count:s.buffer.count,status:s.buffer.status}:null}),
-  select(base){if(dead)return;cancel();s.selected=base?copy(base):null;codec=null;try{codec=base?createUtcCodec(base.leap_sha256):null;}catch(e){s.error=e.message;}s.utc=base?.epoch_utc??'';anchorUtc=s.utc;display(base);emit();},
+  select(base,pin=null){if(dead)return;cancel();s.selected=base?copy(base):null;codec=null;let first=base;try{codec=base?createUtcCodec(base.leap_sha256):null;
+   if(base&&pin){if(pin.normalized_gp_sha256!==base.normalized_gp_sha256||!Array.isArray(pin.position_m)||pin.position_m.length!==3||!pin.position_m.every(Number.isFinite))throw Error('지구 선택 GP/위치가 일치하지 않습니다.');const utc=codec.advance(pin.utc,0);first={...base,utc,position_m:copy(pin.position_m)};}
+  }catch(e){s.error=e.message;first=pin?null:base;}s.utc=first?.utc??base?.epoch_utc??'';anchorUtc=s.utc;display(first);emit();},
   observer(point,minimum){if(dead)return false;if(!point||!['latitude_deg','longitude_deg','ellipsoid_height_m'].every(k=>Number.isFinite(point[k]))||Math.abs(point.latitude_deg)>90||Math.abs(point.longitude_deg)>180||point.virtual!==true||point.ellipsoid!=='WGS84'||!Number.isFinite(minimum)||minimum<0||minimum>90)return false;s.observer=copy(point);s.minimumElevation=minimum;reset();return true;},
   seek(utc){if(dead||!codec)return;const canonical=codec.advance(utc,0);cancel();s.utc=canonical;anchorUtc=canonical;display(null);emit();},
   calculate(){return query(s.utc);},

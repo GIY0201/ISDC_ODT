@@ -1,4 +1,6 @@
 import {createCatalogTimePanel} from '../../../user_application/web/scripts/tabs/catalog_time.js';
+import {createCatalogScene} from '../../../user_application/web/scripts/catalog_scene.js';
+import {createCatalogScenePanel} from '../../../user_application/web/scripts/tabs/catalog_scene.js';
 import {createCatalogTimeline} from '../../../user_application/web/scripts/catalog_timeline.js';
 import {GROUND_STATIONS,stationGroups} from '../../../digital_twin/model_library/browser/ground_station_sites.js';
 import {createStationPanel} from '../../../user_application/web/scripts/tabs/station_workspace.js';
@@ -29,7 +31,7 @@ const globeSource=(await readFile(new URL('workspace_globe.js',web),'utf8')).rep
 const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(globeSource).toString('base64')}`);
 
 export function fixture(width=1280,height=720,options={}){
-  const elements=new Map(),jobs=[],timers=new Set(),frames=new Set(),viewers=[],channels=[],streams=[],charts=[];
+  const elements=new Map(),jobs=[],timers=new Set(),frames=new Set(),viewers=[],channels=[],streams=[],charts=[],pickHandlers=[];
   let context,active=null,nextId=0,commands=0,queries=0,clientDestroyed=0;
   class Element {
     constructor(id='',tag='div'){this.id=id;this.tag=tag;this.style={};this.dataset={};this.attributes={};this.listeners=new Map();this.children=[];this.hidden=false;this.isConnected=true;this._value='';this._html='';this.textContent='';this.scrollTop=0;this.capture=null;const classes=new Set();this.classList={contains:v=>classes.has(v),add:v=>classes.add(v),remove:v=>classes.delete(v)};}
@@ -65,9 +67,13 @@ export function fixture(width=1280,height=720,options={}){
   get('screen').tag='main';get('shelf-restore').hidden=true;
   const win=new Element('window');
   class Channel extends Element {constructor(name){super();this.name=name;channels.push(this);}postMessage(value){this.messages??=[];this.messages.push(structuredClone(value));options.channelSend?.(this,value);}close(){this.closed=true;}}
-  class Viewer {constructor(){this.items=[];this.clock={};this.scene={globe:{},requestRender(){},renderError:{addEventListener:()=>()=>{this.errorRemoved=true;}}};this.camera={flyTo:x=>{this.flight=x;},viewBoundingSphere(){},lookAtTransform(){}};this.entities={add:e=>(this.items.push(e),e),remove:e=>{const i=this.items.indexOf(e);if(i>=0)this.items.splice(i,1);},removeAll:()=>this.items.splice(0)};this.imageryLayers={addImageryProvider(){}};viewers.push(this);}destroy(){this.destroyCount=(this.destroyCount||0)+1;}}
+  class Viewer {constructor(){this.items=[];this.primitives=[];this.clock={};this.scene={globe:{},primitives:{add:e=>(this.primitives.push(e),e),remove:e=>this.primitives.splice(this.primitives.indexOf(e),1)},requestRender(){},renderError:{addEventListener:()=>()=>{this.errorRemoved=true;}}};this.camera={flyTo:x=>{this.flight=x;},viewBoundingSphere(){},lookAtTransform(){}};this.entities={add:e=>(this.items.push(e),e),remove:e=>{const i=this.items.indexOf(e);if(i>=0)this.items.splice(i,1);},removeAll:()=>this.items.splice(0)};this.imageryLayers={addImageryProvider(){}};viewers.push(this);}destroy(){this.destroyCount=(this.destroyCount||0)+1;}}
+  class PrimitiveCollection {constructor(){this.items=[];}add(v){this.items.push(v);return v;}}
   class Cartesian3 {constructor(x,y,z){Object.assign(this,{x,y,z});}static fromDegrees(lon,lat,h){return new Cartesian3(lon,lat,h);}}
   const Cesium={Viewer,Cartesian3,Color:{CYAN:'cyan',WHITE:'white',fromCssColorString:v=>v},JulianDate:{fromIso8601:v=>v},ReferenceFrame:{FIXED:'fixed'},ConstantPositionProperty:class{constructor(value){this.value=value;}},BoundingSphere:class{},HeadingPitchRange:class{},Matrix4:{IDENTITY:{}},EllipsoidTerrainProvider:class{},SingleTileImageryProvider:{fromUrl:()=>new Promise(()=>{})}};
+  Cesium.PointPrimitiveCollection=PrimitiveCollection;Cesium.LabelCollection=PrimitiveCollection;Cesium.NearFarScalar=class{};Cesium.Cartesian2=class{};Cesium.LabelStyle={FILL_AND_OUTLINE:1};Cesium.Color.TRANSPARENT='transparent';
+  Cesium.ScreenSpaceEventType={LEFT_CLICK:1};Cesium.ScreenSpaceEventHandler=class{constructor(){pickHandlers.push(this);}setInputAction(fn){this.click=fn;}destroy(){this.dead=true;}};
+  const originalColor=Cesium.Color.fromCssColorString;Cesium.Color.fromCssColorString=v=>Object.assign(new String(originalColor(v)),{withAlpha:alpha=>({css:v,alpha})});
   const state={revision:4,input_id:'tle',input_hash:'hash',current_utc:'2020-07-12T21:16:01.000416000Z',ground_point:{latitude_deg:33.4996,longitude_deg:126.5312,ellipsoid_height_m:0,virtual:true,ellipsoid:'WGS84'},minimum_elevation_deg:10,playing:false,play_rate:1,leap_sha256:LEAP_SHA256,eop_sha256:'eop',frame:'ITRF',profile:'WGS72_AFSPC'};
   const snapshot={inputs:[{input_id:'tle',satellite_id:'25544',format:'TLE',epoch_utc:state.current_utc,raw_sha256:'hash'}],state,result:{client_request_id:'buffer',revision:4,input_id:'tle',input_hash:'hash',frame:'ITRF',rows:[{utc:state.current_utc,status:'valid',position_m:[1,2,3],elevation_deg:10}]},status:'ready',error:'',receivedAtMs:0};
   const client={destroy:()=>{clientDestroyed++;},snapshot:()=>structuredClone(snapshot),load:()=>jobs.push(()=>context.render()),samples:async()=>{queries++;},setGround:async(point,angle)=>{commands++;if(options.setGround)await options.setGround(point,angle);Object.assign(state,{ground_point:structuredClone(point),minimum_elevation_deg:angle,playing:false,revision:state.revision+1});snapshot.result=null;context.render();},refresh:async()=>{}};
@@ -76,7 +82,7 @@ export function fixture(width=1280,height=720,options={}){
   api.bootstrap=options.planningBootstrap??(async()=>{throw Error("Planning transport not supplied");});
   for(const key of ['runtimeControl','runtimeSpeed','selectScenario','injectFault','missionAction','missionTask','validateMission','replanMission'])api[key]=options[key];
   api.route=options.planningRoute;api.contacts=options.planningContacts;
-  api.catalogSamples=options.catalogSamples;api.catalogPosition=options.catalogPosition;api.satelliteGroups=options.satelliteGroups;api.satellites=options.satellites;api.satelliteProfile=options.satelliteProfile;
+  api.catalogScene=options.catalogScene;api.catalogSamples=options.catalogSamples;api.catalogPosition=options.catalogPosition;api.satelliteGroups=options.satelliteGroups;api.satellites=options.satellites;api.satelliteProfile=options.satelliteProfile;
   api.report=options.report;for(const key of ['deviceAction','hilPreflight','hilSequence','recording'])api[key]=options[key];
   api.orbitRadio=options.radioRequest;
   api.orbitRadioSeries=options.seriesRequest;
@@ -85,10 +91,11 @@ export function fixture(width=1280,height=720,options={}){
   const schedule=set=>()=>{const id=++nextId;set.add(id);return id;};
   Object.assign(win,{Cesium,setTimeout:()=>++nextId,clearTimeout(){},BroadcastChannel:Channel,opener:options.opener??null,open:options.open??(()=>null),close:()=>{win.closed=true;}});
   context=vm.createContext({document:doc,window:win,innerWidth:width,innerHeight:height,location:{hash:options.hash??'#ground',search:options.popout?'?popout=1':'',origin:'http://localhost',href:'http://localhost/#ground'},URL,URLSearchParams,structuredClone,performance:{now:()=>0},crypto:{randomUUID:()=>String(++nextId)},queueMicrotask:fn=>jobs.push(fn),api,drawMultiLine:(canvas,series)=>charts.push(structuredClone(series)),drawSparkline:(canvas,series)=>charts.push(structuredClone(series)),GROUND_STATIONS,stationGroups,createStationPanel,createCatalogTimePanel,createCatalogTimeline:(api,display,notify)=>createCatalogTimeline(api,display,notify,{now:()=>0,requestFrame:schedule(frames),cancelFrame:id=>frames.delete(id),requestId:()=>String(++nextId)}),hilTopology,createHilPanel,createCatalogPanel,createCatalogGeometry,createKpiPanel,telemetrySocket:(message,status)=>{const stream={message,status,closed:0};streams.push(stream);return()=>stream.closed++;},createSimPanel,createMissionPanel,createRadioSeriesPanel,createGroundPanel,createRfPanel,createCommunicationPlanningPanel,createOrbitRadioPanel,createWorkspaceRevisionSync:c=>createWorkspaceRevisionSync(c,win),createOrbitSelection:()=>client,createWorkspaceGlobe:(container,status,button)=>createWorkspaceGlobe(container,status,button,win),createWorkspacePlayback:(c,show)=>createWorkspacePlayback(c,show,{now:()=>0,requestFrame:schedule(frames),cancelFrame:id=>frames.delete(id),setTimer:schedule(timers),clearTimer:id=>timers.delete(id)}),BroadcastChannel:Channel});
+  Object.assign(context,{createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
   // Imported ground UI uses the same adapted document as the VM assembly.
   globalThis.document=doc;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}
   const resize=async(w,h)=>{context.innerWidth=w;context.innerHeight=h;await win.dispatch('resize');};
-  return {get,win,doc,context,resize,viewers,channels,streams,charts,timers,frames,snapshot:()=>structuredClone(snapshot),counts:()=>({commands,queries,clientDestroyed}),flush,dispose(){delete globalThis.document;}};
+  return {get,win,doc,context,resize,viewers,channels,streams,charts,timers,frames,pickCatalog(number){viewers[0].scene.pick=()=>({id:{catalogNumber:number}});pickHandlers[0].click({position:{}});},evaluate:source=>vm.runInContext(source,context),snapshot:()=>structuredClone(snapshot),counts:()=>({commands,queries,clientDestroyed}),flush,dispose(){delete globalThis.document;}};
 }

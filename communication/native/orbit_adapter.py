@@ -26,6 +26,71 @@ class NativeOrbitBatch:
         values=np.frombuffer(values.tobytes(),dtype='<f8').reshape(-1,6)
         return indices,values
 
+
+@dataclass(frozen=True)
+class PreparedCatalogOrbit:
+    """Immutable GP and epoch preparation, independent of observation UTC."""
+    input_id: str
+    payload: str
+    epoch: UtcInstant
+
+
+@dataclass(frozen=True)
+class NativeCatalogBatch:
+    input_ids: tuple[str,...]
+    utc: str
+    errors: tuple[str|None,...]
+    _buffer: bytes
+    frame: str='TEME'
+    profile: str='WGS72_AFSPC'
+
+    def row(self,index):
+        if self.errors[index] is not None:return None
+        return tuple(np.frombuffer(self._buffer,dtype='<f8').reshape(-1,6)[index])
+
+    def valid_rows(self):
+        indices=tuple(i for i,error in enumerate(self.errors) if error is None)
+        rows=np.frombuffer(self._buffer,dtype='<f8').reshape(-1,6)[list(indices)]
+        return indices,np.frombuffer(rows.tobytes(),dtype='<f8').reshape(-1,6)
+
+
+def _omm_payload(orbit):
+    payload=dict(orbit.elements)
+    payload.update(NORAD_CAT_ID=orbit.satellite_id,EPOCH=orbit.epoch_utc.removesuffix('Z'),CLASSIFICATION_TYPE='U',ELEMENT_SET_NO=0,REV_AT_EPOCH=0,EPHEMERIS_TYPE=0)
+    return json.dumps(payload,allow_nan=False)
+
+
+def prepare_catalog_orbits(orbits):
+    prepared=[]
+    for orbit in orbits:
+        if not isinstance(orbit,OrbitInput) or orbit.format!='OMM' or orbit.profile!=native.calculation_profile or orbit.frame!='TEME' or orbit.time_system!='UTC':
+            raise ValueError('supported catalog OMM inputs required')
+        prepared.append(PreparedCatalogOrbit(orbit.input_id,_omm_payload(orbit),parse_utc(orbit.epoch_utc)))
+    return tuple(prepared)
+
+
+def propagate_catalog(prepared,instant:UtcInstant)->NativeCatalogBatch:
+    """Observe every prepared GP at one UTC; native limits never truncate it."""
+    prepared=tuple(prepared)
+    if not isinstance(instant,UtcInstant) or not math.isfinite(instant.jd1) or not math.isfinite(instant.jd2):
+        raise ValueError('finite UTC instant required')
+    if any(not isinstance(row,PreparedCatalogOrbit) or not isinstance(row.epoch,UtcInstant) or
+           not math.isfinite(row.epoch.jd1) or not math.isfinite(row.epoch.jd2) for row in prepared):
+        raise ValueError('prepared catalog inputs required')
+    buffers=[];errors=[]
+    for start in range(0,len(prepared),native.MAX_CATALOG_BATCH_ROWS):
+        chunk=prepared[start:start+native.MAX_CATALOG_BATCH_ROWS]
+        buffer,failed=native.propagate_omm_many([row.payload for row in chunk],
+            [minutes_since_epoch(instant,row.epoch) for row in chunk])
+        if not isinstance(buffer,bytes) or len(buffer)!=len(chunk)*48 or len(failed)!=len(chunk) or any(
+            error is not None and (not isinstance(error,str) or not error) for error in failed):
+            raise RuntimeError('invalid native catalog batch shape or errors')
+        rows=np.frombuffer(buffer,dtype='<f8').reshape(-1,6)
+        valid=np.array([error is None for error in failed],dtype=bool)
+        if not np.isfinite(rows[valid]).all():raise RuntimeError('nonfinite native catalog success')
+        buffers.append(buffer);errors.extend(failed)
+    return NativeCatalogBatch(tuple(row.input_id for row in prepared),instant.iso_utc,tuple(errors),b''.join(buffers))
+
 def propagate(orbit:OrbitInput,utc)->NativeOrbitBatch:
     if orbit.profile!=native.calculation_profile or orbit.frame!='TEME' or orbit.time_system!='UTC':raise ValueError('unsupported native profile')
     if isinstance(utc,(str,bytes)):raise ValueError('one-dimensional UTC sequence required')
@@ -63,9 +128,7 @@ def _propagate_minutes(orbit,minutes):
     if orbit.format=='TLE' and orbit.tle is not None:
         buffer,errors=native.propagate_tle(*orbit.tle,minutes)
     elif orbit.format=='OMM':
-        payload=dict(orbit.elements)
-        payload.update(NORAD_CAT_ID=orbit.satellite_id,EPOCH=orbit.epoch_utc.removesuffix('Z'),CLASSIFICATION_TYPE='U',ELEMENT_SET_NO=0,REV_AT_EPOCH=0,EPHEMERIS_TYPE=0)
-        buffer,errors=native.propagate_omm(json.dumps(payload,allow_nan=False),minutes)
+        buffer,errors=native.propagate_omm(_omm_payload(orbit),minutes)
     else:raise ValueError('unsupported orbit format')
     if len(buffer)!=len(minutes)*48 or len(errors)!=len(minutes):raise RuntimeError('invalid native batch shape')
     rows=np.frombuffer(buffer,dtype='<f8').reshape(-1,6)

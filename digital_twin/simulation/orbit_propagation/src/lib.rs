@@ -2,6 +2,7 @@ use pyo3::prelude::*;
 use pyo3::exceptions::PyValueError;
 use pyo3::types::PyBytes;
 pub const MAX_BATCH_ROWS: usize = 86401;
+pub const MAX_CATALOG_BATCH_ROWS: usize = 50_000;
 pub fn calculate(elements: sgp4::Elements, minutes: Vec<f64>) -> Result<(Vec<u8>,Vec<Option<String>>),String> {
     if minutes.len()>MAX_BATCH_ROWS || minutes.iter().any(|t| !t.is_finite()) {return Err("finite minutes and at most 86401 rows required".into());}
     let constants=sgp4::Constants::from_elements_afspc_compatibility_mode(&elements).map_err(|e|e.to_string())?;
@@ -19,6 +20,27 @@ pub fn calculate(elements: sgp4::Elements, minutes: Vec<f64>) -> Result<(Vec<u8>
     }
     Ok((buffer,errors))
 }
+pub fn calculate_many(payloads: Vec<String>, minutes: Vec<f64>) -> Result<(Vec<u8>, Vec<Option<String>>), String> {
+    if payloads.len() != minutes.len() || payloads.len() > MAX_CATALOG_BATCH_ROWS || minutes.iter().any(|t| !t.is_finite()) {
+        return Err("aligned payloads and finite minutes; at most 50000 catalog rows required".into());
+    }
+    let mut buffer = Vec::with_capacity(payloads.len()*48);
+    let mut errors = Vec::with_capacity(payloads.len());
+    for (payload, minute) in payloads.into_iter().zip(minutes) {
+        let output = match serde_json::from_str::<sgp4::Elements>(&payload) {
+            Ok(elements) => calculate(elements, vec![minute]).map_err(|_| "invalid SGP4 elements"),
+            Err(_) => Err("invalid OMM"),
+        };
+        match output {
+            Ok((row, row_errors)) => { buffer.extend(row); errors.extend(row_errors); }
+            Err(code) => {
+                for _ in 0..6 { buffer.extend_from_slice(&f64::NAN.to_le_bytes()); }
+                errors.push(Some(code.to_string()));
+            }
+        }
+    }
+    Ok((buffer, errors))
+}
 fn run(py:Python<'_>, elements:sgp4::Elements, minutes:Vec<f64>)->PyResult<(Py<PyBytes>,Vec<Option<String>>)> {
     let (buffer,errors)=py.detach(move||calculate(elements,minutes)).map_err(PyValueError::new_err)?;
     Ok((PyBytes::new(py,&buffer).unbind(),errors))
@@ -33,8 +55,14 @@ fn propagate_omm(py:Python<'_>,payload:String,minutes:Vec<f64>)->PyResult<(Py<Py
     let elements:sgp4::Elements=serde_json::from_str(&payload).map_err(|e|PyValueError::new_err(e.to_string()))?;
     run(py,elements,minutes)
 }
+#[pyfunction]
+fn propagate_omm_many(py:Python<'_>,payloads:Vec<String>,minutes:Vec<f64>)->PyResult<(Py<PyBytes>,Vec<Option<String>>)> {
+    let (buffer, errors) = py.detach(move || calculate_many(payloads, minutes)).map_err(PyValueError::new_err)?;
+    Ok((PyBytes::new(py, &buffer).unbind(), errors))
+}
 #[pymodule]
 fn isdc_orbit_propagation(m:&Bound<'_,PyModule>)->PyResult<()> {
     m.add_function(wrap_pyfunction!(propagate_tle,m)?)?;m.add_function(wrap_pyfunction!(propagate_omm,m)?)?;
-    m.add("calculation_profile","WGS72_AFSPC")?;m.add("__version__","0.1.0")?;m.add("MAX_BATCH_ROWS",MAX_BATCH_ROWS)?;Ok(())
+    m.add_function(wrap_pyfunction!(propagate_omm_many,m)?)?;
+    m.add("calculation_profile","WGS72_AFSPC")?;m.add("__version__","0.2.0")?;m.add("MAX_BATCH_ROWS",MAX_BATCH_ROWS)?;m.add("MAX_CATALOG_BATCH_ROWS",MAX_CATALOG_BATCH_ROWS)?;Ok(())
 }

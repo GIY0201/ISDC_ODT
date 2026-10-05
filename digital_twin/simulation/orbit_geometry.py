@@ -108,3 +108,21 @@ def teme_positions_to_itrf(positions_km,times:Time,eop:EarthOrientationVector):
     position=np.einsum('nij,nj->ni',polar,pef)*1000
     if not np.isfinite(position).all():raise ValueError('nonfinite transform result')
     return _readonly(position)
+
+
+def teme_positions_at_utc(positions_km,instant:UtcInstant,eop:EarthOrientationPoint):
+    """Many positions at one UTC: one GMST82 and polar-motion rotation."""
+    r=_vectors(positions_km)
+    if not isinstance(instant,UtcInstant) or not math.isfinite(instant.jd1) or not math.isfinite(instant.jd2):
+        raise ValueError('finite UTC instant required')
+    if not isinstance(eop,EarthOrientationPoint) or not all(math.isfinite(value) for value in
+        (eop.ut1_minus_utc_s,eop.xp_rad,eop.yp_rad)):
+        raise ValueError('finite EOP point required')
+    if not len(r):return _readonly(r)
+    utc=instant.as_time();utc.delta_ut1_utc=eop.ut1_minus_utc_s
+    ut1=utc.ut1;theta=erfa.gmst82(ut1.jd1,ut1.jd2);c,s=np.cos(theta),np.sin(theta)
+    pef=np.column_stack((c*r[:,0]+s*r[:,1],-s*r[:,0]+c*r[:,1],r[:,2]))
+    polar=erfa.pom00(eop.xp_rad,eop.yp_rad,0.)
+    position=np.einsum('ij,nj->ni',polar,pef)*1000
+    if not np.isfinite(position).all():raise ValueError('nonfinite transform result')
+    return _readonly(position)
