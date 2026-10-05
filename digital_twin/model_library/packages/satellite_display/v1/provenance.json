@@ -1,0 +1,1633 @@
+{
+  "schema": 1,
+  "source_repository": "https://github.com/HyeonJun9138/ISDC-ODT",
+  "source_head": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "original_manifest_sha256": "7a88f531a8a138c0d7f8eaa4e3c88a891ab17920d809389f62feb9b5d621f9fe",
+  "original_assets": [
+    {
+      "file": "iss.glb",
+      "sha256": "2ba4427413b0dd89a33d2acaf962dea8a96a3b1d8dceda05cc7aad547ffd3d16",
+      "bytes": 476992,
+      "model_keys": [
+        "iss"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "International Space Station (ISS) (B)/International Space Station (ISS) (B).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "iss.jpg",
+      "sha256": "a69ec13394fcf269fa318746d705768b65d93d96b52497a3777987bbf96d45a2",
+      "bytes": 22329,
+      "model_keys": [
+        "iss"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "International Space Station (ISS) (B)/International Space Station (ISS) (B).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "hubble.glb",
+      "sha256": "e5ba4de15c7d359ac8fa1ab7e286aff42dec09c0fadae3db99252587f39fa384",
+      "bytes": 1694988,
+      "model_keys": [
+        "hubble"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Hubble Space Telescope (A)/Hubble Space Telescope (A).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "hubble.jpg",
+      "sha256": "4bdee1740db2425273d1a107a7f2e6e52febbe081ebc996a5374e9b3b3cbb38f",
+      "bytes": 13371,
+      "model_keys": [
+        "hubble"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Hubble Space Telescope (A)/Hubble Space Telescope (A).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "landsat_7.glb",
+      "sha256": "0ecb0a11a405d6f21a9cca60a65fdbaaaf1d00e026de50ad55e9074279829687",
+      "bytes": 160156,
+      "model_keys": [
+        "landsat_7"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Landsat 7/Landsat 7.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "landsat_7.jpg",
+      "sha256": "56299414a307ec987a3da4c392b49900b51443687385c3e1dbb009d1fdafbea5",
+      "bytes": 13160,
+      "model_keys": [
+        "landsat_7"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Landsat 7/Landsat 7.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "landsat_8.glb",
+      "sha256": "8b599e867be20589cd35e55ed1d46da104299b430b1827b548a25d3fad0a314d",
+      "bytes": 780280,
+      "model_keys": [
+        "landsat_8"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Landsat 8/Landsat 8.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "landsat_8.jpg",
+      "sha256": "91055a1de8909b6424325224556a59b1336bb2637a31a7891a479bc3590c08fa",
+      "bytes": 19580,
+      "model_keys": [
+        "landsat_8"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Landsat 8/Landsat 8.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "terra.glb",
+      "sha256": "8794857595f7a7d416184fe926ecb50e11bf267dbe471d1cf2728a85e8d017fa",
+      "bytes": 2150600,
+      "model_keys": [
+        "terra"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Terra/Terra.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "terra.jpg",
+      "sha256": "3b0458a7fba86b23c6fafdef2eaa83e3798eedbad7483b70b8df03fc382b580b",
+      "bytes": 19936,
+      "model_keys": [
+        "terra"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Terra/Terra.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "aqua.glb",
+      "sha256": "f0761181a1d378b6b3e270e8eee8bf20c241b7d577933630369b0cffd4b521e1",
+      "bytes": 1104016,
+      "model_keys": [
+        "aqua"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Aqua (B)/Aqua (B).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "aqua.jpg",
+      "sha256": "281edf5d8e933a0ce979d733646b59b41ab7343db388b46d015cfe8dfbfb7bdb",
+      "bytes": 9368,
+      "model_keys": [
+        "aqua"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Aqua (B)/Aqua (B).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "aura.glb",
+      "sha256": "99d46cd9af551c7511befe47d3f24b9b957da6a9dc35a0e29fc784db9f55b381",
+      "bytes": 476264,
+      "model_keys": [
+        "aura"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Aura (A)/Aura (A).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "aura.jpg",
+      "sha256": "de89c4802979cdd03f7222749f3b835d1b3721331ec102a0102e115daf59386d",
+      "bytes": 16077,
+      "model_keys": [
+        "aura"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Aura (A)/Aura (A).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "suomi_npp.glb",
+      "sha256": "885278277ed8fa864368803b7da2046292754bff01033055d56fe86e8b951ee4",
+      "bytes": 2283576,
+      "model_keys": [
+        "suomi_npp"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Suomi National Polar-orbiting Partnership (Suomi NPP)/Suomi National Polar-orbiting Partnership (Suomi NPP).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "suomi_npp.jpg",
+      "sha256": "3ea20a5c2418cfac079cf3542aa8cd63e722b36d700519e6b1f198f5183ffa46",
+      "bytes": 16075,
+      "model_keys": [
+        "suomi_npp"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Suomi National Polar-orbiting Partnership (Suomi NPP)/Suomi National Polar-orbiting Partnership (Suomi NPP).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "goes_r.glb",
+      "sha256": "26f2f289ec9fc78612de27548247c8caf754a6f0efe182290bbf81dc9cbf41e6",
+      "bytes": 6409168,
+      "model_keys": [
+        "goes_r"
+      ],
+      "origins": [
+        {
+          "provider": "noaa_goesr",
+          "origin": "GOES-R_1m.glb",
+          "source_commit": null,
+          "repository": "https://www.goes-r.gov/3dModelAR/"
+        }
+      ]
+    },
+    {
+      "file": "goes_r.jpg",
+      "sha256": "cec143d3a965b6f4696a8690bf013842c8c9703f55a7317128d4b0be322d93ed",
+      "bytes": 8319,
+      "model_keys": [
+        "goes_r"
+      ],
+      "origins": [
+        {
+          "provider": "noaa_goesr",
+          "origin": null,
+          "source_commit": null,
+          "repository": "https://www.goes-r.gov/3dModelAR/"
+        }
+      ]
+    },
+    {
+      "file": "goes.glb",
+      "sha256": "e2f690d3d59e101d6a75a8b0bdcbe1cf9f58a058d01eaceede8557460a6e9101",
+      "bytes": 335620,
+      "model_keys": [
+        "goes"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Geostationary Operational Environmental Satellites/Geostationary Operational Environmental Satellites.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "goes.jpg",
+      "sha256": "5c3578efe37bccdb891677cdaaa8cdc1230e4d046a81ec7b44573d34a1638f9a",
+      "bytes": 17850,
+      "model_keys": [
+        "goes"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Geostationary Operational Environmental Satellites/Geostationary Operational Environmental Satellites.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "tdrs.glb",
+      "sha256": "4508756798d827722608aa9001925f01ce6409b9e0fd910eacfde9c061139b9e",
+      "bytes": 216892,
+      "model_keys": [
+        "tdrs"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Tracking and Data Relay Satellites (TRDS) (E)/Tracking and Data Relay Satellites (TRDS) (E).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "tdrs.jpg",
+      "sha256": "b90b239ceccdca48d3fc336361c9846e04b761daa64df9b60304a20c45db3d65",
+      "bytes": 14471,
+      "model_keys": [
+        "tdrs"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Tracking and Data Relay Satellites (TRDS) (E)/Tracking and Data Relay Satellites (TRDS) (E).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "oco_2.glb",
+      "sha256": "5aba302aaf91fe1a915f1121683aca6ef7ad65d7a82dad65f363361e5009b1ef",
+      "bytes": 280060,
+      "model_keys": [
+        "oco_2"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Orbiting Carbon Observatory (OCO) 2/Orbiting Carbon Observatory (OCO) 2.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "oco_2.jpg",
+      "sha256": "de314cc4b1622a7b28768e686579c05a69ddeddb8945a8b320b8ca0429e7b5a9",
+      "bytes": 19176,
+      "model_keys": [
+        "oco_2"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Orbiting Carbon Observatory (OCO) 2/Orbiting Carbon Observatory (OCO) 2.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "sdo.glb",
+      "sha256": "8ce4607bd65f098eee22f02717a182d6721610c940a961511dfbca832a3eda95",
+      "bytes": 497844,
+      "model_keys": [
+        "sdo"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Solar Dynamics Observatory/Solar Dynamics Observatory.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "sdo.jpg",
+      "sha256": "da8d92f49852fbf1ae2cde2727a0216a3ef4fefc92458bc9e685b4d0a5847a75",
+      "bytes": 14854,
+      "model_keys": [
+        "sdo"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Solar Dynamics Observatory/Solar Dynamics Observatory.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "swift.glb",
+      "sha256": "e7074fe1590550747fbcd6803b0c6086b4f57cafd8e3d93789f0b0b7e59b0372",
+      "bytes": 211404,
+      "model_keys": [
+        "swift"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Swift/Swift.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "swift.jpg",
+      "sha256": "aafe38b390c2ce8b5d0181da731bb59d81f8674250c63d407db2770206f0b0e5",
+      "bytes": 18986,
+      "model_keys": [
+        "swift"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Swift/Swift.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "tess.glb",
+      "sha256": "2b82a0191af6f06081368bb59d6cbb63b13ad8f019cd7ad08229e911e5b9ee6a",
+      "bytes": 206576,
+      "model_keys": [
+        "tess"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Transiting Exoplanet Survey Satellite (TESS) (A)/Transiting Exoplanet Survey Satellite (TESS) (A).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "tess.jpg",
+      "sha256": "5f9ab0801ad068e88aa85228a653797230c71cfd1a5f28e8bf3220bef1d3e968",
+      "bytes": 18259,
+      "model_keys": [
+        "tess"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Transiting Exoplanet Survey Satellite (TESS) (A)/Transiting Exoplanet Survey Satellite (TESS) (A).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "icesat_2.glb",
+      "sha256": "e7d260d69852fcd3367c8e7a3c236f8c0551c591abc5a8e8f42c0356a2eebf38",
+      "bytes": 1499504,
+      "model_keys": [
+        "icesat_2"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Ice, Clouds, and Land Elevation Satellite-2 (ICESat-2) (A)/Ice, Clouds, and Land Elevation Satellite-2 (ICESat-2) (A).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "icesat_2.jpg",
+      "sha256": "068c941b1bad667ce263200014c46cbfe18cb5556aae2c1f47b94490094d47c0",
+      "bytes": 21957,
+      "model_keys": [
+        "icesat_2"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Ice, Clouds, and Land Elevation Satellite-2 (ICESat-2) (A)/Ice, Clouds, and Land Elevation Satellite-2 (ICESat-2) (A).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "grace.glb",
+      "sha256": "b376141db89a708acac65484b69ffafe36bbed00709f73c1c9d48cc3d5e3e499",
+      "bytes": 22620,
+      "model_keys": [
+        "grace"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Gravity Recovery and Climate Experiment (GRACE) (A)/Gravity Recovery and Climate Experiment (GRACE) (A).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "grace.jpg",
+      "sha256": "c5beb185d68e6a0f400fabe0da30c2ad54b256aaf77f670cf5ccc3f0e60d31d2",
+      "bytes": 16206,
+      "model_keys": [
+        "grace"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Gravity Recovery and Climate Experiment (GRACE) (A)/Gravity Recovery and Climate Experiment (GRACE) (A).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "jason.glb",
+      "sha256": "22139020d17a118aeedfa95b8295712b60f1ed992dcd6770b7a59bac57ea225b",
+      "bytes": 592740,
+      "model_keys": [
+        "jason"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Jason 1/Jason 1.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "jason.jpg",
+      "sha256": "1f096f669a82624af3054bde2b81d71e6cd3d48a9652c31e508f5becaa902a9a",
+      "bytes": 22863,
+      "model_keys": [
+        "jason"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Jason 1/Jason 1.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "sentinel_6.glb",
+      "sha256": "cd257b8d63deef018d0227fa6c4bcb29974f257073c4d4f92abd557098b3d580",
+      "bytes": 2108496,
+      "model_keys": [
+        "sentinel_6"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Jason Continuity of Service (Sentinel-6)/Jason Continuity of Service (Sentinel-6).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "sentinel_6.jpg",
+      "sha256": "74e7cc19525f5719a54f3fd4cd1f7f2883df9cdd956efefd5f5d901dd396c824",
+      "bytes": 23659,
+      "model_keys": [
+        "sentinel_6"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Jason Continuity of Service (Sentinel-6)/Jason Continuity of Service (Sentinel-6).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "chandra.glb",
+      "sha256": "9383f44fc4c6eba73c40b0c2cfe33c08c90f1fb5230274bfdaa98e0c9f116a34",
+      "bytes": 998500,
+      "model_keys": [
+        "chandra"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Chandra X-ray Observatory/Chandra X-ray Observatory.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "chandra.jpg",
+      "sha256": "33a222427110c64fbc015a371d335f2ba4321fe5fd4877156a7762d1e81f05c4",
+      "bytes": 11510,
+      "model_keys": [
+        "chandra"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Chandra X-ray Observatory/Chandra X-ray Observatory.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "van_allen.glb",
+      "sha256": "be9ed53e1452c615750e8d2f977a168eb95216cb82fb698c16d5e08cb4b891f0",
+      "bytes": 933260,
+      "model_keys": [
+        "van_allen"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Van Allen Probes/Van Allen Probes.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "van_allen.jpg",
+      "sha256": "b58b489100a5542002ecf9d7a8332a1be1b2e440841d7fe10a56b3c1a980130a",
+      "bytes": 15078,
+      "model_keys": [
+        "van_allen"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Van Allen Probes/Van Allen Probes.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "poes.glb",
+      "sha256": "30a8bfdb6585bb87e27d8a847046a55f8c299456e3752d1b00786942c59035aa",
+      "bytes": 1158944,
+      "model_keys": [
+        "poes"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Polar Operational Environmental Satellite (POES)/Polar Operational Environmental Satellite (POES).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "poes.jpg",
+      "sha256": "1bd3bbd9b65b454809a70dac452eccfcf279ce2d0648124b49f9fb74f3089271",
+      "bytes": 23246,
+      "model_keys": [
+        "poes"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Polar Operational Environmental Satellite (POES)/Polar Operational Environmental Satellite (POES).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "eo_1.glb",
+      "sha256": "2d26422a45147e86c93c535979b1d9ae16d34fc0171f661dec051bca61c14a74",
+      "bytes": 224580,
+      "model_keys": [
+        "eo_1"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Earth Observing-1 (EO-1)/Earth Observing-1 (EO-1).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "eo_1.jpg",
+      "sha256": "763df78c2e40c2741e9cf8180dd015f3077415c50df922539eb6567f30d6eb4d",
+      "bytes": 16427,
+      "model_keys": [
+        "eo_1"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Earth Observing-1 (EO-1)/Earth Observing-1 (EO-1).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "sac_c.glb",
+      "sha256": "cf1e9ad3923ded6f6157ec06b545de50840b5b7c9526d0a9bda8be1f021ca745",
+      "bytes": 73608,
+      "model_keys": [
+        "sac_c"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Satellite for Scientific Applications (SAC-C)/Satellite for Scientific Applications (SAC-C).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "sac_c.jpg",
+      "sha256": "f7ff498ee0faa533901b43f5655fb8df34c5fc425c8f685d977b1814e9901609",
+      "bytes": 10554,
+      "model_keys": [
+        "sac_c"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Satellite for Scientific Applications (SAC-C)/Satellite for Scientific Applications (SAC-C).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "radarsat_1.glb",
+      "sha256": "db609daaf38354f67d73f412e44d78642383de157f0e2d1de85c3614562cb86f",
+      "bytes": 68148,
+      "model_keys": [
+        "radarsat_1"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Radar Satellite-1 (RADARSAT-1)/Radar Satellite-1 (RADARSAT-1).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "radarsat_1.jpg",
+      "sha256": "ddf17117f9589379147b5cac4d10f001a682379c778a58d11086645b57eab138",
+      "bytes": 13929,
+      "model_keys": [
+        "radarsat_1"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Radar Satellite-1 (RADARSAT-1)/Radar Satellite-1 (RADARSAT-1).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "cubesat_1u.glb",
+      "sha256": "bae308ea2e33778c93675909f7dc2e0d5d6916cd685668a463566c61224b1e85",
+      "bytes": 149424,
+      "model_keys": [
+        "cubesat_1u"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "CubeSat - 1 RU Generic/CubeSat - 1 RU Generic.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "cubesat_1u.jpg",
+      "sha256": "5b891dc0b580e6790473ebca1cf77823ac539d9ad7fff648a08b028974c3aeb0",
+      "bytes": 21191,
+      "model_keys": [
+        "cubesat_1u"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "CubeSat - 1 RU Generic/CubeSat - 1 RU Generic.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "ssl_1300.glb",
+      "sha256": "63cd644d67ee49ab79e313bb6cb0495e9f6072d421a84e116c2c3f9c40bf9c0c",
+      "bytes": 510324,
+      "model_keys": [
+        "ssl_1300"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Space Systems Loral (SSL-1300)/Space Systems Loral (SSL-1300).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "ssl_1300.jpg",
+      "sha256": "325c89290c103ad025763839c33f3b873e7d7ab736584f728fa4dc1ca255125f",
+      "bytes": 15173,
+      "model_keys": [
+        "ssl_1300"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Space Systems Loral (SSL-1300)/Space Systems Loral (SSL-1300).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "mms.glb",
+      "sha256": "e3688a8db82f1918c3b4525f4ceed08b614a3a2c5be09ade5711baba30262eef",
+      "bytes": 335808,
+      "model_keys": [
+        "mms"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Magnetospheric Multiscale (MMS) (A)/Magnetospheric Multiscale (MMS) (A).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "mms.jpg",
+      "sha256": "7f4aca3655f5648e60100ba47f1a9d30e8b30aa048b7b09b31c5007229676e9f",
+      "bytes": 11186,
+      "model_keys": [
+        "mms"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Magnetospheric Multiscale (MMS) (A)/Magnetospheric Multiscale (MMS) (A).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "cygnss.glb",
+      "sha256": "830321f2d30099b4355f835d7ae5a2ab1f9f91c292dd01dfc008b8d4bf64c962",
+      "bytes": 1622924,
+      "model_keys": [
+        "cygnss"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Cyclone Global Navigation Satellite System (CYGNSS)/Cyclone Global Navigation Satellite System (CYGNSS).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "cygnss.jpg",
+      "sha256": "3163dcd6ce00111519e02e1fdfac65d0d9e913d11a51b1d4acdd3c548f05c8f3",
+      "bytes": 25954,
+      "model_keys": [
+        "cygnss"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Cyclone Global Navigation Satellite System (CYGNSS)/Cyclone Global Navigation Satellite System (CYGNSS).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "gpm.glb",
+      "sha256": "7068c880770bb2ac936e804a1af48e564c90b829ff884c405a4759e8da9e693e",
+      "bytes": 2257008,
+      "model_keys": [
+        "gpm"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Global Precipitation Measurement/Global Precipitation Measurement.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "gpm.jpg",
+      "sha256": "4f7f40bcd675df338749e11875ff802b69112c375e4aaeff8d59ba790097c2b1",
+      "bytes": 19346,
+      "model_keys": [
+        "gpm"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Global Precipitation Measurement/Global Precipitation Measurement.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "hinode.glb",
+      "sha256": "104f23212d379541990c28b26999db3bcfb2ef0731285f2366219e5438e125e6",
+      "bytes": 276248,
+      "model_keys": [
+        "hinode"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Hinode (Solar-B)/Hinode (Solar-B).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "hinode.jpg",
+      "sha256": "37fec6a38d6d62b21b549bf43e179a232368e56ca891ee1bdf533e5968fabf25",
+      "bytes": 11508,
+      "model_keys": [
+        "hinode"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Hinode (Solar-B)/Hinode (Solar-B).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "calipso.glb",
+      "sha256": "4abd7708d0f2629baf3e58e9d5df634c34692365791e58a7795742854e53de1d",
+      "bytes": 536084,
+      "model_keys": [
+        "calipso"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Cloud-Aerosol Lidar and Infrared Pathfinder Satellite (CALIPSO)/Cloud-Aerosol Lidar and Infrared Pathfinder Satellite (CALIPSO).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "calipso.jpg",
+      "sha256": "f7ce1bebe95eb2dbcd8ca51ba4b07357b3a7cb4f2e4f5a6f08323b0bb4fef105",
+      "bytes": 14650,
+      "model_keys": [
+        "calipso"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Cloud-Aerosol Lidar and Infrared Pathfinder Satellite (CALIPSO)/Cloud-Aerosol Lidar and Infrared Pathfinder Satellite (CALIPSO).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "cloudsat.glb",
+      "sha256": "293aab60f12decc020fe7e19ddd0837b0643067425a4ad09f01ffd8a380e7423",
+      "bytes": 267656,
+      "model_keys": [
+        "cloudsat"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "CloudSat (A)/CloudSat (A).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "cloudsat.jpg",
+      "sha256": "1a9400ef79f9bd589b4e91f527296fd5a94ca97a36b66387d6b8ac8649eedac9",
+      "bytes": 17233,
+      "model_keys": [
+        "cloudsat"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "CloudSat (A)/CloudSat (A).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "topex.glb",
+      "sha256": "e5ff3cae87bbdc59c07a626bea1907aa24678038e1431ff703e85fe9d5c88c0c",
+      "bytes": 214264,
+      "model_keys": [
+        "topex"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "TOPEX-Poseidon/TOPEX-Poseidon.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "topex.jpg",
+      "sha256": "b0a22615f4e4f2695132fb1a79fa4f9e44461b08b0797c73b82946ddf8afc956",
+      "bytes": 15334,
+      "model_keys": [
+        "topex"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "TOPEX-Poseidon/TOPEX-Poseidon.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "ibex.glb",
+      "sha256": "6ce15c60467673f599c7085ed5152a07d0335628109741848ce64835e3786406",
+      "bytes": 1306616,
+      "model_keys": [
+        "ibex"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Interstellar Boundary Explorer (IBEX)/Interstellar Boundary Explorer (IBEX).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "ibex.jpg",
+      "sha256": "508f705fba81a2a4595b27239519897050d9d2a0eb92cc004de2bddbe833b9c4",
+      "bytes": 16713,
+      "model_keys": [
+        "ibex"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Interstellar Boundary Explorer (IBEX)/Interstellar Boundary Explorer (IBEX).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "fermi.glb",
+      "sha256": "d345f3b0595f7792f699acf33b28d7401cb53cc2a20b735bca00e95644e3813c",
+      "bytes": 1379016,
+      "model_keys": [
+        "fermi"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Fermi Gamma-ray Large Area Space Telescope/Fermi Gamma-ray Large Area Space Telescope.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "fermi.jpg",
+      "sha256": "39155080e3c3f352ed0dcb9f6261b4aeefa125b3f04826c25aec3dfa0448670b",
+      "bytes": 15393,
+      "model_keys": [
+        "fermi"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Fermi Gamma-ray Large Area Space Telescope/Fermi Gamma-ray Large Area Space Telescope.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "aquarius.glb",
+      "sha256": "dc81055c83e5da56d3ae57f4c967010be64ad5d01cee4cdb0a88c85c2b628116",
+      "bytes": 1137428,
+      "model_keys": [
+        "aquarius"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Aquarius (A)/Aquarius (A).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "aquarius.jpg",
+      "sha256": "1164bfd00a431fde585cf0b7648346159421421475cfd8374c48c8230d87631c",
+      "bytes": 24212,
+      "model_keys": [
+        "aquarius"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Aquarius (A)/Aquarius (A).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "geotail.glb",
+      "sha256": "3b39a3fc157731421869dab707dd5c4d3d829ab0b727b2a6cc8bc211fd96a8ad",
+      "bytes": 91504,
+      "model_keys": [
+        "geotail"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "GeoTailSAT/GeoTailSAT.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "geotail.jpg",
+      "sha256": "f20a0127a264db32b1cc4323516dc3a5ef0fcad834ffe249a66ef73c27b800d6",
+      "bytes": 11671,
+      "model_keys": [
+        "geotail"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "GeoTailSAT/GeoTailSAT.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "themis.glb",
+      "sha256": "2dfe2a2e07de211f6686adbb612c09c5dfac62a397cb88343f119c2124d818e3",
+      "bytes": 682092,
+      "model_keys": [
+        "themis"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Time History of Events and Macroscale Interactions During Substorms (THEMIS)/Time History of Events and Macroscale Interactions During Substorms (THEMIS).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "themis.jpg",
+      "sha256": "2c1825a5563c5c1d4f6a53e0c32283ed3911bedb9b9142c387fb5e8bcdf2c5ba",
+      "bytes": 10139,
+      "model_keys": [
+        "themis"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Time History of Events and Macroscale Interactions During Substorms (THEMIS)/Time History of Events and Macroscale Interactions During Substorms (THEMIS).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "sorce.glb",
+      "sha256": "8ec505080199227d25897f5157f4cd87e60092d69b16079deb3ca32caa2ce10d",
+      "bytes": 366492,
+      "model_keys": [
+        "sorce"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Solar Radiation and Climate Experiment (SORCE)/Solar Radiation and Climate Experiment (SORCE).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "sorce.jpg",
+      "sha256": "069ca87a8389dca587955ee3130370be102999f1c4c7edce763678c52dc57f81",
+      "bytes": 12787,
+      "model_keys": [
+        "sorce"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Solar Radiation and Climate Experiment (SORCE)/Solar Radiation and Climate Experiment (SORCE).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "toms.glb",
+      "sha256": "36578255a65849073c12d596d255a2fc2042730576bfb433bb9073eb66d287d2",
+      "bytes": 98620,
+      "model_keys": [
+        "toms"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Total Ozone Mapping Spectrometer (TOMS)/Total Ozone Mapping Spectrometer (TOMS).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "toms.jpg",
+      "sha256": "28ac495afd1022b1a4ec3ecb3c3812cec37e7b3dd351418509a67db8036e3ec4",
+      "bytes": 14752,
+      "model_keys": [
+        "toms"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Total Ozone Mapping Spectrometer (TOMS)/Total Ozone Mapping Spectrometer (TOMS).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "polar.glb",
+      "sha256": "0ffe9e41f6686db7dcaf3144f967f0f419e72b6a90218d955b1654cf0478801d",
+      "bytes": 98592,
+      "model_keys": [
+        "polar"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Polar/Polar.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "polar.jpg",
+      "sha256": "65a7bffa9ce468df9c51a9191eb7a85d672c7d02efc389b53c87814148a96c10",
+      "bytes": 13709,
+      "model_keys": [
+        "polar"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Polar/Polar.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "swas.glb",
+      "sha256": "c1d58e66cb2f1185fc98b5941cbfeb3dbdb453b817a87f95e6bf8d176630f5a1",
+      "bytes": 150296,
+      "model_keys": [
+        "swas"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Submillimeter Wave Astronomy Satellite (SWAS)/Submillimeter Wave Astronomy Satellite (SWAS).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "swas.jpg",
+      "sha256": "d34ab1f02edeefe274717f83c3d7efce4adfd3d4483fec3bcc427155a50f4af7",
+      "bytes": 13410,
+      "model_keys": [
+        "swas"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Submillimeter Wave Astronomy Satellite (SWAS)/Submillimeter Wave Astronomy Satellite (SWAS).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "fuse.glb",
+      "sha256": "056c26e4f48bc362790ebc42c7c85101037c92b4f50a313bbe2783fc7004cdf8",
+      "bytes": 236704,
+      "model_keys": [
+        "fuse"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Far Ultraviolet Spectroscopic Explorer/Far Ultraviolet Spectroscopic Explorer.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "fuse.jpg",
+      "sha256": "b2dc07db7f907fedb28f2f8ab008feb7cc435be057ed8073de671f8c69258667",
+      "bytes": 10195,
+      "model_keys": [
+        "fuse"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Far Ultraviolet Spectroscopic Explorer/Far Ultraviolet Spectroscopic Explorer.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "wire.glb",
+      "sha256": "adffb87ebd6d884f47b8d82b0aa8c37f72dc1c72bf532ba4117a94c392f6b2d0",
+      "bytes": 375404,
+      "model_keys": [
+        "wire"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Wide-Field Infrared Explorer (WIRE)/Wide-Field Infrared Explorer (WIRE).glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "wire.jpg",
+      "sha256": "d1d293662380c89cb848ccd6a94b39fec5920d98c7129a575aa7a3820ee4efa0",
+      "bytes": 13542,
+      "model_keys": [
+        "wire"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "Wide-Field Infrared Explorer (WIRE)/Wide-Field Infrared Explorer (WIRE).png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "hete_2.glb",
+      "sha256": "f514f7cff65c0d4d565408b3f6ba113c4a3b97321a3fe770c89f67820e83922c",
+      "bytes": 61836,
+      "model_keys": [
+        "hete_2"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "High Energy Transient Explorer/High Energy Transient Explorer.glb",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "hete_2.jpg",
+      "sha256": "7edc2ae73326b0f86ae837dbfb1e46b377f8be29a328be828940d8174f3b9879",
+      "bytes": 12666,
+      "model_keys": [
+        "hete_2"
+      ],
+      "origins": [
+        {
+          "provider": "nasa",
+          "origin": "High Energy Transient Explorer/High Energy Transient Explorer.png",
+          "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+          "repository": "https://github.com/nasa/NASA-3D-Resources"
+        }
+      ]
+    },
+    {
+      "file": "starlink_flat.glb",
+      "sha256": "1f2bd994bca491b82ddaafaae70805b9cab8e8ac42bb1444463e566e44bf29ec",
+      "bytes": 14096,
+      "model_keys": [
+        "starlink_flat"
+      ],
+      "origins": [
+        {
+          "provider": "spacetwin",
+          "origin": null,
+          "source_commit": null,
+          "repository": ""
+        }
+      ]
+    },
+    {
+      "file": "starlink_flat.jpg",
+      "sha256": "a754af76ac86c60e4c4f7bad35b81d42c6ddcc26171e0040d3e316277c50d836",
+      "bytes": 4890,
+      "model_keys": [
+        "starlink_flat"
+      ],
+      "origins": [
+        {
+          "provider": "spacetwin",
+          "origin": null,
+          "source_commit": null,
+          "repository": ""
+        }
+      ]
+    },
+    {
+      "file": "gnss_bus.glb",
+      "sha256": "caa606c93deae3608a8a7ddb2a66c88d266f9bf11b838e56df47a7f6130e5c7e",
+      "bytes": 43068,
+      "model_keys": [
+        "gnss_bus"
+      ],
+      "origins": [
+        {
+          "provider": "spacetwin",
+          "origin": null,
+          "source_commit": null,
+          "repository": ""
+        }
+      ]
+    },
+    {
+      "file": "gnss_bus.jpg",
+      "sha256": "d0c45d4aa4f5ba4a60b287a15fd01ad192fcedd458c23c175a26f77bfe966cae",
+      "bytes": 6467,
+      "model_keys": [
+        "gnss_bus"
+      ],
+      "origins": [
+        {
+          "provider": "spacetwin",
+          "origin": null,
+          "source_commit": null,
+          "repository": ""
+        }
+      ]
+    },
+    {
+      "file": "leo_comms_bus.glb",
+      "sha256": "aba350d67d392924b68b2f8abf9712e55200ad4a88d2340e44c3f5220b84ff09",
+      "bytes": 15896,
+      "model_keys": [
+        "oneweb",
+        "kuiper",
+        "iridium",
+        "globalstar",
+        "orbcomm",
+        "o3b",
+        "china_leo_comms"
+      ],
+      "origins": [
+        {
+          "provider": "spacetwin",
+          "origin": null,
+          "source_commit": null,
+          "repository": ""
+        }
+      ]
+    },
+    {
+      "file": "leo_comms_bus.jpg",
+      "sha256": "a9cd06ac8b09a8b6b6f9630a8fe992f6165fb0e07af17aee0798925fbe647e65",
+      "bytes": 6406,
+      "model_keys": [
+        "oneweb",
+        "kuiper",
+        "iridium",
+        "globalstar",
+        "orbcomm",
+        "o3b",
+        "china_leo_comms"
+      ],
+      "origins": [
+        {
+          "provider": "spacetwin",
+          "origin": null,
+          "source_commit": null,
+          "repository": ""
+        }
+      ]
+    },
+    {
+      "file": "cubesat_3u.glb",
+      "sha256": "8657ecec5c182900985c92b85281f49ca4c7859e1ff40b704aef7a54359d073f",
+      "bytes": 10608,
+      "model_keys": [
+        "cubesat_3u"
+      ],
+      "origins": [
+        {
+          "provider": "spacetwin",
+          "origin": null,
+          "source_commit": null,
+          "repository": ""
+        }
+      ]
+    },
+    {
+      "file": "cubesat_3u.jpg",
+      "sha256": "a60d42aedbc57c216d2166d5bffe73e822bf920065203167646c38bf8329b804",
+      "bytes": 7668,
+      "model_keys": [
+        "cubesat_3u"
+      ],
+      "origins": [
+        {
+          "provider": "spacetwin",
+          "origin": null,
+          "source_commit": null,
+          "repository": ""
+        }
+      ]
+    }
+  ],
+  "derivatives": [],
+  "source_guidance": {
+    "nasa": "NASA source credit and educational/informational usage guidance; third-party/branding exceptions retained",
+    "noaa_goesr": "Original NOAA/NASA GOES-R Program source attribution; no endorsement implied",
+    "spacetwin": "Original prototype-generated representative shapes; manufacturer identity and exact dimensions are not asserted"
+  },
+  "render_status": "unverified",
+  "unresolved": [
+    {
+      "file": "terra.glb",
+      "reason": "active external TGA textures unavailable in inspected official distributions; exact mapping preserved"
+    }
+  ]
+}

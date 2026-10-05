@@ -16,3 +16,7 @@ Original addSunIndicator/updateSunIndicator/positionSunOverlay uses Simon1994pos
 Return to existing feature specify/plan/tasks owner for these original functions; preserve T111–T116 and all previous decisions. Define originaldisplay controls, exact modelmapping/load/lifecycle/failure/provenance, oneViewer and source-ownedasset packaging before implementation. Current T075 partial; T076–T084 and T032/F001/F004–6/download diskunknown unchanged. Do not create another feature or import executable reference paths.
 
 Additional original display detail: tabs/orbit.js hoverSatellite renders a bounded pointer card with escaped name, NORAD, orbit regime and altitude. Current hover emphasis alone does not reproduce this card. Retain the card with T075 model/inspector design using native display geometry and explicit height/frame contract; do not fabricate altitude or exclude it when closing T075.
+
+
+## 2026-10-05 metadata encoding correction
+Direct UTF-8 byte/JSON inspection of original manifestSHA7a88f531 found0 U+FFFD characters; runtime validator reports0 presentation repairs. Prior descriptions of garbled source labels/providers were based on terminal decoding artifacts and are superseded. Original intact Korean labels/credits remain unchanged; defensive corrupted-input repair tests remain appropriate. This corrects source evidence without narrowing model/quality/credit requirements or removing any tasks. Actual package dependency/Pillow pixel check49models/76embeddedimages/50thumbnails passes; Terra active2externalTGA dependencies remain unresolved.

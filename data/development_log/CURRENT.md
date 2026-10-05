@@ -1,5 +1,10 @@
 # 현재 개발 기록
 
+## 2026-10-05 T123 위성 자산 검사와 패키징 부분 진행
+- 변경: 원본56매핑/50GLB/50썸네일과해시·출처보존, 오프라인의존성검사/명시PNG변환·정렬삽입도구 및16회귀시험. UTF-8원문라벨정상확인/이전출력오류정정.
+- 검증: 전체Python439PASS5기존warnings233.18s/Node244PASS1193.0097ms/target16PASS. 실제이미지디코딩49모델/76내장이미지/50썸네일; 합성TGA변환·픽셀·geometry보존PASS. validation/t123_satellite_assets.md.
+- 남음: Terra공식텍스처2개누락으로validator exit1/completefalse, T123/T129완료아님. 실제GPU/모델·카메라연결미검증; T122renderer/cameraRED→T125/126다음. 전체T075–84/T032/실통신/다운로드미확인보존. 서버/8891/native/PR/병합변경없음.
+
 ## 2026-10-05 Ground station shared globe
 - 변경: 선배29sites/5groups/cardfacts 재사용, V6 위성·지상국 목록/지구pick/강조·카메라/clear/소유사본, 단일Viewer/가상지점·위성보존, ADR0011/T090–94.
 - 검증: Python385PASS137.93s/Node175PASS673.2623ms, 실제8891두해상도/list·mousepick·filter·복원/readonly/canvas1/console0; t094_ground_stations.md. 초기staticHTMLfallback 기대값수정/encodedtraversal404; overlap/label보완후최종Node재검증.

@@ -1,0 +1,9 @@
+# Satellite display assets v1
+
+Extracted used display assets from the original ISDC-ODT source1a1e002. The56 ordered model mappings reference50 distinct GLB models and50 thumbnails. Original assets and raw manifest hashes remain in provenance.json; runtime manifest is a validated copy. No model is removed or mapped to an invented replacement.
+
+Static dependency checks and explicit Pillow12.3.0 pixel decode passed for49 models,76 embedded images and50 thumbnails. Terra still references missing Side_Panels_TERRA.tga and solarpanels.tga; asset_receipt.json therefore has complete=false. No faithful Terra repair or actual Cesium/GPU rendering is claimed. The renderer must preserve a point and an explicit unavailable reason for this asset until authoritative textures are recovered. Full T123/T129 acceptance stays incomplete.
+
+NASA 3D Resources assets use the pinned commit11ebb4ee043715aefbba6aeec8a61746fad67fa7 and NASA source credit. NASA usage guidance: https://www.nasa.gov/nasa-brand-center/images-and-media/ . Third-party copyright/branding conditions are not replaced by this source receipt. GOES-R retains NOAA/NASA GOES-R Program attribution and https://www.goes-r.gov/3dModelAR/ source metadata. SpaceTwin shapes are prototype-generated representative geometry, not manufacturer models. Model dimensions and orientation are display approximations; these assets are not measurements, imagery of current pose or endorsement.
+
+Raw metadata is valid UTF-8 with no replacement characters; no source labels were rewritten. The runtime validator retains defensive handling for truly corrupted metadata, with presentation_repairs empty for this package. Source assets are static data only; no upstream code directory is imported at runtime. The package is not mounted by the current server yet.

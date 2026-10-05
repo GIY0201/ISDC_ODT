@@ -1,0 +1,2273 @@
+{
+  "schema": 1,
+  "package": "satellite_display",
+  "complete": false,
+  "render_status": "unverified",
+  "mapping_count": 56,
+  "unique_model_files": 50,
+  "assets": [
+    {
+      "file": "iss.glb",
+      "keys": [
+        "iss"
+      ],
+      "valid": true,
+      "sha256": "2ba4427413b0dd89a33d2acaf962dea8a96a3b1d8dceda05cc7aad547ffd3d16",
+      "bytes": 476992,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "iss.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "a69ec13394fcf269fa318746d705768b65d93d96b52497a3777987bbf96d45a2",
+          "bytes": 22329,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "hubble.glb",
+      "keys": [
+        "hubble"
+      ],
+      "valid": true,
+      "sha256": "e5ba4de15c7d359ac8fa1ab7e286aff42dec09c0fadae3db99252587f39fa384",
+      "bytes": 1694988,
+      "errors": [],
+      "active_image_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "extensions_used": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco",
+        "webp"
+      ],
+      "image_checks": [
+        {
+          "index": 0,
+          "mime_type": "image/webp",
+          "sha256": "0584510f19ff6e73a581e5a7dabddf87269ec691bb0892c4cf0f922de6189788",
+          "bytes": 27836,
+          "decoded": true,
+          "width": 512,
+          "height": 1024
+        },
+        {
+          "index": 1,
+          "mime_type": "image/png",
+          "sha256": "c44db6a4c1538b1ebf3fd24ca55ef253e51b4eb8fb4580d95769608ace9919ec",
+          "bytes": 212970,
+          "decoded": true,
+          "width": 512,
+          "height": 1024
+        },
+        {
+          "index": 2,
+          "mime_type": "image/webp",
+          "sha256": "51a6c06d96c1aeef31ad0accb80f7e134f7fe0a88a4f8427a4e0198c4a48d538",
+          "bytes": 5498,
+          "decoded": true,
+          "width": 512,
+          "height": 1024
+        },
+        {
+          "index": 3,
+          "mime_type": "image/png",
+          "sha256": "b8aead64321d856e9bd771cae6a7fe19c994173843a5f1e1933773830318c517",
+          "bytes": 100339,
+          "decoded": true,
+          "width": 512,
+          "height": 1024
+        },
+        {
+          "index": 4,
+          "mime_type": "image/webp",
+          "sha256": "2df9acaf8e8e6d629d1979b76c732b1e640e5aae84620d98bbf22493fa4e7b42",
+          "bytes": 7858,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        },
+        {
+          "index": 5,
+          "mime_type": "image/png",
+          "sha256": "ae20738bf7e53d31d0db6b28eff32077f4cbc9f061d25832079c8ea6519376f3",
+          "bytes": 234701,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        },
+        {
+          "index": 6,
+          "mime_type": "image/webp",
+          "sha256": "749e0748d8acdb60e0f7b9fc45019aa2f46537b8b110c9947ec0bb2ce7495dba",
+          "bytes": 33668,
+          "decoded": true,
+          "width": 512,
+          "height": 1024
+        },
+        {
+          "index": 7,
+          "mime_type": "image/png",
+          "sha256": "39b7d9e3ec2a5fdc9cc2b4d918289f99786d915a40f280d6e61e5895a140126b",
+          "bytes": 654776,
+          "decoded": true,
+          "width": 512,
+          "height": 1024
+        },
+        {
+          "index": 8,
+          "mime_type": "image/webp",
+          "sha256": "cf63a672cc794f21dbcadb60bcc6526503c62bb5c9ecaae50874fb912f36dfe1",
+          "bytes": 13748,
+          "decoded": true,
+          "width": 512,
+          "height": 1024
+        },
+        {
+          "index": 9,
+          "mime_type": "image/png",
+          "sha256": "41006ca89f633e9c2a3be483b8e58e0ead3d759983966c10af5846c01d96b66c",
+          "bytes": 251128,
+          "decoded": true,
+          "width": 512,
+          "height": 1024
+        }
+      ],
+      "thumbnails": [
+        {
+          "file": "hubble.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "4bdee1740db2425273d1a107a7f2e6e52febbe081ebc996a5374e9b3b3cbb38f",
+          "bytes": 13371,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "landsat_7.glb",
+      "keys": [
+        "landsat_7"
+      ],
+      "valid": true,
+      "sha256": "0ecb0a11a405d6f21a9cca60a65fdbaaaf1d00e026de50ad55e9074279829687",
+      "bytes": 160156,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "landsat_7.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "56299414a307ec987a3da4c392b49900b51443687385c3e1dbb009d1fdafbea5",
+          "bytes": 13160,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "landsat_8.glb",
+      "keys": [
+        "landsat_8"
+      ],
+      "valid": true,
+      "sha256": "8b599e867be20589cd35e55ed1d46da104299b430b1827b548a25d3fad0a314d",
+      "bytes": 780280,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "landsat_8.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "91055a1de8909b6424325224556a59b1336bb2637a31a7891a479bc3590c08fa",
+          "bytes": 19580,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "terra.glb",
+      "keys": [
+        "terra"
+      ],
+      "valid": false,
+      "sha256": "8794857595f7a7d416184fe926ecb50e11bf267dbe471d1cf2728a85e8d017fa",
+      "bytes": 2150600,
+      "errors": [
+        "external_image:0:..\\Terra.fbm\\Side_Panels_TERRA.tga",
+        "external_image:1:..\\Terra.fbm\\solarpanels.tga"
+      ],
+      "active_image_indices": [
+        0,
+        1
+      ],
+      "extensions_used": [],
+      "required_codecs": [],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "terra.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "3b0458a7fba86b23c6fafdef2eaa83e3798eedbad7483b70b8df03fc382b580b",
+          "bytes": 19936,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "aqua.glb",
+      "keys": [
+        "aqua"
+      ],
+      "valid": true,
+      "sha256": "f0761181a1d378b6b3e270e8eee8bf20c241b7d577933630369b0cffd4b521e1",
+      "bytes": 1104016,
+      "errors": [],
+      "active_image_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "extensions_used": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco",
+        "webp"
+      ],
+      "image_checks": [
+        {
+          "index": 0,
+          "mime_type": "image/webp",
+          "sha256": "2734d1fe31be65083363bca13e0a379f8329f375ced8435fa746aae60138d391",
+          "bytes": 21878,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 1,
+          "mime_type": "image/png",
+          "sha256": "c4ac90eaa878872f936d8f6c0cdf2484621d15858dd0c44a69eab1ed9d5a9e11",
+          "bytes": 525127,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 2,
+          "mime_type": "image/webp",
+          "sha256": "0c6157b764de4e9a08af7eba88eb570fc981b0a248a663dd81c13085e79f69d1",
+          "bytes": 11902,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        },
+        {
+          "index": 3,
+          "mime_type": "image/png",
+          "sha256": "2ac7f687a8d7c334158a9dc9934fb7be27bd524967eb1cd9a9451204123cee87",
+          "bytes": 309641,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        },
+        {
+          "index": 4,
+          "mime_type": "image/webp",
+          "sha256": "0e3e330ec7a0f97ef62a6cb4330b920ae8f93f9e819e80642b1e4e2ac149b067",
+          "bytes": 774,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 5,
+          "mime_type": "image/png",
+          "sha256": "fb58fcd71c70b6714e2c06e3d0ebc3f5e77b4e4c91b78c807927be0c2d619d26",
+          "bytes": 3627,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 6,
+          "mime_type": "image/webp",
+          "sha256": "b4885c835369474481885338c371799b0d7c7bf4f953d168f1ca57eff89258df",
+          "bytes": 414,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 7,
+          "mime_type": "image/png",
+          "sha256": "567af56afb9b1af16f52db7d95250e297d38d21efefcc8f5e6649555bc05559a",
+          "bytes": 3466,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        }
+      ],
+      "thumbnails": [
+        {
+          "file": "aqua.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "281edf5d8e933a0ce979d733646b59b41ab7343db388b46d015cfe8dfbfb7bdb",
+          "bytes": 9368,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "aura.glb",
+      "keys": [
+        "aura"
+      ],
+      "valid": true,
+      "sha256": "99d46cd9af551c7511befe47d3f24b9b957da6a9dc35a0e29fc784db9f55b381",
+      "bytes": 476264,
+      "errors": [],
+      "active_image_indices": [
+        0,
+        1
+      ],
+      "extensions_used": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco",
+        "webp"
+      ],
+      "image_checks": [
+        {
+          "index": 0,
+          "mime_type": "image/webp",
+          "sha256": "e03614442594991bd2c900de200fdc0379bca5b83a24a248bb7fffba0bb3b57e",
+          "bytes": 41580,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 1,
+          "mime_type": "image/jpeg",
+          "sha256": "a5f704f0e8d41c1632c100d089a10f6bf0b9856c6fa117591451bc3f87eff507",
+          "bytes": 341723,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        }
+      ],
+      "thumbnails": [
+        {
+          "file": "aura.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "de89c4802979cdd03f7222749f3b835d1b3721331ec102a0102e115daf59386d",
+          "bytes": 16077,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "suomi_npp.glb",
+      "keys": [
+        "suomi_npp"
+      ],
+      "valid": true,
+      "sha256": "885278277ed8fa864368803b7da2046292754bff01033055d56fe86e8b951ee4",
+      "bytes": 2283576,
+      "errors": [],
+      "active_image_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "extensions_used": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco",
+        "webp"
+      ],
+      "image_checks": [
+        {
+          "index": 0,
+          "mime_type": "image/webp",
+          "sha256": "0e3e330ec7a0f97ef62a6cb4330b920ae8f93f9e819e80642b1e4e2ac149b067",
+          "bytes": 774,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 1,
+          "mime_type": "image/png",
+          "sha256": "fb58fcd71c70b6714e2c06e3d0ebc3f5e77b4e4c91b78c807927be0c2d619d26",
+          "bytes": 3627,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 2,
+          "mime_type": "image/webp",
+          "sha256": "19f1ba4978fbb80546667177b337f849033f12588d16c9818df63f107e402afd",
+          "bytes": 41938,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 3,
+          "mime_type": "image/png",
+          "sha256": "e1b14c23974383ad79a96a1e7b91693d6805567af2a80d2580002ad776a3ebce",
+          "bytes": 851167,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 4,
+          "mime_type": "image/webp",
+          "sha256": "b00180bc705f5efd73994ca0304d3e6d7a8663616e88587838fac9b3d16f2f94",
+          "bytes": 12916,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 5,
+          "mime_type": "image/png",
+          "sha256": "8dea450cf89bf1c28777b55bbaecebaf2f5a22faa2d4f973f49b3b020656d48c",
+          "bytes": 303564,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 6,
+          "mime_type": "image/webp",
+          "sha256": "b4885c835369474481885338c371799b0d7c7bf4f953d168f1ca57eff89258df",
+          "bytes": 414,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 7,
+          "mime_type": "image/png",
+          "sha256": "567af56afb9b1af16f52db7d95250e297d38d21efefcc8f5e6649555bc05559a",
+          "bytes": 3466,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 8,
+          "mime_type": "image/webp",
+          "sha256": "74b6ed30a58ea3bbe1244b57fd4dd0e9e7e074152a065a6ac1a6f25c6a412d4c",
+          "bytes": 54350,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 9,
+          "mime_type": "image/png",
+          "sha256": "d5b2ff9c43d47801891d76e305ae638101e1c597e10d75d2f3efdf851fb3ff90",
+          "bytes": 978789,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        }
+      ],
+      "thumbnails": [
+        {
+          "file": "suomi_npp.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "3ea20a5c2418cfac079cf3542aa8cd63e722b36d700519e6b1f198f5183ffa46",
+          "bytes": 16075,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "goes_r.glb",
+      "keys": [
+        "goes_r"
+      ],
+      "valid": true,
+      "sha256": "26f2f289ec9fc78612de27548247c8caf754a6f0efe182290bbf81dc9cbf41e6",
+      "bytes": 6409168,
+      "errors": [],
+      "active_image_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "extensions_used": [
+        "KHR_texture_transform"
+      ],
+      "required_codecs": [],
+      "image_checks": [
+        {
+          "index": 0,
+          "mime_type": "image/jpeg",
+          "sha256": "72466399785819062d15a4f592992a5b57782723bab2a4c24dcc094d3399ee24",
+          "bytes": 164969,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        },
+        {
+          "index": 1,
+          "mime_type": "image/jpeg",
+          "sha256": "be922b7ea550409b042aaf666a70af1f32175a6ac732030812c2bac04595c578",
+          "bytes": 43058,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        },
+        {
+          "index": 2,
+          "mime_type": "image/png",
+          "sha256": "b90b983a6d3d86164e3089da78a9728bb39a298ff73995f3219c314362eb280b",
+          "bytes": 628664,
+          "decoded": true,
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "index": 3,
+          "mime_type": "image/png",
+          "sha256": "d6648c30d1c35cc858b10946aec7ed6f6bc61b2cec55cc1ed46681810f6a003b",
+          "bytes": 1097140,
+          "decoded": true,
+          "width": 2048,
+          "height": 2048
+        }
+      ],
+      "thumbnails": [
+        {
+          "file": "goes_r.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "cec143d3a965b6f4696a8690bf013842c8c9703f55a7317128d4b0be322d93ed",
+          "bytes": 8319,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "goes.glb",
+      "keys": [
+        "goes"
+      ],
+      "valid": true,
+      "sha256": "e2f690d3d59e101d6a75a8b0bdcbe1cf9f58a058d01eaceede8557460a6e9101",
+      "bytes": 335620,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "goes.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "5c3578efe37bccdb891677cdaaa8cdc1230e4d046a81ec7b44573d34a1638f9a",
+          "bytes": 17850,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "tdrs.glb",
+      "keys": [
+        "tdrs"
+      ],
+      "valid": true,
+      "sha256": "4508756798d827722608aa9001925f01ce6409b9e0fd910eacfde9c061139b9e",
+      "bytes": 216892,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "tdrs.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "b90b239ceccdca48d3fc336361c9846e04b761daa64df9b60304a20c45db3d65",
+          "bytes": 14471,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "oco_2.glb",
+      "keys": [
+        "oco_2"
+      ],
+      "valid": true,
+      "sha256": "5aba302aaf91fe1a915f1121683aca6ef7ad65d7a82dad65f363361e5009b1ef",
+      "bytes": 280060,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "oco_2.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "de314cc4b1622a7b28768e686579c05a69ddeddb8945a8b320b8ca0429e7b5a9",
+          "bytes": 19176,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "sdo.glb",
+      "keys": [
+        "sdo"
+      ],
+      "valid": true,
+      "sha256": "8ce4607bd65f098eee22f02717a182d6721610c940a961511dfbca832a3eda95",
+      "bytes": 497844,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "sdo.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "da8d92f49852fbf1ae2cde2727a0216a3ef4fefc92458bc9e685b4d0a5847a75",
+          "bytes": 14854,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "swift.glb",
+      "keys": [
+        "swift"
+      ],
+      "valid": true,
+      "sha256": "e7074fe1590550747fbcd6803b0c6086b4f57cafd8e3d93789f0b0b7e59b0372",
+      "bytes": 211404,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "swift.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "aafe38b390c2ce8b5d0181da731bb59d81f8674250c63d407db2770206f0b0e5",
+          "bytes": 18986,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "tess.glb",
+      "keys": [
+        "tess"
+      ],
+      "valid": true,
+      "sha256": "2b82a0191af6f06081368bb59d6cbb63b13ad8f019cd7ad08229e911e5b9ee6a",
+      "bytes": 206576,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "tess.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "5f9ab0801ad068e88aa85228a653797230c71cfd1a5f28e8bf3220bef1d3e968",
+          "bytes": 18259,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "icesat_2.glb",
+      "keys": [
+        "icesat_2"
+      ],
+      "valid": true,
+      "sha256": "e7d260d69852fcd3367c8e7a3c236f8c0551c591abc5a8e8f42c0356a2eebf38",
+      "bytes": 1499504,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "icesat_2.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "068c941b1bad667ce263200014c46cbfe18cb5556aae2c1f47b94490094d47c0",
+          "bytes": 21957,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "grace.glb",
+      "keys": [
+        "grace"
+      ],
+      "valid": true,
+      "sha256": "b376141db89a708acac65484b69ffafe36bbed00709f73c1c9d48cc3d5e3e499",
+      "bytes": 22620,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "grace.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "c5beb185d68e6a0f400fabe0da30c2ad54b256aaf77f670cf5ccc3f0e60d31d2",
+          "bytes": 16206,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "jason.glb",
+      "keys": [
+        "jason"
+      ],
+      "valid": true,
+      "sha256": "22139020d17a118aeedfa95b8295712b60f1ed992dcd6770b7a59bac57ea225b",
+      "bytes": 592740,
+      "errors": [],
+      "active_image_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "extensions_used": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular"
+      ],
+      "required_codecs": [
+        "draco",
+        "webp"
+      ],
+      "image_checks": [
+        {
+          "index": 0,
+          "mime_type": "image/webp",
+          "sha256": "0fa3672e78e7f2d9d39f12450cf001e4f08c633a8abfd2c234f71553ad100f7d",
+          "bytes": 7284,
+          "decoded": true,
+          "width": 500,
+          "height": 375
+        },
+        {
+          "index": 1,
+          "mime_type": "image/png",
+          "sha256": "90dd9391c05e555ebefb4d01c91c61c442fa14055410db3b8d780f28afea2310",
+          "bytes": 124919,
+          "decoded": true,
+          "width": 500,
+          "height": 375
+        },
+        {
+          "index": 2,
+          "mime_type": "image/webp",
+          "sha256": "5435be7828dc9c305527ce4c85674701cfc7fc7a3fae2e4ee8e04f11057b97ea",
+          "bytes": 988,
+          "decoded": true,
+          "width": 128,
+          "height": 128
+        },
+        {
+          "index": 3,
+          "mime_type": "image/png",
+          "sha256": "707262e3b6f13fffbfe6b90419e806a8cc8936c18c906ac74f116597b30d1788",
+          "bytes": 15638,
+          "decoded": true,
+          "width": 128,
+          "height": 128
+        },
+        {
+          "index": 4,
+          "mime_type": "image/webp",
+          "sha256": "0fa3672e78e7f2d9d39f12450cf001e4f08c633a8abfd2c234f71553ad100f7d",
+          "bytes": 7284,
+          "decoded": true,
+          "width": 500,
+          "height": 375
+        },
+        {
+          "index": 5,
+          "mime_type": "image/png",
+          "sha256": "90dd9391c05e555ebefb4d01c91c61c442fa14055410db3b8d780f28afea2310",
+          "bytes": 124919,
+          "decoded": true,
+          "width": 500,
+          "height": 375
+        }
+      ],
+      "thumbnails": [
+        {
+          "file": "jason.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "1f096f669a82624af3054bde2b81d71e6cd3d48a9652c31e508f5becaa902a9a",
+          "bytes": 22863,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "sentinel_6.glb",
+      "keys": [
+        "sentinel_6"
+      ],
+      "valid": true,
+      "sha256": "cd257b8d63deef018d0227fa6c4bcb29974f257073c4d4f92abd557098b3d580",
+      "bytes": 2108496,
+      "errors": [],
+      "active_image_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "extensions_used": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression",
+        "KHR_texture_transform"
+      ],
+      "required_codecs": [
+        "draco",
+        "webp"
+      ],
+      "image_checks": [
+        {
+          "index": 0,
+          "mime_type": "image/webp",
+          "sha256": "74ea208d3d49600e918776910e0688dd6530bcb8a2b1fbeb0397e25fbafe54a5",
+          "bytes": 11512,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        },
+        {
+          "index": 1,
+          "mime_type": "image/jpeg",
+          "sha256": "be922b7ea550409b042aaf666a70af1f32175a6ac732030812c2bac04595c578",
+          "bytes": 43058,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        },
+        {
+          "index": 2,
+          "mime_type": "image/webp",
+          "sha256": "a44495461b52821599bc3ce63d53a4e1fd1739fc25d3149c38a68f285a314382",
+          "bytes": 85644,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 3,
+          "mime_type": "image/jpeg",
+          "sha256": "e1c1dd2879b1a7bfc0519e8bbe4a468ffac4146db1ccf1dcc3a7973218218d77",
+          "bytes": 323687,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 4,
+          "mime_type": "image/webp",
+          "sha256": "e33f7fcbff6340d7df05d0c4f8e09db5743282bcd1bbbe49d5f5e78977c705c3",
+          "bytes": 101254,
+          "decoded": true,
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "index": 5,
+          "mime_type": "image/png",
+          "sha256": "8e71a1ef2091b0195b9ed7160916bd2be630fb20ff13ea16f1225422e9ef5230",
+          "bytes": 825227,
+          "decoded": true,
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "index": 6,
+          "mime_type": "image/webp",
+          "sha256": "7f8ddbd4e03b7f70587995fc19606c26631a7f683d7b4247b5c4d71356537641",
+          "bytes": 38114,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 7,
+          "mime_type": "image/jpeg",
+          "sha256": "92c64621930895d0e7d023953b2cb67d32a0d798ba98c7f9b1a82300414b7c28",
+          "bytes": 177544,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 8,
+          "mime_type": "image/webp",
+          "sha256": "e3ab79635be3ff6fc3a32f384011fb9ded9c7686ed19988c1bbc8506b7123848",
+          "bytes": 3900,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        },
+        {
+          "index": 9,
+          "mime_type": "image/jpeg",
+          "sha256": "06ffbb5aedfdc40306c8635365797204b1081b77ac67e40b82e8b5598bf84611",
+          "bytes": 85302,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        },
+        {
+          "index": 10,
+          "mime_type": "image/webp",
+          "sha256": "47903a686f9e26b04eb7edc8bd333079d959aeab59c077c43448cd7a8267ce5e",
+          "bytes": 270,
+          "decoded": true,
+          "width": 110,
+          "height": 62
+        },
+        {
+          "index": 11,
+          "mime_type": "image/png",
+          "sha256": "8316a9e5fb9677bd78ee44504cc66b7a2294c08fd0034cecb98814c4dd22b47f",
+          "bytes": 2808,
+          "decoded": true,
+          "width": 110,
+          "height": 62
+        },
+        {
+          "index": 12,
+          "mime_type": "image/webp",
+          "sha256": "23369c925abc925c29481b4af2652e66d5b576c58f5ad05426d3d4e5db7cc2c8",
+          "bytes": 116,
+          "decoded": true,
+          "width": 110,
+          "height": 62
+        },
+        {
+          "index": 13,
+          "mime_type": "image/jpeg",
+          "sha256": "94bd4d8fe8ed9d7374fb62a6e8403f24e3ae17805f6638bcfd3e2cd90d637115",
+          "bytes": 9079,
+          "decoded": true,
+          "width": 110,
+          "height": 62
+        },
+        {
+          "index": 14,
+          "mime_type": "image/webp",
+          "sha256": "c54fe2a6cc760c58b19cbb6d620c15bcf96e519367a4642ed081811c2ba29313",
+          "bytes": 7316,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        },
+        {
+          "index": 15,
+          "mime_type": "image/png",
+          "sha256": "eae6dfcdab44881a69a5edcab7117e7be5f3d4baf607c1fb14697fdf257df1aa",
+          "bytes": 209522,
+          "decoded": true,
+          "width": 512,
+          "height": 512
+        }
+      ],
+      "thumbnails": [
+        {
+          "file": "sentinel_6.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "74e7cc19525f5719a54f3fd4cd1f7f2883df9cdd956efefd5f5d901dd396c824",
+          "bytes": 23659,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "chandra.glb",
+      "keys": [
+        "chandra"
+      ],
+      "valid": true,
+      "sha256": "9383f44fc4c6eba73c40b0c2cfe33c08c90f1fb5230274bfdaa98e0c9f116a34",
+      "bytes": 998500,
+      "errors": [],
+      "active_image_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "extensions_used": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco",
+        "webp"
+      ],
+      "image_checks": [
+        {
+          "index": 0,
+          "mime_type": "image/webp",
+          "sha256": "0e3e330ec7a0f97ef62a6cb4330b920ae8f93f9e819e80642b1e4e2ac149b067",
+          "bytes": 774,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 1,
+          "mime_type": "image/png",
+          "sha256": "fb58fcd71c70b6714e2c06e3d0ebc3f5e77b4e4c91b78c807927be0c2d619d26",
+          "bytes": 3627,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 2,
+          "mime_type": "image/webp",
+          "sha256": "b4885c835369474481885338c371799b0d7c7bf4f953d168f1ca57eff89258df",
+          "bytes": 414,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 3,
+          "mime_type": "image/png",
+          "sha256": "567af56afb9b1af16f52db7d95250e297d38d21efefcc8f5e6649555bc05559a",
+          "bytes": 3466,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 4,
+          "mime_type": "image/webp",
+          "sha256": "623aee977ded66d113309aa6c5c4e49d00488f3ceb7de9a1a5b8fe0dff1dbd5d",
+          "bytes": 43520,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 5,
+          "mime_type": "image/png",
+          "sha256": "83fcc1b32d2987d1d8f65f0e49ac4dd04cdd1b85af3261e57a569c7fdc4d6297",
+          "bytes": 796736,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        }
+      ],
+      "thumbnails": [
+        {
+          "file": "chandra.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "33a222427110c64fbc015a371d335f2ba4321fe5fd4877156a7762d1e81f05c4",
+          "bytes": 11510,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "van_allen.glb",
+      "keys": [
+        "van_allen"
+      ],
+      "valid": true,
+      "sha256": "be9ed53e1452c615750e8d2f977a168eb95216cb82fb698c16d5e08cb4b891f0",
+      "bytes": 933260,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular",
+        "KHR_materials_transmission"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "van_allen.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "b58b489100a5542002ecf9d7a8332a1be1b2e440841d7fe10a56b3c1a980130a",
+          "bytes": 15078,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "poes.glb",
+      "keys": [
+        "poes"
+      ],
+      "valid": true,
+      "sha256": "30a8bfdb6585bb87e27d8a847046a55f8c299456e3752d1b00786942c59035aa",
+      "bytes": 1158944,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular",
+        "KHR_materials_transmission"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "poes.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "1bd3bbd9b65b454809a70dac452eccfcf279ce2d0648124b49f9fb74f3089271",
+          "bytes": 23246,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "eo_1.glb",
+      "keys": [
+        "eo_1"
+      ],
+      "valid": true,
+      "sha256": "2d26422a45147e86c93c535979b1d9ae16d34fc0171f661dec051bca61c14a74",
+      "bytes": 224580,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "eo_1.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "763df78c2e40c2741e9cf8180dd015f3077415c50df922539eb6567f30d6eb4d",
+          "bytes": 16427,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "sac_c.glb",
+      "keys": [
+        "sac_c"
+      ],
+      "valid": true,
+      "sha256": "cf1e9ad3923ded6f6157ec06b545de50840b5b7c9526d0a9bda8be1f021ca745",
+      "bytes": 73608,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "sac_c.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "f7ff498ee0faa533901b43f5655fb8df34c5fc425c8f685d977b1814e9901609",
+          "bytes": 10554,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "radarsat_1.glb",
+      "keys": [
+        "radarsat_1"
+      ],
+      "valid": true,
+      "sha256": "db609daaf38354f67d73f412e44d78642383de157f0e2d1de85c3614562cb86f",
+      "bytes": 68148,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular",
+        "KHR_materials_transmission"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "radarsat_1.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "ddf17117f9589379147b5cac4d10f001a682379c778a58d11086645b57eab138",
+          "bytes": 13929,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "cubesat_1u.glb",
+      "keys": [
+        "cubesat_1u"
+      ],
+      "valid": true,
+      "sha256": "bae308ea2e33778c93675909f7dc2e0d5d6916cd685668a463566c61224b1e85",
+      "bytes": 149424,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "cubesat_1u.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "5b891dc0b580e6790473ebca1cf77823ac539d9ad7fff648a08b028974c3aeb0",
+          "bytes": 21191,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "ssl_1300.glb",
+      "keys": [
+        "ssl_1300"
+      ],
+      "valid": true,
+      "sha256": "63cd644d67ee49ab79e313bb6cb0495e9f6072d421a84e116c2c3f9c40bf9c0c",
+      "bytes": 510324,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "ssl_1300.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "325c89290c103ad025763839c33f3b873e7d7ab736584f728fa4dc1ca255125f",
+          "bytes": 15173,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "mms.glb",
+      "keys": [
+        "mms"
+      ],
+      "valid": true,
+      "sha256": "e3688a8db82f1918c3b4525f4ceed08b614a3a2c5be09ade5711baba30262eef",
+      "bytes": 335808,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "mms.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "7f4aca3655f5648e60100ba47f1a9d30e8b30aa048b7b09b31c5007229676e9f",
+          "bytes": 11186,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "cygnss.glb",
+      "keys": [
+        "cygnss"
+      ],
+      "valid": true,
+      "sha256": "830321f2d30099b4355f835d7ae5a2ab1f9f91c292dd01dfc008b8d4bf64c962",
+      "bytes": 1622924,
+      "errors": [],
+      "active_image_indices": [
+        0,
+        1
+      ],
+      "extensions_used": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco",
+        "webp"
+      ],
+      "image_checks": [
+        {
+          "index": 0,
+          "mime_type": "image/webp",
+          "sha256": "5162e2052c1fd3d360ec9a71c69b657300541d3edde66e1811356d9c9ae66007",
+          "bytes": 112506,
+          "decoded": true,
+          "width": 2048,
+          "height": 2048
+        },
+        {
+          "index": 1,
+          "mime_type": "image/png",
+          "sha256": "c49539b38011e28ab1026610bf309e8498a7a65226f40e68beb64b9eaf61f88d",
+          "bytes": 1441610,
+          "decoded": true,
+          "width": 2048,
+          "height": 2048
+        }
+      ],
+      "thumbnails": [
+        {
+          "file": "cygnss.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "3163dcd6ce00111519e02e1fdfac65d0d9e913d11a51b1d4acdd3c548f05c8f3",
+          "bytes": 25954,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "gpm.glb",
+      "keys": [
+        "gpm"
+      ],
+      "valid": true,
+      "sha256": "7068c880770bb2ac936e804a1af48e564c90b829ff884c405a4759e8da9e693e",
+      "bytes": 2257008,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "gpm.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "4f7f40bcd675df338749e11875ff802b69112c375e4aaeff8d59ba790097c2b1",
+          "bytes": 19346,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "hinode.glb",
+      "keys": [
+        "hinode"
+      ],
+      "valid": true,
+      "sha256": "104f23212d379541990c28b26999db3bcfb2ef0731285f2366219e5438e125e6",
+      "bytes": 276248,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "hinode.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "37fec6a38d6d62b21b549bf43e179a232368e56ca891ee1bdf533e5968fabf25",
+          "bytes": 11508,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "calipso.glb",
+      "keys": [
+        "calipso"
+      ],
+      "valid": true,
+      "sha256": "4abd7708d0f2629baf3e58e9d5df634c34692365791e58a7795742854e53de1d",
+      "bytes": 536084,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "calipso.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "f7ce1bebe95eb2dbcd8ca51ba4b07357b3a7cb4f2e4f5a6f08323b0bb4fef105",
+          "bytes": 14650,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "cloudsat.glb",
+      "keys": [
+        "cloudsat"
+      ],
+      "valid": true,
+      "sha256": "293aab60f12decc020fe7e19ddd0837b0643067425a4ad09f01ffd8a380e7423",
+      "bytes": 267656,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "cloudsat.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "1a9400ef79f9bd589b4e91f527296fd5a94ca97a36b66387d6b8ac8649eedac9",
+          "bytes": 17233,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "topex.glb",
+      "keys": [
+        "topex"
+      ],
+      "valid": true,
+      "sha256": "e5ff3cae87bbdc59c07a626bea1907aa24678038e1431ff703e85fe9d5c88c0c",
+      "bytes": 214264,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "topex.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "b0a22615f4e4f2695132fb1a79fa4f9e44461b08b0797c73b82946ddf8afc956",
+          "bytes": 15334,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "ibex.glb",
+      "keys": [
+        "ibex"
+      ],
+      "valid": true,
+      "sha256": "6ce15c60467673f599c7085ed5152a07d0335628109741848ce64835e3786406",
+      "bytes": 1306616,
+      "errors": [],
+      "active_image_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "extensions_used": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco",
+        "webp"
+      ],
+      "image_checks": [
+        {
+          "index": 0,
+          "mime_type": "image/webp",
+          "sha256": "0e3e330ec7a0f97ef62a6cb4330b920ae8f93f9e819e80642b1e4e2ac149b067",
+          "bytes": 774,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 1,
+          "mime_type": "image/png",
+          "sha256": "fb58fcd71c70b6714e2c06e3d0ebc3f5e77b4e4c91b78c807927be0c2d619d26",
+          "bytes": 3627,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 2,
+          "mime_type": "image/webp",
+          "sha256": "b4885c835369474481885338c371799b0d7c7bf4f953d168f1ca57eff89258df",
+          "bytes": 414,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 3,
+          "mime_type": "image/png",
+          "sha256": "567af56afb9b1af16f52db7d95250e297d38d21efefcc8f5e6649555bc05559a",
+          "bytes": 3466,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 4,
+          "mime_type": "image/webp",
+          "sha256": "1885a511df850a5d3c41c6dfd1b36a617216748e4848ba8e34082a9dac1927f4",
+          "bytes": 125026,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 5,
+          "mime_type": "image/png",
+          "sha256": "d210ac1beac1dd1e57f52a764ae8ecb98a1549359104cb38ca9c9e05b1b981b4",
+          "bytes": 1128215,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        }
+      ],
+      "thumbnails": [
+        {
+          "file": "ibex.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "508f705fba81a2a4595b27239519897050d9d2a0eb92cc004de2bddbe833b9c4",
+          "bytes": 16713,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "fermi.glb",
+      "keys": [
+        "fermi"
+      ],
+      "valid": true,
+      "sha256": "d345f3b0595f7792f699acf33b28d7401cb53cc2a20b735bca00e95644e3813c",
+      "bytes": 1379016,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "fermi.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "39155080e3c3f352ed0dcb9f6261b4aeefa125b3f04826c25aec3dfa0448670b",
+          "bytes": 15393,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "aquarius.glb",
+      "keys": [
+        "aquarius"
+      ],
+      "valid": true,
+      "sha256": "dc81055c83e5da56d3ae57f4c967010be64ad5d01cee4cdb0a88c85c2b628116",
+      "bytes": 1137428,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "aquarius.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "1164bfd00a431fde585cf0b7648346159421421475cfd8374c48c8230d87631c",
+          "bytes": 24212,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "geotail.glb",
+      "keys": [
+        "geotail"
+      ],
+      "valid": true,
+      "sha256": "3b39a3fc157731421869dab707dd5c4d3d829ab0b727b2a6cc8bc211fd96a8ad",
+      "bytes": 91504,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "geotail.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "f20a0127a264db32b1cc4323516dc3a5ef0fcad834ffe249a66ef73c27b800d6",
+          "bytes": 11671,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "themis.glb",
+      "keys": [
+        "themis"
+      ],
+      "valid": true,
+      "sha256": "2dfe2a2e07de211f6686adbb612c09c5dfac62a397cb88343f119c2124d818e3",
+      "bytes": 682092,
+      "errors": [],
+      "active_image_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "extensions_used": [
+        "EXT_texture_webp",
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco",
+        "webp"
+      ],
+      "image_checks": [
+        {
+          "index": 0,
+          "mime_type": "image/webp",
+          "sha256": "0e3e330ec7a0f97ef62a6cb4330b920ae8f93f9e819e80642b1e4e2ac149b067",
+          "bytes": 774,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 1,
+          "mime_type": "image/png",
+          "sha256": "fb58fcd71c70b6714e2c06e3d0ebc3f5e77b4e4c91b78c807927be0c2d619d26",
+          "bytes": 3627,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 2,
+          "mime_type": "image/webp",
+          "sha256": "b4885c835369474481885338c371799b0d7c7bf4f953d168f1ca57eff89258df",
+          "bytes": 414,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 3,
+          "mime_type": "image/png",
+          "sha256": "567af56afb9b1af16f52db7d95250e297d38d21efefcc8f5e6649555bc05559a",
+          "bytes": 3466,
+          "decoded": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "index": 4,
+          "mime_type": "image/webp",
+          "sha256": "422052631f424e24709a56c67c54fce44be86dae734100e5e48adfbbd44b0aee",
+          "bytes": 26312,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        },
+        {
+          "index": 5,
+          "mime_type": "image/png",
+          "sha256": "03075d9185d820176019da2c4ef17805643dd48cce21c87660221895da6f32fc",
+          "bytes": 597333,
+          "decoded": true,
+          "width": 1024,
+          "height": 1024
+        }
+      ],
+      "thumbnails": [
+        {
+          "file": "themis.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "2c1825a5563c5c1d4f6a53e0c32283ed3911bedb9b9142c387fb5e8bcdf2c5ba",
+          "bytes": 10139,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "sorce.glb",
+      "keys": [
+        "sorce"
+      ],
+      "valid": true,
+      "sha256": "8ec505080199227d25897f5157f4cd87e60092d69b16079deb3ca32caa2ce10d",
+      "bytes": 366492,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "sorce.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "069ca87a8389dca587955ee3130370be102999f1c4c7edce763678c52dc57f81",
+          "bytes": 12787,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "toms.glb",
+      "keys": [
+        "toms"
+      ],
+      "valid": true,
+      "sha256": "36578255a65849073c12d596d255a2fc2042730576bfb433bb9073eb66d287d2",
+      "bytes": 98620,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "toms.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "28ac495afd1022b1a4ec3ecb3c3812cec37e7b3dd351418509a67db8036e3ec4",
+          "bytes": 14752,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "polar.glb",
+      "keys": [
+        "polar"
+      ],
+      "valid": true,
+      "sha256": "0ffe9e41f6686db7dcaf3144f967f0f419e72b6a90218d955b1654cf0478801d",
+      "bytes": 98592,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression",
+        "KHR_materials_specular",
+        "KHR_materials_transmission"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "polar.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "65a7bffa9ce468df9c51a9191eb7a85d672c7d02efc389b53c87814148a96c10",
+          "bytes": 13709,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "swas.glb",
+      "keys": [
+        "swas"
+      ],
+      "valid": true,
+      "sha256": "c1d58e66cb2f1185fc98b5941cbfeb3dbdb453b817a87f95e6bf8d176630f5a1",
+      "bytes": 150296,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "swas.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "d34ab1f02edeefe274717f83c3d7efce4adfd3d4483fec3bcc427155a50f4af7",
+          "bytes": 13410,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "fuse.glb",
+      "keys": [
+        "fuse"
+      ],
+      "valid": true,
+      "sha256": "056c26e4f48bc362790ebc42c7c85101037c92b4f50a313bbe2783fc7004cdf8",
+      "bytes": 236704,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "fuse.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "b2dc07db7f907fedb28f2f8ab008feb7cc435be057ed8073de671f8c69258667",
+          "bytes": 10195,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "wire.glb",
+      "keys": [
+        "wire"
+      ],
+      "valid": true,
+      "sha256": "adffb87ebd6d884f47b8d82b0aa8c37f72dc1c72bf532ba4117a94c392f6b2d0",
+      "bytes": 375404,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "wire.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "d1d293662380c89cb848ccd6a94b39fec5920d98c7129a575aa7a3820ee4efa0",
+          "bytes": 13542,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "hete_2.glb",
+      "keys": [
+        "hete_2"
+      ],
+      "valid": true,
+      "sha256": "f514f7cff65c0d4d565408b3f6ba113c4a3b97321a3fe770c89f67820e83922c",
+      "bytes": 61836,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [
+        "KHR_draco_mesh_compression"
+      ],
+      "required_codecs": [
+        "draco"
+      ],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "hete_2.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "7edc2ae73326b0f86ae837dbfb1e46b377f8be29a328be828940d8174f3b9879",
+          "bytes": 12666,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "starlink_flat.glb",
+      "keys": [
+        "starlink_flat"
+      ],
+      "valid": true,
+      "sha256": "1f2bd994bca491b82ddaafaae70805b9cab8e8ac42bb1444463e566e44bf29ec",
+      "bytes": 14096,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [],
+      "required_codecs": [],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "starlink_flat.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "a754af76ac86c60e4c4f7bad35b81d42c6ddcc26171e0040d3e316277c50d836",
+          "bytes": 4890,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "gnss_bus.glb",
+      "keys": [
+        "gnss_bus"
+      ],
+      "valid": true,
+      "sha256": "caa606c93deae3608a8a7ddb2a66c88d266f9bf11b838e56df47a7f6130e5c7e",
+      "bytes": 43068,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [],
+      "required_codecs": [],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "gnss_bus.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "d0c45d4aa4f5ba4a60b287a15fd01ad192fcedd458c23c175a26f77bfe966cae",
+          "bytes": 6467,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "leo_comms_bus.glb",
+      "keys": [
+        "oneweb",
+        "kuiper",
+        "iridium",
+        "globalstar",
+        "orbcomm",
+        "o3b",
+        "china_leo_comms"
+      ],
+      "valid": true,
+      "sha256": "aba350d67d392924b68b2f8abf9712e55200ad4a88d2340e44c3f5220b84ff09",
+      "bytes": 15896,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [],
+      "required_codecs": [],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "leo_comms_bus.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "a9cd06ac8b09a8b6b6f9630a8fe992f6165fb0e07af17aee0798925fbe647e65",
+          "bytes": 6406,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    },
+    {
+      "file": "cubesat_3u.glb",
+      "keys": [
+        "cubesat_3u"
+      ],
+      "valid": true,
+      "sha256": "8657ecec5c182900985c92b85281f49ca4c7859e1ff40b704aef7a54359d073f",
+      "bytes": 10608,
+      "errors": [],
+      "active_image_indices": [],
+      "extensions_used": [],
+      "required_codecs": [],
+      "image_checks": [],
+      "thumbnails": [
+        {
+          "file": "cubesat_3u.jpg",
+          "mime_type": "image/jpeg",
+          "sha256": "a60d42aedbc57c216d2166d5bffe73e822bf920065203167646c38bf8329b804",
+          "bytes": 7668,
+          "decoded": true,
+          "width": 640,
+          "height": 360
+        }
+      ]
+    }
+  ],
+  "errors": [
+    "terra.glb:external_image:0:..\\Terra.fbm\\Side_Panels_TERRA.tga",
+    "terra.glb:external_image:1:..\\Terra.fbm\\solarpanels.tga"
+  ]
+}
