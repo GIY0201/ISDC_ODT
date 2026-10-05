@@ -50,7 +50,9 @@ export function createSatelliteModelPanel(globe) {
     if (/^https:\/\//.test(text.creditUrl)) credit.setAttribute('href', text.creditUrl);
     else credit.removeAttribute('href');
     const status = state.status || {phase: 'unassigned'};
-    node('status').textContent = `${phases[status.phase] || '상태 미확인'}${status.error ? ' · ' + status.error : ''}${state.tracking ? ' · 선택 위성 추적 중' : ''}`;
+    const manifest = state.manifest;
+    const manifestText = manifest?.phase === 'error' ? ` · 모델 목록 오류: ${manifest.error}` : manifest?.phase === 'loading' ? ' · 모델 목록 준비 중' : '';
+    node('status').textContent = `${phases[status.phase] || '상태 미확인'}${status.error ? ' · ' + status.error : ''}${manifestText}${state.tracking ? ' · 선택 위성 추적 중' : ''}`;
     const canFocus = !!state.selected && !['hidden_no_geometry', 'error'].includes(status.phase);
     node('focus').disabled = !canFocus; node('follow').disabled = !canFocus;
     node('release').disabled = !state.tracking;

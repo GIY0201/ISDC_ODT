@@ -476,3 +476,8 @@ Official NASA pinnedtree/alternateGLB/FBX/archive checks show Terra exacttexture
 - 변경: 기존catalog timeline의 readonly currentUtc/sampleAt/advanceUtc, exact pin/native buffer/GP fence/윤초·gap보존. workspace_globe 단일renderer modelState/observeModel/show/카메라/status revision 및정리.
 - 검증: Node314PASS1177.5623ms/Python439PASS5기존warnings181.99s/exit0; missing method RED→PASS. validation/t128_model_boundaries.md.
 - 남음: 실제 선택·profile·manifest·panel·hover 조립/staticmount/8891 실제render/Terra/T129/solar/fullT075–84·기존보류. 서버restart/포트/native/API/PR/병합 변경없음.
+
+## 2026-10-05 T128 선택 위성 모델 매칭 부분 진행
+- 변경: 현재위성/profile/native GP매칭 조립helper·늦은manifest차단·반복로딩방지, 고정static manifest transport와독립오류표시. 실제workspace import/mount전.
+- 검증: Node320PASS1208.3885ms/Python439PASS5기존warnings186.30s/exit0; 실제원본resolver의nullcatalog/epoch정밀도RED 수정. validation/t128_model_selection.md.
+- 남음: 실제catalog hooks/workspace/modelpanel/hover/staticmount/8891 렌더검증/Terra/solar/fullT075–84·기존보류. 서버restart/native/API/PR/병합 없음.

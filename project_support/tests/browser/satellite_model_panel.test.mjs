@@ -27,5 +27,6 @@ test('no model clears thumbnail/credit, no selection and missing geometry disabl
  assert.equal(f.get('satellite-model-image').hidden,true);assert.equal(f.get('satellite-model-credit').hidden,true);assert.equal(f.get('satellite-model-focus').disabled,true);
  state={selected:{catalog_number:1},match:{title:'x',label:'x',quality:'series',credit:'literal',creditUrl:'javascript:attack()',thumbnail:'/x.jpg'},status:{phase:'hidden_no_geometry'},tracking:false};panel.update();
  assert.equal(f.get('satellite-model-focus').disabled,true);assert.equal(f.get('satellite-model-credit').attributes.href,undefined);assert.equal(f.get('satellite-model-retry').disabled,true);
+ state.manifest={phase:'error',error:'manifest 404'};panel.update();assert.match(f.get('satellite-model-status').textContent,/manifest 404/);
  panel.destroy();}finally{f.dispose();}
 });

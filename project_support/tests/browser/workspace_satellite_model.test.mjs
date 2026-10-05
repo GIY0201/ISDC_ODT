@@ -25,6 +25,7 @@ const source=()=>({timeSource:()=> '2026-10-05T00:00:00.000000000Z',advanceUtc:(
 
 test('preboot current model only, copied description/status and explicit camera actions share existing renderer',async()=>{
  const f=await fixture(),events=[],remove=f.ui.observeModel(v=>events.push(v)),a=description(),b=description(123);
+ f.ui.modelManifestStatus({phase:'error',error:'missing manifest'});assert.equal(f.ui.modelState().manifest.error,'missing manifest');const metadata=f.ui.modelState();metadata.manifest.error='changed';assert.equal(f.ui.modelState().manifest.error,'missing manifest');
  f.ui.setSatelliteModel(a,source());a.orientation.heading=90;f.ui.setSatelliteModel(b,source());f.boot();await Promise.resolve();assert.equal(f.renderers.length,1);
  const shown=f.calls.filter(c=>c[0]==='show');assert.equal(shown.length,1);assert.equal(shown[0][1].satelliteId,123);assert.equal(f.ui.modelState().status.phase,'loading');assert.equal(f.ui.modelState().match.orientation.heading,0);
  const snap=f.ui.modelState();snap.match.orientation.heading=90;assert.equal(f.ui.modelState().match.orientation.heading,0);

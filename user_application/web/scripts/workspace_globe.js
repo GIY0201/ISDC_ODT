@@ -5,9 +5,9 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let globe=null,latest=null,catalog=null,sceneInput=null,sceneMetadata=null,trackInput=null,onCatalogSelect=()=>{},groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
   let choice={mode:'3d',imagery:'blue_marble',theme:'dark',emphasis:true},imagery={requestedImagery:'blue_marble',displayedImagery:null,phase:'pending',error:null},mode={phase:'ready',error:null},modeRevision=0;
   const viewObservers=new Set();
-  let modelDescription=null,modelSource=null,modelRevision=0,modelStatus={phase:'unassigned'};
+  let modelDescription=null,modelSource=null,modelRevision=0,modelStatus={phase:'unassigned'},modelManifest={phase:'pending',error:null};
   const modelObservers=new Set();
-  const modelState=()=>structuredClone({selected:modelDescription?{catalog_number:modelDescription.satelliteId,normalized_gp_sha256:modelDescription.normalized_gp_sha256}:null,match:modelDescription?.url?modelDescription:null,status:modelStatus,tracking:Boolean(globe?.modelLayer?.tracking)});
+  const modelState=()=>structuredClone({selected:modelDescription?{catalog_number:modelDescription.satelliteId,normalized_gp_sha256:modelDescription.normalized_gp_sha256}:null,match:modelDescription?.url?modelDescription:null,status:modelStatus,manifest:modelManifest,tracking:Boolean(globe?.modelLayer?.tracking)});
   const notifyModel=()=>{if(!disposed)for(const fn of modelObservers)fn(modelState());};
   function applyModel(){
     if(!globe||disposed||!modelDescription||!modelSource)return;
@@ -84,6 +84,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
     modelState,
+    modelManifestStatus(value){if(disposed)return;modelManifest=structuredClone(value);notifyModel();},
     observeModel(fn){if(disposed)return()=>{};modelObservers.add(fn);fn(modelState());return()=>modelObservers.delete(fn);},
     setSatelliteModel(description,source){
       if(disposed)return;
