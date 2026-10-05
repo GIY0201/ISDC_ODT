@@ -426,3 +426,8 @@ Final productcode2a447be/Python423PASS243.40s/Node224PASS966.3763ms evidence con
 
 ## 2026-10-05 US16 Draft publication complete / originalGLB correction
 T111–T116 scopedcomplete: attached DraftPR30 https://github.com/GIY0201/ISDC_ODT/pull/30 above29/open/unmerged/mergeabletrue,39blobSHAverified/remotehead6e1bef2/tree6c98af43a6462ddb53781b2c8a78750bbc48d834 exactlocal749a999. Fetched/exactclean tree then softreconciled; originalseries saved codex/catalog-track-passes-local-749a999/no hardreset. FunctionalPython423/Node224/8891 proof unchanged. Nextoriginaldisplayaudit found50GLB/56manifest mappings and realSatelliteModelLayer; earlierSVG-only assumption explicitly superseded in research/audit. catalog_view_source_audit.md records modes/imagery/theme/sun/follow/model source and syntheticsunfallback/garbledmetadata design gaps. WholeT075–T084 remainopen; no runtimeassetcopy/newstack/merge. Nextspecify/plan/tasks for originalremainingT075,thenimplementation; allT032/deferredscope retained.
+
+## 2026-10-05 Globe display renderer progress
+- 변경: 원본2D/3D/지도/테마 표시 요구를US17로세분화. 단일Viewer 주입 렌더러의전환취소/지도최신응답/원본NaturalEarth대체/소유레이어·리스너정리/명암값 구현. 모델·태양연구결과와Terra텍스처누락후속수용기준보존.
+- 검증: REDmissingmodule확인후6behaviorPASS,전체Node230PASS1117.1831ms/Python423PASS5warnings174.32s/gitdiffcheck. 초기Python기본temp권한오류269PASS154setupERROR는별도보존;새projectbasetemp재검증통과. validation/t118_globe_view_renderer.md.
+- 남음: OrbitGlobe위임/provider주입/표식색·UI설정/실제8891두해상도/Draft검토. 이번새UI/지도실행완료아님;포트변경·서버재시작없음. T075partial/T076–84/GLB·태양·성능·실수신·저장파일검증보존,자동병합없음.

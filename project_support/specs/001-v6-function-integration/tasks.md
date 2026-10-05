@@ -215,3 +215,11 @@ Dependency: T104 native RED→T105; T104 backend RED→T106→T107; T104 browser
 - [x] T115 [US16] Add injected segmented track polyline to OrbitGlobe, original width3/ArcType.NONE/toggle/no failurebridge/oneViewer; fullcatalog/stations/selection preserved.
 - [x] T116 [US16] WholePython/Node/scalar/native evidence/actual8891twores/readonly/pick/passseek/replay/toggle/restore and Draft abovePR29; validation/t116_catalog_track_passes.md/ledger/log/audit.
 Dependency111→112→113→114→115→116. OriginalT075 sun/2D3D/imagery/labels/representativeSVG andT076–84 remain open; T032/SC006/F001/F004–6/diskunknown preserved.
+
+## US17 / T075 globe view controls
+- [ ] T117 [US17] Add RED source style/mode/provider ordering/failure/disposal tests in project_support/tests/browser/globe_view.test.mjs and application assembly coverage in project_support/tests/browser/workspace_globe_view.test.mjs; FR026/SC023.
+- [ ] T118 [US17] Implement injected morph/style/owned imagery lifecycle in digital_twin/visualization/globe_view.js and delegate from digital_twin/visualization/orbit_globe.js; exact enums/defaults and original navigation/style values per contracts/globe_view.md.
+- [ ] T119 [US17] Inject provider construction and preboot/late/status handling in user_application/web/scripts/workspace_globe.js; preserve other layers/UTC/state and repaint native catalog palette/labels/track in digital_twin/visualization/orbit_globe.js.
+- [ ] T120 [US17] Add accessible choice panel/drafts/dispose in user_application/web/scripts/tabs/globe_view.js and compose in user_application/web/scripts/workspace_orbit.js; retain source errors and state across window restore.
+- [ ] T121 [US17] Run full Python/Node/actual8891twores/mode-map-style-fallback-restore/oneViewer/readonly, record project_support/specs/001-v6-function-integration/validation/t121_globe_view.md and publish reviewed Draft abovePR30.
+Dependency117 rendererRED->118;117applicationRED->119->120->121. Sixteen prior stories unchanged. Scoped independently testable choices with shared native scene; no delegated edits. T075 GLB/camera/solar and allT076–84 remain tracked, no overall completion claim.
