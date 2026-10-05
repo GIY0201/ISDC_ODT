@@ -523,3 +523,8 @@ Actualowned31524/3780 CIMconfirmed (standarddenied/read-onlyescalation), freshly
 - 변경: 선배 태양 표식 투영 규칙50ms/80000000m/45px/차폐/2D숨김 이식, 정밀ITRF 주입·조명부호/밝기·소유플래그정리. invalid status/같은순간재시도 RED 수정.
 - 검증: target7PASS77.9063ms/Node334PASS1228.9975ms/Python471PASS8warnings201.73s; validation/t133_solar_renderer.md. 실제 UI 연결·두해상도 검증 전.
 - 남음: T134–137 buffer/preferences/조립/live/Draft, US18Terra/fullT075–84/T032/장비/다운로드. 서버/8891/native/wheel/runtime/PR/병합변경없음.
+
+## 2026-10-05 T134 solar display buffer
+- 변경: 기존UTCcodec와native태양API 재사용,601표본/1SI초/정규화보간/120초미리받기/최대2buffer/역방향·최신시각·출처fence/명시재시도. 반대방향표본 보간실패 RED 수정.
+- 검증: target10PASS202.4369ms/Node344PASS1364.4604ms/Python471PASS8warnings204.02s. 실제native→JS9604시각 대조 최대2.4115991620879543e-10rad<1e-6; 모델일치만 검증. validation/t134_solar_timeline.md.
+- 남음: T135–137 preferences/UI조립/live/Draft, US18Terra/fullT075–84/T032/장비/다운로드. 서버/8891/native/wheel/runtime/API/PR/병합변경없음.
