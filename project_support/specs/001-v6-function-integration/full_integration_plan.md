@@ -102,3 +102,6 @@ Final US11 review: malformed manifest startup isolation hardened; historical tes
 
 ## 2026-10-05 US12 station connection complete
 FR020/SC018/T090–94 → validation/t094_ground_stations.md. Original29sites/5groups/cards preserved; Python385PASS137.93s/Node175PASS673.2623ms/actual8891twores/list-and-mouse-pick/filter/clear/restore/views/canvas1/console0/liveGP-UTC-virtualpoint-SIMreadonly. Initial static404expectation corrected against unchanged HTMLfallback; encodedtraversal404. ADR0011/sourcegolden/labels/overlap fallback recorded. Scoped verify complete, overall implement/verify running; T075partial/T076–84/F001/F002/F004–6/T032/W06diskunknown unchanged. Draftabove25/no merge, fixed8891/verifiedrestartSIMmemoryreset only.
+
+## 2026-10-05 US13 station calculation connection
+FR021/SC019/T095–98→validation/t098_station_observer.md: original preset lat/lon/mask to explicit draft and existing virtual-ground apply/radio/visibility. Height datum unknown preserves user height. Python385/Node181/actual8891twores verified. T075 catalog dynamic/multiple/playback/3D remains partial; other gaps preserved.

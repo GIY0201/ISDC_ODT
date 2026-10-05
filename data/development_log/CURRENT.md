@@ -364,3 +364,6 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 
 ## 2026-10-04 W04 임무 관리 V6 연결
 기존 임무 API/계산을 변경하지 않고 V6 서버 목록/작업 CRUD/상태/충돌/재계획 preview·apply를 연결했다. 전체 Python371PASS125.76s(기존경고1),Node134PASS457.4237ms,실제8891두해상도/소수키/복원/입력18개 보존 확인. 최초pytest Temp권한148setup오류는workspace새basetemp로해소했고원본실패로그보존. 원본lane재계획은의존충돌전체해소를보장하지않으며preview현재검증/최신재계산을구분. W05후속/F001/T032보류 유지. 상세 validation/t058_mission_workspace.md. Draft PR 리뷰, 자동병합없음.
+
+## 2026-10-05 US13 지상국→기존 계산 연결
+원본좌표/최소각을명시초안으로전달하고기존적용·가시구간·거리/도플러를재사용. 높이datum미확인으로사용자타원체높이유지; 저장GP/UTC/주파수보존. 최종Node181PASS713.1441ms/Python385PASS140.61s(기존경고1),actual8891두해상도/대전8구간·스발바르없음/거리계산/단일canvas/error0. RED누락버튼및harness오류구분, no-input초안소실을선택first안내로보완. 서버재시작없음/8891유지. validation/t098_station_observer.md. T075partial/다른gap/F001/F002/F004–6/T032/W06diskunknown보존,stackedDraft리뷰/자동병합없음.

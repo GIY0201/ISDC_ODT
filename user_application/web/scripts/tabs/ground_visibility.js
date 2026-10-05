@@ -39,7 +39,7 @@ export function visibilityMarkup(result){
 }
 
 export function createGroundPanel(client,api,{onInterval=()=>{},onInvalidate=()=>{}}={}){
-  let active=false,panel=null,draft=null,rangeInput=null,working=false,message='',dirty=false,pointKey=null;
+  let active=false,panel=null,draft=null,rangeInput=null,working=false,message='',dirty=false,pointKey=null,dead=false;
   const controller=createGroundVisibility(client,api,render);
   function cancelVisibility(){controller.cancel();onInvalidate();}
   function render(){
@@ -94,5 +94,17 @@ export function createGroundPanel(client,api,{onInterval=()=>{},onInvalidate=()=
     for(const item of items){if(!ids.includes(item.id)||typeof item.value!=='string')continue;const field=panel.querySelector('#'+item.id);if(field&&field.value!==item.value){field.value=item.value;changed=true;}}
     if(changed){dirty=true;draft=readFields();cancelVisibility();message='별도 창에서 전달된 편집값 · 적용 전입니다.';render();}
   }
-  return {applyDraft,show(view){active=view==='ground';render();},update:render,destroy:()=>cancelVisibility()};
+  function stageStation(site){
+    if(dead||working||client.snapshot().status==='pending')return false;
+    if(!client.snapshot().state?.input_id){message='저장 궤도 입력을 먼저 선택한 뒤 지상국 좌표를 가져오세요.';render();return false;}
+    if(!site||typeof site.key!=='string'||![site.latitude,site.longitude,site.minElevationDeg].every(Number.isFinite)||Math.abs(site.latitude)>90||Math.abs(site.longitude)>180||site.minElevationDeg<0||site.minElevationDeg>90)return false;
+    const state=client.snapshot().state;
+    const values=panel?.isConnected?readFields():draft||{height:String(state?.ground_point?.ellipsoid_height_m??0),start:'',end:''};
+    if(!values.start&&!values.end){const record=client.snapshot().inputs.find(row=>row.input_id===state?.input_id);if(record){values.start=record.epoch_utc;values.end=createUtcCodec(state.leap_sha256).advance(record.epoch_utc,86400);}}
+    draft={...values,lat:String(site.latitude),lon:String(site.longitude),angle:String(site.minElevationDeg)};
+    dirty=true;cancelVisibility();if(panel?.isConnected)writeFields(draft);
+    message=`${site.name} (${site.key}) 대표 좌표·최소각을 초안에 가져왔습니다. 높이는 기준면 미확인으로 복사하지 않았습니다. 현재 타원체 높이를 확인하고 적용하세요. 저장 궤도 입력으로 계산하며 카탈로그 표시 위성과는 별개입니다. 실제 통신 미확인.`;
+    render();return true;
+  }
+  return {stageStation,applyDraft,show(view){active=view==='ground';render();},update:render,destroy(){dead=true;cancelVisibility();}};
 }

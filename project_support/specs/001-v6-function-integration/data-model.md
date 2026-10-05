@@ -56,3 +56,5 @@ serverquery는normalizedGP의canonicalJSONhash, epoch, source, listfetched_at, t
 
 ## US12 view-only station selection
 ReferenceSite: original key/name/group/region/operator/network/role/latitude/longitude/altitudeKm/dishMeters/bands/minElevationDeg/presetKey. All positions are original representative presets. StationSelection: selectedKey|null, group=all|sourcegroup, display copy; no persisted physical station state. Scene entities keyed reference-ground-{key}; virtual-ground-point/stored-orbit-satellite unaffected. List/canvas invoke same selector. Unknown key leaves selection unchanged, clear retains all markers and existing camera; explicit focus moves camera only. Dispose releases pick handler once.
+
+US13: StationDraft is local lat/lon/angle plus existing height/start/end strings. Source station key/name is an explanatory message, never authoritative server metadata. GroundPoint remains virtual WGS84. No source altitudeKm-to-ellipsoid-height conversion. Selected catalog geometry remains separate from stored orbit input.
