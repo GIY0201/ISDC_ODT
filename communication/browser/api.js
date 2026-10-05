@@ -52,6 +52,8 @@ export const api = {
   health: () => request("/api/health"),
   catalogPosition: (payload,{signal}={}) => request("/api/catalog/position",{method:"POST",headers:jsonHeaders,body:JSON.stringify(payload),signal}),
   catalogScene: (payload,{signal}={}) => orbitRequest("/api/catalog/scene",{method:"POST",headers:jsonHeaders,body:JSON.stringify(payload),signal}),
+  catalogTrack: (payload,{signal}={}) => orbitRequest("/api/catalog/track",{method:"POST",headers:jsonHeaders,body:JSON.stringify(payload),signal}),
+  catalogVisibility: (payload,{signal}={}) => orbitRequest("/api/catalog/visibility",{method:"POST",headers:jsonHeaders,body:JSON.stringify(payload),signal}),
   catalogSamples: (payload,{signal}={}) => request("/api/catalog/samples",{method:"POST",headers:jsonHeaders,body:JSON.stringify(payload),signal}),
   satelliteGroups: ({signal} = {}) => request("/api/satellite-groups", {signal}),
   satellites: ({ group = "active", limit = 0, offset = 0, query = "", orbit = "all" } = {}, {signal} = {}) => request(`/api/satellites?group=${encodeURIComponent(group)}&limit=${limit}&offset=${offset}&q=${encodeURIComponent(query)}&orbit=${encodeURIComponent(orbit)}`, {signal}),

@@ -1,3 +1,6 @@
+import {createCatalogTrack} from '../../../user_application/web/scripts/catalog_track.js';
+import {createCatalogPasses} from '../../../user_application/web/scripts/catalog_passes.js';
+import {createCatalogPassPanel} from '../../../user_application/web/scripts/tabs/catalog_passes.js';
 import {createCatalogTimePanel} from '../../../user_application/web/scripts/tabs/catalog_time.js';
 import {createCatalogScene} from '../../../user_application/web/scripts/catalog_scene.js';
 import {createCatalogScenePanel} from '../../../user_application/web/scripts/tabs/catalog_scene.js';
@@ -71,6 +74,7 @@ export function fixture(width=1280,height=720,options={}){
   class PrimitiveCollection {constructor(){this.items=[];}add(v){this.items.push(v);return v;}}
   class Cartesian3 {constructor(x,y,z){Object.assign(this,{x,y,z});}static fromDegrees(lon,lat,h){return new Cartesian3(lon,lat,h);}}
   const Cesium={Viewer,Cartesian3,Color:{CYAN:'cyan',WHITE:'white',fromCssColorString:v=>v},JulianDate:{fromIso8601:v=>v},ReferenceFrame:{FIXED:'fixed'},ConstantPositionProperty:class{constructor(value){this.value=value;}},BoundingSphere:class{},HeadingPitchRange:class{},Matrix4:{IDENTITY:{}},EllipsoidTerrainProvider:class{},SingleTileImageryProvider:{fromUrl:()=>new Promise(()=>{})}};
+  Cesium.ArcType={NONE:0};
   Cesium.PointPrimitiveCollection=PrimitiveCollection;Cesium.LabelCollection=PrimitiveCollection;Cesium.NearFarScalar=class{};Cesium.Cartesian2=class{};Cesium.LabelStyle={FILL_AND_OUTLINE:1};Cesium.Color.TRANSPARENT='transparent';
   Cesium.ScreenSpaceEventType={LEFT_CLICK:1};Cesium.ScreenSpaceEventHandler=class{constructor(){pickHandlers.push(this);}setInputAction(fn){this.click=fn;}destroy(){this.dead=true;}};
   const originalColor=Cesium.Color.fromCssColorString;Cesium.Color.fromCssColorString=v=>Object.assign(new String(originalColor(v)),{withAlpha:alpha=>({css:v,alpha})});
@@ -82,7 +86,7 @@ export function fixture(width=1280,height=720,options={}){
   api.bootstrap=options.planningBootstrap??(async()=>{throw Error("Planning transport not supplied");});
   for(const key of ['runtimeControl','runtimeSpeed','selectScenario','injectFault','missionAction','missionTask','validateMission','replanMission'])api[key]=options[key];
   api.route=options.planningRoute;api.contacts=options.planningContacts;
-  api.catalogScene=options.catalogScene;api.catalogSamples=options.catalogSamples;api.catalogPosition=options.catalogPosition;api.satelliteGroups=options.satelliteGroups;api.satellites=options.satellites;api.satelliteProfile=options.satelliteProfile;
+  api.catalogTrack=options.catalogTrack;api.catalogVisibility=options.catalogVisibility;api.catalogScene=options.catalogScene;api.catalogSamples=options.catalogSamples;api.catalogPosition=options.catalogPosition;api.satelliteGroups=options.satelliteGroups;api.satellites=options.satellites;api.satelliteProfile=options.satelliteProfile;
   api.report=options.report;for(const key of ['deviceAction','hilPreflight','hilSequence','recording'])api[key]=options[key];
   api.orbitRadio=options.radioRequest;
   api.orbitRadioSeries=options.seriesRequest;
@@ -91,7 +95,7 @@ export function fixture(width=1280,height=720,options={}){
   const schedule=set=>()=>{const id=++nextId;set.add(id);return id;};
   Object.assign(win,{Cesium,setTimeout:()=>++nextId,clearTimeout(){},BroadcastChannel:Channel,opener:options.opener??null,open:options.open??(()=>null),close:()=>{win.closed=true;}});
   context=vm.createContext({document:doc,window:win,innerWidth:width,innerHeight:height,location:{hash:options.hash??'#ground',search:options.popout?'?popout=1':'',origin:'http://localhost',href:'http://localhost/#ground'},URL,URLSearchParams,structuredClone,performance:{now:()=>0},crypto:{randomUUID:()=>String(++nextId)},queueMicrotask:fn=>jobs.push(fn),api,drawMultiLine:(canvas,series)=>charts.push(structuredClone(series)),drawSparkline:(canvas,series)=>charts.push(structuredClone(series)),GROUND_STATIONS,stationGroups,createStationPanel,createCatalogTimePanel,createCatalogTimeline:(api,display,notify)=>createCatalogTimeline(api,display,notify,{now:()=>0,requestFrame:schedule(frames),cancelFrame:id=>frames.delete(id),requestId:()=>String(++nextId)}),hilTopology,createHilPanel,createCatalogPanel,createCatalogGeometry,createKpiPanel,telemetrySocket:(message,status)=>{const stream={message,status,closed:0};streams.push(stream);return()=>stream.closed++;},createSimPanel,createMissionPanel,createRadioSeriesPanel,createGroundPanel,createRfPanel,createCommunicationPlanningPanel,createOrbitRadioPanel,createWorkspaceRevisionSync:c=>createWorkspaceRevisionSync(c,win),createOrbitSelection:()=>client,createWorkspaceGlobe:(container,status,button)=>createWorkspaceGlobe(container,status,button,win),createWorkspacePlayback:(c,show)=>createWorkspacePlayback(c,show,{now:()=>0,requestFrame:schedule(frames),cancelFrame:id=>frames.delete(id),setTimer:schedule(timers),clearTimer:id=>timers.delete(id)}),BroadcastChannel:Channel});
-  Object.assign(context,{createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
+  Object.assign(context,{createCatalogTrack,createCatalogPasses,createCatalogPassPanel,createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
   // Imported ground UI uses the same adapted document as the VM assembly.
   globalThis.document=doc;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();

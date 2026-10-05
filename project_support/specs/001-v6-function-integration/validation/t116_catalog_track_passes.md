@@ -1,0 +1,13 @@
+# T116 selected catalog track/pass final verification
+
+FR024/FR025/SC022 coverage: T112 native fullperiod/dense/center/failure/hash/readonly golden; T113 strict additive API; T114 controller ownership/generation/replay/source/table/timeline/AOSseek; T115 segmented3px/NONE renderer/oneViewer; evidence reports retained. No original GP/UTC/SIM authority mutation or JavaScript propagation. Source reference HEAD1a1e002 unchanged.
+
+Final product source validated at2a447bed87fa5946f1fbb7a1ac1cab7c3530d38e: Python423PASS5existingwarnings243.40s,Node224PASS966.3763ms. No product code edits after these runs; this final report and publication bookkeeping do not change code. Prior profiler architecture failure was repaired by moving executable helper into tooling without weakening assertion. Native/wheel0.2.0 unchanged from validated T105.
+
+Actual8891 finalreload1280x720/1920x1080: ISS1021valid/fullperiod5578.758s, Daejeon assumedWGS84height123.45/min5degrees next24h7knownintervals, zero contacts/errors;90degreesnone, AOSseek/catalogUTC only,60xreplay/stop/epochreturn, hide/show, minimizedrestore. Wholeactive16633valid coexists,onecanvas/consoleerror0. See t115_catalog_track_passes_ui.md; rawscreenshots/logs preserved. These are geometric model observations, not RF communication or performance percentile acceptance.
+
+Additional actual mousepick on the globe,1280x720 at678,403, selected overlapping off-page CREW DRAGON13/NORAD100882 (not an asserted ISS-only hit). Native-selected GP8b709a183c32552352c930a3304b7225ad78d8692a9b48fdaa09104e89e682e6/EOPc672540e026d3cd4840c0858d4ce2bc4a18c3bc9751f9636c3285e11950d58a1; pinned snapshotUTC2026-10-04T12:43:41.833920000Z distinct from GPepoch. Old seveninterval result invalidated, new track1021valid/oneknownsegment/5578.757s, whole16633/onecanvas preserved, no browserwarnings/errors. Proof t116_actual_pick.json/png; saved GP/anchorUTC/observer/mask/playback/provenance rechecked exactlyunchanged in t116_saved_state_readonly.json. Temporaryviewportreset/tabhandoff complete.
+
+Readonly source review: strictresponse/provenance and partial-with-no-known-interval semantics match existing search_visibility; original error status preserved. Original dense period shape, explicitquery/AOSclock ownership and no failurebridge retained. No new dependency/stack or nativewheel. No actionable scoped blocker found; fullgoal not complete.
+
+Functional final verification is complete. T116 checkbox remains pending until actual Draft PR abovePR29 is created/attached and remote tree matches these committed bytes. T075sun/modes/imagery/labels/modelassets and all T076–T084 remain open. T032/SC006,F001/F004–6 and disk-saveunknown remain unresolved. No merge.

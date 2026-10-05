@@ -39,6 +39,17 @@ export class OrbitGlobe {
     if(this.entity){if(this.viewer.entities.remove)this.viewer.entities.remove(this.entity);else this.viewer.entities.removeAll();}
     this.entity=null;this.position=null;
   }
+  setCatalogTrack(value){
+    if(this.destroyed)return false;
+    this.trackEntities??=[];
+    for(const entity of this.trackEntities)this.viewer.entities.remove(entity);
+    this.trackEntities=[];
+    if(value){
+      if(value.frame!=='ITRF'||!Array.isArray(value.segments)||value.segments.some(segment=>!Array.isArray(segment)||segment.length<2||segment.some(position=>!Array.isArray(position)||position.length!==3||!position.every(Number.isFinite))))throw Error('Invalid native track segments');
+      for(const [index,segment]of value.segments.entries())this.trackEntities.push(this.viewer.entities.add({id:`catalog-track-${index}`,name:'카탈로그 궤적 · GP 모델',polyline:{positions:segment.map(position=>new this.C.Cartesian3(...position)),width:3,arcType:this.C.ArcType.NONE,material:this.C.Color.fromCssColorString('#5edfff')}}));
+    }
+    this.viewer.scene.requestRender();return true;
+  }
   _selectCatalogMarker(number,gpHash){
     const previous=this.catalogPoints.get(this.selectedCatalog);if(previous)previous.show=this.catalogValid.has(this.selectedCatalog);
     const previousLabel=this.catalogLabels.get(this.selectedCatalog);if(previousLabel)previousLabel.show=this.catalogValid.has(this.selectedCatalog);

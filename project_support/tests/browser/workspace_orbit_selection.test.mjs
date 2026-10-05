@@ -12,6 +12,9 @@ test('empty UI choice restores server selection without clearing its result or s
   globalThis.testOrbitClient={snapshot:()=>data,select:value=>calls.push(value),samples(){},load(){}};
   globalThis.window={addEventListener(){}};
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
+    .replace(/import \{createCatalogTrack\} from [^;]+;/,'const createCatalogTrack=()=>({select(){},observe(){},destroy(){}});')
+    .replace(/import \{createCatalogPasses\} from [^;]+;/,'const createCatalogPasses=()=>({update(){},destroy(){}});')
+    .replace(/import \{createCatalogPassPanel\} from [^;]+;/,'const createCatalogPassPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createWorkspaceRevisionSync\} from [^;]+;/,'const createWorkspaceRevisionSync=()=>({observe(){},destroy(){}});')
     .replace(/import \{GROUND_STATIONS,stationGroups\} from [^;]+;/,'const GROUND_STATIONS={},stationGroups=()=>[];')
     .replace(/import \{createStationPanel\} from [^;]+;/,'const createStationPanel=()=>({controller:{choose(){}},show(){},update(){},destroy(){}});')
