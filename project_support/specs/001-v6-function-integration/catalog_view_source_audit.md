@@ -14,3 +14,5 @@ Original addSunIndicator/updateSunIndicator/positionSunOverlay uses Simon1994pos
 
 ## Next stage
 Return to existing feature specify/plan/tasks owner for these original functions; preserve T111–T116 and all previous decisions. Define originaldisplay controls, exact modelmapping/load/lifecycle/failure/provenance, oneViewer and source-ownedasset packaging before implementation. Current T075 partial; T076–T084 and T032/F001/F004–6/download diskunknown unchanged. Do not create another feature or import executable reference paths.
+
+Additional original display detail: tabs/orbit.js hoverSatellite renders a bounded pointer card with escaped name, NORAD, orbit regime and altitude. Current hover emphasis alone does not reproduce this card. Retain the card with T075 model/inspector design using native display geometry and explicit height/frame contract; do not fabricate altitude or exclude it when closing T075.

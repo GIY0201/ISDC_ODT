@@ -3,6 +3,7 @@ const PALETTES={dark:{LEO:'#ff9f43',MEO:'#e6ed55',GEO:'#5ee277',HEO:'#53c8ff',se
 /** Native GP display only. Caller supplies ITRF metres and UTC; no propagation or transport. */
 export class OrbitGlobe {
   constructor(Cesium,container,options={}){
+    this.container=container;this.hoveredCatalog=null;
     this.C=Cesium;this.position=null;this.destroyed=false;this.stationEntities=new Map();this.stationSites=new Map();this.stationIds=new Map();this.selectedStation=null;this.catalogPoints=new Map();this.catalogLabels=new Map();this.catalogHashes=new Map();this.catalogStyles=new Map();this.catalogEpochs=new Map();this.catalogValid=new Set();this.selectedCatalog=null;
     this.viewer=new Cesium.Viewer(container,{
       baseLayer:false,terrainProvider:new Cesium.EllipsoidTerrainProvider(),
@@ -68,6 +69,7 @@ export class OrbitGlobe {
     if(this.destroyed)return false;this.onCatalogSelect=onSelect;
     const {C,viewer}=this;
     if(!value){
+      this.hoverCatalog(null);
       if(this.catalogCollection)viewer.scene.primitives.remove(this.catalogCollection);
       if(this.catalogLabelCollection)viewer.scene.primitives.remove(this.catalogLabelCollection);
       this.catalogCollection=null;this.catalogLabelCollection=null;this.catalogSignature=null;
@@ -96,7 +98,7 @@ export class OrbitGlobe {
       if(!epoch||epoch.hash!==row.normalized_gp_sha256||epoch.utc!==row.epoch_utc){epoch={hash:row.normalized_gp_sha256,utc:row.epoch_utc,milliseconds:Date.parse(row.epoch_utc)};this.catalogEpochs.set(row.catalog_number,epoch);}
       const age=(utcMilliseconds-epoch.milliseconds)/3600000;
       const baseAlpha=Number.isFinite(age)&&age>72?.56:value.count>1000?.9:.98;
-      this.catalogVisuals.set(row.catalog_number,{regime:row.orbit_regime,alpha:baseAlpha});
+      this.catalogVisuals.set(row.catalog_number,{regime:row.orbit_regime,alpha:baseAlpha,size});
       const alpha=baseAlpha*(this.selectedCatalog!==null&&this.selectedCatalog!==row.catalog_number ? .65 : 1),css=colors[row.orbit_regime]||colors.LEO,style=`${css}:${alpha}`;
       let point=this.catalogPoints.get(row.catalog_number);
       if(!point){
@@ -113,9 +115,10 @@ export class OrbitGlobe {
     // The same GP can transition to/from a propagation failure at another UTC.
     for(const [number,point]of this.catalogPoints){if(!seen.has(number)){point.show=false;const label=this.catalogLabels.get(number);if(label)label.show=false;}}
     this.catalogValid=seen;
+    if(this.hoveredCatalog!==null&&!seen.has(this.hoveredCatalog))this.hoverCatalog(null);
     const selected=this.selectedCatalog;
     if(selected!==null)this._selectCatalogMarker(selected,this.catalogHashes.get(selected));
-    this._ensurePickHandler();viewer.scene.requestRender();return true;
+    this._paintHovered();this._ensurePickHandler();viewer.scene.requestRender();return true;
   }
   _ensurePickHandler(){
     const {C,viewer}=this;
@@ -130,6 +133,12 @@ export class OrbitGlobe {
       if(!key&&id==='virtual-ground-point'&&viewer.scene.drillPick)key=viewer.scene.drillPick(event.position,4).map(value=>this.stationIds.get(value?.id?.id??value?.id)).find(Boolean);
       if(key)this.onStationSelect?.(key);
     },C.ScreenSpaceEventType.LEFT_CLICK);
+    if(C.ScreenSpaceEventType.MOUSE_MOVE!==undefined)this.stationPickHandler.setInputAction(event=>{
+      if(this.destroyed)return;const picked=viewer.scene.pick(event.endPosition),id=picked?.id?.id??picked?.id;
+      this.hoverCatalog(id?.catalogNumber??(id==='stored-orbit-satellite'?this.selectedCatalog:null));
+      if(this.hoveredCatalog===null&&this.stationIds.has(id)&&viewer.scene.canvas.style)viewer.scene.canvas.style.cursor='pointer';
+    },C.ScreenSpaceEventType.MOUSE_MOVE);
+    this.leaveCatalog=()=>this.hoverCatalog(null);this.container.addEventListener?.('mouseleave',this.leaveCatalog);
   }
   setGroundPoint(point){
     if(this.destroyed)return;
@@ -187,6 +196,22 @@ export class OrbitGlobe {
     this.viewer.imageryLayers.addImageryProvider(provider);this.viewer.scene.requestRender();
   }
   setViewMode(mode){return this.viewControls.setMode(mode);}
+  hoverCatalog(number){
+    if(this.destroyed)return false;
+    const next=this.catalogValid.has(number)?number:null;
+    if(next!==this.hoveredCatalog){const previous=this.hoveredCatalog;this.hoveredCatalog=next;this._paintCatalogPoint(previous);this._paintHovered();this.viewer.scene.requestRender();}
+    const cursor=next===null?'':'pointer';if(this.container.style)this.container.style.cursor=cursor;if(this.viewer.scene.canvas?.style)this.viewer.scene.canvas.style.cursor=cursor;
+    return true;
+  }
+  _paintCatalogPoint(number){
+    const point=this.catalogPoints.get(number),visual=this.catalogVisuals.get(number);if(!point||!visual)return;
+    const palette=PALETTES[this.viewControls.theme],alpha=visual.alpha*(this.selectedCatalog!==null&&this.selectedCatalog!==number?.65:1);
+    point.pixelSize=visual.size;point.color=this.C.Color.fromCssColorString(palette[visual.regime]||palette.LEO).withAlpha(alpha);
+  }
+  _paintHovered(){
+    const number=this.hoveredCatalog,point=this.catalogPoints.get(number),visual=this.catalogVisuals.get(number);
+    if(point&&visual&&number!==this.selectedCatalog){point.pixelSize=Math.max(7,visual.size*2.2);point.color=this.C.Color.fromCssColorString(this.viewControls.theme==='light'?'#1c2833':'#ffffff');point.outlineWidth=0;}
+  }
   setViewImagery(mode){return this.viewControls.setImagery(mode);}
   setViewStyle(theme,emphasis){if(!this.viewControls.setStyle(theme,emphasis))return false;this._repaintCatalog();this._styleSelected();for(const entity of this.trackEntities??[])entity.polyline.material=this._trackMaterial();return true;}
   _trackMaterial(){const palette=PALETTES[this.viewControls.theme],C=this.C,color=C.Color.fromCssColorString(palette.selected);return C.PolylineOutlineMaterialProperty?new C.PolylineOutlineMaterialProperty({color,outlineColor:C.Color.fromCssColorString(palette.outline),outlineWidth:1.4}):color;}
@@ -195,7 +220,7 @@ export class OrbitGlobe {
     const palette=PALETTES[this.viewControls.theme],colors=new Map(),C=this.C;
     const outline=C.Color.fromCssColorString(palette.outline),labelColor=C.Color.fromCssColorString(this.viewControls.theme==='light'?'#1c2833':'#ffffff');
     for(const [number,point]of this.catalogPoints){const visual=this.catalogVisuals.get(number);if(!visual)continue;const alpha=visual.alpha*(this.selectedCatalog!==null&&this.selectedCatalog!==number ? .65 : 1),css=palette[visual.regime]||palette.LEO,style=`${css}:${alpha}`;if(!colors.has(style))colors.set(style,C.Color.fromCssColorString(css).withAlpha(alpha));point.color=colors.get(style);this.catalogStyles.set(number,style);const label=this.catalogLabels.get(number);if(label){label.fillColor=labelColor;label.outlineColor=outline;}}
-    this.viewer.scene.requestRender();
+    this._paintHovered();this.viewer.scene.requestRender();
   }
-  destroy(){if(this.destroyed)return;this.destroyed=true;this.position=null;this.viewControls.destroy();this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.viewer.destroy();}
+  destroy(){if(this.destroyed)return;this.hoverCatalog(null);this.container.removeEventListener?.('mouseleave',this.leaveCatalog);this.destroyed=true;this.position=null;this.viewControls.destroy();this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.viewer.destroy();}
 }
