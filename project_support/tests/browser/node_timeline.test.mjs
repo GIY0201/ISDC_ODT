@@ -69,6 +69,18 @@ test('valid source IDs that match object prototype names are fenced by own hash 
   const buffer=createNodeSampleBuffer(f.request,f.response);assert.equal(buffer.geometryFor(f.request.nodes[0],{utc:start}).definition_hash,H);
   assert.equal(Object.hasOwn(buffer.definitionHashes(),'__proto__'),true);
 });
+test('source Gregorian definition epochs are independent of the frozen display leap-table domain',()=>{
+  for(const epoch of ['1970-01-01T00:00:00Z','1969-12-31T23:59:59.123456789+00:00','2026-10-04T00:00:00+00:00']){
+    const f=fixture();f.request.nodes[0].orbit.epoch=epoch;const buffer=createNodeSampleBuffer(f.request,f.response);assert.equal(buffer.geometryFor(f.request.nodes[0],{utc:start}).node_definition.orbit.epoch,epoch);
+  }
+  for(const epoch of ['0000-01-01T00:00:00Z','2026-02-30T00:00:00Z','2026-01-01T24:00:00Z','2026-01-01T00:00:60Z']){const f=fixture();f.request.nodes[0].orbit.epoch=epoch;assert.throws(()=>createNodeSampleBuffer(f.request,f.response));}
+});
+test('valid leap epoch retains aligned native errors while malformed leap epoch is rejected',()=>{
+  const f=fixture();f.request.nodes[0].orbit.epoch='2016-12-31T23:59:60+00:00';f.response.status='error';
+  for(const row of f.response.nodes[0].rows){for(const key of Object.keys(row))if(!['utc','status','error_code'].includes(key))row[key]=null;row.status='error';row.error_code='unsupported_node_time';}
+  const buffer=createNodeSampleBuffer(f.request,f.response);assert.equal(buffer.geometryFor(f.request.nodes[0],{utc:start}).row.error_code,'unsupported_node_time');
+  f.request.nodes[0].orbit.epoch='2016-12-30T23:59:60Z';assert.throws(()=>createNodeSampleBuffer(f.request,f.response));
+});
 test('custom validity predicates receive readonly captured rows and cannot leak mutable buffer state',()=>{
   const rows=[0,1].map(i=>({utc:codec.advance(start,i),status:'valid',position_m:[i,0,0],elevation_deg:i}));let captured;
   const buffer=createSampleBuffer(rows,codec.difference,{isValid:row=>{captured=row;return row.status==='valid';}});

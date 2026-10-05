@@ -658,3 +658,8 @@ Actualowned31524/3780 CIMconfirmed (standarddenied/read-onlyescalation), freshly
 - 변경: 표본과 독립적인 궤적 요청세대·취소·hash·원자적121점수용, 공용UTC30초앞뒤갱신·고속재생중복병합·실패명시재시도. 전체240노드29040행/240yield 보존, 새 시계·전파 없음.
 - 검증: missingexport RED와고속재생9PASS1FAIL 수정. 최종Node495PASS2835.6891ms/Python546PASS8기존warnings153.70s/session91714exit0/syntax. validation/t147_node_track_requests.md. 주입executor는실제프레임yield증거아님.
 - 남음: T147 표본·궤적직렬조정/앞뒤미리받기, T148/T079/T149–153 및전체T075–84/T032/장비/다운로드. 8891서버/native/browser/remotePR/병합 변경없음.
+
+## 2026-10-06 T147 공용UTC 표본·궤적 연결부 완료
+- 변경: 기존 두timeline을직렬조립, 최신공용UTC/300초미리받기/역방향600초조회/취소·입력변경·재시도 처리. 윤초표본오류유지와1972이전기준epoch의서버호환검증 수정. 새시계·전파 없음.
+- 검증: missingexport/윤초8PASS1FAIL/epoch12PASS1FAIL RED수정. 최종Node508PASS2798.805ms/Python546PASS8기존warnings152.69s/session72615exit0/syntax. 실제client조립240노드순차83/83/74+track, 실행중client호출최대1. validation/t147_node_display_coordinator.md.
+- 남음: T147로컬구현checked; 실제화면/JSON/frame/backend취소·busy검증은T151/T152/T032. 다음T148원본NodeScene. T079/T149–153/fullT075–84/Terra/all50/장비/다운로드 유지;8891서버/native/browser/remotePR/병합변경없음.

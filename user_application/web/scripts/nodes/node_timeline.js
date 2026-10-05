@@ -23,7 +23,10 @@ function definitionKeyFor(node,ids,catalogs){
   if(node.schema!==1||typeof node.id!=='string'||!node.id.trim()||node.id.length>80||ids.has(node.id)||!Number.isSafeInteger(node.catalog_number)||node.catalog_number<900000||catalogs.has(node.catalog_number)||!node.orbit||Array.isArray(node.orbit)||typeof node.orbit!=='object')throw new Error('invalid node sample definitions');
   for(const field of ['altitude_km','inclination','eccentricity','raan','argp','mean_anomaly'])if(!Number.isFinite(node.orbit[field]??(['altitude_km','inclination'].includes(field)?NaN:0)))throw new Error('invalid node orbital field');
   const epoch=node.orbit.epoch;
-  if(typeof epoch==='string')codec.advance(epoch,0);else if(typeof epoch!=='number'||!Number.isFinite(epoch)||Math.abs(epoch)>8.64e15)throw new Error('invalid node definition epoch');
+  if(typeof epoch==='string'){
+    if(/T\d{2}:\d{2}:60(?:\.|Z|\+00:00)/.test(epoch))codec.advance(epoch.replace(/\+00:00$/,'Z'),0);
+    else nodeGregorianMillis(epoch);
+  }else if(typeof epoch!=='number'||!Number.isFinite(epoch)||Math.abs(epoch)>8.64e15)throw new Error('invalid node definition epoch');
   return key;
 }
 const interpolate=(a,b,fraction)=>{
@@ -81,7 +84,7 @@ export async function createNodeSampleBufferAsync(request,response,{yieldControl
 }
 
 // Calendar conversion for the source Date TimeClip grid, not a display clock.
-function trackCenterMillis(utc){
+function nodeGregorianMillis(utc){
   const match=typeof utc==='string'&&/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?(?:Z|\+00:00)$/.exec(utc);
   if(!match)throw new Error('explicit node UTC required');
   const [year,month,day,hour,minute,second]=match.slice(1,7).map(Number);
@@ -94,7 +97,7 @@ function trackCenterMillis(utc){
 function* prepareNodeTrackBuffer(request,response,{periodFor,expectedHashes={}}={}){
   if(typeof periodFor!=='function')throw new TypeError('source static period resolver required');
   if(!request||typeof request.request_id!=='string'||!request.request_id.trim()||request.request_id.length>128||!Array.isArray(request.nodes)||request.nodes.length<1||request.nodes.length>240)throw new Error('invalid node track request');
-  const center=trackCenterMillis(request.center_utc);
+  const center=nodeGregorianMillis(request.center_utc);
   if(!response||response.schema_version!==1||response.request_id!==request.request_id||!['valid','partial','error'].includes(response.status)||Object.entries(metadata).some(([key,value])=>response[key]!==value)||!Array.isArray(response.nodes)||response.nodes.length!==request.nodes.length)throw new Error('node track metadata mismatch');
   const responseStatus=response.status,entries=new Map(),catalogs=new Set();let errors=0;
   for(const [index,node]of request.nodes.entries()){
@@ -145,7 +148,7 @@ export function createNodeTrackTimeline({api,periodFor,requestId,yieldControl,on
   }
   function calculate(utc,{background=false,expectedHashes={}}={}){
     requireOpen();let canonical;
-    try{trackCenterMillis(utc);canonical=codec.advance(utc,0);}catch(e){invalidate(true);error=e instanceof Error?e.message:String(e);emit();return Promise.resolve(false);}
+    try{nodeGregorianMillis(utc);canonical=codec.advance(utc,0);}catch(e){invalidate(true);error=e instanceof Error?e.message:String(e);emit();return Promise.resolve(false);}
     if(!definitions.length)return Promise.resolve(false);
     invalidate(!background);const ticket=generation,controller=new AbortController(),scope=structuredClone(definitions),known=structuredClone(expectedHashes),previous=structuredClone(hashes);
     const task={center:canonical,controller,promise:null};active=task;emit();
@@ -167,9 +170,9 @@ export function createNodeTrackTimeline({api,periodFor,requestId,yieldControl,on
   function refresh(utc,options={}){
     requireOpen();if(error)return Promise.resolve(false);
     try{
-      const center=trackCenterMillis(utc);
+      const center=nodeGregorianMillis(utc);
       if(active)return active.promise??Promise.resolve(false);
-      if(!active&&centerUtc&&Math.abs(center-trackCenterMillis(centerUtc))<30000)return Promise.resolve(false);
+      if(!active&&centerUtc&&Math.abs(center-nodeGregorianMillis(centerUtc))<30000)return Promise.resolve(false);
     }catch{return calculate(utc,options);}
     return calculate(utc,{...options,background:true});
   }
@@ -227,4 +230,56 @@ export function createNodeTimeline({api,requestId,yieldControl,onChange=()=>{},o
   function cancel(){requireOpen();invalidate(true);emit();}
   function destroy(){if(disposed)return;invalidate(true);disposed=true;definitions=[];hashes={};}
   return Object.freeze({setDefinitions,calculate,geometryFor,snapshot,cancel,destroy});
+}
+
+// One application queue for source-native display work. No clock or animation scheduler.
+export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,onChange=()=>{},onError=()=>{}}={}){
+  const samples=createNodeTimeline({api,requestId,yieldControl}),tracks=createNodeTrackTimeline({api,periodFor,requestId,yieldControl});
+  let disposed=false,utc=null,direction=1,nodeCount=0,runner=null,activeKind=null,inputError='';
+  const requireOpen=()=>{if(disposed)throw new Error('node display timeline disposed');};
+  const snapshot=()=>{const sample=samples.snapshot(),track=tracks.snapshot();return {utc,direction,pending:runner!==null,activeKind,error:inputError||sample.error||track.error,samples:sample,tracks:track};};
+  const emit=()=>{if(disposed)return;try{onChange(snapshot());}catch(e){try{onError(e instanceof Error?e.message:String(e));}catch{/* Display observers do not own calculations. */}}};
+  function schedule(){
+    if(disposed||!utc||!nodeCount||inputError)return Promise.resolve();
+    if(runner)return runner;
+    async function run(){
+      while(!disposed&&utc&&nodeCount&&!inputError){
+        const sample=samples.snapshot();if(sample.error)break;
+        let target=null,background=false;
+        if(!sample.startUtc)target=direction<0?codec.advance(utc,-600):utc;
+        else{
+          const elapsed=codec.difference(utc,sample.startUtc);
+          if(elapsed<0||elapsed>600)target=direction<0?codec.advance(utc,-600):utc;
+          else if(direction>0&&elapsed>=300){target=codec.advance(sample.startUtc,300);background=true;}
+          else if(direction<0&&elapsed<=300){target=codec.advance(sample.startUtc,-300);background=true;}
+        }
+        if(target){activeKind='samples';emit();await samples.calculate(target,{background});activeKind=null;emit();continue;}
+        const track=tracks.snapshot();
+        let trackDue=!track.centerUtc;
+        if(!trackDue&&!track.error){try{trackDue=Math.abs(nodeGregorianMillis(utc)-nodeGregorianMillis(track.centerUtc))>=30000;}catch{trackDue=true;}}
+        if(!track.error&&trackDue){
+          activeKind='track';emit();await tracks.refresh(utc,{expectedHashes:sample.definitionHashes});activeKind=null;emit();continue;
+        }
+        break;
+      }
+    }
+    runner=Promise.resolve().then(run).catch(e=>{if(!disposed){inputError=e instanceof Error?e.message:String(e);samples.cancel();tracks.cancel();}}).finally(()=>{runner=null;activeKind=null;emit();});
+    return runner;
+  }
+  function setDefinitions(nodes){
+    requireOpen();const changed=samples.setDefinitions(nodes);tracks.setDefinitions(nodes);nodeCount=nodes.length;
+    if(changed){inputError='';emit();void schedule();}return changed;
+  }
+  function observe(value,{seek=false}={}){
+    requireOpen();let canonical;
+    try{canonical=codec.advance(value,0);}catch(e){samples.cancel();tracks.cancel();utc=null;inputError=e instanceof Error?e.message:String(e);emit();return Promise.resolve();}
+    if(utc){const delta=codec.difference(canonical,utc);if(delta)direction=Math.sign(delta);}
+    utc=canonical;
+    if(seek){samples.cancel();tracks.cancel();inputError='';}
+    return schedule();
+  }
+  function retry(){requireOpen();samples.cancel();tracks.cancel();inputError='';return schedule();}
+  function clear(){requireOpen();utc=null;direction=1;inputError='';samples.cancel();tracks.cancel();emit();}
+  function destroy(){if(disposed)return;disposed=true;utc=null;samples.destroy();tracks.destroy();}
+  return Object.freeze({setDefinitions,observe,retry,clear,snapshot,geometryFor:(node,display={utc})=>disposed||inputError?null:samples.geometryFor(node,display),pathFor:node=>disposed||inputError?null:tracks.pathFor(node),destroy});
 }
