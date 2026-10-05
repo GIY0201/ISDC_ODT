@@ -1,0 +1,15 @@
+{
+  "source": "PyERFA erfa/tests/test_ufunc.py:test_c2t06a, translated from ERFA t_erfa_c.c",
+  "source_url": "https://github.com/liberfa/erfa/blob/master/src/t_erfa_c.c",
+  "tt_jd": [2400000.5, 53736.0],
+  "ut1_jd": [2400000.5, 53736.0],
+  "xp_rad": 2.55060238e-7,
+  "yp_rad": 1.860359247e-6,
+  "matrix": [
+    [-0.1810332128305897282, 0.9834769806938592296, 0.00006555550962998436505],
+    [-0.9834768134136214897, -0.1810332203649130832, 0.0005749800844905594110],
+    [0.0005773474024748545878, 0.00003961816829632690581, 0.9999998325501747785]
+  ],
+  "absolute_tolerance": 1e-12,
+  "scope": "Published chosen ERFA rotation model fixture, not independent ephemeris or observed accuracy"
+}

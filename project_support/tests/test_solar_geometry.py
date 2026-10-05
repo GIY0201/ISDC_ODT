@@ -1,6 +1,7 @@
 """Solar display model consistency, not independent ephemeris accuracy."""
 from dataclasses import replace
 import hashlib
+import json
 import numpy as np
 import pytest
 import astropy_iers_data
@@ -69,3 +70,31 @@ def test_invalid_time_eop_alignment_and_identity(eop):
             ([instant,instant],[point,replace(point,leap_sha256='other')]),
             ([instant,instant],[point,replace(point,snapshot_sha256='other')])]:
         with pytest.raises(ValueError):solar_directions(instants,points)
+
+
+def test_published_erfa_rotation_fixture():
+    import erfa
+    fixture=json.loads((Path(__file__).parent/'fixtures/orbit/solar_rotation_erfa.json').read_text())
+    matrix=erfa.c2t06a(*fixture['tt_jd'],*fixture['ut1_jd'],fixture['xp_rad'],fixture['yp_rad'])
+    np.testing.assert_allclose(matrix,fixture['matrix'],rtol=0,atol=fixture['absolute_tolerance'])
+
+
+@pytest.mark.parametrize('direction',[[0,0,0],[float('nan'),1,1],[float('inf'),1,1]])
+def test_bad_ephemeris_vector_never_becomes_synthetic_sun(eop,monkeypatch,direction):
+    from types import SimpleNamespace
+    from digital_twin.simulation import solar_geometry as module
+    instant=parse_utc('2020-07-12T21:16:01Z');point=eop.at(instant)
+    monkeypatch.setattr(module,'get_sun',lambda time:SimpleNamespace(cartesian=SimpleNamespace(xyz=np.array(direction)[:,None]*u.au)))
+    with pytest.raises(ValueError,match='solar vector'):solar_directions([instant],[point])
+
+
+def test_frozen_snapshot_edges_accept_valid_rows_and_reject_outside(eop):
+    from astropy.time import Time
+    edges=[float(eop._table['MJD'].value[0])+1,float(eop._table['MJD'].value[-1])-1]
+    times=Time(edges,format='mjd',scale='utc')
+    instants=tuple(UtcInstant(float(a),float(b)) for a,b in zip(times.jd1,times.jd2))
+    result=solar_directions(instants,eop.at_many(instants))
+    assert np.isfinite(result.direction_to_sun).all()
+    for mjd in [edges[0]-2,edges[-1]+2]:
+        time=Time(mjd,format='mjd',scale='utc')
+        with pytest.raises(ValueError,match='EOP snapshot range'):eop.at_many([UtcInstant(float(time.jd1),float(time.jd2))])

@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from communication.external.celestrak import CelesTrakSource
 from communication.http import system, catalog, runtime, rf_network, missions, hil, reports, telemetry
 from communication.http import catalog_geometry as catalog_geometry_http
+from communication.http import solar_geometry as solar_geometry_http
 from communication.http import orbit as orbit_http
 from data.catalog.access import Catalog
 from data.catalog.cache import CatalogCache
@@ -22,12 +23,13 @@ from user_application.bootstrap import create_runtime
 from user_application.configs.paths import APP_NAME, APP_VERSION, WEB_DIR, VISUALIZATION_DIR, CLIENT_DIR, CATALOG_CACHE_DIR
 
 
-def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None) -> FastAPI:
+def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None,solar_geometry_query=None) -> FastAPI:
     from communication.native.orbit_execution import BoundedOrbitExecutor
     from digital_twin.runtime.orbit import OrbitRuntime
     from digital_twin.contracts.orbit import GroundPoint
     from user_application.configs import orbit as orbit_config
     from user_application.orbit_calculation import create_orbit_calculation
+    from user_application.solar_geometry import SolarGeometryQuery
     records={record.input_id:record for record in orbit_inputs}
     if len(records)!=len(orbit_inputs):raise ValueError('duplicate orbit inputs')
     executor=BoundedOrbitExecutor(workers=orbit_config.CALCULATION_WORKERS,waiting_requests=orbit_config.CALCULATION_WAITING_REQUESTS)
@@ -58,6 +60,8 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
                 try:
                     catalog_eop=await asyncio.to_thread(load_geometry_snapshot,catalog_geometry_manifest_path)
                     app.state.catalog_geometry_query=CatalogGeometryQuery(app.state.catalog,catalog_eop,create_orbit_calculation(catalog_eop),executor.run)
+                    if solar_geometry_query is None:
+                        app.state.solar_geometry_query=SolarGeometryQuery(catalog_eop,executor.run)
                 except (OSError,ValueError,KeyError,TypeError):
                     app.state.catalog_geometry_error='snapshot_invalid'
             yield
@@ -71,6 +75,8 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
     app.state.catalog_geometry_query=catalog_geometry_query
     app.state.catalog_geometry_error=None
     app.include_router(catalog_geometry_http.router)
+    app.state.solar_geometry_query=solar_geometry_query if solar_geometry_query is not None else (SolarGeometryQuery(eop_provider,executor.run) if eop_provider is not None else None)
+    app.include_router(solar_geometry_http.router)
     app.state.runtime = state
     app.state.orbit_executor = executor
     app.state.orbit_inputs = tuple(records.values())
@@ -88,7 +94,7 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
     from fastapi.exception_handlers import request_validation_exception_handler
     @app.exception_handler(RequestValidationError)
     async def validation_error_handler(request,exc):
-        if request.url.path.startswith('/api/orbit/'):
+        if request.url.path.startswith(('/api/orbit/','/api/solar/')):
             # NaN/Inf in the original request cannot be echoed into strict JSON.
             return JSONResponse(status_code=422,content={'detail':[{'type':error['type'],'loc':error['loc'],'msg':error['msg']} for error in exc.errors()]})
         return await request_validation_exception_handler(request,exc)

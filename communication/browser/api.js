@@ -40,6 +40,7 @@ async function rfRequest(payload, { signal } = {}) {
 }
 
 export const api = {
+  solarSamples: (payload,{signal}={}) => orbitRequest('/api/solar/samples',{method:'POST',headers:jsonHeaders,body:JSON.stringify(payload),signal}),
   satelliteModelManifest: ({signal}={}) => request('/static/satellite_display/manifest.json',{signal}),
   report: reportRequest,
   orbitRadioSeries: (payload, { signal } = {}) => orbitRequest('/api/orbit/radio-series', { method: 'POST', headers: jsonHeaders, body: JSON.stringify(payload), signal }),
