@@ -213,5 +213,5 @@ Dependency: T104 native RED→T105; T104 backend RED→T106→T107; T104 browser
 - [x] T113 [US16] Add strict readonly /api/catalog/track and /api/catalog/visibility, browser transport and CatalogGeometryPort; ADR0015/schema compatibility allowlist.
 - [x] T114 [US16] Connect selectedGP/time/observer controllers, track controls,24h pass table/timeline/AOSseek, error/clip/contact/source/hash/late/clear/draft and replay renewal in V6.
 - [x] T115 [US16] Add injected segmented track polyline to OrbitGlobe, original width3/ArcType.NONE/toggle/no failurebridge/oneViewer; fullcatalog/stations/selection preserved.
-- [ ] T116 [US16] WholePython/Node/scalar/native evidence/actual8891twores/readonly/pick/passseek/replay/toggle/restore and Draft abovePR29; validation/t116_catalog_track_passes.md/ledger/log/audit.
+- [x] T116 [US16] WholePython/Node/scalar/native evidence/actual8891twores/readonly/pick/passseek/replay/toggle/restore and Draft abovePR29; validation/t116_catalog_track_passes.md/ledger/log/audit.
 Dependency111→112→113→114→115→116. OriginalT075 sun/2D3D/imagery/labels/representativeSVG andT076–84 remain open; T032/SC006/F001/F004–6/diskunknown preserved.
