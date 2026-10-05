@@ -1,4 +1,6 @@
 import {GlobeView} from './globe_view.js';
+import {SatelliteModelLayer} from './satellite_model.js';
+import {CenteredCameraMotion} from './centered_camera_motion.js';
 const PALETTES={dark:{LEO:'#ff9f43',MEO:'#e6ed55',GEO:'#5ee277',HEO:'#53c8ff',selected:'#efff62',outline:'#061528'},light:{LEO:'#c9651a',MEO:'#8f8a12',GEO:'#1f8a55',HEO:'#1f7fa8',selected:'#d35400',outline:'#ffffff'}};
 /** Native GP display only. Caller supplies ITRF metres and UTC; no propagation or transport. */
 export class OrbitGlobe {
@@ -16,7 +18,20 @@ export class OrbitGlobe {
     this.viewer.clock.shouldAnimate=false;
     this.catalogVisuals=new Map();
     this.viewControls=new GlobeView(Cesium,this.viewer,options.createProvider,options.onStatus);
+    this.modelLayer=options.modelLayer??null;
+    this.cameraMotion=new CenteredCameraMotion(Cesium,this.viewer,{model:()=>this.modelLayer,now:options.motionNow});
   }
+  async setSatelliteModel(description,source){
+    if(this.destroyed)return null;
+    if(!this.modelLayer)this.modelLayer=new SatelliteModelLayer({viewer:this.viewer,cesium:this.C,isTransitioning:()=>Boolean(this.viewControls.cancelMorph),onCameraInput:()=>this.cameraMotion.cancel(),onFrame:()=>{if(this.modelLayer?.tracking)this.viewer.scene.requestRender();}});
+    this.modelLayer.setTimeSource(source.timeSource);this.modelLayer.advanceUtc=source.advanceUtc;
+    this.modelLayer.onStatus=source.onStatus??(()=>{});
+    return this.modelLayer.show(description,source.sampleAt,source.timeSource?.());
+  }
+  focusSatelliteModel(options={}){if(this.destroyed)return false;this.cameraMotion.cancel();return this.modelLayer?.focus(undefined,options)??false;}
+  releaseSatelliteModel(options){if(!this.destroyed)this.cameraMotion.release(options);}
+  retrySatelliteModel(){return this.destroyed?Promise.resolve(null):this.modelLayer?.retry()??Promise.resolve(null);}
+  clearSatelliteModel(){if(!this.destroyed){this.cameraMotion.cancel();this.modelLayer?.clear();}}
   update(sample){
     if(this.destroyed)throw new Error('OrbitGlobe destroyed');
     const {C,viewer}=this;
@@ -183,10 +198,12 @@ export class OrbitGlobe {
   }
   focusStation(key){
     const site=this.stationSites.get(key);if(this.destroyed||!site||!this.viewer.camera.flyTo)return false;
+    this.cameraMotion.release();
     this.viewer.camera.flyTo({destination:this.C.Cartesian3.fromDegrees(site.longitude,site.latitude,2500000),orientation:{heading:0,pitch:-89*Math.PI/180,roll:0},duration:1.2});return true;
   }
   focus(){
     if(!this.position||this.destroyed)return false;
+    this.cameraMotion.release();
     const {C,viewer}=this;
     viewer.camera.viewBoundingSphere(new C.BoundingSphere(this.position,800000),new C.HeadingPitchRange(0,-Math.PI/2,12000000));
     viewer.camera.lookAtTransform(C.Matrix4.IDENTITY);viewer.scene.requestRender();return true;
@@ -195,7 +212,7 @@ export class OrbitGlobe {
     if(this.destroyed)return;
     this.viewer.imageryLayers.addImageryProvider(provider);this.viewer.scene.requestRender();
   }
-  setViewMode(mode){return this.viewControls.setMode(mode);}
+  setViewMode(mode){this.cameraMotion.release();return this.viewControls.setMode(mode);}
   hoverCatalog(number){
     if(this.destroyed)return false;
     const next=this.catalogValid.has(number)?number:null;
@@ -222,5 +239,5 @@ export class OrbitGlobe {
     for(const [number,point]of this.catalogPoints){const visual=this.catalogVisuals.get(number);if(!visual)continue;const alpha=visual.alpha*(this.selectedCatalog!==null&&this.selectedCatalog!==number ? .65 : 1),css=palette[visual.regime]||palette.LEO,style=`${css}:${alpha}`;if(!colors.has(style))colors.set(style,C.Color.fromCssColorString(css).withAlpha(alpha));point.color=colors.get(style);this.catalogStyles.set(number,style);const label=this.catalogLabels.get(number);if(label){label.fillColor=labelColor;label.outlineColor=outline;}}
     this._paintHovered();this.viewer.scene.requestRender();
   }
-  destroy(){if(this.destroyed)return;this.hoverCatalog(null);this.container.removeEventListener?.('mouseleave',this.leaveCatalog);this.destroyed=true;this.position=null;this.viewControls.destroy();this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.viewer.destroy();}
+  destroy(){if(this.destroyed)return;this.hoverCatalog(null);this.container.removeEventListener?.('mouseleave',this.leaveCatalog);this.modelLayer?.dispose();this.cameraMotion.dispose();this.destroyed=true;this.position=null;this.viewControls.destroy();this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.viewer.destroy();}
 }

@@ -1,5 +1,10 @@
 # 현재 개발 기록
 
+## 2026-10-05 T126 카메라 입력·단일 지구 조립 부분 진행
+- 변경: 원본3D25/2D7카메라시나리오native계약대조, 원본Earth중심wheel추출/핀치보존·입력소유복원, OrbitGlobe모델진입점/초점·전환해제/정리연결. model UI아직미조립.
+- 검증: 전체Node300PASS1124.4004ms/Python439PASS5기존warnings180.70s. 실제8891두해상도wheel확대/2D→3D/canvas1/로그오류0; 궤도상태observed_monotonic_s제외동일. 불완전Viewer정리결함RED수정. validation/t126_model_camera.md.
+- 남음: 모델ready/follow/hover/UI/Terra/T125·126최종수용및T127–129, 일조·전체T075–84·T032/실통신/다운로드. 서버restart/포트/native/PR/병합변경없음.
+
 ## 2026-10-05 T125 렌더러와 T126 카메라 기본 이식
 - 변경: 원본SatelliteModelLayer/CameraRangeMotion재사용, 주입nativeITRF/UTC/GP선택검증·ready/error/retry/late폐기·소유리스너정리·좌표없음숨김. camera_motion원본바이트동일; UI조립전.
 - 검증: native렌더러8/원본카메라8PASS; 전체Node260PASS1071.3918ms/Python439PASS5기존warnings178.42s. orientation공유RED수정/최종Node검증. validation/t125_satellite_renderer.md.
