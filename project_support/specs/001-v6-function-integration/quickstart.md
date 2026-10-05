@@ -78,3 +78,6 @@ W06: 8891 #data에서 KPI/요구 filter/detail, 세션이력 scrub/replay/live�
 
 ## Catalog V6
 Keep fixed0.0.0.0:8891, open /?validation=t074#satellite. Edit group/search/orbit then 조건 적용·조회 button; search name/COSPAR/NORAD, navigate100row pages, click satellite for SATCAT details. Catalog selection does not select stored orbit or change UTC. Source/timestamp/warnings and missing values are shown.
+
+## US12 ground station validation
+Use8891 V6 satellite or ground view. Confirm29 total and5 regional groups; chooseDAEJEON orSVALBARD, verify original representative coordinates/details and highlighted marker; globe marker click updates same selector. Clear/minimize/restore/switch views preserve stored GP/UTC/virtual point and satellite. No automatic calculation or RF application. Verify no console errors/duplicate Viewer at1280x720/1920x1080. Node browser suite and full pytest remain required; no extra runtime download/profile needed for static station display.

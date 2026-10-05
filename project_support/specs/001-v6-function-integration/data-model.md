@@ -53,3 +53,6 @@ HilView: copied devices/runtime/events and optional telemetry; selectedDevice/se
 
 ## US11 표시사본
 serverquery는normalizedGP의canonicalJSONhash, epoch, source, listfetched_at, typedOrbitInput 및명시IERS-A/윤초hash를가진일회읽기전용사본. UI는선택요청과검증된고정ITRF행만보유하며현재상태권위는기존runtime. Viewer표시모드는clock권위아님.
+
+## US12 view-only station selection
+ReferenceSite: original key/name/group/region/operator/network/role/latitude/longitude/altitudeKm/dishMeters/bands/minElevationDeg/presetKey. All positions are original representative presets. StationSelection: selectedKey|null, group=all|sourcegroup, display copy; no persisted physical station state. Scene entities keyed reference-ground-{key}; virtual-ground-point/stored-orbit-satellite unaffected. List/canvas invoke same selector. Unknown key leaves selection unchanged, clear retains all markers and existing camera; explicit focus moves camera only. Dispose releases pick handler once.

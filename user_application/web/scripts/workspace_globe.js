@@ -1,8 +1,8 @@
-import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t088-r1';
+import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t093-r3';
 
 /** Render-only copy, never a clock/selection authority. One controller per document. */
 export function createWorkspaceGlobe(container,status,focusButton,host=window){
-  let globe=null,latest=null,catalog=null,groundPoint=null,disposed=false,failed=false,removeError=null,focused=false;
+  let globe=null,latest=null,catalog=null,groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
   const describe=message=>{status.textContent=message;};
   function paint(){
     focusButton.disabled=true;
@@ -30,6 +30,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     if(!host.Cesium){fail();return;}
     try{
       globe=new OrbitGlobe(host.Cesium,container);
+      if(stations.length){globe.setStations(stations,onStationSelect);globe.selectStation(selectedStation);}
       removeError=globe.viewer.scene.renderError.addEventListener(fail);
       host.Cesium.SingleTileImageryProvider.fromUrl('/static/assets/nasa_blue_marble_september.jpg',{credit:'NASA Blue Marble'}).then(provider=>{
         if(!disposed&&globe)globe.setImagery(provider);
@@ -41,6 +42,9 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   if(host.Cesium)boot();else host.addEventListener('load',boot,{once:true});
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
+    stations(values,onSelect){stations=structuredClone(values);onStationSelect=onSelect;globe?.setStations(stations,onStationSelect);},
+    selectStation(key){selectedStation=key;globe?.selectStation(key);},
+    focusStation(key){if(globe?.focusStation(key)){focused=true;return true;}return false;},
     catalog(sample){if(disposed)return;catalog=sample?structuredClone(sample):null;focused=false;paint();},
     update(snapshot,display,displayUtc){
       if(disposed)return;

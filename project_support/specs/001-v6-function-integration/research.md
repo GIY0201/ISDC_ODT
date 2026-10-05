@@ -93,3 +93,6 @@ US10 validation clarified: successful SATCAT responses use24h cache; GP fallback
 
 ## US11 사전검증
 실제기존Rust에카탈로그ISS OMM(epoch2026-10-04T01:53:16.268928000Z)주입/native성공. 기존IERS-B끝MJD61273, installedIERS-A끝61673;현재epochUT1/극운동status2(예측). 공식Astropy IERS docs https://docs.astropy.org/en/stable/utils/iers.html 및 IERS API 의 FROM_IERS_A_PREDICTION 구분확인. noauto-download/기존Bhash보존/별도Ahash로정밀계산 가능;실측위치의증거아님.
+
+## US12 decisions
+Original HEAD1a1e002: ground_station_sites.js supplies29 upper-case keys/5groups; imports12STATION_PRESETS and17 extra sites. Extract only used preset data, preserve sites/group functions. Original station_card.js option/coordinate/card functions reused; visibleSatelliteCount unused and excluded. Existing renderer addGroundStations/styleStations/flyToStation/pick semantics retained within render-only OrbitGlobe, without original synthetic propagation or station link claim. Selection is visual, existing manual virtual-point controls unchanged. User approved list/shared-globe connection; routine choice defaults no selected station. Prototype metadata is not current facility evidence and requires F001 verification before RF application.

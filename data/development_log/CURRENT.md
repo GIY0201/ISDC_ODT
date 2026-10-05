@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 Ground station shared globe
+- 변경: 선배29sites/5groups/cardfacts 재사용, V6 위성·지상국 목록/지구pick/강조·카메라/clear/소유사본, 단일Viewer/가상지점·위성보존, ADR0011/T090–94.
+- 검증: Python385PASS137.93s/Node175PASS673.2623ms, 실제8891두해상도/list·mousepick·filter·복원/readonly/canvas1/console0; t094_ground_stations.md. 초기staticHTMLfallback 기대값수정/encodedtraversal404; overlap/label보완후최종Node재검증.
+- 남음: T075partial/T076–84/F001/F002/F004–6/T032/W06diskunknown; DraftPR25위검토/병합없음. 정확한8891serverrestart SIM메모리초기화/저장자료보존. 시설/높이/장비·실수신 미확인.
+
+
 ## 2026-10-05 Selected catalog epoch globe
 - 변경: 기존catalog/Rust/정밀ITRF+별도IERS-A snapshot/readonlyAPI/단일Viewer 선택·해제/quality·hash 연결; ADR0010/T085–89.
 - 검증: Python384PASS133.29s+target7PASS,Node170PASS633.3169ms,실제8891두해상도/readonly/singlecanvas/console0/Astropyoracle0m, t089_catalog_position.md. 초기cache/allowlist/temp오류수정후통과. 최종manifest형식손상시기존API보존/fixture독립성보완후전체재검증.

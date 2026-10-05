@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';import{fixture}from'./workspace_fixture.mjs';
+for(const[w,h]of[[1280,720],[1920,1080]])test(`station real assembly shared29 markers/camera/readonly/restore ${w}x${h}`,async()=>{
+ const f=fixture(w,h,{hash:'#ground'});try{const before=f.snapshot();const viewer=f.viewers[0];assert.equal(f.viewers.length,1);assert.equal(viewer.items.filter(x=>x.id.startsWith('reference-ground-')).length,29);
+ const select=f.get('station-select');select.value='DAEJEON';await select.dispatch('change');assert.match(f.get('station-detail').innerHTML,/36.3742/);assert.match(f.get('station-detail').innerHTML,/미확인/);assert.equal(viewer.items.find(x=>x.id==='reference-ground-DAEJEON').point.pixelSize,10);assert.equal(viewer.flight.destination.z,2500000);assert.equal(f.counts().commands,0);assert.deepEqual(f.snapshot(),before);
+ const region=f.get('station-region');region.value='polar';await region.dispatch('change');assert.match(f.get('station-select').innerHTML,/현재 선택/);await f.get('window-minimize').dispatch('click');await f.get('shelf-restore').dispatch('click');assert.equal(f.get('station-select').value,'DAEJEON');
+ await f.get('station-clear').dispatch('click');assert.equal(viewer.items.find(x=>x.id==='reference-ground-DAEJEON').point.pixelSize,6);assert.deepEqual(f.snapshot(),before);assert.equal(viewer.items.filter(x=>x.id.startsWith('reference-ground-')).length,29);assert.ok(viewer.items.some(x=>x.id==='virtual-ground-point'));assert.ok(viewer.items.some(x=>x.id==='stored-orbit-satellite'));await f.win.dispatch('pagehide',{persisted:false});assert.equal(viewer.destroyCount,1);
+ }finally{f.dispose();}
+});
