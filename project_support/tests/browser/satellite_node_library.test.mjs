@@ -67,3 +67,42 @@ test('node identity, equipment identity and schema repairs do not admit ambiguou
  const bad=structuredClone(node);bad.equipment[1].id=bad.equipment[0].id;assert.ok(lib.validateNode(bad).length>0);
  assert.throws(()=>lib.createNode({}, {epoch,catalogNumber:900001}), /id/i);
 });
+test('only declared presets, modes, catalogs and roles are valid, including inherited property names',()=>{
+ const lib=library(),node=lib.createNode({}, {epoch,id:'N-1',catalogNumber:900001});
+ for(const key of ['__proto__','constructor','toString']){
+  assert.equal(lib.equipmentSpec({catalog:key}),null,key);
+  assert.throws(()=>lib.createEquipment(key),RangeError,key);
+  assert.equal(lib.createNode({bus:key},{epoch,id:'N-2',catalogNumber:900002}).bus,'comms_small');
+  for(const field of ['bus','mode']){const bad=structuredClone(node);bad[field]=key;assert.ok(lib.validateNode(bad).length>0,field);}
+  const bad=structuredClone(node);bad.equipment[0].role=key;assert.ok(lib.validateNode(bad).length>0,key);
+  const params=lib.normalizeFormationParams({preset:key,bus:key,link_policy:key});
+  assert.equal(params.preset,'walker_delta');assert.equal(params.bus,'comms_small');assert.equal(params.link_policy,'grid');
+ }
+});
+test('all nested node/catalog and active-terminal values are independent copies',()=>{
+ const lib=library(),sourceDate=new Date(epoch),partial={orbit:{epoch:sourceDate},power:{metadata:{source:'original'}}};
+ const node=lib.createNode(partial,{epoch,id:'N-1',catalogNumber:900001});
+ node.orbit.epoch.setUTCFullYear(2040);node.power.metadata.source='changed';
+ assert.equal(sourceDate.getUTCFullYear(),2026);assert.equal(partial.power.metadata.source,'original');
+ const terminals=lib.activeOislTerminals(node);terminals[0].role='auto';assert.equal(node.equipment[0].role,'fore');
+ const item=lib.nodeCatalogItem(node);item.orbit.epoch.setUTCFullYear(2050);assert.equal(node.orbit.epoch.getUTCFullYear(),2040);
+});
+test('normalization preserves a valid record but refuses corrupt definitions and incomplete orbital domains',()=>{
+ const lib=library(),node=lib.createNode({}, {epoch,id:'N-1',catalogNumber:900001});
+ assert.deepEqual(lib.normalizeNode(node,epoch),node);
+ for(const change of [{mode:'not-a-mode'},{bus:'not-a-bus'},{orbit:null},{orbit:{epoch}},{schema:2}])assert.equal(lib.normalizeNode({...node,...change},epoch),null,JSON.stringify(change));
+ const bad=structuredClone(node);bad.equipment[0].catalog='missing';assert.equal(lib.normalizeNode(bad,epoch),null);
+ for (const change of [{role:'invalid'},{enabled:'false'},{id:''}]) {
+  const corrupt=structuredClone(node);Object.assign(corrupt.equipment[0],change);assert.equal(lib.normalizeNode(corrupt,epoch),null);
+ }
+ assert.equal(lib.normalizeNode({...node,mass_kg:Infinity},epoch),null);
+ assert.equal(lib.normalizeNode({...node,created_at:'bad-date'},epoch),null);
+ const dateNode=lib.createNode({orbit:{epoch:new Date(epoch)}},{epoch,id:'N-2',catalogNumber:900002});
+ const normalized=lib.normalizeNode(dateNode,epoch);normalized.orbit.epoch.setUTCFullYear(2040);assert.equal(dateNode.orbit.epoch.getUTCFullYear(),2026);
+});
+test('invalid text/time metadata is not coerced into a valid node record',()=>{
+ const lib=library(),node=lib.createNode({}, {epoch,id:'N-1',catalogNumber:900001});
+ for(const key of ['created_at','updated_at']){const bad=structuredClone(node);bad[key]='bad-date';assert.ok(lib.validateNode(bad).length>0,key);}
+ const bad=structuredClone(node);bad.name={name:'name'};assert.ok(lib.validateNode(bad).length>0);
+ assert.throws(()=>lib.createNode({}, {epoch:'2026-02-30T12:00:00Z',id:'N-1',catalogNumber:900001}), /epoch/);
+});

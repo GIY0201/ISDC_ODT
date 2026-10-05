@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 T140–T141 노드 순수 정의 이식
+- 변경: 선배 노드/버스/장비/모드/편대/전력 함수와 정적 궤도 요소 도메인 이식. epoch/ID/요약 주입, 원본 정상값 보존; 유한성/깊은 사본/상속 enum/날짜/메타데이터/손상 복원 검사 개선.
+- 검증: 원본62순수/8정적 결과 동일, fixture hash 보존. 초기 missingmodule 및 실제 RED2/3/1 후 최종 Node368PASS1402.9604ms/Python471PASS8기존warnings227.61s(session27519exit0)/syntax/diffcheck. validation/t141_node_library.md.
+- 남음: T142 Rust Kepler+J2 및 T143–153/native/store/editor/scene/T079서버수락/실제UI/리뷰. T076전체/T075Terra/all50/T137인증/전체T075–84/T032/장비·RF·HIL/다운로드/AeroDT 유지. 8891서버/API/native/사용자화면/병합 변경 없음.
+
+
 ## 2026-10-05 T139 위성 노드 연결 계약
 - 변경: 기존feature US20/FR030·31/SC026과 node계약/ADR0017/설계·데이터·검증가이드/T140–153 추가. Rust원본Kepler+J2/근사frame·Unix시간/31float64 ABI, 순수JS정의주입, 서버수락·T079 활성화/restoreGET만/원본120구간121점 정밀화. 제품 코드 변경 없음.
 - 검증: 기존setup-plan보존/setup-tasks/prerequisites, checklist8/8/hooks없음/constitution1.2.0; readonly범위분석 요구3/3·세부14task·기존139행보존, source본문/whitespace. validation/t139_node_design.md. 새동작시험아님; 기존471Python/355Node 증거 유지.

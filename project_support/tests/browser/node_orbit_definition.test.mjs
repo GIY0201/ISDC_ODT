@@ -21,3 +21,7 @@ test('edited definitions do not reuse stale elements; missing epoch and nonfinit
 test('browser orbital helper has no time propagation or guessed Sun/frame conversion',()=>{
  for(const name of ['nodeStateAt','nodePositionAt','inertialStateAt','sunDirectionAt','gmst','fixedFromInertial'])assert.equal(definition[name],undefined,name);
 });
+test('explicit epoch validation rejects invalid calendar rollovers, timezone guesses and leap collapse',()=>{
+ for(const value of ['2026-02-30T12:00:00Z','2026-01-01T24:00:00Z','2026-01-01T12:00:00','2016-12-31T23:59:60Z'])assert.equal(definition.epochMillis(value),null,value);
+ assert.equal(definition.epochMillis('2026-10-04T22:01:12.000Z'),fixture.evidence.epoch);
+});
