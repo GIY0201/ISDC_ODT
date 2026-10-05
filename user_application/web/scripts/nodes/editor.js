@@ -120,7 +120,7 @@ function parseField(input) {
   }
   return input.value;
 }
-function createNodeEditor({form,models=()=>[],otherNodes=()=>[],onSave,onCancel,onModelChange}) {
+function createNodeEditor({form,models=()=>[],otherNodes=()=>[],onSave,onCancel,onModelChange,onClose}) {
   if (!form || typeof form.addEventListener!=='function') throw new TypeError('editor_form_required');
   let draft=null,destroyed=false,generation=0,pending=null;
   const bindings=[];
@@ -188,7 +188,7 @@ function createNodeEditor({form,models=()=>[],otherNodes=()=>[],onSave,onCancel,
     const copy=structuredClone(node),errors=validateNode(copy);if(errors.length)throw new Error(errors.join('; '));
     invalidate();draft=copy;form.hidden=false;render();if(focus)form.querySelector('[data-path="name"]')?.focus();
   }
-  function close(){invalidate();draft=null;form.hidden=true;form.innerHTML='';}
+  function close(){const wasOpen=isOpen();invalidate();draft=null;form.hidden=true;form.innerHTML='';if(wasOpen)onClose?.();}
   async function submit(event) {
     event.preventDefault();if(!isOpen()||pending)return;
     const errors=validateNode(draft);if(errors.length){showErrors(errors);return;}

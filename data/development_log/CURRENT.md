@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-06 T146 초안 동작 연결 부분 구현
+- 변경: 기존 library/store/editor/formation을 재사용해 위성 추가·저장·선택·비우기 연결. 유효하지 않은 입력/저장 실패 때 정의·ID·편집 보존, 명시 선택만 focus:false 전달, 비우기 확인의 변경·종료·늦은응답 차단. 저장 성공 시 편대 분리/해당 단말 owner 알림, editor onClose로 상태 표시 갱신. 생성실패·종료 시 소유 listener/subscription 정리.
+- 검증: actions9RED, closure10PASS1FAIL 및 초기화 cleanup12PASS1FAIL 후 보완. 최종 전체Node444PASS1432.6922ms/전체Python545PASS8기존warnings150.85s(session1180exit0)/syntax. 새 basetemp/cache 사용, 기존 cache 보존. 실제editor+store 조립 포함, fakeDOM/주입수락은 실제 UI·배치 증거 아님. validation/t146_node_draft_panel.md.
+- 남음: T146unchecked 전체workwindow shell/fleet-status 연결/source scene controls. T147–153/T079실제수락/N001/N003/전체T076/T075–84/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. 서버8891/native설치/사용자화면/원격PR·병합 변경 없음.
+
+
 ## 2026-10-06 T146 상태·선택·툴팁 부분 이식 / N002 조회각도 해결
 - 변경: 원본상태/목록/terminalRow/phase색상·220ms툴팁 재사용, scopedDOM/store/display/native/model/action 주입. 원본5bus 정상출력일치; 현재각도 native22/24/25 DTO 추가(실패null/새계산없음). stale/error/누락결과수치리셋·focus차단, 클릭때재검사, 사본/cleanup/저장실패보존. 미확인통신은주값unknown+원본전체활성단말전력가정별도표시; 모델출처/렌더상태/가상번호구분.
 - 검증: source5hash+정확한원본3function VM; 두48217bytecapture SHAfd27d1df… 동일/5frame·fleet·live·가정값동일. angles2FAIL→52PASS1warning1.69s, UI RED/수정후최종전체Node430PASS1583.2346ms, 전체Python545PASS9warnings141.27s(session48056exit0)/syntax/stageddiffcheck. 8기존경고+oldcache접근불가경고1; 기존cache보존/새cache target2PASS1기존warning2.24s와실제nodeids2개쓰기확인. validation/t146_node_status.md.

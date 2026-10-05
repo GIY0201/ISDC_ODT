@@ -117,7 +117,8 @@ function createFormationPanel({root=null,store,now,createFormationId,timers,onEr
     const checkbox=get('#formation-live');bind(checkbox,'change',()=>setLive(checkbox.checked));
     bind(get('#formation-generate'),'click',()=>generate());bind(get('#formation-remove'),'click',()=>remove());render();
   }
-  return Object.freeze({change,generate,setLive,adopt,remove,destroy,snapshot});
+  function parametersForCreate(){requireOpen();if(invalidInputs.size)throw new Error('잘못된 편대 입력을 수정한 뒤 생성하세요.');return structuredClone(params);}
+  return Object.freeze({change,generate,setLive,adopt,remove,destroy,snapshot,parametersForCreate});
 }
 function utcLabel(value,seconds=true){
   const time=typeof value==='number'?value:typeof value==='string'&&value.trim()?Date.parse(/(?:Z|[+-]\d{2}:?\d{2})$/i.test(value.trim())?value:`${value}Z`):NaN;
@@ -344,5 +345,72 @@ function bindNodeTooltips({root,tip,timers,viewport,contains,scrollTarget=null}=
   bind(root,'focusout',hide);bind(root,'mousedown',hide);bind(scrollTarget,'scroll',hide,true);
   return ()=>{if(destroyed)return;destroyed=true;hide();for(const remove of owned.splice(0))remove();};
 }
-return Object.freeze({formationControlsMarkup,formationSummaryText,createFormationPanel,statusFrame,fleetMarkup,terminalRow,statusPresentation,createNodeStatusPanel,createNodeFleetPanel,bindNodeTooltips});
+// Source add/save/select/clear orchestration. Owners supply display, history and scene callbacks;
+// this controller neither loads storage nor creates a Viewer, clock, transport or deployment.
+function createNodeDraftPanel({root,store,editorTools,now,timers,createFormationId,models,otherNodes,
+  onModelChange,confirmClear,onRefresh=()=>{},onDefinitionsChanged=()=>{},onResetTerminals=()=>{},
+  onSelected=()=>{},onError=()=>{},initialParams=FORMATION_DEFAULTS}={}){
+  const form=root?.querySelector('#node-editor');
+  if(!root||!form||!store||typeof editorTools?.createNodeEditor!=='function'||typeof now!=='function')throw new TypeError('node_draft_panel_dependencies_required');
+  let disposed=false,clearVersion=0;const owned=[];
+  const requireOpen=()=>{if(disposed)throw new Error('node_draft_panel_disposed');};
+  const report=error=>{try{onError(error instanceof Error?error.message:String(error));}catch{/* Reporting cannot undo a persisted transaction. */}};
+  const call=(fn,...args)=>{try{const result=fn(...args);if(result?.then)result.catch(report);return result;}catch(error){report(error);}};
+  const refresh=()=>{if(!disposed)call(onRefresh);};
+  const formation=createFormationPanel({root,store,now,timers,createFormationId,initialParams,onError:report,onChange:refresh});
+  function save(draft,{signal}={}){
+    if(disposed||signal?.aborted)return ['위성 편집이 취소되었습니다.'];
+    const original=store.find(draft.id);if(!original)return ['노드를 찾을 수 없습니다.'];
+    const errors=store.update(draft.id,{...structuredClone(draft),formation:null});
+    if(!errors.length)call(onResetTerminals,[draft.id]);
+    return errors;
+  }
+  let editor;
+  try{editor=editorTools.createNodeEditor({form,models,otherNodes:otherNodes??(()=>store.drafts),onModelChange,onSave:save,onCancel:refresh,onClose:refresh});}
+  catch(error){disposed=true;formation.destroy();throw error;}
+  function openEditor(id,{focus=true}={}){
+    requireOpen();const node=store.find(id);if(!node)return false;
+    try{editor.open(node,{focus});refresh();return true;}catch(error){report(error);return false;}
+  }
+  function add(){
+    requireOpen();let node;
+    try{
+      const params=formation.parametersForCreate(),epoch=now();
+      if(typeof epoch!=='number'||!Number.isFinite(epoch)||!Number.isFinite(new Date(epoch).getTime()))throw new Error('위성 정의 UTC 시각을 확인하세요.');
+      node=store.add({bus:params.bus,orbit:library.defaultOrbit(epoch,{altitude_km:params.altitude_km,inclination:params.inclination,raan:params.raan_start,mean_anomaly:params.anomaly_start})},{linkPolicy:params.link_policy});
+    }catch(error){report(error);return null;}
+    openEditor(node.id);return structuredClone(node);
+  }
+  function select(id){
+    requireOpen();if(!store.find(id))return false;
+    try{store.select(id);}catch(error){report(error);return false;}
+    editor.close();refresh();call(onSelected,store.selected,{userInitiated:true,focus:false});return true;
+  }
+  async function clear(){
+    requireOpen();if(!store.drafts.length||typeof confirmClear!=='function')return false;
+    const version=++clearVersion,revision=store.revision,nodes=store.drafts;
+    try{
+      const approved=await confirmClear(structuredClone(nodes));
+      if(disposed||version!==clearVersion)return false;
+      if(approved!==true)return false;
+      if(store.revision!==revision){report('위성 작업 세트가 변경되었습니다. 내용을 확인하고 다시 비우세요.');return false;}
+      store.clear();call(onResetTerminals,nodes.map(node=>node.id));return true;
+    }catch(error){report(error);return false;}
+  }
+  function onStoreChange(event){
+    if(disposed)return;
+    // Preserve unrelated editors/listeners and never turn a passive selection into a camera command.
+    if(editor.isOpen()&&(!store.find(editor.draft?.id)||(event==='select'&&editor.draft?.id!==store.selectedId)))call(()=>editor.close());
+    call(()=>formation.adopt(store.selected));refresh();
+    if(['add','update','remove'].includes(event))call(onDefinitionsChanged,store.drafts,event);
+  }
+  const unsubscribe=store.subscribe(onStoreChange);
+  const bind=(selector,handler)=>{const el=root.querySelector(selector);if(!el)return;const guarded=()=>{if(!disposed)return handler();};el.addEventListener('click',guarded);owned.push(()=>el.removeEventListener('click',guarded));};
+  bind('#node-add',add);bind('#nodes-clear',clear);
+  const clearButton=root.querySelector('#nodes-clear');if(clearButton)clearButton.disabled=typeof confirmClear!=='function';
+  formation.adopt(store.selected);refresh();
+  function destroy(){if(disposed)return;disposed=true;clearVersion++;unsubscribe();for(const remove of owned.splice(0))remove();formation.destroy();editor.destroy();}
+  return Object.freeze({formation,editor,add,select,clear,openEditor,refresh,destroy});
+}
+return Object.freeze({formationControlsMarkup,formationSummaryText,createFormationPanel,statusFrame,fleetMarkup,terminalRow,statusPresentation,createNodeStatusPanel,createNodeFleetPanel,bindNodeTooltips,createNodeDraftPanel});
 }

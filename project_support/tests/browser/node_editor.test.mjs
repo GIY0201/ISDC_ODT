@@ -105,3 +105,11 @@ test('explicit time input and invalid replacement preserve editor ownership',asy
  assert.throws(()=>editor.open({...node,name:''}));assert.equal(editor.draft.id,node.id);assert.equal(editor.isOpen(),true);
  editor.destroy();assert.throws(()=>editor.open(node),/disposed/);
 });
+
+test('owner receives close after successful save or explicit cancel, but not failed save or redundant close',async()=>{
+ const {tools,node}=setup(),form=new Form();let result=['denied'],closes=0;
+ const editor=tools.createNodeEditor({form,onSave:()=>result,onClose:()=>{assert.equal(editor.isOpen(),false);closes++;}});
+ editor.open(node);await form.dispatch('submit');assert.equal(closes,0);assert.equal(editor.isOpen(),true);
+ result=[];await form.dispatch('submit');assert.equal(closes,1);editor.close();assert.equal(closes,1);
+ editor.open(node);editor.close();assert.equal(closes,2);editor.destroy();assert.equal(closes,2);
+});
