@@ -39,3 +39,6 @@
 .cp-table th { position: sticky; top: 0; background: #10212c; }
 
 .catalog-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end}.catalog-controls label{display:grid;gap:4px}.catalog-controls input{min-width:220px}#catalog-workspace .body{overflow-wrap:anywhere}#cat-detail dl{display:grid;grid-template-columns:minmax(130px,1fr) 2fr;gap:6px}#cat-detail dd{margin:0}#cat-list{max-height:350px;overflow:auto}
+/* Original satellite hover surface, mounted once in the existing globe. */
+.satellite-hover-card{z-index:35;width:205px;padding:10px 11px;pointer-events:none;border:1px solid rgba(239,255,98,.48);border-radius:var(--radius-sm,4px);color:#e8f1fb;background:rgba(5,12,21,.94);box-shadow:0 12px 30px rgba(0,0,0,.34),inset 3px 0 #efff62;backdrop-filter:blur(10px)}
+.satellite-hover-card[hidden]{display:none}

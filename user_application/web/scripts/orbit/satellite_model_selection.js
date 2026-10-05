@@ -22,7 +22,7 @@ export function createSatelliteModelSelection({api,globe,timeline,validateManife
       (!profile.gp||profile.gp.NORAD_CAT_ID===item.NORAD_CAT_ID&&
         (!profile.gp.EPOCH||!item.EPOCH||sameEpoch(profile.gp.EPOCH,item.EPOCH)))?profile.catalog:null;
     const match=resolver(item,catalog??{});
-    const description={...match,satelliteId:geometry.catalog_number,normalized_gp_sha256:geometry.normalized_gp_sha256};
+    const description={...match,satelliteId:geometry.catalog_number,normalized_gp_sha256:geometry.normalized_gp_sha256,catalogName:item.OBJECT_NAME,catalogOrbitRegime:item.ORBIT_REGIME};
     const next=JSON.stringify(description);
     if(next===signature)return;
     signature=next;globe.setSatelliteModel(description,source);

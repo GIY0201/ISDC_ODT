@@ -5,7 +5,7 @@ let sequence=0;
 async function fixture(){
  const renderers=[],listeners=new Map(),calls=[];
  globalThis.ModelRenderer=class{
-  constructor(){this.modelLayer={tracking:false};this.viewer={scene:{renderError:{addEventListener:()=>()=>{}}}};renderers.push(this);}
+  constructor(C,container,options){this.options=options;this.modelLayer={tracking:false};this.viewer={scene:{renderError:{addEventListener:()=>()=>{}}}};renderers.push(this);}
   setSatelliteModel(description,source){calls.push(['show',description,source]);this.source=source;source.onStatus({phase:description.url?'loading':'unassigned',satelliteId:description.satelliteId});return Promise.resolve(null);}
   focusSatelliteModel(options){calls.push(['focus',options]);this.modelLayer.tracking=true;return true;}
   releaseSatelliteModel(){calls.push(['release']);this.modelLayer.tracking=false;}
@@ -22,6 +22,12 @@ async function fixture(){
 }
 const description=(id=25544,hash='a'.repeat(64))=>({satelliteId:id,normalized_gp_sha256:hash,url:'/static/satellite_display/iss.glb',key:'iss',quality:'exact',orientation:{heading:0}});
 const source=()=>({timeSource:()=> '2026-10-05T00:00:00.000000000Z',advanceUtc:()=>null,sampleAt:()=>null});
+test('hover subscriptions forward owned presentation values and stop after removal or destroy',async()=>{
+ const f=await fixture(),a=[],b=[];const remove=f.ui.observeSatelliteHover(v=>{a.push(v);if(v)v.position.position_m[0]=0;});f.ui.observeSatelliteHover(v=>b.push(v));f.boot();
+ const payload={id:1,item:{OBJECT_NAME:'ISS'},position:{frame:'ITRF',utc:'2026-10-05T00:00:00Z',catalog_number:1,position_m:[1,2,3]},screen:{x:20,y:30}};
+ f.renderers[0].options.onSatelliteHover(payload);assert.equal(b.at(-1).position.position_m[0],1);assert.equal(payload.position.position_m[0],1);
+ remove();const count=a.length;f.renderers[0].options.onSatelliteHover(null);assert.equal(a.length,count);assert.equal(b.at(-1),null);f.ui.destroy();const after=b.length;f.renderers[0].options.onSatelliteHover(payload);assert.equal(b.length,after);
+});
 
 test('preboot current model only, copied description/status and explicit camera actions share existing renderer',async()=>{
  const f=await fixture(),events=[],remove=f.ui.observeModel(v=>events.push(v)),a=description(),b=description(123);

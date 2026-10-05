@@ -10,6 +10,19 @@ function fixture(){const collections=[],handlers=[],viewers=[],allocations={colo
 }
 const utc='2020-07-12T21:16:01.000416000Z';
 const scene=(n=16633)=>({frame:'ITRF',utc,scene_sha256:'a'.repeat(64),count:n,valid_count:n,error_count:0,rows:Array.from({length:n},(_,i)=>({catalog_number:i+1,name:'sat'+i,status:'valid',normalized_gp_sha256:'b'.repeat(64),epoch_utc:utc,orbit_regime:['LEO','MEO','GEO','HEO'][i%4],position_m:[7000000,i+1,0]}))});
+test('native hover emits picked scene UTC or selected UTC, including model picks, without selecting or sharing geometry',()=>{
+ const {globe,handlers}=fixture(),events=[],selected=[];globe.C.ScreenSpaceEventType.MOUSE_MOVE=2;
+ globe.onSatelliteHover=value=>events.push(value);globe.setCatalogScene(scene(2),n=>selected.push(n));
+ const move=(id)=>{globe.viewer.picked=id==null?null:{id};handlers[0].actions.get(2)({endPosition:{x:25,y:40}});};
+ move({catalogNumber:2});assert.equal(events.at(-1).position.utc,utc);assert.equal(events.at(-1).item.OBJECT_NAME,'sat1');assert.equal(events.at(-1).item.ORBIT_REGIME,'MEO');assert.deepEqual(events.at(-1).position.position_m,[7000000,2,0]);
+ events.at(-1).position.position_m[0]=0;move({catalogNumber:2});assert.equal(events.at(-1).position.position_m[0],7000000);
+ const selectedUtc='2020-07-12T21:16:02.000416000Z';globe.update({...scene(2).rows[0],frame:'ITRF',utc:selectedUtc,name:'ISS',orbit_regime:'LEO',interpolated:true});
+ move('stored-orbit-satellite');assert.equal(events.at(-1).position.utc,selectedUtc);assert.equal(events.at(-1).position.interpolated,true);assert.equal(events.at(-1).id,1);
+ move({satelliteId:1});assert.equal(events.at(-1).position.utc,selectedUtc);
+ move({satelliteId:'1'});assert.equal(events.at(-1)?.position.utc,selectedUtc,'original GLB picks carry string satellite IDs');
+ const failed=scene(2);failed.rows[1].status='error';globe.setCatalogScene(failed);move({catalogNumber:2});assert.equal(events.at(-1),null);
+ globe.update(null);move({satelliteId:1});assert.equal(events.at(-1),null);assert.deepEqual(selected,[]);globe.destroy();
+});
 test('hover restores exact original size/color, changes only two points and survives theme/selection',()=>{
  const {globe,allocations}=fixture();globe.setCatalogScene(scene());const other=globe.catalogPoints.get(9000).color;
  globe.hoverCatalog(1);assert.equal(globe.catalogPoints.get(1).pixelSize,7);assert.equal(globe.catalogPoints.get(1).color.css,'#ffffff');

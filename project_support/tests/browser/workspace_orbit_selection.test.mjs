@@ -44,7 +44,8 @@ test('empty UI choice restores server selection without clearing its result or s
     .replace(/import \{api,telemetrySocket\} from [^;]+;/,'const api={},telemetrySocket=()=>()=>{};')
     .replace(/import \{createOrbitSelection\} from [^;]+;/,'const createOrbitSelection=()=>globalThis.testOrbitClient;')
     .replace(/import \{createWorkspacePlayback\} from [^;]+;/,'const createWorkspacePlayback=()=>({update(){},destroy(){}});')
-    .replace(/import \{createWorkspaceGlobe\} from [^;]+;/,'const createWorkspaceGlobe=()=>({update(){},catalog(){},stations(){},selectStation(){},focusStation(){},destroy(){}});');
+    .replace(/import \{createSatelliteHover\} from [^;]+;/,'const createSatelliteHover=()=>({show(){},clear(){},destroy(){}});')
+    .replace(/import \{createWorkspaceGlobe\} from [^;]+;/,'const createWorkspaceGlobe=()=>({observeSatelliteHover(){return()=>{};},update(){},catalog(){},stations(){},selectStation(){},focusStation(){},destroy(){}});');
   try {
     const ui=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
     ui.showWorkspaceOrbit('satellite');

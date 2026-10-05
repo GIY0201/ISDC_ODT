@@ -1,5 +1,6 @@
 import {createGlobeViewPanel} from './tabs/globe_view.js?v=t120-r1';
 import {createSatelliteModelPanel} from './tabs/satellite_model.js?v=t128-r1';
+import {createSatelliteHover} from './tabs/satellite_hover.js?v=t129-r1';
 import {createSatelliteModelSelection} from './orbit/satellite_model_selection.js?v=t128-r1';
 import {createModelResolver,validateSatelliteManifest} from '/static/model_library/satellite_models.js';
 import {createCatalogTrack} from './catalog_track.js?v=t115-r1';
@@ -37,6 +38,11 @@ export function bindWorkspaceView(open){openWorkspaceView=open;}
 const globe=createWorkspaceGlobe(document.getElementById('stored-orbit-globe'),document.getElementById('orbit-globe-status'),document.getElementById('orbit-globe-focus'));
 const globeViewPanel=createGlobeViewPanel(globe);
 const modelPanel=createSatelliteModelPanel(globe);
+let satelliteHover=null;
+const removeSatelliteHover=globe.observeSatelliteHover((payload,C)=>{
+  if(!satelliteHover&&payload&&C)satelliteHover=createSatelliteHover(document.getElementById('stored-orbit-globe'),C);
+  if(payload)satelliteHover?.show(payload);else satelliteHover?.clear();
+});
 const stationPanel=createStationPanel(GROUND_STATIONS,stationGroups(),{select:key=>globe.selectStation(key),focus:key=>globe.focusStation(key),use:site=>{const staged=groundPanel.stageStation(site);location.hash='ground';return staged;},useCatalog:site=>{catalogTimePanel.stage(site);location.hash='satellite';}});
 globe.stations(Object.values(GROUND_STATIONS),key=>stationPanel.controller.choose(key));
 const client=createOrbitSelection(api,render);
@@ -70,7 +76,7 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeModelSelection();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   revisionSync.observe(client.snapshot());

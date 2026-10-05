@@ -502,3 +502,8 @@ Official NASA pinnedtree/alternateGLB/FBX/archive checks show Terra exacttexture
 - 검증: 실제8891 ISS2Dfocus 검정재현; read-onlycamera/좌표/width/globe·tilesLoaded·imagery확인. 같은focus의NASA밝음두해상도와dark강조해제/대체NaturalEarth에서지도보임. validation/t129_map_diagnosis.md.
 - 정정: 카메라결함증거아님; 원본NASA어두운바다+원본강조스타일의가독성저하. 원래실패관측보존, dark가독성미해결. 제품코드변경·새시험실행·serverrestart·PR·병합없음.
 - 남음: nativehover/livecamera/all50/Terra/solar/fullT075–84 및기존보류. 임시tab닫기/viewport복원/debugger정리.
+
+## 2026-10-05 T129 위성 호버 카드 실제 연결 부분 검증
+- 변경: 기존단일pick처리에native좌표/해당UTC·이름·궤도분류 전달, 원본카드·스타일V6연결/사본·실패·leave·정리. 문자열모델ID RED수정, CSS캐시버전갱신.
+- 검증: renderer/observer/실제조립RED→PASS. 최종Node325PASS1226.8844ms/Python440PASS5기존warnings199.48s/session42230exit0/diffcheck. 실제8891두해상도ISShover25544/LEO/424.549km/표시UTC/빈공간숨김/console0; validation/t129_native_hover.md.
+- 남음: 전체카탈로그·2D·재생·edge/liveerror/camera/all50/Terra/dark가독성/solar/fullT075–84 및기존보류. 서버restart/포트8891/API/native/PR/병합변경없음; 임시tab·viewport정리.

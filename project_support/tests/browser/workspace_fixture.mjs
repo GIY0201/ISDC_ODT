@@ -1,5 +1,6 @@
 import {createGlobeViewPanel} from '../../../user_application/web/scripts/tabs/globe_view.js';
 import {createSatelliteModelPanel} from '../../../user_application/web/scripts/tabs/satellite_model.js';
+import {createSatelliteHover} from '../../../user_application/web/scripts/tabs/satellite_hover.js';
 import {createSatelliteModelSelection} from '../../../user_application/web/scripts/orbit/satellite_model_selection.js';
 import {createModelResolver,validateSatelliteManifest} from '../../../digital_twin/model_library/browser/satellite_models.js';
 import {createCatalogTrack} from '../../../user_application/web/scripts/catalog_track.js';
@@ -47,6 +48,9 @@ export function fixture(width=1280,height=720,options={}){
     get innerHTML(){return this._html;}
     *descendants(){for(const child of this.children){yield child;yield* child.descendants();}}
     prepend(child){child.parent=this;child.isConnected=true;this.children.unshift(child);if(child.id)elements.set(child.id,child);}
+    append(...children){for(const child of children){child.parent=this;child.isConnected=true;this.children.push(child);}}
+    remove(){this.isConnected=false;if(this.parent)this.parent.children=this.parent.children.filter(child=>child!==this);}
+    get ownerDocument(){return doc;}
     querySelector(selector){if(selector.startsWith('#'))return elements.get(selector.slice(1))||null;return [...this.descendants()].find(el=>el.tag===selector)||null;}
     querySelectorAll(selector){return [...this.descendants()].filter(el=>selector.includes('input')?['input','select','textarea'].includes(el.tag):el.tag==='button');}
     addEventListener(name,fn){if(!this.listeners.has(name))this.listeners.set(name,new Set());this.listeners.get(name).add(fn);}
@@ -82,7 +86,8 @@ export function fixture(width=1280,height=720,options={}){
   Cesium.SceneMode={SCENE2D:2,SCENE3D:3,MORPHING:0};
   Cesium.Viewer=class extends Viewer{constructor(...args){super(...args);const listeners=new Set();this.scene.mode=3;this.scene.screenSpaceCameraController={};this.scene.morphComplete={addEventListener:fn=>{listeners.add(fn);return()=>listeners.delete(fn);}};const finish=mode=>{this.scene.mode=mode;for(const fn of [...listeners])fn();};this.scene.morphTo2D=()=>finish(2);this.scene.morphTo3D=()=>finish(3);this.scene.completeMorph=()=>finish(this.scene.mode);this.camera.cancelFlight=()=>{};this.imageryLayers={addImageryProvider:provider=>({provider}),remove(){}};}};
   Cesium.PointPrimitiveCollection=PrimitiveCollection;Cesium.LabelCollection=PrimitiveCollection;Cesium.NearFarScalar=class{};Cesium.Cartesian2=class{};Cesium.LabelStyle={FILL_AND_OUTLINE:1};Cesium.Color.TRANSPARENT='transparent';
-  Cesium.ScreenSpaceEventType={LEFT_CLICK:1};Cesium.ScreenSpaceEventHandler=class{constructor(){pickHandlers.push(this);}setInputAction(fn){this.click=fn;}destroy(){this.dead=true;}};
+  Cesium.Cartographic={fromCartesian:()=>({height:123456})};
+  Cesium.ScreenSpaceEventType={LEFT_CLICK:1,MOUSE_MOVE:2};Cesium.ScreenSpaceEventHandler=class{constructor(){pickHandlers.push(this);}setInputAction(fn,type){if(type===1)this.click=fn;else this.move=fn;}destroy(){this.dead=true;}};
   const originalColor=Cesium.Color.fromCssColorString;Cesium.Color.fromCssColorString=v=>Object.assign(new String(originalColor(v)),{withAlpha:alpha=>({css:v,alpha})});
   const state={revision:4,input_id:'tle',input_hash:'hash',current_utc:'2020-07-12T21:16:01.000416000Z',ground_point:{latitude_deg:33.4996,longitude_deg:126.5312,ellipsoid_height_m:0,virtual:true,ellipsoid:'WGS84'},minimum_elevation_deg:10,playing:false,play_rate:1,leap_sha256:LEAP_SHA256,eop_sha256:'eop',frame:'ITRF',profile:'WGS72_AFSPC'};
   const snapshot={inputs:[{input_id:'tle',satellite_id:'25544',format:'TLE',epoch_utc:state.current_utc,raw_sha256:'hash'}],state,result:{client_request_id:'buffer',revision:4,input_id:'tle',input_hash:'hash',frame:'ITRF',rows:[{utc:state.current_utc,status:'valid',position_m:[1,2,3],elevation_deg:10}]},status:'ready',error:'',receivedAtMs:0};
@@ -102,11 +107,11 @@ export function fixture(width=1280,height=720,options={}){
   const schedule=set=>()=>{const id=++nextId;set.add(id);return id;};
   Object.assign(win,{Cesium,setTimeout:()=>++nextId,clearTimeout(){},BroadcastChannel:Channel,opener:options.opener??null,open:options.open??(()=>null),close:()=>{win.closed=true;}});
   context=vm.createContext({document:doc,window:win,innerWidth:width,innerHeight:height,location:{hash:options.hash??'#ground',search:options.popout?'?popout=1':'',origin:'http://localhost',href:'http://localhost/#ground'},URL,URLSearchParams,structuredClone,performance:{now:()=>0},crypto:{randomUUID:()=>String(++nextId)},queueMicrotask:fn=>jobs.push(fn),api,drawMultiLine:(canvas,series)=>charts.push(structuredClone(series)),drawSparkline:(canvas,series)=>charts.push(structuredClone(series)),GROUND_STATIONS,stationGroups,createStationPanel,createCatalogTimePanel,createCatalogTimeline:(api,display,notify)=>createCatalogTimeline(api,display,notify,{now:()=>0,requestFrame:schedule(frames),cancelFrame:id=>frames.delete(id),requestId:()=>String(++nextId)}),hilTopology,createHilPanel,createCatalogPanel,createCatalogGeometry,createKpiPanel,telemetrySocket:(message,status)=>{const stream={message,status,closed:0};streams.push(stream);return()=>stream.closed++;},createSimPanel,createMissionPanel,createRadioSeriesPanel,createGroundPanel,createRfPanel,createCommunicationPlanningPanel,createOrbitRadioPanel,createWorkspaceRevisionSync:c=>createWorkspaceRevisionSync(c,win),createOrbitSelection:()=>client,createWorkspaceGlobe:(container,status,button)=>createWorkspaceGlobe(container,status,button,win),createWorkspacePlayback:(c,show)=>createWorkspacePlayback(c,show,{now:()=>0,requestFrame:schedule(frames),cancelFrame:id=>frames.delete(id),setTimer:schedule(timers),clearTimer:id=>timers.delete(id)}),BroadcastChannel:Channel});
-  Object.assign(context,{createSatelliteModelPanel,createSatelliteModelSelection,createModelResolver,validateSatelliteManifest,createGlobeViewPanel,createCatalogTrack,createCatalogPasses,createCatalogPassPanel,createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
+  Object.assign(context,{createSatelliteHover,createSatelliteModelPanel,createSatelliteModelSelection,createModelResolver,validateSatelliteManifest,createGlobeViewPanel,createCatalogTrack,createCatalogPasses,createCatalogPassPanel,createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
   // Imported ground UI uses the same adapted document as the VM assembly.
   globalThis.document=doc;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}
   const resize=async(w,h)=>{context.innerWidth=w;context.innerHeight=h;await win.dispatch('resize');};
-  return {get,win,doc,context,resize,viewers,channels,streams,charts,timers,frames,pickCatalog(number){viewers[0].scene.pick=()=>({id:{catalogNumber:number}});pickHandlers[0].click({position:{}});},evaluate:source=>vm.runInContext(source,context),snapshot:()=>structuredClone(snapshot),counts:()=>({commands,queries,clientDestroyed}),flush,dispose(){delete globalThis.document;}};
+  return {get,win,doc,context,resize,viewers,channels,streams,charts,timers,frames,pickHandlers,pickCatalog(number){viewers[0].scene.pick=()=>({id:{catalogNumber:number}});pickHandlers[0].click({position:{}});},evaluate:source=>vm.runInContext(source,context),snapshot:()=>structuredClone(snapshot),counts:()=>({commands,queries,clientDestroyed}),flush,dispose(){delete globalThis.document;}};
 }

@@ -6,6 +6,7 @@ const PALETTES={dark:{LEO:'#ff9f43',MEO:'#e6ed55',GEO:'#5ee277',HEO:'#53c8ff',se
 export class OrbitGlobe {
   constructor(Cesium,container,options={}){
     this.container=container;this.hoveredCatalog=null;
+    this.onSatelliteHover=options.onSatelliteHover??(()=>{});this.hoverPick=null;this.selectedHover=null;this.catalogUtc=null;
     this.C=Cesium;this.position=null;this.destroyed=false;this.stationEntities=new Map();this.stationSites=new Map();this.stationIds=new Map();this.selectedStation=null;this.catalogPoints=new Map();this.catalogLabels=new Map();this.catalogHashes=new Map();this.catalogStyles=new Map();this.catalogEpochs=new Map();this.catalogValid=new Set();this.selectedCatalog=null;
     this.viewer=new Cesium.Viewer(container,{
       baseLayer:false,terrainProvider:new Cesium.EllipsoidTerrainProvider(),
@@ -43,6 +44,7 @@ export class OrbitGlobe {
     let utc;
     try{utc=C.JulianDate.fromIso8601(sample.utc);}catch{this.clearSatellite();viewer.scene.requestRender();return false;}
     this.position=new C.Cartesian3(...coordinates);
+    this.selectedHover=sample.catalog_number!=null&&sample.status!=='error'&&!sample.error_code?structuredClone({catalog_number:sample.catalog_number,normalized_gp_sha256:sample.normalized_gp_sha256,frame:'ITRF',utc:sample.utc,position_m:coordinates,interpolated:Boolean(sample.interpolated),name:sample.name,orbit_regime:sample.orbit_regime}):null;
     this._selectCatalogMarker(sample.catalog_number,sample.normalized_gp_sha256);
     viewer.clock.currentTime=utc;
     if(this.entity)this.entity.position=new C.ConstantPositionProperty(this.position,C.ReferenceFrame.FIXED);
@@ -54,12 +56,13 @@ export class OrbitGlobe {
     this.entity.name=sample.name?`${sample.name} · SGP4 모델`:'ISS · SGP4 모델';
     this.entity.label.text=sample.name?`${sample.name} · GP 모델`:'ISS · GP 예측';
     this._styleSelected();
-    viewer.scene.requestRender();return true;
+    this._refreshSatelliteHover();this._ensurePickHandler();viewer.scene.requestRender();return true;
   }
   clearSatellite(){
     this._selectCatalogMarker(null);
     if(this.entity){if(this.viewer.entities.remove)this.viewer.entities.remove(this.entity);else this.viewer.entities.removeAll();}
     this.entity=null;this.position=null;
+    this.selectedHover=null;this._refreshSatelliteHover();
   }
   setCatalogTrack(value){
     if(this.destroyed)return false;
@@ -89,6 +92,7 @@ export class OrbitGlobe {
       if(this.catalogCollection)viewer.scene.primitives.remove(this.catalogCollection);
       if(this.catalogLabelCollection)viewer.scene.primitives.remove(this.catalogLabelCollection);
       this.catalogCollection=null;this.catalogLabelCollection=null;this.catalogSignature=null;
+      this.catalogUtc=null;this._clearSatelliteHover();
       this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.catalogValid.clear();this.selectedCatalog=null;
       viewer.scene.requestRender();return true;
     }
@@ -100,6 +104,7 @@ export class OrbitGlobe {
       this.catalogLabelCollection=viewer.scene.primitives.add(new C.LabelCollection());
       this.catalogSignature=value.scene_sha256;
     }
+    this.catalogUtc=value.utc;
     const size=value.count>10000?2.4:value.count>2000?3:value.count>200?4.5:6.5;
     const colors=PALETTES[this.viewControls.theme];
     const seen=new Set(),palette=new Map(),utcMilliseconds=Date.parse(value.utc);
@@ -126,6 +131,7 @@ export class OrbitGlobe {
       }else{point.position=position;point.show=true;if(this.catalogStyles.get(row.catalog_number)!==style)point.color=color(style,css,alpha);}
       this.catalogStyles.set(row.catalog_number,style);
       this.catalogHashes.set(row.catalog_number,row.normalized_gp_sha256);
+      point.id.name=row.name;point.id.orbit_regime=row.orbit_regime;
       const label=this.catalogLabels.get(row.catalog_number);if(label){label.position=position;label.show=true;}
     }
     // The same GP can transition to/from a propagation failure at another UTC.
@@ -134,7 +140,29 @@ export class OrbitGlobe {
     if(this.hoveredCatalog!==null&&!seen.has(this.hoveredCatalog))this.hoverCatalog(null);
     const selected=this.selectedCatalog;
     if(selected!==null)this._selectCatalogMarker(selected,this.catalogHashes.get(selected));
-    this._paintHovered();this._ensurePickHandler();viewer.scene.requestRender();return true;
+    this._paintHovered();this._refreshSatelliteHover();this._ensurePickHandler();viewer.scene.requestRender();return true;
+  }
+  _clearSatelliteHover(){this.hoverPick=null;this.onSatelliteHover(null);}
+  _refreshSatelliteHover(){
+    if(!this.hoverPick)return;
+    const {id,screen}=this.hoverPick,number=id?.catalogNumber;
+    let position,item;
+    if(number!=null){
+      const point=this.catalogPoints.get(number);
+      if(point?.show&&this.catalogValid.has(number)&&this.catalogUtc){
+        const p=point.position;position={catalog_number:number,normalized_gp_sha256:this.catalogHashes.get(number),frame:'ITRF',utc:this.catalogUtc,position_m:[p.x,p.y,p.z]};
+        item={OBJECT_NAME:point.id.name,ORBIT_REGIME:point.id.orbit_regime};
+      }
+    }else if(id==='stored-orbit-satellite'||id?.satelliteId!=null&&String(id.satelliteId)===String(this.selectedHover?.catalog_number)){
+      position=this.selectedHover;
+      if(position){
+        const description=this.modelLayer?.description;
+        const matching=String(description?.satelliteId)===String(position.catalog_number)&&description?.normalized_gp_sha256===position.normalized_gp_sha256;
+        item={OBJECT_NAME:position.name||(matching?description.catalogName:undefined),ORBIT_REGIME:position.orbit_regime||(matching?description.catalogOrbitRegime:undefined)};
+      }
+    }
+    if(!position){this._clearSatelliteHover();return;}
+    this.onSatelliteHover(structuredClone({id:position.catalog_number,item,position,screen}));
   }
   _ensurePickHandler(){
     const {C,viewer}=this;
@@ -152,9 +180,11 @@ export class OrbitGlobe {
     if(C.ScreenSpaceEventType.MOUSE_MOVE!==undefined)this.stationPickHandler.setInputAction(event=>{
       if(this.destroyed)return;const picked=viewer.scene.pick(event.endPosition),id=picked?.id?.id??picked?.id;
       this.hoverCatalog(id?.catalogNumber??(id==='stored-orbit-satellite'?this.selectedCatalog:null));
+      this.hoverPick={id:typeof id==='object'?{catalogNumber:id?.catalogNumber,satelliteId:id?.satelliteId}:id,screen:{x:event.endPosition.x,y:event.endPosition.y}};
+      this._refreshSatelliteHover();
       if(this.hoveredCatalog===null&&this.stationIds.has(id)&&viewer.scene.canvas.style)viewer.scene.canvas.style.cursor='pointer';
     },C.ScreenSpaceEventType.MOUSE_MOVE);
-    this.leaveCatalog=()=>this.hoverCatalog(null);this.container.addEventListener?.('mouseleave',this.leaveCatalog);
+    this.leaveCatalog=()=>{this.hoverCatalog(null);this._clearSatelliteHover();};this.container.addEventListener?.('mouseleave',this.leaveCatalog);
   }
   setGroundPoint(point){
     if(this.destroyed)return;
@@ -240,5 +270,5 @@ export class OrbitGlobe {
     for(const [number,point]of this.catalogPoints){const visual=this.catalogVisuals.get(number);if(!visual)continue;const alpha=visual.alpha*(this.selectedCatalog!==null&&this.selectedCatalog!==number ? .65 : 1),css=palette[visual.regime]||palette.LEO,style=`${css}:${alpha}`;if(!colors.has(style))colors.set(style,C.Color.fromCssColorString(css).withAlpha(alpha));point.color=colors.get(style);this.catalogStyles.set(number,style);const label=this.catalogLabels.get(number);if(label){label.fillColor=labelColor;label.outlineColor=outline;}}
     this._paintHovered();this.viewer.scene.requestRender();
   }
-  destroy(){if(this.destroyed)return;this.hoverCatalog(null);this.container.removeEventListener?.('mouseleave',this.leaveCatalog);this.modelLayer?.dispose();this.cameraMotion.dispose();this.destroyed=true;this.position=null;this.viewControls.destroy();this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.viewer.destroy();}
+  destroy(){if(this.destroyed)return;this.hoverCatalog(null);this._clearSatelliteHover();this.selectedHover=null;this.container.removeEventListener?.('mouseleave',this.leaveCatalog);this.modelLayer?.dispose();this.cameraMotion.dispose();this.destroyed=true;this.position=null;this.viewControls.destroy();this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.viewer.destroy();}
 }
