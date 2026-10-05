@@ -5,6 +5,12 @@ const groups={items:[{id:'active',label:'전체'},{id:'stations',label:'정거�
 const item={NORAD_CAT_ID:25544,OBJECT_NAME:'ISS',MEAN_MOTION:15,PERIOD_MINUTES:96,INCLINATION:0};
 const page=(p,extra={})=>({source:'celestrak-cache',group:p.group,label:'전체',items:[item],count:1,total:201,filtered_total:201,offset:p.offset,limit:100,fetched_at:'2026-10-05T00:00:00Z',...extra});
 const deferred=()=>{let resolve;return {promise:new Promise(r=>resolve=r),resolve};};
+
+test('selection observers receive owned item/profile even without visible panel; stale details and teardown stay fenced',async()=>{
+ const detail=deferred(),events=[];const c=createCatalogWorkspace({satelliteGroups:async()=>groups,satellites:async p=>page(p),satelliteProfile:()=>detail.promise});
+ const remove=c.observeSelection(value=>events.push(value));assert.equal(events.at(-1).selected,null);await c.load();const work=c.select(25544);assert.equal(events.at(-1).selectedItem.OBJECT_NAME,'ISS');events.at(-1).selectedItem.OBJECT_NAME='mutated';assert.equal(c.snapshot().selectedItem.OBJECT_NAME,'ISS');
+ await c.search();const count=events.length;detail.resolve({source:'gp-cache',catalog:{NORAD_CAT_ID:25544},gp:item});await work;assert.equal(events.length,count);assert.equal(events.at(-1).profile,null);remove();c.edit('query','next');assert.equal(events.length,count);c.destroy();assert.equal(c.observeSelection(()=>assert.fail('disposed')) instanceof Function,true);
+});
 test('whole-scene off-page selection uses applied context and pinned GP while draft does not change it',async()=>{
  const picked=[],applied=[];const c=createCatalogWorkspace({satelliteGroups:async()=>groups,satellites:async p=>page(p),satelliteProfile:async number=>({source:'gp-cache',catalog:{NORAD_CAT_ID:number},gp:null})},()=>{}, {select:(...args)=>picked.push(args),applied:p=>applied.push(p)});
  await c.load();const row={catalog_number:16633,name:'off page',status:'valid',normalized_gp_sha256:'a'.repeat(64),position_m:[1,2,3],epoch_utc:'2020-07-12T21:16:01.000416000Z'};

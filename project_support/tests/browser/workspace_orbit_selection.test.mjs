@@ -12,6 +12,11 @@ test('empty UI choice restores server selection without clearing its result or s
   globalThis.testOrbitClient={snapshot:()=>data,select:value=>calls.push(value),samples(){},load(){}};
   globalThis.window={addEventListener(){}};
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
+    // Model composition has dedicated real-assembly tests; this fixture isolates
+    // the unchanged stored-orbit select handler and its no-command assertion.
+    .replace(/import \{createSatelliteModelPanel\} from [^;]+;/,'const createSatelliteModelPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
+    .replace(/import \{createSatelliteModelSelection\} from [^;]+;/,'const createSatelliteModelSelection=()=>({select(){},load(){},destroy(){}});')
+    .replace(/import \{createModelResolver,validateSatelliteManifest\} from [^;]+;/,'const createModelResolver=()=>{},validateSatelliteManifest=()=>{};')
     .replace(/import \{createGlobeViewPanel\} from [^;]+;/,'const createGlobeViewPanel=()=>({show(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createCatalogTrack\} from [^;]+;/,'const createCatalogTrack=()=>({select(){},observe(){},destroy(){}});')
     .replace(/import \{createCatalogPasses\} from [^;]+;/,'const createCatalogPasses=()=>({update(){},destroy(){}});')
@@ -25,7 +30,7 @@ test('empty UI choice restores server selection without clearing its result or s
     .replace(/import \{createCatalogScene\} from [^;]+;/,'const createCatalogScene=()=>({snapshot(){return {}},destroy(){}});')
     .replace(/import \{createCatalogScenePanel\} from [^;]+;/,'const createCatalogScenePanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createCatalogGeometry\} from [^;]+;/,'const createCatalogGeometry=()=>({select(){},clear(){},snapshot(){return {}},destroy(){}});')
-    .replace(/import \{createCatalogPanel\} from [^;]+;/,'const createCatalogPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
+    .replace(/import \{createCatalogPanel\} from [^;]+;/,'const createCatalogPanel=()=>({controller:{observeSelection(){return()=>{}}},show(){},update(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createHilPanel\} from [^;]+;/,'const createHilPanel=()=>({show(){},update(){},receive(){},connection(){},applyDraft(){},destroy(){}});')
     .replace(/import \{hilTopology\} from [^;]+;/,'const hilTopology=()=>{};')
     .replace(/import \{createKpiPanel\} from [^;]+;/,'const createKpiPanel=()=>({show(){},update(){},receive(){},connection(){},applyDraft(){},destroy(){}});')

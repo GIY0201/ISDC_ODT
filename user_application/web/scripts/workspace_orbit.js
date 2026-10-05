@@ -1,4 +1,7 @@
 import {createGlobeViewPanel} from './tabs/globe_view.js?v=t120-r1';
+import {createSatelliteModelPanel} from './tabs/satellite_model.js?v=t128-r1';
+import {createSatelliteModelSelection} from './orbit/satellite_model_selection.js?v=t128-r1';
+import {createModelResolver,validateSatelliteManifest} from '/static/model_library/satellite_models.js';
 import {createCatalogTrack} from './catalog_track.js?v=t115-r1';
 import {createCatalogPasses} from './catalog_passes.js?v=t115-r1';
 import {createCatalogPassPanel} from './tabs/catalog_passes.js?v=t115-r1';
@@ -33,6 +36,7 @@ let openWorkspaceView=()=>{};
 export function bindWorkspaceView(open){openWorkspaceView=open;}
 const globe=createWorkspaceGlobe(document.getElementById('stored-orbit-globe'),document.getElementById('orbit-globe-status'),document.getElementById('orbit-globe-focus'));
 const globeViewPanel=createGlobeViewPanel(globe);
+const modelPanel=createSatelliteModelPanel(globe);
 const stationPanel=createStationPanel(GROUND_STATIONS,stationGroups(),{select:key=>globe.selectStation(key),focus:key=>globe.focusStation(key),use:site=>{const staged=groundPanel.stageStation(site);location.hash='ground';return staged;},useCatalog:site=>{catalogTimePanel.stage(site);location.hash='satellite';}});
 globe.stations(Object.values(GROUND_STATIONS),key=>stationPanel.controller.choose(key));
 const client=createOrbitSelection(api,render);
@@ -44,16 +48,20 @@ const planningPanel=createCommunicationPlanningPanel(api);
 const radioPanel=createOrbitRadioPanel(client,api);
 const missionPanel=createMissionPanel(api);
 const kpiPanel=createKpiPanel(api,drawMultiLine);
-let catalogPanel,catalogTimePanel,catalogScene,catalogScenePanel,catalogTrack,catalogPasses,catalogPassPanel;
+let catalogPanel,catalogTimePanel,catalogScene,catalogScenePanel,catalogTrack,catalogPasses,catalogPassPanel,modelSelection;
+function syncModel(selection){if(!modelSelection||!catalogPanel)return;const selected=selection??catalogPanel.controller.snapshot();modelSelection.select(selected.selectedItem,selected.profile,catalogTimeline.snapshot().selected);}
 const catalogTimeline=createCatalogTimeline(api,value=>globe.catalog(value),()=>{catalogTimePanel?.update();const t=catalogTimeline.snapshot();catalogTrack?.select(t.selected);if(t.utc)catalogTrack?.observe(t.utc);catalogPasses?.update(t);catalogPassPanel?.update();if(catalogScenePanel?.followsTimeline()&&t.selected?.group===catalogScene?.snapshot().context?.group&&t.utc)catalogScene.observe(t.utc);});
 catalogTrack=createCatalogTrack(api,value=>globe.catalogTrack(value),()=>catalogPassPanel?.update(),{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
 catalogPasses=createCatalogPasses(api,()=>catalogPassPanel?.update(),async utc=>{catalogTimeline.seek(utc);await catalogTimeline.calculate();},{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
 catalogPassPanel=createCatalogPassPanel(catalogTrack,catalogPasses,()=>catalogTimeline.snapshot());
 catalogTimePanel=createCatalogTimePanel(catalogTimeline,GROUND_STATIONS);
-const catalogGeometry=createCatalogGeometry(api,(value,pin)=>catalogTimeline.select(value,pin),()=>{catalogPanel?.update();if(catalogGeometry.snapshot().hashConflict){catalogScene?.clear();catalogTimeline.clear();}});
+const catalogGeometry=createCatalogGeometry(api,(value,pin)=>{catalogTimeline.select(value,pin);syncModel();},()=>{catalogPanel?.update();if(catalogGeometry.snapshot().hashConflict){catalogScene?.clear();catalogTimeline.clear();}});
 catalogScene=createCatalogScene(api,value=>globe.catalogScene(value,number=>{const s=catalogScene.snapshot();const row=catalogScene.row(number);if(row&&s.result&&!catalogPanel.controller.snapshot().pending){catalogPanel.controller.selectExternal(row,s.result);openWorkspaceView('satellite');}}),()=>catalogScenePanel?.update(),{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
 catalogScenePanel=createCatalogScenePanel(catalogScene,()=>catalogTimeline.snapshot());
 catalogPanel=createCatalogPanel(api,catalogGeometry,{applied:p=>catalogScene.configure(p)});
+modelSelection=createSatelliteModelSelection({api,globe,timeline:catalogTimeline,validateManifest:validateSatelliteManifest,createResolver:createModelResolver});
+const removeModelSelection=catalogPanel.controller.observeSelection(syncModel);
+void modelSelection.load();
 const hilPanel=createHilPanel(api,hilTopology,drawSparkline);
 const simPanel=createSimPanel(api,telemetrySocket,values=>missionPanel.controller.receiveMissions(values),{frame:value=>{kpiPanel.receive(value);hilPanel.receive(value);},status:value=>{kpiPanel.connection(value);hilPanel.connection(value);}});
 const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
@@ -62,7 +70,7 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;globeViewPanel.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeModelSelection();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   revisionSync.observe(client.snapshot());
@@ -81,6 +89,7 @@ function render(){
   catalogScenePanel.update();
   catalogPassPanel.update();
   stationPanel.update();
+  modelPanel.update();
   if(view!=='satellite')return;
   const screen=document.getElementById('screen');let panel=document.getElementById('stored-orbit');
   if(!panel){panel=document.createElement('section');panel.id='stored-orbit';panel.className='panel';screen.prepend(panel);}
@@ -100,10 +109,11 @@ function render(){
   panel.querySelector('#orbit-seek').addEventListener('click',()=>{const field=panel.querySelector('#orbit-utc'),utc=field.value.trim();delete field.dataset.dirty;command(()=>client.seek(utc));});
   panel.querySelector('#orbit-epoch').addEventListener('click',()=>{delete panel.querySelector('#orbit-utc').dataset.dirty;command(()=>client.seek(record.epoch_utc));});
 }
-export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);globeViewPanel.show(view);}
+export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);globeViewPanel.show(view);modelPanel.show(view);}
 client.load();
 
 export function applyWorkspaceDraft(items,remote=false){
+  modelPanel.applyDraft(items);
   globeViewPanel.applyDraft(items);
   missionPanel.applyDraft(items,remote);
   simPanel.applyDraft(items);

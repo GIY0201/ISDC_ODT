@@ -481,3 +481,8 @@ Official NASA pinnedtree/alternateGLB/FBX/archive checks show Terra exacttexture
 - 변경: 현재위성/profile/native GP매칭 조립helper·늦은manifest차단·반복로딩방지, 고정static manifest transport와독립오류표시. 실제workspace import/mount전.
 - 검증: Node320PASS1208.3885ms/Python439PASS5기존warnings186.30s/exit0; 실제원본resolver의nullcatalog/epoch정밀도RED 수정. validation/t128_model_selection.md.
 - 남음: 실제catalog hooks/workspace/modelpanel/hover/staticmount/8891 렌더검증/Terra/solar/fullT075–84·기존보류. 서버restart/native/API/PR/병합 없음.
+
+## 2026-10-05 T128 V6 모델 선택·패널 조립 부분 진행
+- 변경: 숨긴창과독립적인catalog 선택/profile 사본알림, 실제workspace modelselection/panel/lifecycle 연결. 재생frame마다catalog복사/재매칭하지않음.
+- 검증: Node323PASS1265.1034ms/Python439PASS5기존warnings186.66s/exit0; 실제JS조립 ISSexact/Viewer1/저장상태·명령0/clear/draft/정리. validation/t128_workspace_model_assembly.md.
+- 남음: package staticmount/8891소유서버확인·상태보존restart/nativehover/실제GPU/Terra/solar/fullT075–84·기존보류. 현고정manifest경로는mount전으로실제자료표시완료아님. 이번서버restart/포트/native/API/PR/병합 변경없음.

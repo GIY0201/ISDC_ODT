@@ -15,7 +15,9 @@ export function profileRows(item,profile){
 export function createCatalogWorkspace(api,notify=()=>{},hooks={}){
  let dead=false,listToken=0,detailToken=0,listAbort,detailAbort;
  const state={groups:[],draft:{group:'active',query:'',orbit:'all'},applied:null,result:null,selected:null,selectedItem:null,profile:null,pending:false,detailPending:false,error:'',detailError:'',status:'조회 전'};
- const emit=()=>{if(!dead)notify();};
+ const selectionObservers=new Set();
+ const selectionState=()=>copy({selected:state.selected,selectedItem:state.selectedItem,profile:state.profile,detailPending:state.detailPending,detailError:state.detailError});
+ const emit=()=>{if(!dead){notify();for(const fn of selectionObservers)fn(selectionState());}};
  const clearDetail=()=>{detailToken++;detailAbort?.abort();state.selected=null;state.selectedItem=null;state.profile=null;state.detailPending=false;state.detailError='';hooks.clear?.();};
  async function search(offset=0){
   if(dead||!state.groups.length)return;
@@ -44,7 +46,7 @@ export function createCatalogWorkspace(api,notify=()=>{},hooks={}){
   return selectItem({NORAD_CAT_ID:row.catalog_number,OBJECT_NAME:row.name,ORBIT_REGIME:row.orbit_regime,EPOCH:row.epoch_utc},copy({...row,utc:context.utc}));
  }
  function page(delta){const p=state.applied,r=state.result;if(!p||!r||state.pending||['group','query','orbit'].some(k=>state.draft[k]!==p[k]))return;const offset=p.offset+delta*100;if(offset<0||offset>=r.filtered_total)return;state.draft={group:p.group,query:p.query,orbit:p.orbit};return search(offset);}
- return {snapshot:()=>copy(state),load,search:()=>search(0),edit,select,selectExternal,next:()=>page(1),previous:()=>page(-1),destroy(){dead=true;listToken++;detailToken++;listAbort?.abort();detailAbort?.abort();}};
+ return {snapshot:()=>copy(state),observeSelection(fn){if(dead)return()=>{};selectionObservers.add(fn);fn(selectionState());return()=>selectionObservers.delete(fn);},load,search:()=>search(0),edit,select,selectExternal,next:()=>page(1),previous:()=>page(-1),destroy(){dead=true;selectionObservers.clear();listToken++;detailToken++;listAbort?.abort();detailAbort?.abort();}};
 }
 export function createCatalogPanel(api,geometry,hooks={}){
  let view,loaded=false;const visible=()=>view==='satellite';
