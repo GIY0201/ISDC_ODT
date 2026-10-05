@@ -36,3 +36,8 @@ Saved orbit input/anchor/currentUTC/revision/ground/mask/playback/hash fields co
 ## Publication and remaining scope
 
 T119/T120 functional complete. T121 publication remains pending until remote tree/Draft URL abovePR30 and task attachment are verified. Overall goal active. T075 actualGLB/thumbnail/mapping/camera/hovercard/solar, T076–84, T032/SC006/F001/F004–6/actualdownloadedbytes remain open. No performance acceptance or automatic merge.
+
+
+## 2026-10-05 US17 Draft publication verified
+Draft PR31 https://github.com/GIY0201/ISDC_ODT/pull/31 above PR30 is attached, open, draft, unmerged and mergeable at verification. All33 raw Git blobs matched their local hashes. Remote tree f2bb80f44109f252b0e8edccbcebc1ec749e8390 exactly matches validated local source6cb4234756715f5725a6a8c5bd8082c964f715fa; published head0634243a4c437cf5e2b8aec1e408bb6cc3db9597 parent6e1bef2c279e1a00a32da9675dcfc4cb65f7c384. T117–T121 scoped complete. Existing Python423/Node238 and actual8891 evidence unchanged; no new code, runtime restart, or merge. Publication bookkeeping follows the published source locally.
+Full T075–T084 goal remains active: original GLB models/ordered mapping/thumbnail/credits/camera/hover information card/solar and T076–84 are not complete. T032/SC006, F001/F004–6 and disk-download evidence remain open. Next owner specify/plan for faithful selected-model integration including missing Terra textures; preserve original assets and prove real rendering, no SVG-only substitute. Task counts are not whole-product completion percentages.

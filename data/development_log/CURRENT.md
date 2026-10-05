@@ -441,3 +441,8 @@ T111–T116 scopedcomplete: attached DraftPR30 https://github.com/GIY0201/ISDC_O
 - 변경: 원본hover색·크기와mouseleave/실패복원,동일hover반복시재색칠없음;설정패널분리된입력노드리스너제거/새소유자한번재연결. T119/T120완료; 원본hover정보카드는T075모델/상세후속으로보존.
 - 검증: RED2→PASS,최종Node238PASS1012.3735ms/Python423PASS5warnings177.34s. 실제8891/16633valid+CALSPHERE900선택+1021valid궤적/두해상도/2D3D/hoveredge·leave/canvas1/ArcGISfailure주입→NaturalEarth명시대체/차단·cache복원/저장state readonly. validation/t121_globe_view.md.
 - 남음: T121 Draft공개·remoteexacttree/첨부후완료표시. T075모델·카메라·hovercard·태양/T076–84/T032/실수신/저장파일검증보존. 새포트·서버재시작·native변경·자동병합없음.
+
+
+## 2026-10-05 US17 Draft publication verified
+Draft PR31 https://github.com/GIY0201/ISDC_ODT/pull/31 above PR30 is attached, open, draft, unmerged and mergeable at verification. All33 raw Git blobs matched their local hashes. Remote tree f2bb80f44109f252b0e8edccbcebc1ec749e8390 exactly matches validated local source6cb4234756715f5725a6a8c5bd8082c964f715fa; published head0634243a4c437cf5e2b8aec1e408bb6cc3db9597 parent6e1bef2c279e1a00a32da9675dcfc4cb65f7c384. T117–T121 scoped complete. Existing Python423/Node238 and actual8891 evidence unchanged; no new code, runtime restart, or merge. Publication bookkeeping follows the published source locally.
+Full T075–T084 goal remains active: original GLB models/ordered mapping/thumbnail/credits/camera/hover information card/solar and T076–84 are not complete. T032/SC006, F001/F004–6 and disk-download evidence remain open. Next owner specify/plan for faithful selected-model integration including missing Terra textures; preserve original assets and prove real rendering, no SVG-only substitute. Task counts are not whole-product completion percentages.
