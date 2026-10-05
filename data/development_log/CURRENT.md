@@ -528,3 +528,8 @@ Actualowned31524/3780 CIMconfirmed (standarddenied/read-onlyescalation), freshly
 - 변경: 기존UTCcodec와native태양API 재사용,601표본/1SI초/정규화보간/120초미리받기/최대2buffer/역방향·최신시각·출처fence/명시재시도. 반대방향표본 보간실패 RED 수정.
 - 검증: target10PASS202.4369ms/Node344PASS1364.4604ms/Python471PASS8warnings204.02s. 실제native→JS9604시각 대조 최대2.4115991620879543e-10rad<1e-6; 모델일치만 검증. validation/t134_solar_timeline.md.
 - 남음: T135–137 preferences/UI조립/live/Draft, US18Terra/fullT075–84/T032/장비/다운로드. 서버/8891/native/wheel/runtime/API/PR/병합변경없음.
+
+## 2026-10-05 T135 workspace solar assembly
+- 변경: 기존Viewer/표시UTC 우선순위에 태양buffer·renderer 연결, 선배조명설정key/event/theme재사용·storage이벤트/정리, 기존지구설정에 UTC/품질/오류·재시도. 원본숨김CSS와 V6표식class 적용 차이 명시.
+- 검증: target8PASS145.5529ms/Node349PASS1291.5502ms/Python471PASS8warnings206.15s; validation/t135_workspace_solar.md. unknown status solar 우선순위 RED 수정. 실제브라우저T136 전.
+- 남음: T136–137 실제8891두해상도/복원/Draft, US18Terra/fullT075–84/T032/장비/HIL/다운로드/AeroDT. 서버restart/포트8891/native/wheel/runtime/API/PR/병합변경없음.

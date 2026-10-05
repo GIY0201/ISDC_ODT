@@ -42,3 +42,36 @@
 /* Original satellite hover surface, mounted once in the existing globe. */
 .satellite-hover-card{z-index:35;width:205px;padding:10px 11px;pointer-events:none;border:1px solid rgba(239,255,98,.48);border-radius:var(--radius-sm,4px);color:#e8f1fb;background:rgba(5,12,21,.94);box-shadow:0 12px 30px rgba(0,0,0,.34),inset 3px 0 #efff62;backdrop-filter:blur(10px)}
 .satellite-hover-card[hidden]{display:none}
+
+/* Original solar indicator visual; explicitly assembled for V6. */
+.space-sun {
+  position: absolute;
+  z-index: 5;
+  width: 74px;
+  height: 74px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: .9;
+  background: radial-gradient(circle,
+    rgba(255,255,244,1) 0 7%,
+    rgba(255,241,166,.98) 8% 14%,
+    rgba(255,192,70,.8) 20%,
+    rgba(255,143,31,.3) 38%,
+    rgba(255,132,25,.09) 58%,
+    rgba(255,140,30,0) 74%);
+  filter: drop-shadow(0 0 7px rgba(255,183,64,.45));
+}
+.space-sun::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #fffde7;
+  box-shadow: 0 0 6px #fff2ad, 0 0 13px rgba(255,183,59,.72);
+}
+.space-sun[hidden] { display: none; }

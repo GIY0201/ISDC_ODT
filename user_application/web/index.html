@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ISDC–ODT Satellite · V6 작업 창 시안</title>
-  <link rel="stylesheet" href="/static/styles/workspace.css?v=t129-r1">
+  <link rel="stylesheet" href="/static/styles/workspace.css?v=t135-r1">
   <script>window.CESIUM_BASE_URL='https://cesium.com/downloads/cesiumjs/releases/1.143/Build/Cesium/';</script>
   <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.143/Build/Cesium/Widgets/widgets.css">
   <script defer src="https://cesium.com/downloads/cesiumjs/releases/1.143/Build/Cesium/Cesium.js"></script>
-  <script type="module" src="/static/scripts/workspace.js?v=t120-r1"></script>
+  <script type="module" src="/static/scripts/workspace.js?v=t135-r1"></script>
 </head>
 <body>
   <div class="shell">
@@ -24,6 +24,7 @@
       <div class="alertline"><b>사건 예시</b><span id="alert-text">E-014 링크 품질 저하 · 실제 경보·우선순위 판정 없음</span><button id="alert-open" type="button">운용 창 열기</button></div>
       <div class="desktop" id="desktop">
         <div id="stored-orbit-globe" aria-label="저장 궤도 ITRF 지구"></div>
+        <div id="orbit-solar-overlay" class="space-sun" hidden aria-hidden="true"></div>
         <div class="orbit-globe-caption"><p id="orbit-globe-status" role="status">Cesium 준비 중</p><button id="orbit-globe-focus" type="button" disabled>계산 위치로 이동</button></div>
         <div class="desktop-globe" aria-label="AerODT Satellite 지구 배경 · CSS 개념 시안"><div class="desktop-orbit one"></div><div class="desktop-orbit two"></div><div class="desktop-earth" aria-hidden="true"></div><button class="desktop-sat a" data-sat="SAT-A">SAT-A</button><button class="desktop-sat b" data-sat="SAT-B">SAT-B</button><button class="desktop-sat c" data-sat="SAT-C">SAT-C · DT</button><span class="desktop-station one">GS-01</span><span class="desktop-station two">GS-02</span></div>
         <section class="glass overview" aria-label="선택 위성 빠른 상태"><div class="eyebrow">선택 위성 · 빠른 상태</div><strong id="desktop-sat-name">SAT-A</strong><div id="desktop-sat-status">운용 상태 예시 · 실측 없음</div><dl><div><dt>다음 접촉</dt><dd id="desktop-next">GS-02 · 03:24 UTC 계획</dd></div><div><dt>사건</dt><dd>E-014 링크 품질 저하</dd></div><div><dt>자료 시각</dt><dd>03:18 UTC 예시</dd></div></dl><button type="button" data-view="satellite">위성 상태·궤도 열기</button></section>

@@ -1,0 +1,23 @@
+# T135 solar workspace assembly (2026-10-05)
+
+Application assembly implemented. Actual two-resolution/browser acceptance is T136 and remains pending. Full T075–T084 goal remains active.
+
+## Changes and original fidelity
+
+workspace_globe emits a small copied display context from valid catalog geometry, otherwise valid stored geometry, otherwise a successful ITRF whole-scene snapshot. The existing selected/stored/scene geometry and its UTC remain the only authorities; no new clock or Viewer. Solar rendering attaches to the existing Viewer and is destroyed before Viewer failure/disposal. Stored leap identity is retained in the copied row; its orbit EOP identity is not mislabelled as solar EOP. Solar query pins its own IERS-A identity as documented in T134.
+
+New application module workspace_solar assembles existing SolarTimeline and SolarDisplay. The original `spacetwin-globe-lighting-v1` key and `spacetwin:globelighting` event are preserved. Default shading on, storage-denial session fallback, same-window mirroring and cross-window storage events are handled; imported mirror events never write/broadcast again. Nonboolean events are ignored. Theme changes reapply original light-theme/no-shading policy without changing imagery colors. All subscriptions and listeners are removable; no global context/runtime duplication.
+
+Existing globe_view panel contains lighting checkbox, explicit retry and source/UTC/model/EOP-quality/error text. Retries require a current context and wait while query pending. Failed query hides solar input. Projection failure is shown as an error. Quality/hash display is copied metadata, not an accuracy claim. Existing globe choices and drafts remain intact; lighting persistence is the original browser preference rather than an orbit command.
+
+index mounts a hidden accessible-neutral overlay at the same desktop origin as the existing globe. Generic `.space-sun` CSS is reused verbatim from pinned original theme.css:74px radial glow/11px center and pointer-events:none. Deliberate source presentation difference: original index omitted this class and screen CSS hid these elements; V6 explicitly applies the original visual class so the approved indicator can be shown. Actual visible rendering is not claimed until T136. JS/CSS entry imports bumped to t135-r1; static files are read from disk and no Python route/factory/mount changed.
+
+## Regression evidence
+
+Initial RED logs: `data/workspace/validation/ground_stations/t135_workspace_solar_red.log` (missing module), `t135_solar_priority_red.log` (missing context interface), `t135_solar_panel_red.log` (missing UI controls). `t135_solar_status_red.log` exposed unknown-status geometry taking solar priority; solar context now requires status valid. Existing marker/hover presentation remains compatible. Test adapter updates include the new owned renderer lifecycle; an initial fixture source insertion split a data-URL semicolon and was corrected. These were fixture/implementation failures, not live browser acceptance.
+
+- `node --test project_support/tests/browser/workspace_solar.test.mjs project_support/tests/browser/workspace_globe.test.mjs project_support/tests/browser/globe_view_panel_lifecycle.test.mjs`:8 passed,145.5529ms (`t135_solar_target.log`). Tests actual timeline/application assembly with injected transport/renderer: UTC/quality copies, failures and explicit recovery; source priority/fallback; one globe renderer ownership; original event/storage/theme policy; no-context behavior; detached control/subscription teardown.
+- `node --test project_support/tests/browser/*.test.mjs`:349 passed,1291.5502ms (`t135_solar_node.log`), after final strict solar-status repair. Includes prior whole-catalog/model/hover/window/draft/stored-orbit regression.
+- `project_support/.venv/Scripts/python -m pytest -q --basetemp=data/workspace/validation/pytest_t135_solar_20261005`:471 passed,8warnings,206.15s (`t135_solar_pytest.log`); session73106 terminal exit0. Existing Starlette deprecation/ERFA date warnings. Final subsequent edits were JS-only and covered by final Node suite.
+
+Same feature/prerequisites, constitution1.2.0 and requirements checklist8/8 retained; extensions.yml absent. Module is a small application assembly at the existing boundary, not another runtime or renderer. Whitespace check passes. No server restart/port/native/wheel/API/runtime/PR/merge changes; fixed8891 retained. No actual screenshot, occlusion/subsolar sign, native60x live playback, live two-window preferences or performance acceptance claimed. T136 live evidence and T137 source ledger/Draft review remain required; US18/Terra, macroT075–84 and performance/equipment/HIL/AeroDT/download gaps remain open.

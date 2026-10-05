@@ -1,4 +1,5 @@
-import {createGlobeViewPanel} from './tabs/globe_view.js?v=t120-r1';
+import {createWorkspaceSolar} from './workspace_solar.js?v=t135-r1';
+import {createGlobeViewPanel} from './tabs/globe_view.js?v=t135-r1';
 import {createSatelliteModelPanel} from './tabs/satellite_model.js?v=t128-r1';
 import {createSatelliteHover} from './tabs/satellite_hover.js?v=t129-r1';
 import {createSatelliteModelSelection} from './orbit/satellite_model_selection.js?v=t128-r1';
@@ -17,13 +18,13 @@ import {createCatalogPanel} from './tabs/catalog_workspace.js?v=t110-r3';
 import {createHilPanel} from './tabs/hil_workspace.js?v=t069-r2';
 import {hilTopology} from '/static/visualization/hil_topology.js';
 import {createWorkspaceRevisionSync} from './workspace_revision_sync.js';
-import {api,telemetrySocket} from '/static/communication/api.js?v=t115-r1';
+import {api,telemetrySocket} from '/static/communication/api.js?v=t135-r1';
 import {createKpiPanel} from './tabs/kpi_workspace.js?v=t069-r2';
 import {drawMultiLine,drawSparkline} from '/static/visualization/charts.js';
 import {createSimPanel} from './tabs/sim_workspace.js?v=t069-r2';
 import {createMissionPanel} from './tabs/mission_workspace.js?v=t069-r2';
 import {createOrbitSelection} from './orbit_selection.js?v=t031-r1';
-import {createWorkspaceGlobe} from './workspace_globe.js?v=t120-r1';
+import {createWorkspaceGlobe} from './workspace_globe.js?v=t135-r1';
 import {createWorkspacePlayback} from './workspace_playback.js';
 import {createGroundPanel} from './tabs/ground_visibility.js?v=t097-r2';
 import {createRadioSeriesPanel} from './tabs/orbit_radio_series.js?v=t053-r1';
@@ -36,7 +37,8 @@ let view=null,displayUtc=null,displayElevation='자료 준비 중';
 let openWorkspaceView=()=>{};
 export function bindWorkspaceView(open){openWorkspaceView=open;}
 const globe=createWorkspaceGlobe(document.getElementById('stored-orbit-globe'),document.getElementById('orbit-globe-status'),document.getElementById('orbit-globe-focus'));
-const globeViewPanel=createGlobeViewPanel(globe);
+const solar=createWorkspaceSolar({api,globe,overlay:document.getElementById('orbit-solar-overlay')});
+const globeViewPanel=createGlobeViewPanel(globe,solar);
 const modelPanel=createSatelliteModelPanel(globe);
 let satelliteHover=null;
 const removeSatelliteHover=globe.observeSatelliteHover((payload,C)=>{
@@ -76,7 +78,7 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   revisionSync.observe(client.snapshot());

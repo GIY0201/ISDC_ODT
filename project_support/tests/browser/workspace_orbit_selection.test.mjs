@@ -14,6 +14,7 @@ test('empty UI choice restores server selection without clearing its result or s
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
     // Model composition has dedicated real-assembly tests; this fixture isolates
     // the unchanged stored-orbit select handler and its no-command assertion.
+    .replace(/import \{createWorkspaceSolar\} from [^;]+;/,'const createWorkspaceSolar=()=>({destroy(){}});')
     .replace(/import \{createSatelliteModelPanel\} from [^;]+;/,'const createSatelliteModelPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createSatelliteModelSelection\} from [^;]+;/,'const createSatelliteModelSelection=()=>({select(){},load(){},destroy(){}});')
     .replace(/import \{createModelResolver,validateSatelliteManifest\} from [^;]+;/,'const createModelResolver=()=>{},validateSatelliteManifest=()=>{};')

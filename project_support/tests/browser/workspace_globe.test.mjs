@@ -2,6 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 
+test('solar UTC priority uses valid catalog then stored then scene and renderer disposal belongs to one globe',async()=>{
+ let removed=0,destroyed=0,attached=0;globalThis.SolarGlobe=class{constructor(){this.viewer={scene:{renderError:{addEventListener:()=>()=>{}}}};}update(){return false;}setGroundPoint(){}setViewStyle(){}setViewImagery(){}setCatalogScene(){}destroy(){destroyed++;}};
+ const code=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.SolarGlobe;');
+ const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
+ const host={Cesium:{},setTimeout:()=>1,clearTimeout(){},addEventListener(){},removeEventListener(){}};
+ const ui=createWorkspaceGlobe({dataset:{}},{},{addEventListener(){},removeEventListener(){}},host),seen=[],remove=ui.observeDisplayContext(v=>seen.push(v));
+ ui.bindSolarRenderer(()=>{attached++;return{destroy(){removed++;}};});
+ const H='a'.repeat(64),L='b'.repeat(64),time='2020-07-12T21:16:01Z';
+ ui.catalogScene({frame:'ITRF',scene_sha256:H,utc:time,leap_sha256:L,eop_sha256:H,count:1,valid_count:1,error_count:0,rows:[]},()=>{});assert.equal(seen.at(-1).key,'scene:'+H);
+ const state={input_id:'ISS',input_hash:H,revision:1,current_utc:time};const row={utc:time,position_m:[1,2,3],status:'valid'};
+ ui.update({status:'ready',state,result:{...state,frame:'ITRF',leap_sha256:L,rows:[row]}});assert.match(seen.at(-1).key,/^stored:/);assert.equal(seen.at(-1).eop_sha256,null);
+ ui.catalog({...row,frame:'ITRF',catalog_number:25544,normalized_gp_sha256:H,leap_sha256:L,eop_sha256:H});assert.match(seen.at(-1).key,/^catalog:/);
+ ui.catalog({...row,status:'unknown',frame:'ITRF',catalog_number:25544});assert.match(seen.at(-1).key,/^stored:/);
+ ui.catalog({...row,frame:'TEME',catalog_number:25544});assert.match(seen.at(-1).key,/^stored:/);
+ ui.update({status:'pending',state,result:null});assert.match(seen.at(-1).key,/^scene:/);ui.catalogScene(null);assert.equal(seen.at(-1),null);
+ remove();ui.destroy();assert.equal(attached,1);assert.equal(removed,1);assert.equal(destroyed,1);delete globalThis.SolarGlobe;
+});
+
 test('shared globe gates UTC/revision/hash, clears during requests, and disposes exactly once',async()=>{
   const instances=[];globalThis.TestGlobe=class {
     constructor(){this.updates=[];this.viewer={scene:{renderError:{addEventListener:()=>()=>{}}}};instances.push(this);}

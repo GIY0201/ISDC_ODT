@@ -5,6 +5,17 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let globe=null,latest=null,catalog=null,sceneInput=null,sceneMetadata=null,trackInput=null,onCatalogSelect=()=>{},groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
   let choice={mode:'3d',imagery:'blue_marble',theme:'dark',emphasis:true},imagery={requestedImagery:'blue_marble',displayedImagery:null,phase:'pending',error:null},mode={phase:'ready',error:null},modeRevision=0;
   const viewObservers=new Set();
+  const displayObservers=new Set();let displayKey=null,solarFactory=null,solarRenderer=null;
+  const validPosition=value=>value?.frame==='ITRF'&&value.status!=='error'&&!value.error_code&&typeof value.utc==='string'&&value.utc.endsWith('Z')&&Array.isArray(value.position_m)&&value.position_m.length===3&&value.position_m.every(Number.isFinite);
+  function displayContext(){
+    if(!globe||failed||disposed)return null;
+    if(validPosition(catalog)&&catalog.status==='valid')return{key:`catalog:${catalog.catalog_number}:${catalog.normalized_gp_sha256}`,utc:catalog.utc,leap_sha256:catalog.leap_sha256,eop_sha256:catalog.eop_sha256};
+    if(validPosition(latest)&&latest.status==='valid')return{key:`stored:${latest.input_id}:${latest.input_hash}`,utc:latest.utc,leap_sha256:latest.leap_sha256,eop_sha256:null};
+    if(sceneMetadata?.frame==='ITRF'&&sceneMetadata.valid_count>0)return{key:`scene:${sceneMetadata.scene_sha256}`,utc:sceneMetadata.utc,leap_sha256:sceneMetadata.leap_sha256,eop_sha256:sceneMetadata.eop_sha256};
+    return null;
+  }
+  function notifyDisplay(){const value=displayContext(),key=JSON.stringify(value);if(key===displayKey)return;displayKey=key;for(const fn of displayObservers)fn(value?structuredClone(value):null);}
+  function attachSolar(){solarRenderer?.destroy();solarRenderer=globe&&solarFactory?solarFactory(host.Cesium,globe.viewer):null;}
   const hoverObservers=new Set();
   const notifyHover=value=>{if(!disposed)for(const fn of hoverObservers)fn(value?structuredClone(value):null,host.Cesium);};
   let modelDescription=null,modelSource=null,modelRevision=0,modelStatus={phase:'unassigned'},modelManifest={phase:'pending',error:null};
@@ -36,10 +47,11 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   }
   const describe=message=>{status.textContent=message;};
   function paint(){
+    notifyDisplay();
     focusButton.disabled=true;
     if(!globe){if(!failed)describe('Cesium 준비 중 · 계산 위치는 아직 표시하지 않습니다.');return;}
     try{
-      const display=catalog??latest;
+      const display=validPosition(catalog)?catalog:latest;
       const shown=globe.update(display);
       globe.setGroundPoint(groundPoint);
       container.dataset.orbitVisible=String(shown);
@@ -47,14 +59,14 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
         if(!focused){globe.focus();focused=true;}
         focusButton.disabled=false;
         const whole=sceneMetadata?` | 전체 ${sceneMetadata.count}개 / 성공 ${sceneMetadata.valid_count} / 실패 ${sceneMetadata.error_count} · 전체 snapshot UTC ${sceneMetadata.utc}`:'';
-        if(catalog){describe(`카탈로그 ${catalog.name} (${catalog.catalog_number}) · 시간 탐색 모델/실측 아님 | 선택 위성 UTC ${catalog.utc}${whole} | ITRF m ${catalog.position_m.map(x=>x.toFixed(2)).join(', ')} | IERS-A UT1 ${catalog.eop_quality.ut1} / 극운동 ${catalog.eop_quality.polar_motion} | 실제 통신 미확인`);return;}
+        if(display===catalog){describe(`카탈로그 ${catalog.name} (${catalog.catalog_number}) · 시간 탐색 모델/실측 아님 | 선택 위성 UTC ${catalog.utc}${whole} | ITRF m ${catalog.position_m.map(x=>x.toFixed(2)).join(', ')} | IERS-A UT1 ${catalog.eop_quality.ut1} / 극운동 ${catalog.eop_quality.polar_motion} | 실제 통신 미확인`);return;}
         describe(`ISS · GP 예측 / 실측 아님 | 표시 UTC ${latest.utc}${whole} | ITRF m ${latest.position_m.map(v=>v.toFixed(2)).join(', ')} | 고도각 ${latest.elevation_deg?.toFixed(4)??'미확인'}° | revision ${latest.revision} | 실제 통신 미확인`);
       }else describe(sceneMetadata?`전체 ${sceneMetadata.count}개 / 성공 ${sceneMetadata.valid_count} / 실패 ${sceneMetadata.error_count} · snapshot UTC ${sceneMetadata.utc} · GP 모델/실측 아님 · 지구 위성을 선택하세요.`:'표시할 현재 UTC 계산 결과가 없습니다. 위성 창에서 저장 입력을 선택하고 계산하세요.');
     }catch{fail();}
   }
   function fail(){
     failed=true;focusButton.disabled=true;container.dataset.orbitVisible='false';
-    removeError?.();removeError=null;globe?.destroy();globe=null;
+    removeError?.();removeError=null;solarRenderer?.destroy();solarRenderer=null;globe?.destroy();globe=null;notifyDisplay();
     describe('지구 렌더링을 사용할 수 없습니다. 위성 창의 수치 결과를 확인하세요. 합성 위치는 표시하지 않습니다.');
     notifyView();
   }
@@ -79,12 +91,15 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       notifyView();
       paint();
       applyModel();
+      attachSolar();
     }catch{fail();}
   }
   const timer=host.setTimeout(boot,12000);
   if(host.Cesium)boot();else host.addEventListener('load',boot,{once:true});
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
+    observeDisplayContext(fn){if(disposed)return()=>{};displayObservers.add(fn);fn(displayContext());return()=>displayObservers.delete(fn);},
+    bindSolarRenderer(factory){if(disposed)return()=>{};solarFactory=factory;attachSolar();return()=>{if(solarFactory!==factory)return;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;};},
     observeSatelliteHover(fn){if(disposed)return()=>{};hoverObservers.add(fn);return()=>hoverObservers.delete(fn);},
     modelState,
     modelManifestStatus(value){if(disposed)return;modelManifest=structuredClone(value);notifyModel();},
@@ -128,10 +143,10 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       const row=display===undefined?result?.rows?.[0]:display;
       const matchingUtc=display===undefined?row?.utc===state?.current_utc:row?.utc===displayUtc;
       const valid=phase==='ready'&&!result?.stale&&row?.status==='valid'&&matchingUtc&&result.input_id===state?.input_id&&result.revision===state?.revision&&result.input_hash===state?.input_hash;
-      latest=valid?structuredClone({...row,frame:result.frame,revision:result.revision}):null;
+      latest=valid?structuredClone({...row,frame:result.frame,revision:result.revision,leap_sha256:result.leap_sha256,input_id:result.input_id,input_hash:result.input_hash}):null;
       paint();
       if(!catalog&&!latest&&!sceneMetadata&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
     },
-    destroy(){if(disposed)return;disposed=true;hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
+    destroy(){if(disposed)return;disposed=true;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;displayObservers.clear();hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
   };
 }
