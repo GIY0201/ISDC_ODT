@@ -28,6 +28,7 @@ test('preboot current model only, copied description/status and explicit camera 
  f.ui.modelManifestStatus({phase:'error',error:'missing manifest'});assert.equal(f.ui.modelState().manifest.error,'missing manifest');const metadata=f.ui.modelState();metadata.manifest.error='changed';assert.equal(f.ui.modelState().manifest.error,'missing manifest');
  f.ui.setSatelliteModel(a,source());a.orientation.heading=90;f.ui.setSatelliteModel(b,source());f.boot();await Promise.resolve();assert.equal(f.renderers.length,1);
  const shown=f.calls.filter(c=>c[0]==='show');assert.equal(shown.length,1);assert.equal(shown[0][1].satelliteId,123);assert.equal(f.ui.modelState().status.phase,'loading');assert.equal(f.ui.modelState().match.orientation.heading,0);
+ const eventCount=events.length;f.renderers[0].modelLayer.tracking=true;f.renderers[0].source.onTrackingChange(true);assert.equal(events.length,eventCount+1);assert.equal(events.at(-1).tracking,true);f.renderers[0].modelLayer.tracking=false;
  const snap=f.ui.modelState();snap.match.orientation.heading=90;assert.equal(f.ui.modelState().match.orientation.heading,0);
  f.renderers[0].source.onStatus({phase:'ready',satelliteId:123});assert.equal(f.ui.modelState().status.phase,'ready');
  assert.equal(f.ui.focusSatelliteModel({keepRange:true}),true);assert.equal(f.ui.modelState().tracking,true);f.ui.releaseSatelliteModel();assert.equal(f.ui.modelState().tracking,false);await f.ui.retrySatelliteModel();

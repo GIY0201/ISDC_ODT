@@ -491,3 +491,9 @@ Official NASA pinnedtree/alternateGLB/FBX/archive checks show Terra exacttexture
 - 변경: 버전v1 package만staticmount. 소유server19916/34668 확인·capture후동일venv/factory/0.0.0.0:8891 hiddenrestart, 새listener31524/launcher3780. 저장orbit선택/UTC/관측·재생설정복원; SIM메모리실행경과·runID초기화는별도기록.
 - 검증: Python440PASS5기존warnings184.08s/Node323PASS1238.6573ms/target3PASS; 실제HTTP101파일38015944bytes 원본일치/health정상. 복원clock/receipt3필드변경외상태동일; raw비교실패보존. validation/t128_satellite_mount.md.
 - 남음: 실제GPU/hover/follow/두해상도/Terra texture/all50수용/solar/fullT075–84·기존보류. 파일bytes제공은렌더링증거아님. 8891서버실행유지/native/wheel/API/PR/병합변경없음.
+
+## 2026-10-05 T129 ISS 실제 표시 및 추적 알림 부분 검증
+- 변경: 기존 model tracking 콜백을 OrbitGlobe와 workspace의 revision/disposal 경계로 전달. 누락 콜백 RED 후 수정, 새 상태 권위나 시계 없음.
+- 검증: 이전 실제8891 ISS 원본모델 1280×720/1920×1080 표시 증거 보존. Node323PASS0fail1219.9083ms/Python440PASS5기존warnings201.23s/원래session29835완료확인/diffcheck. validation/t129_model_tracking.md.
+- 실패: 1920×1080 실제2D초점 배경지도검정/점·궤적만표시, 후속관측에도유지. 원인미확인, mock시험으로PASS재분류하지않음.
+- 남음: T126/T129실제2D수정·두해상도/hover/추적해제·오류/all50/Terra/solar/fullT075–84·기존보류. 임시tab은재개시없었음;이번새GPU확인·서버restart·포트변경·PR·병합없음.

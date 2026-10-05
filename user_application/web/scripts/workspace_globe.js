@@ -18,7 +18,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       modelStatus=structuredClone(value);notifyModel();
     };
     try{
-      Promise.resolve(globe.setSatelliteModel(description,{...modelSource,onStatus:report})).then(()=>{if(!disposed&&revision===modelRevision)notifyModel();}).catch(error=>report({phase:'error',errorKind:'renderer',error:String(error?.message||error),satelliteId:description.satelliteId}));
+      Promise.resolve(globe.setSatelliteModel(description,{...modelSource,onStatus:report,onTrackingChange:()=>{if(!disposed&&revision===modelRevision)notifyModel();}})).then(()=>{if(!disposed&&revision===modelRevision)notifyModel();}).catch(error=>report({phase:'error',errorKind:'renderer',error:String(error?.message||error),satelliteId:description.satelliteId}));
     }catch(error){report({phase:'error',errorKind:'renderer',error:String(error?.message||error),satelliteId:description.satelliteId});}
   }
   const viewState=()=>structuredClone({choice,imagery,mode,available:Boolean(globe)&&!failed&&!disposed});

@@ -26,6 +26,7 @@ export class OrbitGlobe {
     if(!this.modelLayer)this.modelLayer=new SatelliteModelLayer({viewer:this.viewer,cesium:this.C,isTransitioning:()=>Boolean(this.viewControls.cancelMorph),onCameraInput:()=>this.cameraMotion.cancel(),onFrame:()=>{if(this.modelLayer?.tracking)this.viewer.scene.requestRender();}});
     this.modelLayer.setTimeSource(source.timeSource);this.modelLayer.advanceUtc=source.advanceUtc;
     this.modelLayer.onStatus=source.onStatus??(()=>{});
+    this.modelLayer.onTrackingChange=source.onTrackingChange??(()=>{});
     return this.modelLayer.show(description,source.sampleAt,source.timeSource?.());
   }
   focusSatelliteModel(options={}){if(this.destroyed)return false;this.cameraMotion.cancel();return this.modelLayer?.focus(undefined,options)??false;}

@@ -11,8 +11,9 @@ function fixture(){
   const globe=new OrbitGlobe(C,canvas,{modelLayer:model});return{globe,model,calls,inputs,oldWheel};
 }
 test('one Viewer receives model source callbacks; explicit focus/retry/clear delegate without propagation',async()=>{
-  const f=fixture(),source={sampleAt:()=>null,timeSource:()=> '2026-10-05T00:00:00Z',advanceUtc:()=>null,onStatus:()=>{}};
+  const f=fixture(),source={sampleAt:()=>null,timeSource:()=> '2026-10-05T00:00:00Z',advanceUtc:()=>null,onStatus:()=>{},onTrackingChange:()=>{}};
   assert.equal(await f.globe.setSatelliteModel({satelliteId:25544},source),'primitive');assert.equal(f.model.timeSource,source.timeSource);assert.equal(f.model.advanceUtc,source.advanceUtc);assert.equal(f.model.onStatus,source.onStatus);
+  assert.equal(f.model.onTrackingChange,source.onTrackingChange);
   assert.equal(f.globe.focusSatelliteModel({keepRange:true}),true);assert.equal(await f.globe.retrySatelliteModel(),'retry');f.globe.clearSatelliteModel();
   assert.deepEqual(f.calls.map(v=>Array.isArray(v)?v[0]:v),['show','focus','retry','clear']);assert.equal(f.globe.viewer.scene.preUpdate.f.size,1);f.globe.destroy();
 });
