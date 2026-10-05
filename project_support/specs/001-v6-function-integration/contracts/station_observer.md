@@ -1,0 +1,4 @@
+# Station observer draft contract
+Explicit stage only, no API change. Input preset copy with key/name and finite latitude[-90,90],longitude[-180,180],minElevationDeg[0,90]. Invalid or busy state rejects without changing fields. Height datum unknown; preserve existing height string exactly. Preserve range and frequency drafts. Stage clears old visibility and interval analysis and opens ground role. Server changes only via existing apply/query, virtual WGS84 point and threshold; same saved input/UTC, pause through existing selection command. Manual edits replace explanatory source message. Source values are representative, actual RF remains unknown.
+
+Precondition: saved orbit input selected. Missing input returns false with selection-first guidance and opens ground role; no draft overwritten. Disposed panels reject. Preset values remain user assumptions; height is retained, never inferred.

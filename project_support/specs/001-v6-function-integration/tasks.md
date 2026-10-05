@@ -180,3 +180,10 @@ Dependency T085→T086→T087→T088→T089. T075partial유지;원본전체범�
 - [x] T093 [US12] Inject shared station display/select/focus callbacks through workspace_orbit.js/workspace_globe.js to digital_twin/visualization/orbit_globe.js; add one pick handler and stable29 markers; keep satellite and virtual point.
 - [x] T094 [US12] Complete full Python/Node and actual8891 two-resolution selection/click/clear/restore/readonly checks; validation/t094_ground_stations.md, audit/ledger/logs and stacked Draft review abovePR25.
 Dependency T090→91→92→93→94; T075 remains partial for catalogue playback/multi-satellite/3D-sun and dynamic station geometry. T032/F001/F002/F004–6/W06disk unknown preserved.
+
+## US13 station observer input
+- [x] T095 [US13] Add RED explicit station draft and real assembly acceptance in project_support/tests/browser/station_observer.test.mjs; preserve height/range/state and busy/error boundaries.
+- [x] T096 [US13] Add validated stageStation in user_application/web/scripts/tabs/ground_visibility.js; retain height/range and invalidate old queries, reuse existing apply/run.
+- [x] T097 [US13] Add explicit use button in tabs/station_workspace.js and workspace_orbit.js role handoff; explain saved GP/catalog distinction, no auto apply.
+- [x] T098 [US13] Run full Python/Node, real8891 two-resolution apply/visibility/radio/restore checks; validation/t098_station_observer.md, audit/ledger/log and stacked Draft PR.
+Dependency T095→96→97→98. T075 remains partial for catalog live geometry/playback/multiple/3D. Other F001/F002/F004–6/T032/W06disk gaps unchanged.

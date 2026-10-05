@@ -81,3 +81,5 @@ Keep fixed0.0.0.0:8891, open /?validation=t074#satellite. Edit group/search/orbi
 
 ## US12 ground station validation
 Use8891 V6 satellite or ground view. Confirm29 total and5 regional groups; chooseDAEJEON orSVALBARD, verify original representative coordinates/details and highlighted marker; globe marker click updates same selector. Clear/minimize/restore/switch views preserve stored GP/UTC/virtual point and satellite. No automatic calculation or RF application. Verify no console errors/duplicate Viewer at1280x720/1920x1080. Node browser suite and full pytest remain required; no extra runtime download/profile needed for static station display.
+
+US13: at8891 select DAEJEON, use coordinates in calculation draft; verify lat36.3742/lon127.3567/mask5 and previous height/range retained. Confirm height; choose saved ISS input; apply and calculate short UTC window with existing buttons. Satellite role distance/radio uses same applied ground point. SVALBARD staging mask3 must retain height. Selection/clear alone must not apply. Catalog ISS remains separate.

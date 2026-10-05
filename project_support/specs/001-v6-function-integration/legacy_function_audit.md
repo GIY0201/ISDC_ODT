@@ -78,3 +78,5 @@ W04에서 “새 임무 생성 기능은 원본에 없음”이라고 한 것은
 US11 증거 갱신: validation/t089_catalog_position.md. C001은 일부 위치 표시만 추가되었으며 partial을 유지한다. 이전 API counts는 PR23 audit 시점의 값으로 현재 route는 ADR0010 하나 추가되었다.
 
 US12 증거: validation/t094_ground_stations.md. C00129지상국 목록/시각선택 연결추가; partial유지(다중/재생/동적기하/모델). 원본 프리셋 높이/장비의 실제값검증은 F001에남는다.
+
+US13: validation/t098_station_observer.md connects explicit station preset lat/lon/mask to existing saved-GP observer apply/elevation/range/visibility. Original browser observer h0 assumption is not imported as verified altitude. C001 partial remains for catalog dynamic observer geometry/playback/multiple/3D. Real conditionsF001 and othergap bundles unchanged.
