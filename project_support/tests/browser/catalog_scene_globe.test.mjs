@@ -32,6 +32,14 @@ test('hover restores exact original size/color, changes only two points and surv
  globe.update({...scene(3).rows[0],frame:'ITRF',utc});assert.equal(globe.catalogPoints.get(2).color.alpha,1);globe.hoverCatalog(null);assert.equal(globe.catalogPoints.get(2).color.alpha,.9*.65);
  globe.hoverCatalog(999999);assert.equal(globe.hoveredCatalog,null);globe.setCatalogScene(null);globe.destroy();assert.equal(globe.hoverCatalog(1),false);
 });
+test('stationary hover refreshes only the picked native projection and keeps selected playback UTC independent',()=>{
+ const {globe,handlers}=fixture(),events=[];globe.C.ScreenSpaceEventType.MOUSE_MOVE=2;globe.onSatelliteHover=v=>events.push(v);
+ const whole=scene(3);globe.setCatalogScene(whole);globe.viewer.picked={id:{catalogNumber:2}};handlers[0].actions.get(2)({endPosition:{x:25,y:40}});
+ const next=scene(3);next.utc='2020-07-12T21:16:05.000416000Z';next.rows[1].position_m=[7000010,5,0];globe.setCatalogScene(next);assert.equal(events.at(-1).position.utc,next.utc);assert.deepEqual(events.at(-1).position.position_m,next.rows[1].position_m);
+ const selected={...scene(3).rows[0],frame:'ITRF',utc:'2020-07-12T21:16:06.000416000Z',name:'selected',interpolated:true};globe.update(selected);globe.viewer.picked={id:'stored-orbit-satellite'};handlers[0].actions.get(2)({endPosition:{x:25,y:40}});
+ globe.setCatalogScene({...next,utc:'2020-07-12T21:16:09.000416000Z'});assert.equal(events.at(-1).position.utc,selected.utc);
+ globe.update({...selected,utc:'2020-07-12T21:16:06.500416000Z',position_m:[7000020,6,0]});assert.equal(events.at(-1).position.utc,'2020-07-12T21:16:06.500416000Z');assert.equal(events.at(-1).position.interpolated,true);assert.deepEqual(events.at(-1).screen,{x:25,y:40});globe.destroy();assert.equal(events.at(-1),null);
+});
 test('mouse hover and leave use one handler, clear failed rows, and never issue selection',()=>{
  const {globe,handlers}=fixture(),listeners=new Map(),selected=[];globe.C.ScreenSpaceEventType.MOUSE_MOVE=2;globe.container.addEventListener=(name,fn)=>listeners.set(name,fn);globe.container.removeEventListener=name=>listeners.delete(name);globe.container.style={};globe.viewer.scene.canvas.style={};
  globe.setCatalogScene(scene(3),number=>selected.push(number));globe.viewer.picked={id:{catalogNumber:2}};handlers[0].actions.get(2)({endPosition:{}});assert.equal(globe.hoveredCatalog,2);assert.equal(globe.container.style.cursor,'pointer');assert.deepEqual(selected,[]);assert.equal(handlers.length,1);
