@@ -1,1 +1,5 @@
+# Source receipts hash exact upstream bytes, including original line endings.
 project_support/docs/ui/v6_source/* -text whitespace=cr-at-eol
+digital_twin/model_library/packages/satellite_display/v1/original_manifest.json -text
+digital_twin/model_library/packages/satellite_display/v1/*.glb -text
+digital_twin/model_library/packages/satellite_display/v1/*.jpg -text

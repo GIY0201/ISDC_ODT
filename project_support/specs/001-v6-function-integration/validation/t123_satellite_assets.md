@@ -33,3 +33,5 @@ T123 remains unchecked until authoritative Terra textures and faithful repair ar
 ## Final regression
 
 Target asset tests: 16 passed in 0.31s. Whole Python: 439 passed, 5 existing warnings, 233.18s, exit 0; whole Node: 244 passed, 0 failed, 1193.0097ms, exit 0. Logs: data/workspace/validation/ground_stations/t123_pytest_final.log and t123_node_final.log. Python used a fresh project-owned --basetemp data/workspace/validation/ground_stations/pytest_t123_assets_20261005_final. Git diff --check passed. These regressions do not prove actual model rendering.
+
+Post-commit exact-byte audit found Git text normalization had changed the stored raw manifest hash despite unchanged working bytes. Added scoped -text rules while preserving existing V6 source rule, renormalized raw manifest from original bytes, and verified index/worktree exact SHA256 7a88f531a8a138c0d7f8eaa4e3c88a891ab17920d809389f62feb9b5d621f9fe. No product code changed; previous regression remains applicable.
