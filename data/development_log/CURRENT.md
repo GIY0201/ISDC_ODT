@@ -1,5 +1,10 @@
 # 현재 개발 기록
 
+## 2026-10-05 T125 렌더러와 T126 카메라 기본 이식
+- 변경: 원본SatelliteModelLayer/CameraRangeMotion재사용, 주입nativeITRF/UTC/GP선택검증·ready/error/retry/late폐기·소유리스너정리·좌표없음숨김. camera_motion원본바이트동일; UI조립전.
+- 검증: native렌더러8/원본카메라8PASS; 전체Node260PASS1071.3918ms/Python439PASS5기존warnings178.42s. orientation공유RED수정/최종Node검증. validation/t125_satellite_renderer.md.
+- 남음: T125/126partial/전체T122와127–129, 실제모델GPU·카메라·hover·twores미검증/Terra텍스처. 전체T075–84와기존보류유지. 서버/8891/nativewheel/PR/병합변경없음.
+
 ## 2026-10-05 T123 위성 자산 검사와 패키징 부분 진행
 - 변경: 원본56매핑/50GLB/50썸네일과해시·출처보존, 오프라인의존성검사/명시PNG변환·정렬삽입도구 및16회귀시험. UTF-8원문라벨정상확인/이전출력오류정정.
 - 검증: 전체Python439PASS5기존warnings233.18s/Node244PASS1193.0097ms/target16PASS. 실제이미지디코딩49모델/76내장이미지/50썸네일; 합성TGA변환·픽셀·geometry보존PASS. validation/t123_satellite_assets.md.
