@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 T143 native 어댑터 부분 구현
+- 변경: 불변 노드 정의/전체입력hash/31float64 decoder와 profile/frame/time 검증, km→m 단일변환, UTC 달력→Unix-ms 및 윤초 행/epoch 명시실패. Python 궤도 재계산/서버조립 없음.
+- 검증: RED missingmodule/준비metadata/잘못된JSON 후 target20PASS0.33s, Node369PASS1423.3499ms. 첫Python490PASS1FAIL(기존wheel 격리설치 Windows 긴경로) 기록보존; 짧은 새workspace경로 설치2PASS5.28s/전체491PASS8기존warnings216.03s(session52016exit0)/syntax/diffcheck. validation/t143_node_adapter.md.
+- 남음: T143 query/HTTP samples·track/각노드궤적grid/browser/readonly 검증, T144 실제새wheel 격리설치. T143unchecked/전체T075–84/T076/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. 서버8891/API/native설치/사용자화면/병합 변경 없음.
+
+
 ## 2026-10-05 T142 원본 노드 Rust 계산
 - 변경: 선배 Kepler+J2/GMST/WGS84/Sun/일조/LVLH 식과 additive propagate_nodes, 명시 근사 frame/time/profile, 소유31float64/오류 정렬·240/601/50000한도. 기존SGP4 식·profile·export 유지.
 - 검증: 원본20+추가42상태 허용오차 내 동일, 확장capture2회byte동일/기존91capture 보존. RED module/frame/tool 후 Rust9PASS/Node369PASS1438.2249ms/Python471PASS8기존warnings219.57s(session66925exit0)/diffcheck. validation/t142_node_native_source.md. rustfmt component없음/format성공 주장없음.

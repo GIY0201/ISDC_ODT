@@ -113,3 +113,17 @@ Offline source evidence can be reproduced now: `node --experimental-vm-modules p
 After product tasks: run full Python/Node, locked/offline Rust product tests and additive wheel installation in a clean validation venv, verifying old GP exports before using the new node export. Use fixed8891 with captured GP/SIM state and documented owned restart. At1280×720/1920×1080, create all4formation presets, switch3modes, edit9equipment kinds/power/orbit/model, save detached member, regenerate formation, test240-bound/error, inspect distinct GP precise-vs-node approximate provenance, replay/seek/reverse60x/2D3D/restore/clear with oneViewer. No automatic server deploy on opening/restoring a window.
 
 With the verified T079 module present, issue explicit node deploy/recall and compare server accepted roster/revision/run/scope plus local sent snapshot. Exercise409/timeout/same-ID retry/activation failure; drafts and accepted state must survive failure. If module is unavailable, observe503 and keep server-deployment acceptance unverified. Real OISL/RF/physical battery behavior is not implied. Measure game frame/UI/API/bytes costs and keep existing T032 gate. Final acceptance needs source comparison/full regression/live evidence and attached Draft; preserve wholeT075–84 and earlier limitations.
+
+
+### Windows node validation temporary paths (T143)
+
+Full pytest includes a clean-venv wheel installation. A deeply nested basetemp plus the test name and installed DLL/package names can exceed Windows path limits. Use a fresh short directory under ignored data/workspace/v; preserve failed logs and do not change system settings or skip installation validation.
+
+```powershell
+New-Item -ItemType Directory -Force data/workspace/v | Out-Null
+$validationPath = Join-Path 'data/workspace/v' ('check_' + [guid]::NewGuid().ToString('N').Substring(0,8))
+if (Test-Path -LiteralPath $validationPath) { throw 'Validation path must be fresh' }
+project_support/.venv/Scripts/python.exe -m pytest -q --basetemp $validationPath
+```
+
+Node adapter preparation/row validation is tested with pinned original source rows. Actual new export installation is still gated by T144; a passing old-wheel test does not establish new-node native installation or UI/server acceptance.
