@@ -1,3 +1,6 @@
+import {createCatalogTrack} from './catalog_track.js?v=t115-r1';
+import {createCatalogPasses} from './catalog_passes.js?v=t115-r1';
+import {createCatalogPassPanel} from './tabs/catalog_passes.js?v=t115-r1';
 import {createCatalogTimeline} from './catalog_timeline.js?v=t110-r3';
 import {createCatalogScene} from './catalog_scene.js?v=t110-r3';
 import {createCatalogScenePanel} from './tabs/catalog_scene.js?v=t110-r3';
@@ -9,13 +12,13 @@ import {createCatalogPanel} from './tabs/catalog_workspace.js?v=t110-r3';
 import {createHilPanel} from './tabs/hil_workspace.js?v=t069-r2';
 import {hilTopology} from '/static/visualization/hil_topology.js';
 import {createWorkspaceRevisionSync} from './workspace_revision_sync.js';
-import {api,telemetrySocket} from '/static/communication/api.js?v=t110-r3';
+import {api,telemetrySocket} from '/static/communication/api.js?v=t115-r1';
 import {createKpiPanel} from './tabs/kpi_workspace.js?v=t069-r2';
 import {drawMultiLine,drawSparkline} from '/static/visualization/charts.js';
 import {createSimPanel} from './tabs/sim_workspace.js?v=t069-r2';
 import {createMissionPanel} from './tabs/mission_workspace.js?v=t069-r2';
 import {createOrbitSelection} from './orbit_selection.js?v=t031-r1';
-import {createWorkspaceGlobe} from './workspace_globe.js?v=t110-r3';
+import {createWorkspaceGlobe} from './workspace_globe.js?v=t115-r1';
 import {createWorkspacePlayback} from './workspace_playback.js';
 import {createGroundPanel} from './tabs/ground_visibility.js?v=t097-r2';
 import {createRadioSeriesPanel} from './tabs/orbit_radio_series.js?v=t053-r1';
@@ -39,8 +42,11 @@ const planningPanel=createCommunicationPlanningPanel(api);
 const radioPanel=createOrbitRadioPanel(client,api);
 const missionPanel=createMissionPanel(api);
 const kpiPanel=createKpiPanel(api,drawMultiLine);
-let catalogPanel,catalogTimePanel,catalogScene,catalogScenePanel;
-const catalogTimeline=createCatalogTimeline(api,value=>globe.catalog(value),()=>{catalogTimePanel?.update();const t=catalogTimeline.snapshot();if(catalogScenePanel?.followsTimeline()&&t.selected?.group===catalogScene?.snapshot().context?.group&&t.utc)catalogScene.observe(t.utc);});
+let catalogPanel,catalogTimePanel,catalogScene,catalogScenePanel,catalogTrack,catalogPasses,catalogPassPanel;
+const catalogTimeline=createCatalogTimeline(api,value=>globe.catalog(value),()=>{catalogTimePanel?.update();const t=catalogTimeline.snapshot();catalogTrack?.select(t.selected);if(t.utc)catalogTrack?.observe(t.utc);catalogPasses?.update(t);catalogPassPanel?.update();if(catalogScenePanel?.followsTimeline()&&t.selected?.group===catalogScene?.snapshot().context?.group&&t.utc)catalogScene.observe(t.utc);});
+catalogTrack=createCatalogTrack(api,value=>globe.catalogTrack(value),()=>catalogPassPanel?.update(),{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
+catalogPasses=createCatalogPasses(api,()=>catalogPassPanel?.update(),async utc=>{catalogTimeline.seek(utc);await catalogTimeline.calculate();},{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
+catalogPassPanel=createCatalogPassPanel(catalogTrack,catalogPasses,()=>catalogTimeline.snapshot());
 catalogTimePanel=createCatalogTimePanel(catalogTimeline,GROUND_STATIONS);
 const catalogGeometry=createCatalogGeometry(api,(value,pin)=>catalogTimeline.select(value,pin),()=>{catalogPanel?.update();if(catalogGeometry.snapshot().hashConflict){catalogScene?.clear();catalogTimeline.clear();}});
 catalogScene=createCatalogScene(api,value=>globe.catalogScene(value,number=>{const s=catalogScene.snapshot();const row=catalogScene.row(number);if(row&&s.result&&!catalogPanel.controller.snapshot().pending){catalogPanel.controller.selectExternal(row,s.result);openWorkspaceView('satellite');}}),()=>catalogScenePanel?.update(),{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
@@ -54,7 +60,7 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   revisionSync.observe(client.snapshot());
@@ -71,6 +77,7 @@ function render(){
   catalogPanel.update();
   catalogTimePanel.update();
   catalogScenePanel.update();
+  catalogPassPanel.update();
   stationPanel.update();
   if(view!=='satellite')return;
   const screen=document.getElementById('screen');let panel=document.getElementById('stored-orbit');
@@ -91,7 +98,7 @@ function render(){
   panel.querySelector('#orbit-seek').addEventListener('click',()=>{const field=panel.querySelector('#orbit-utc'),utc=field.value.trim();delete field.dataset.dirty;command(()=>client.seek(utc));});
   panel.querySelector('#orbit-epoch').addEventListener('click',()=>{delete panel.querySelector('#orbit-utc').dataset.dirty;command(()=>client.seek(record.epoch_utc));});
 }
-export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);stationPanel.show(view);}
+export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);}
 client.load();
 
 export function applyWorkspaceDraft(items,remote=false){
@@ -102,6 +109,7 @@ export function applyWorkspaceDraft(items,remote=false){
   catalogPanel.applyDraft(items);
   catalogTimePanel.applyDraft(items);
   catalogScenePanel.applyDraft(items);
+  catalogPassPanel.applyDraft(items);
   groundPanel.applyDraft(items);
   rfPanel.applyDraft(items,remote);
   planningPanel.applyDraft(items,remote);

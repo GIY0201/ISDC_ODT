@@ -1,4 +1,4 @@
-import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView} from './workspace_orbit.js?v=t110-r3';
+import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView} from './workspace_orbit.js?v=t115-r1';
 (() => {
   const screen = document.getElementById('screen');
   const groups = [

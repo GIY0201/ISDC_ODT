@@ -1,8 +1,8 @@
-import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t110-r3';
+import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t115-r1';
 
 /** Render-only copy, never a clock/selection authority. One controller per document. */
 export function createWorkspaceGlobe(container,status,focusButton,host=window){
-  let globe=null,latest=null,catalog=null,sceneInput=null,sceneMetadata=null,onCatalogSelect=()=>{},groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
+  let globe=null,latest=null,catalog=null,sceneInput=null,sceneMetadata=null,trackInput=null,onCatalogSelect=()=>{},groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
   const describe=message=>{status.textContent=message;};
   function paint(){
     focusButton.disabled=true;
@@ -33,6 +33,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       globe=new OrbitGlobe(host.Cesium,container);
       if(stations.length){globe.setStations(stations,onStationSelect);globe.selectStation(selectedStation);}
       if(sceneInput){globe.setCatalogScene(sceneInput,onCatalogSelect);sceneInput=null;}
+      if(trackInput)globe.setCatalogTrack(trackInput);
       removeError=globe.viewer.scene.renderError.addEventListener(fail);
       host.Cesium.SingleTileImageryProvider.fromUrl('/static/assets/nasa_blue_marble_september.jpg',{credit:'NASA Blue Marble'}).then(provider=>{
         if(!disposed&&globe)globe.setImagery(provider);
@@ -53,6 +54,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       sceneInput=globe?null:value?structuredClone(value):null;
       try{globe?.setCatalogScene(value,onSelect);container.dataset.catalogCount=String(value?.valid_count??0);paint();}catch{fail();}
     },
+    catalogTrack(value){if(disposed)return;trackInput=value?structuredClone(value):null;try{globe?.setCatalogTrack(trackInput);container.dataset.trackSegmentCount=String(value?.segments?.length??0);}catch{fail();}},
     catalog(sample){if(disposed)return;const changed=catalog?.catalog_number!==sample?.catalog_number||catalog?.normalized_gp_sha256!==sample?.normalized_gp_sha256;catalog=sample?structuredClone(sample):null;if(changed)focused=false;paint();},
     update(snapshot,display,displayUtc){
       if(disposed)return;
@@ -65,6 +67,6 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       paint();
       if(!catalog&&!latest&&!sceneMetadata&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
     },
-    destroy(){if(disposed)return;disposed=true;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;},
+    destroy(){if(disposed)return;disposed=true;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
   };
 }

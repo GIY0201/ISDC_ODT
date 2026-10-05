@@ -1,7 +1,7 @@
 """Readonly catalog/native/precise-frame query assembly; no runtime ownership."""
 import hashlib,json,math,re
 from collections import OrderedDict
-from dataclasses import dataclass
+from dataclasses import dataclass,asdict
 from threading import Lock
 import numpy as np
 from astropy.time import TimeDelta
@@ -11,6 +11,7 @@ from digital_twin.contracts.catalog_geometry import CatalogGpChanged
 from digital_twin.simulation.orbit_geometry import observation_geometry,teme_positions_at_utc
 from communication.native.orbit_adapter import prepare_catalog_orbits,propagate_catalog
 from foundation.orbit_time import parse_utc,parse_utc_batch,format_utc_times
+from digital_twin.simulation.visibility import search_visibility
 
 
 @dataclass(frozen=True)
@@ -34,6 +35,45 @@ class CatalogGeometryQuery:
         self.catalog=catalog;self.eop=eop;self.calculate=calculate;self.execute=execute
         # GP preparation only: no propagated/current runtime states are cached.
         self._scene_prepared=OrderedDict();self._scene_lock=Lock()
+
+    async def track(self,group,catalog_number,expected_hash,utc,client_request_id):
+        instant=parse_utc(utc)
+        values,item,orbit,digest=await self._input(group,catalog_number)
+        if expected_hash!=digest:raise CatalogGpChanged('catalog GP changed; reselect before calculating')
+        def compute():
+            motion=float(item['MEAN_MOTION'])
+            if not math.isfinite(motion) or motion<=0:raise ValueError('invalid catalog mean motion')
+            period=86400/motion
+            if not math.isfinite(period):raise ValueError('catalog period outside limits')
+            half=period/2;dense=min(45.,half)
+            coarse=np.linspace(-half,half,121)
+            offsets=np.unique(np.round(np.concatenate((coarse[np.abs(coarse)>45],np.arange(-dense,dense+1e-8,.1),[-half,0,half])),9))
+            times=(instant.as_time()+TimeDelta(offsets,format='sec',scale='tai')).utc
+            stamps=list(format_utc_times(times));stamps[int(np.flatnonzero(offsets==0)[0])]=instant.iso_utc
+            result=self.calculate(orbit,stamps,GroundPoint(0,0,0))
+            if len(result.rows)!=len(stamps) or result.frame!='ITRF' or result.profile!=orbit.profile or result.eop_sha256!=self.eop.eop_sha256 or result.leap_sha256!=self.eop.leap_sha256:raise ValueError('catalog track provenance mismatch')
+            rows=[]
+            for stamp,row in zip(stamps,result.rows):
+                if row.utc!=stamp:raise ValueError('catalog track UTC mismatch')
+                if row.error_code is not None and (not isinstance(row.error_code,str) or not row.error_code):raise ValueError('invalid track error')
+                if row.error_code is None and (row.position_m is None or len(row.position_m)!=3 or not all(math.isfinite(x) for x in row.position_m)):raise ValueError('invalid track position')
+                rows.append(dict(utc=stamp,status='error' if row.error_code else 'valid',error_code=row.error_code,position_m=None if row.error_code else list(row.position_m),eop_quality=self.eop.quality(parse_utc(stamp))))
+            failed=sum(row['status']=='error' for row in rows)
+            return dict(version=1,status='error' if failed==len(rows) else 'partial' if failed else 'valid',group=group,catalog_number=catalog_number,client_request_id=client_request_id,name=item.get('OBJECT_NAME',''),source=values['source'],fetched_at=values['fetched_at'],warning=values.get('warning',''),stale=bool(values.get('stale',False)),normalized_gp_sha256=digest,epoch_utc=orbit.epoch_utc,reference_utc=instant.iso_utc,period_seconds=period,count=len(rows),valid_count=len(rows)-failed,error_count=failed,rows=rows,frame=result.frame,profile=result.profile,eop_sha256=result.eop_sha256,leap_sha256=result.leap_sha256,eop_kind='IERS_A',units={'position':'m','time':'UTC','period':'s'})
+        return await self.execute(compute)
+
+    async def visibility(self,group,catalog_number,expected_hash,start_utc,end_utc,ground_point,minimum_elevation_deg,client_request_id):
+        start=parse_utc(start_utc);end=parse_utc(end_utc)
+        values,item,orbit,digest=await self._input(group,catalog_number)
+        if expected_hash!=digest:raise CatalogGpChanged('catalog GP changed; reselect before calculating')
+        def compute():
+            vector=getattr(self.calculate,'evaluate_times',None)
+            result=search_visibility(calculate=lambda stamps:self.calculate(orbit,stamps,ground_point),calculate_times=(lambda times:vector(orbit,times,ground_point)) if callable(vector) else None,start_utc=start.iso_utc,end_utc=end.iso_utc,minimum_elevation_deg=minimum_elevation_deg)
+            if result.eop_sha256!=self.eop.eop_sha256 or result.leap_sha256!=self.eop.leap_sha256:raise ValueError('catalog visibility provenance mismatch')
+            value=asdict(result)
+            value.update(version=1,group=group,catalog_number=catalog_number,client_request_id=client_request_id,name=item.get('OBJECT_NAME',''),source=values['source'],fetched_at=values['fetched_at'],warning=values.get('warning',''),stale=bool(values.get('stale',False)),normalized_gp_sha256=digest,epoch_utc=orbit.epoch_utc,eop_kind='IERS_A',ground_point={'latitude_deg':ground_point.latitude_deg,'longitude_deg':ground_point.longitude_deg,'ellipsoid_height_m':ground_point.ellipsoid_height_m,'virtual':True,'ellipsoid':'WGS84'},communication_status='unknown',units={'time':'UTC','elevation':'deg','duration':'s'})
+            return value
+        return await self.execute(compute)
 
     async def scene(self,group,query,orbit,utc,client_request_id,expected_scene_sha256=None):
         if group not in {g['id'] for g in self.catalog.catalog_groups()}:raise ValueError('unknown catalog group')

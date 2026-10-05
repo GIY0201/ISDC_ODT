@@ -1,0 +1,7 @@
+# T114 selected track controller progress
+
+T111 browser controller RED: missing catalog_track.js. Implemented readonly presentation controller: copied selected identity, AbortSignal/generation fence, one pending/latest UTC coalescing, dense-window renewal, compact metadata snapshots and owned segmented positions. Native failures terminate segments; no interpolation or JS propagation. GP409 disables renewal and reports conflict; malformed data clears geometry. Automatic transport failures wait for explicit refresh instead of retrying each replay notification (additional RED assertion2calls vs1, then fixed).
+
+Target6 tests PASS; full Node217 PASS930.9457ms. InvalidUTC makes no query; all failed native rows retain explicit error metadata with no path. Original period endpoints/center, strict source/hash/profile/frame/units, row ordering, dense .1s timestamps/quality and failure counts checked. Actual preserved t113_live_track.json accepted by controller: valid/noerror. This is actual API response validation, not a rendered browser claim.
+
+Full Python423 PASS, five existing warnings,177.17s; log data/workspace/validation/ground_stations/python_t114_track_controller.txt. No HTTP/native changes or server restart in this stage. Controller not yet assembled into V6. T111 aggregate/T114 remain unchecked; visibility controller/table/timeline/AOSseek, T115 renderer and T116 realtwores/Draft remain. Whole T075–T084 and deferred requirements unchanged.
