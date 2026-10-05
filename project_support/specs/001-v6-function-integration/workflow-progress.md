@@ -548,3 +548,8 @@ Previousgoalturn=progress2d94bf1. Staticmount packagev1 added after RED HTMLfall
 
 ## 2026-10-05 T129 actual ISS proof and tracking observer repair partial
 Previous goal turn was a status-only response (no progress); revalidated current worktree, active feature prerequisites and completed original test session29835 rather than restarting it. Checklist8/8, hooks absent, original T075–T084 scope unchanged. Tracking callback RED then forwarding plus revision/disposal fence; finalNode323PASS1219.9083ms/Python440PASS5warnings201.23s/diffcheck. Earlier actual8891 ISS model visible at1280/1920; real1920 2D focus black-map failure retained, cause unproven. Evidence validation/t129_model_tracking.md. Temporary browser tab unavailable on resumption; no fresh live follow/Escape claim. T122aggregate/T123/T125–129 remain incomplete; nativehover/2Drepair/livecamera/all50/Terra/solar/fullT075–T084/T032/actualcommunication/download/AeroDT gates preserved. Next investigate actual Cesium2D camera source/transform and regression before repair, then two-resolution proof; nativehover composition independently available. No serverrestart/newport/native/API/PR/merge.
+
+## 2026-10-05 T129 2D 검정 화면 원인 대조 및 정정
+- 이전a9c244f목표turn은progress. 실제8891 ISS2Dfocus 재현 후 read-only debugger로camera/width/좌표/globe표시·tilesLoaded/imagery1 확인. 같은focus에서NaturalEarth와NASA밝음·어두움강조해제는섬·해안표시; 원본NASA어두운바다+기존dark/emphasis스타일로가독성저하.
+- 이전검정화면을카메라결함으로해석하지않도록정정; 원래실패관측과스크린샷보존. 1280×720/1920×1080밝음NASA증거/1920강조해제증거. validation/t129_map_diagnosis.md. 코드·시험변경없음, 불필요한전체시험재실행없음.
+- T126/T129는전체camera/hover/all50/Terra 등미완료유지; dark가독성미해결/원본스타일임의변경없음. 기존포트8891·server·API·native·PR·병합변경없음. 임시tab닫기/viewport reset/debugger정리. 다음nativehover조립,fullT075–84/solar/T032/통신·장비/다운로드·AerODT보존.

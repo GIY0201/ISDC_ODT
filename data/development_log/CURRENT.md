@@ -497,3 +497,8 @@ Official NASA pinnedtree/alternateGLB/FBX/archive checks show Terra exacttexture
 - 검증: 이전 실제8891 ISS 원본모델 1280×720/1920×1080 표시 증거 보존. Node323PASS0fail1219.9083ms/Python440PASS5기존warnings201.23s/원래session29835완료확인/diffcheck. validation/t129_model_tracking.md.
 - 실패: 1920×1080 실제2D초점 배경지도검정/점·궤적만표시, 후속관측에도유지. 원인미확인, mock시험으로PASS재분류하지않음.
 - 남음: T126/T129실제2D수정·두해상도/hover/추적해제·오류/all50/Terra/solar/fullT075–84·기존보류. 임시tab은재개시없었음;이번새GPU확인·서버restart·포트변경·PR·병합없음.
+
+## 2026-10-05 T129 2D 지도 가독성 원인 확인
+- 검증: 실제8891 ISS2Dfocus 검정재현; read-onlycamera/좌표/width/globe·tilesLoaded·imagery확인. 같은focus의NASA밝음두해상도와dark강조해제/대체NaturalEarth에서지도보임. validation/t129_map_diagnosis.md.
+- 정정: 카메라결함증거아님; 원본NASA어두운바다+원본강조스타일의가독성저하. 원래실패관측보존, dark가독성미해결. 제품코드변경·새시험실행·serverrestart·PR·병합없음.
+- 남음: nativehover/livecamera/all50/Terra/solar/fullT075–84 및기존보류. 임시tab닫기/viewport복원/debugger정리.
