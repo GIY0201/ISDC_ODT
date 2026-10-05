@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-05 T145 원본 초안·편대 store 이식
+- 변경: 원본 CRUD/선택/dirty/편대교체/키·schema·240상한, library/storage/time/수락검사 주입. 사본·중복/finite·전체복원 검사, 저장실패 memory/ID보존, 개별수정 편대분리, revision/token 충돌과명시reload, restore수락false. 실제수락은 T150/T079만.
+- 검증: 원본3sourcehash VM11상태 두capture65029bytes/SHA83edb7bc… 동일 및 전체11결과일치. missingmodule RED 후15PASS, 추가16PASS3FAIL보완 후target19PASS133.2599ms/최종Node390PASS1359.5967ms/전체Python543PASS8기존warnings218.57s(session48227exit0)/syntax/diffcheck. validation/t145_constellation.md.
+- 남음: N001(T151/T152) 실제storage event/동시창쓰기직렬화·수용은 미검증; token검사는CAS아님. T146editor/T147timeline/T148scene/T079·149–150실제수락/T151–153실제UI/리뷰. T145컴포넌트만 완료, 전체T076/T075–84/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. 현재8891서버/native설치/사용자화면/병합 변경 없음.
+
+
 ## 2026-10-05 T144 additive Rust wheel 격리 설치 검증 완료
 - 변경: 제품 crate/lock/Python metadata0.3.0 및 native버전 Cargo참조. cleanvenv/-I 실제 old/new export 검증 확대. 제품manifest release/locked wheel과 DLL출처·license·RECORD 영수증 보존. 실행환경0.2.0 유지.
 - 검증: oldwheel/version RED2FAIL1PASS5.41s 후 실제새wheel target3PASS6.11s; 원본62상태/공식33입력668상태/OMM scalar-many bytes/240nodes/50000rows/오류·소유버퍼 확인. Rust9PASS/전체Python543PASS8기존warnings226.35s(session19156exit0)/diffcheck. JS미변경으로 기존Node371PASS 재사용. 첫build maturin없음실패 보존, 기존전용builder1.15.0 명시로 성공. validation/t144_node_native.md.

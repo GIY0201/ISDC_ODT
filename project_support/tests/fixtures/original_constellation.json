@@ -1,0 +1,2218 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_hashes": {
+    "digital_twin/simulation/browser/satellite_dynamics.js": "5580263519e45f6b3e1f7d2a5dbceae097d99d6949f8190ce8c87fe2145f6eb5",
+    "digital_twin/model_library/browser/satellite_nodes.js": "722323b356b8c0937896aff45f919300099aed789372054ec142148520eadafb",
+    "user_application/web/scripts/nodes/constellation.js": "a4b7a68595ae219688ee16922fe58af852d2a074641c7185081242cc9760f231"
+  },
+  "epoch": 1791151272000,
+  "steps": [
+    {
+      "operation": "load",
+      "args": [],
+      "expected": {
+        "drafts": [],
+        "deployed": [],
+        "deployedAt": null,
+        "selectedId": null,
+        "dirty": false
+      }
+    },
+    {
+      "operation": "add",
+      "args": [
+        {
+          "bus": "flat_panel"
+        }
+      ],
+      "expected": {
+        "drafts": [
+          {
+            "schema": 1,
+            "id": "NODE-0001",
+            "catalog_number": 900001,
+            "name": "NODE-0001",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          }
+        ],
+        "deployed": [],
+        "deployedAt": null,
+        "selectedId": "NODE-0001",
+        "dirty": true
+      }
+    },
+    {
+      "operation": "add",
+      "args": [
+        {
+          "name": "second"
+        }
+      ],
+      "expected": {
+        "drafts": [
+          {
+            "schema": 1,
+            "id": "NODE-0001",
+            "catalog_number": 900001,
+            "name": "NODE-0001",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0002",
+            "catalog_number": 900002,
+            "name": "second",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          }
+        ],
+        "deployed": [],
+        "deployedAt": null,
+        "selectedId": "NODE-0002",
+        "dirty": true
+      }
+    },
+    {
+      "operation": "duplicate",
+      "args": [
+        "NODE-0001"
+      ],
+      "expected": {
+        "drafts": [
+          {
+            "schema": 1,
+            "id": "NODE-0001",
+            "catalog_number": 900001,
+            "name": "NODE-0001",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0002",
+            "catalog_number": 900002,
+            "name": "second",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0003",
+            "catalog_number": 900003,
+            "name": "NODE-0001 사본",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-15",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-16",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-17",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-18",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-19",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-20",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-21",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          }
+        ],
+        "deployed": [],
+        "deployedAt": null,
+        "selectedId": "NODE-0003",
+        "dirty": true
+      }
+    },
+    {
+      "operation": "update",
+      "args": [
+        "NODE-0002",
+        "changed"
+      ],
+      "expected": {
+        "drafts": [
+          {
+            "schema": 1,
+            "id": "NODE-0001",
+            "catalog_number": 900001,
+            "name": "NODE-0001",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0002",
+            "catalog_number": 900002,
+            "name": "second",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "changed",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0003",
+            "catalog_number": 900003,
+            "name": "NODE-0001 사본",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-15",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-16",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-17",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-18",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-19",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-20",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-21",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          }
+        ],
+        "deployed": [],
+        "deployedAt": null,
+        "selectedId": "NODE-0003",
+        "dirty": true
+      }
+    },
+    {
+      "operation": "select",
+      "args": [
+        "NODE-0001"
+      ],
+      "expected": {
+        "drafts": [
+          {
+            "schema": 1,
+            "id": "NODE-0001",
+            "catalog_number": 900001,
+            "name": "NODE-0001",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0002",
+            "catalog_number": 900002,
+            "name": "second",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "changed",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0003",
+            "catalog_number": 900003,
+            "name": "NODE-0001 사본",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-15",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-16",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-17",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-18",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-19",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-20",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-21",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          }
+        ],
+        "deployed": [],
+        "deployedAt": null,
+        "selectedId": "NODE-0001",
+        "dirty": true
+      }
+    },
+    {
+      "operation": "remove",
+      "args": [
+        "NODE-0003"
+      ],
+      "expected": {
+        "drafts": [
+          {
+            "schema": 1,
+            "id": "NODE-0001",
+            "catalog_number": 900001,
+            "name": "NODE-0001",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0002",
+            "catalog_number": 900002,
+            "name": "second",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "changed",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          }
+        ],
+        "deployed": [],
+        "deployedAt": null,
+        "selectedId": "NODE-0001",
+        "dirty": true
+      }
+    },
+    {
+      "operation": "deploy",
+      "args": [],
+      "expected": {
+        "drafts": [
+          {
+            "schema": 1,
+            "id": "NODE-0001",
+            "catalog_number": 900001,
+            "name": "NODE-0001",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0002",
+            "catalog_number": 900002,
+            "name": "second",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "changed",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          }
+        ],
+        "deployed": [
+          {
+            "schema": 1,
+            "id": "NODE-0001",
+            "catalog_number": 900001,
+            "name": "NODE-0001",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0002",
+            "catalog_number": 900002,
+            "name": "second",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "changed",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          }
+        ],
+        "deployedAt": "2026-10-04T22:01:12.000Z",
+        "selectedId": "NODE-0001",
+        "dirty": false
+      }
+    },
+    {
+      "operation": "add",
+      "args": [
+        {
+          "name": "later"
+        }
+      ],
+      "expected": {
+        "drafts": [
+          {
+            "schema": 1,
+            "id": "NODE-0001",
+            "catalog_number": 900001,
+            "name": "NODE-0001",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0002",
+            "catalog_number": 900002,
+            "name": "second",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "changed",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0004",
+            "catalog_number": 900004,
+            "name": "later",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-22",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-23",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-24",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-25",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-26",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-27",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-28",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          }
+        ],
+        "deployed": [
+          {
+            "schema": 1,
+            "id": "NODE-0001",
+            "catalog_number": 900001,
+            "name": "NODE-0001",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0002",
+            "catalog_number": 900002,
+            "name": "second",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "changed",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          }
+        ],
+        "deployedAt": "2026-10-04T22:01:12.000Z",
+        "selectedId": "NODE-0004",
+        "dirty": true
+      }
+    },
+    {
+      "operation": "recall",
+      "args": [],
+      "expected": {
+        "drafts": [
+          {
+            "schema": 1,
+            "id": "NODE-0001",
+            "catalog_number": 900001,
+            "name": "NODE-0001",
+            "bus": "flat_panel",
+            "model_key": "starlink_flat",
+            "mode": "nominal",
+            "mass_kg": 800,
+            "power": {
+              "generation_w": 4500,
+              "bus_w": 400,
+              "battery_wh": 8000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0002",
+            "catalog_number": 900002,
+            "name": "second",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "changed",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-0004",
+            "catalog_number": 900004,
+            "name": "later",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1791151272000
+            },
+            "equipment": [
+              {
+                "id": "EQ-muud7yo0-22",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-23",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-24",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-25",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-26",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-27",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-muud7yo0-28",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-10-04T22:01:12.000Z",
+            "updated_at": "2026-10-04T22:01:12.000Z"
+          }
+        ],
+        "deployed": [],
+        "deployedAt": null,
+        "selectedId": "NODE-0004",
+        "dirty": true
+      }
+    },
+    {
+      "operation": "clear",
+      "args": [],
+      "expected": {
+        "drafts": [],
+        "deployed": [],
+        "deployedAt": null,
+        "selectedId": null,
+        "dirty": false
+      }
+    }
+  ]
+}
