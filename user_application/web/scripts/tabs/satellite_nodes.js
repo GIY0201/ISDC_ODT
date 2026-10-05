@@ -1,7 +1,8 @@
+import {describeMatch} from '../orbit/satellite_model_description.js';
 // Senior node-panel presentation and formation editing; no global scene or time owner.
 export function createSatelliteNodePanelTools({library}={}) {
   if(!library)throw new TypeError('node_panel_library_required');
-  const {BUS_PRESETS,FORMATION_CONTROLS,FORMATION_DEFAULTS,FORMATION_PRESETS,LINK_POLICIES}=library;
+  const {BUS_PRESETS,FORMATION_CONTROLS,FORMATION_DEFAULTS,FORMATION_PRESETS,LINK_POLICIES,NODE_MODES,OISL_ROLES}=library;
   const esc=value=>String(value??'—').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   function displayNumber(value,digits=1){if((typeof value!=='number'&&typeof value!=='string')||(typeof value==='string'&&!value.trim()))return '—';const number=Number(value);return Number.isFinite(number)?number.toLocaleString('en-US',{minimumFractionDigits:digits,maximumFractionDigits:digits}):'—';}
   function controlEnabled(control,params){return !control.presets||control.presets.includes(params.preset);}
@@ -118,5 +119,230 @@ function createFormationPanel({root=null,store,now,createFormationId,timers,onEr
   }
   return Object.freeze({change,generate,setLive,adopt,remove,destroy,snapshot});
 }
-return Object.freeze({formationControlsMarkup,formationSummaryText,createFormationPanel});
+function utcLabel(value,seconds=true){
+  const time=typeof value==='number'?value:typeof value==='string'&&value.trim()?Date.parse(/(?:Z|[+-]\d{2}:?\d{2})$/i.test(value.trim())?value:`${value}Z`):NaN;
+  const date=new Date(time);return Number.isFinite(date.getTime())?date.toISOString().slice(0,seconds?19:16).replace('T',' '):'—';
+}
+const sourceCommit='1a1e00297a0301637455b0ef2cf48b2e74576b07';
+const nativeMetadata={model_profile:'SOURCE_KEPLER_J2_V1',frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',source_commit:sourceCommit,quality:'engineering_assumption'};
+const sameDefinition=(a,b)=>{try{return JSON.stringify(a)===JSON.stringify(b);}catch{return false;}};
+function validGeometry(node,geometry,utc){
+  if(!geometry||typeof utc!=='string'||!utc||geometry.node_id!==node.id||!sameDefinition(geometry.node_definition,node)||typeof geometry.definition_hash!=='string'||!geometry.definition_hash)return false;
+  if(Object.entries(nativeMetadata).some(([key,value])=>geometry[key]!==value))return false;
+  const row=geometry.row;
+  if(!row||row.utc!==utc||row.status!=='valid'||row.error_code!==null||typeof row.sunlit!=='boolean')return false;
+  if(['raan_deg','argp_deg','mean_anomaly_deg','latitude_deg','longitude_deg','height_km'].some(key=>typeof row[key]!=='number'||!Number.isFinite(row[key])))return false;
+  return ['position_m','inertial_velocity_km_s'].every(key=>Array.isArray(row[key])&&row[key].length===3&&row[key].every(v=>typeof v==='number'&&Number.isFinite(v)));
+}
+function validLinks(links,nodes,utc,verifyLinkSnapshot){
+  if(!links||links.status!=='valid'||links.utc!==utc||links.source_commit!==sourceCommit||links.quality!=='engineering_assumption'||!Array.isArray(links.terminals)||!Array.isArray(links.pairs)||!sameDefinition(links.node_definitions,nodes)||typeof verifyLinkSnapshot!=='function')return false;
+  try{return verifyLinkSnapshot(structuredClone(links),{nodes:structuredClone(nodes),utc})===true;}catch{return false;}
+}
+function statusPresentation(node,{utc,geometry=null,links=null,nodes=[node],verifyLinkSnapshot,oislPresentation=null}={}){
+  const hasGeometry=validGeometry(node,geometry,utc),row=hasGeometry?geometry.row:null;
+  let hasLinks=validLinks(links,nodes,utc,verifyLinkSnapshot);
+  let terminals=hasLinks?links.terminals.filter(terminal=>terminal.nodeId===node.id):[];
+  if(terminals.length&&['acquisitionProgress','blockedLabel','phaseLabel'].some(key=>typeof oislPresentation?.[key]!=='function')){hasLinks=false;terminals=[];}
+  const activeTerminals=new Set(terminals.filter(terminal=>terminal.targetId).map(terminal=>terminal.equipmentId));
+  const needsLinks=node.equipment.some(item=>library.equipmentActive(node,item)&&library.equipmentSpec(item)?.kind==='oisl');
+  const consumptionKnown=hasLinks||!needsLinks;
+  const power=library.powerBudget(node,{sunlit:row?.sunlit===true,activeTerminals});
+  const generationKnown=!!row,marginKnown=generationKnown&&consumptionKnown;
+  const allEnabled=needsLinks&&!hasLinks?library.powerBudget(node,{sunlit:row?.sunlit===true,activeTerminals:null}):null;
+  const powerAssumption=allEnabled?{consumption_w:allEnabled.consumption_w,margin_w:row?allEnabled.margin_w:null,quality:'engineering_assumption'}:null;
+  const texts={raan:`${displayNumber(row?.raan_deg,2)}°`,argp:`${displayNumber(row?.argp_deg,2)}°`,anomaly:`${displayNumber(row?.mean_anomaly_deg,2)}°`,
+    latlon:`${displayNumber(row?.latitude_deg,3)}° / ${displayNumber(row?.longitude_deg,3)}°`,altitude:`${displayNumber(row?.height_km,1)} km`,speed:`${displayNumber(row?Math.hypot(...row.inertial_velocity_km_s):null,3)} km/s`,
+    sun:row?(row.sunlit?'일조':'지구 그림자 (식)'):'위치 계산 미확인',
+    generation:generationKnown?`${displayNumber(power.generation_w,0)} W`:'미확인',consumption:consumptionKnown?`${displayNumber(power.consumption_w,0)} W`:'미확인',margin:marginKnown?`${displayNumber(power.margin_w,0)} W`:'미확인',
+    'equipment-summary':consumptionKnown?`${power.items.filter(entry=>entry.active).length} / ${power.items.length} 사용 중 · 총 질량 ${displayNumber(library.nodeMass(node),0)} kg`:`전력 소비 미확인 · 총 질량 ${displayNumber(library.nodeMass(node),0)} kg`,
+    'power-assumption':powerAssumption?`전체 활성 단말 운용 가정: 소비 ${displayNumber(powerAssumption.consumption_w,0)} W${powerAssumption.margin_w===null?'':` · 여유 ${displayNumber(powerAssumption.margin_w,0)} W`} · 통신 연결은 미확인`:'',
+    'terminal-summary':hasLinks?`${terminals.length}기 · 짐벌 지향과 포착 순서는 기하 모델`:needsLinks?'통신 결과 미확인':'활성 OISL 단말 없음 (운용 모드/장비 정의)'};
+  const equipmentMarkup=consumptionKnown?power.items.map(entry=>`<span class="${entry.active?'on':'off'}"><b>${esc(entry.label)}</b><small>${entry.active?`${esc(entry.power_w)} W`:'꺼짐'}</small></span>`).join('')||'장비 없음':node.equipment.map(item=>{
+    const spec=library.equipmentSpec(item),active=library.equipmentActive(node,item);if(!spec)return '';
+    const unknown=active&&spec.kind==='oisl';return `<span class="${unknown?'unknown':active?'on':'off'}"><b>${esc(spec.label)}</b><small>${unknown?'통신 결과 미확인':active?`${esc(spec.power_w)} W`:'꺼짐'}</small></span>`;
+  }).join('')||'장비 없음';
+  let terminalMarkup;
+  try { terminalMarkup=hasLinks?terminals.map(terminal=>terminalRow(terminal,new Date(utc),{...oislPresentation,findNode:id=>nodes.find(node=>node.id===id)})).join('')||`<div class="ns-empty">활성 OISL 단말이 없습니다. 운용 모드와 장비를 확인하세요.</div>`:`<div class="ns-empty">${needsLinks?'OISL 계산 결과가 아직 확인되지 않았습니다.':'현재 운용 모드와 장비 정의에는 활성 OISL 단말이 없습니다.'}</div>`;
+  } catch {
+    const fallback=statusPresentation(node,{utc,geometry,nodes});fallback.linksStatus='error';fallback.texts['terminal-summary']='OISL 결과 형식 오류';fallback.terminalMarkup='<div class="ns-empty">통신 결과 형식을 확인할 수 없습니다.</div>';return fallback;
+  }
+  const width=marginKnown?`${Math.max(0,Math.min(100,power.generation_w?power.consumption_w/power.generation_w*100:100))}%`:'0%';
+  return {texts,equipmentMarkup,terminalMarkup,powerAssumption,canLocate:hasGeometry,geometryStatus:hasGeometry?'valid':geometry?.row?.status==='error'?'error':geometry?'unavailable':'unknown',linksStatus:hasLinks?'valid':links?.status==='error'?'error':'unknown',
+    sunClass:row?(row.sunlit?'sunlit':'eclipse'):'',marginClass:marginKnown?(power.margin_w>=0?'ok':'bad'):'unknown',powerBar:{width,className:marginKnown?(power.margin_w>=0?'':'bad'):'unknown'}};
+}
+function createNodeStatusPanel({host,store,readDisplay,geometryFor=()=>null,linksFor=()=>null,verifyLinkSnapshot,oislPresentation,modelFor=()=>null,modelReadinessFor=()=>null,editor,onEdit,onFocus,onError=()=>{}}={}){
+  if(!host||!store||typeof readDisplay!=='function')throw new TypeError('node_status_dependencies_required');
+  let destroyed=false,key=null,generation=0,lastError=null;const owned=[];
+  const requireOpen=()=>{if(destroyed)throw new Error('node_status_disposed');};
+  const report=error=>{const message=error instanceof Error?error.message:String(error);if(message!==lastError){lastError=message;onError(message);}};
+  function unbind(){generation++;for(const remove of owned.splice(0))remove();}
+  function context(node){
+    let display=null,geometry=null,links=null;
+    try{display=readDisplay();if(display?.utc)geometry=geometryFor(structuredClone(node),structuredClone(display));}catch(error){report(error);}
+    try{if(display?.utc)links=linksFor({nodes:store.drafts,utc:display.utc});}catch(error){report(error);}
+    return {utc:display?.utc,geometry,links,nodes:store.drafts,verifyLinkSnapshot,oislPresentation};
+  }
+  function bind(selector,node,action){
+    const element=host.querySelector(selector);if(!element)return;
+    const version=generation,definition=JSON.stringify(node);
+    const handler=async()=>{
+      if(destroyed||host.hidden||version!==generation||store.selectedId!==node.id||JSON.stringify(store.find(node.id))!==definition)return;
+      try{await action(structuredClone(node));if(!destroyed)refresh();}catch(error){report(error);if(!destroyed)refresh();}
+    };
+    element.addEventListener('click',handler);owned.push(()=>element.removeEventListener('click',handler));
+  }
+  function renderFrame(node,match,readiness){
+    unbind();const shape=describeMatch(match);
+    const credit=shape.credit||'출처 미확인';const url=typeof shape.creditUrl==='string'&&/^https?:\/\//i.test(shape.creditUrl)?shape.creditUrl:null;
+    const creditMarkup=url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(credit)}</a>`:esc(credit);
+    host.innerHTML=statusFrame(node,{match})+`<p class="ns-note">샌드박스 가상 번호 ${esc(node.catalog_number)} · 실제 NORAD 등록 번호가 아닙니다.</p><p class="ns-note" data-live="model-status">${esc(shape.note)} 출처: ${creditMarkup} · 렌더링 ${esc(readiness?.status||'미확인')}</p><p class="ns-note" data-live="native-status"></p><p class="ns-note" data-live="power-assumption"></p>`;
+    bind('#node-edit',node,next=>typeof onEdit==='function'?onEdit(next):editor?.open(next));
+    const edit=host.querySelector('#node-edit');if(edit)edit.disabled=typeof onEdit!=='function'&&typeof editor?.open!=='function';
+    bind('#node-duplicate',node,next=>store.duplicate(next.id));
+    bind('#node-remove',node,next=>store.remove(next.id));
+    bind('#node-locate',node,next=>{
+      const input=context(next);if(!validGeometry(next,input.geometry,input.utc)||typeof onFocus!=='function')return;
+      return onFocus(next,structuredClone(input.geometry),{userInitiated:true,focus:true});
+    });
+  }
+  function refresh(){
+    requireOpen();if(editor?.isOpen()){host.hidden=true;unbind();key=null;return;}
+    host.hidden=false;const node=store.selected;
+    if(!node){if(key!=='empty'){unbind();host.innerHTML='<div class="ns-empty tall">위성을 선택하면 궤도, 전력, 장비와 OISL 단말 상태를 표시합니다.</div>';key='empty';}return;}
+    let match=null,readiness=null;try{match=modelFor(structuredClone(node));readiness=modelReadinessFor(structuredClone(node));}catch(error){report(error);}
+    const nextKey=JSON.stringify([node,match,readiness]);if(nextKey!==key){key=nextKey;renderFrame(node,match,readiness);}
+    const input=context(node),value=statusPresentation(node,input);
+    for(const [name,text]of Object.entries(value.texts)){const el=host.querySelector(`[data-live="${name}"]`);if(el)el.textContent=text;}
+    const update=(name,action)=>{const el=host.querySelector(`[data-live="${name}"]`);if(el)action(el);};
+    update('power-assumption',el=>el.hidden=!value.powerAssumption);
+    update('sun',el=>el.className=value.sunClass);update('margin-cell',el=>el.className=value.marginClass);
+    update('power-bar',el=>{el.style.width=value.powerBar.width;el.className=value.powerBar.className;});
+    update('equipment',el=>el.innerHTML=value.equipmentMarkup);update('terminals',el=>el.innerHTML=value.terminalMarkup);
+    update('native-status',el=>el.textContent=value.geometryStatus==='valid'?`Kepler+J2 모의 위치 · GMST 근사 좌표 · ${input.utc}`:value.geometryStatus==='error'?'위치 계산 오류 · 수치와 뷰 정렬을 사용할 수 없습니다.':'현재 시각의 위치 계산 미확인');
+    const locate=host.querySelector('#node-locate');if(locate)locate.disabled=!value.canLocate||typeof onFocus!=='function';
+    return structuredClone(value);
+  }
+  function destroy(){if(destroyed)return;unbind();destroyed=true;}
+  return Object.freeze({refresh,destroy});
+}
+function statusFrame(node,{match=null}={}) {
+  const item = library.nodeCatalogItem(node);
+  const shape = describeMatch(match);
+  return `
+    <header class="ns-status-head">
+      <span class="ns-kicker">${esc(BUS_PRESETS[node.bus]?.label || node.bus)} · ${esc(node.id)} · 참조 ${esc(node.catalog_number)}</span>
+      <h3>${esc(node.name)}</h3>
+      <div class="ns-status-tags"><span class="ns-tag ${esc(node.mode)}">${esc(NODE_MODES[node.mode]?.label || node.mode)}</span><span class="ns-tag">${esc(item.ORBIT_REGIME || "—")}</span>${node.formation ? `<span class="ns-tag">${esc(FORMATION_PRESETS[node.formation.preset]?.label || node.formation.preset)} ${esc(node.formation.id)}</span>` : `<span class="ns-tag">개별 배치</span>`}</div>
+      <div class="ns-status-actions"><button id="node-edit">편집</button><button id="node-duplicate">복제</button><button id="node-locate">뷰 정렬</button><button id="node-remove" class="danger">삭제</button></div>
+    </header>
+    <section class="ns-section ns-shape"><figure>${match ? `<img src="${esc(match.thumbnail)}" alt="${esc(shape.alt)}" decoding="async">` : ""}<figcaption><b>${esc(shape.label)}</b><small>${esc(shape.state)}${match?.sizeMeters ? ` · 대표 치수 ${esc(displayNumber(match.sizeMeters, 1))} m` : ""}</small></figcaption></figure></section>
+    <section class="ns-section"><h4>궤도 <small>Kepler + J2 · 정의 ${esc(utcLabel(node.orbit.epoch, false))} UTC</small></h4>
+      <dl class="ns-values">
+        <div><dt>평균 고도</dt><dd>${esc(displayNumber(node.orbit.altitude_km, 1))} km</dd></div><div><dt>이심률 / 경사각</dt><dd>${esc(displayNumber(node.orbit.eccentricity, 4))} / ${esc(displayNumber(node.orbit.inclination, 2))}°</dd></div>
+        <div><dt>승교점 적경 (현재)</dt><dd data-live="raan">—</dd></div><div><dt>근지점 편각 (현재)</dt><dd data-live="argp">—</dd></div>
+        <div><dt>평균 근점 이각 (현재)</dt><dd data-live="anomaly">—</dd></div><div><dt>주기</dt><dd>${esc(displayNumber(item.PERIOD_MINUTES, 2))} min</dd></div>
+        <div><dt>승교점 이동률</dt><dd>${esc(displayNumber(item.RAAN_DRIFT_DEG_PER_DAY, 3))}°/일</dd></div><div><dt>근지점 / 원지점</dt><dd>${esc(displayNumber(item.PERIGEE_KM, 0))} / ${esc(displayNumber(item.APOGEE_KM, 0))} km</dd></div>
+      </dl>
+      <dl class="ns-values ns-live">
+        <div><dt>위도 / 경도</dt><dd data-live="latlon">—</dd></div><div><dt>타원체 고도</dt><dd data-live="altitude">—</dd></div>
+        <div><dt>속력 (관성계)</dt><dd data-live="speed">—</dd></div><div><dt>태양 조건</dt><dd data-live="sun">—</dd></div>
+      </dl></section>
+    <section class="ns-section"><h4>전력 <small>순간 수지 · 배터리 적분 아님</small></h4>
+      <div class="ns-power"><span>발전 <b data-live="generation">—</b></span><span>소비 <b data-live="consumption">—</b></span><span data-live="margin-cell">여유 <b data-live="margin">—</b></span><span>배터리 <b>${esc(displayNumber(node.power?.battery_wh, 0))} Wh</b></span></div>
+      <i class="ns-power-bar"><b data-live="power-bar" style="width:0%"></b></i></section>
+    <section class="ns-section"><h4>임무 장비 <small data-live="equipment-summary">—</small></h4>
+      <div class="ns-eq-status" data-live="equipment"></div></section>
+    <section class="ns-section"><h4>OISL 단말 <small data-live="terminal-summary">—</small></h4>
+      <div data-live="terminals"></div></section>
+    <p class="ns-note">위치와 링크 상태는 Kepler+J2 모의 계산과 기하학적 가시선 판정입니다. 실측 텔레메트리나 링크 예산이 아닙니다.</p>`;
+}
+
+function fleetMarkup(nodes){
+return nodes.map(node => {
+      const item = library.nodeCatalogItem(node);
+      return `<button class="ns-fleet-row" role="option" aria-selected="false" data-node-id="${esc(node.id)}"><span class="status-dot neutral"></span><span class="ns-fleet-body"><b>${esc(node.name)}</b><small>${esc(item.ORBIT_REGIME || "—")} · ${esc(displayNumber(node.orbit.altitude_km, 0))} km · i ${esc(displayNumber(node.orbit.inclination, 1))}°${node.formation ? ` · ${esc(node.formation.id)}` : ""}</small></span><span class="ns-fleet-mode ${esc(node.mode)}">${esc(NODE_MODES[node.mode]?.label || node.mode)}</span></button>`;
+    }).join("") || `<div class="ns-empty">위성이 없습니다. 아래 편대 배치에서 생성하거나 <b>＋ 위성 추가</b>를 누르세요.</div>`;
+}
+function terminalRow(terminal, date, {findNode,acquisitionProgress,blockedLabel,phaseLabel}) {
+  const { spec, state, geometry, margin } = terminal;
+  const target = terminal.targetId ? findNode(terminal.targetId)?.name || terminal.targetId : "—";
+  const progress = acquisitionProgress(state, spec, date);
+  const detail = state.phase === "blocked" ? blockedLabel(state.blockedBy)
+    : state.phase === "idle" ? "가시 상대 없음"
+      : `거리 ${displayNumber(geometry?.range_km, 0)} km · 여유 ${displayNumber(margin.margin_db, 1)} dB${terminal.dataRateMbps ? ` · ${displayNumber(terminal.dataRateMbps / 1000, 1)} Gbps` : ""}`;
+  return `<div class="ns-terminal" data-phase="${esc(state.phase)}">
+    <div class="ns-terminal-head"><b>${esc(spec.label)}</b><span class="ns-tag ${esc(state.phase)}">${esc(phaseLabel(state.phase))}</span></div>
+    <div class="ns-terminal-grid"><span>방향 <b>${esc(OISL_ROLES[terminal.role] || terminal.role)}</b></span><span>상대 <b>${esc(target)}</b></span><span>짐벌 Az/El <b>${esc(displayNumber(state.azimuth, 1))}° / ${esc(displayNumber(state.elevation, 1))}°</b></span><span>지향 오차 <b>${state.pointingError == null ? "—" : esc(displayNumber(state.pointingError, 3))}°</b></span></div>
+    <small>${esc(detail)}</small>${progress !== null ? `<i class="ns-progress"><b style="width:${Math.round(progress * 100)}%"></b></i>` : ""}
+  </div>`;
+}
+
+function linkStateOf(nodeId,links) {
+  const mine = links.pairs.filter(pair => pair.a === nodeId || pair.b === nodeId);
+  if (!mine.length) return links.terminals.some(terminal => terminal.nodeId === nodeId && terminal.state.phase === "blocked") ? "danger" : "neutral";
+  if (mine.some(pair => pair.state === "locked")) return "ok";
+  if (mine.some(pair => pair.state === "acquiring" || pair.state === "slewing" || pair.state === "one_way")) return "warning";
+  return "danger";
+}
+
+function createNodeFleetPanel({host,count=null,store,readDisplay,linksFor=()=>null,verifyLinkSnapshot,onSelected=()=>{},onError=()=>{}}={}){
+  if(!host||!store||typeof readDisplay!=='function')throw new TypeError('node_fleet_dependencies_required');
+  let destroyed=false,key=null,generation=0;const owned=[];
+  const requireOpen=()=>{if(destroyed)throw new Error('node_fleet_disposed');};
+  function unbind(){generation++;for(const remove of owned.splice(0))remove();}
+  function refresh(){
+    requireOpen();const nodes=store.drafts,nextKey=JSON.stringify(nodes.map(node=>[node.id,node.updated_at,node.name,node.mode,node.orbit,node.formation]));
+    if(count)count.textContent=String(nodes.length);
+    if(nextKey!==key){
+      key=nextKey;unbind();host.innerHTML=fleetMarkup(nodes);const version=generation;
+      host.querySelectorAll('[data-node-id]').forEach(row=>{
+        const id=row.dataset.nodeId;
+        const handler=async()=>{
+          if(destroyed||version!==generation||!store.find(id))return;
+          try{store.select(id);await onSelected(store.selected);if(!destroyed)refresh();}catch(error){onError(error instanceof Error?error.message:String(error));if(!destroyed)refresh();}
+        };
+        row.addEventListener('click',handler);owned.push(()=>row.removeEventListener('click',handler));
+      });
+    }
+    let links=null,utc=null;try{utc=readDisplay()?.utc;if(utc)links=linksFor({nodes:structuredClone(nodes),utc});}catch(error){onError(error instanceof Error?error.message:String(error));}
+    const verified=validLinks(links,nodes,utc,verifyLinkSnapshot);
+    host.querySelectorAll('[data-node-id]').forEach(row=>{
+      row.setAttribute('aria-selected',String(row.dataset.nodeId===store.selectedId));const dot=row.querySelector('.status-dot');
+      if(dot){dot.className=`status-dot ${verified?linkStateOf(row.dataset.nodeId,links):'neutral'}`;dot.title=verified?'원본 기하 모델의 통신 상태':'통신 결과 미확인';}
+    });
+  }
+  function destroy(){if(destroyed)return;unbind();destroyed=true;}
+  return Object.freeze({refresh,destroy});
+}
+function bindNodeTooltips({root,tip,timers,viewport,contains,scrollTarget=null}={}){
+  if(!root||!tip||typeof timers?.set!=='function'||typeof timers?.clear!=='function'||typeof viewport!=='function')throw new TypeError('node_tooltip_dependencies_required');
+  const isContained=contains??(target=>root.contains(target));
+  let timer=null,current=null,destroyed=false;const owned=[];
+  tip.hidden=true;tip.setAttribute('role','tooltip');
+  const clear=()=>{if(timer!==null)timers.clear(timer);timer=null;};
+  const place=target=>{
+    const rect=target.getBoundingClientRect(),bounds=viewport(),width=tip.offsetWidth,height=tip.offsetHeight;
+    if(![rect.left,rect.width,rect.top,rect.bottom,bounds.width,bounds.height,width,height].every(Number.isFinite))throw new Error('tooltip_bounds_unavailable');
+    const left=Math.max(8,Math.min(bounds.width-width-8,rect.left+rect.width/2-width/2));
+    const above=rect.top-height-8,top=Math.max(8,Math.min(bounds.height-height-8,above>=8?above:rect.bottom+8));
+    tip.style.left=`${left}px`;tip.style.top=`${top}px`;tip.dataset.placement=above>=8?'above':'below';
+  };
+  const hide=()=>{clear();current=null;tip.hidden=true;};
+  const show=target=>{
+    if(destroyed||!target?.dataset.tip||!isContained(target))return;
+    current=target;clear();tip.hidden=true;
+    timer=timers.set(()=>{
+      timer=null;if(destroyed||current!==target||!isContained(target)||!target.dataset.tip){hide();return;}
+      tip.textContent=target.dataset.tip;
+      try{place(target);tip.hidden=false;}catch{hide();}
+    },220);
+  };
+  const bind=(element,event,handler,options)=>{if(!element)return;element.addEventListener(event,handler,options);owned.push(()=>element.removeEventListener(event,handler,options));};
+  bind(root,'mouseover',event=>{const target=event.target.closest('[data-tip]');if(target&&target!==current)show(target);});
+  bind(root,'mouseout',event=>{const target=event.target.closest('[data-tip]');if(target&&!target.contains(event.relatedTarget))hide();});
+  bind(root,'focusin',event=>{const target=event.target.closest('[data-tip]');if(target)show(target);});
+  bind(root,'focusout',hide);bind(root,'mousedown',hide);bind(scrollTarget,'scroll',hide,true);
+  return ()=>{if(destroyed)return;destroyed=true;hide();for(const remove of owned.splice(0))remove();};
+}
+return Object.freeze({formationControlsMarkup,formationSummaryText,createFormationPanel,statusFrame,fleetMarkup,terminalRow,statusPresentation,createNodeStatusPanel,createNodeFleetPanel,bindNodeTooltips});
 }

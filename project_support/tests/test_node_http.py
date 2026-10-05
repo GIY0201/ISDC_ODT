@@ -19,7 +19,7 @@ def payload(**changes):
 
 def query():
  def native(definitions,indices,times):
-  row=[0.0]*31;row[6:9]=[7000,0,0];row[9]=row[12]=row[16]=row[20]=1;row[21]=7000;row[27]=1;row[30]=550
+  row=[0.0]*31;row[6:9]=[7000,0,0];row[9]=row[12]=row[16]=row[20]=1;row[21]=7000;row[22]=73.125;row[24]=321.25;row[25]=45.5;row[27]=1;row[30]=550
   return struct.pack('<'+'d'*31*len(indices),*(row*len(indices))),[None]*len(indices)
  port=SimpleNamespace(propagate_nodes=native,node_calculation_profile='SOURCE_KEPLER_J2_V1',node_frame='EARTH_FIXED_GMST_UTC_APPROX',node_inertial_frame='SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',node_time_model='unix_ms_utc_approx',NODE_ROW_WIDTH=31,MAX_NODE_DEFINITIONS=240,MAX_NODE_ROWS=50000,MAX_NODE_SAMPLES=601)
  return NodeGeometryQuery(calculate=lambda p,g:propagate_node_grids(p,g,native_port=port))
@@ -77,3 +77,16 @@ def test_http_absent_port_leap_track_and_malformed_batch():
   assert response.status_code==422 and 'unsupported_node_time' in response.text
  with client(NodeGeometryQuery(calculate=lambda *args:None)) as c:
   assert c.post('/api/nodes/samples',json=payload()).status_code==502
+
+
+def test_http_live_degree_fields_samples_track_errors_and_readonly():
+ with client(query()) as c:
+  before=state(c)
+  response=c.post('/api/nodes/samples',json=payload());assert response.status_code==200
+  rows=response.json()['nodes'][0]['rows']
+  assert {key:rows[0].get(key) for key in ['mean_anomaly_deg','raan_deg','argp_deg']}=={'mean_anomaly_deg':73.125,'raan_deg':321.25,'argp_deg':45.5}
+  assert all(key in rows[1] and rows[1][key] is None for key in ['mean_anomaly_deg','raan_deg','argp_deg'])
+  response=c.post('/api/nodes/track',json={'request_id':'angles-track','nodes':payload()['nodes'],'center_utc':'2026-10-04T22:01:12Z'})
+  assert response.status_code==200
+  assert all(row['raan_deg']==321.25 and row['argp_deg']==45.5 and row['mean_anomaly_deg']==73.125 for row in response.json()['nodes'][0]['rows'])
+  assert state(c)==before

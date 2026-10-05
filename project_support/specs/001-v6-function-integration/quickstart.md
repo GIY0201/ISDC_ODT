@@ -139,3 +139,5 @@ Runtime .venv intentionally has no build tooling. Use the established separate p
 ```
 
 Set ISDC_ORBIT_INSTALL_WHEEL to the exact produced product wheel and run test_orbit_install.py with a fresh short basetemp as described above. The test creates its own isolated environment; it does not install into the running application environment. Inspect build_receipt.json and isolated_call.json before claiming an installation gate. Build and other-platform distributions remain explicit workflows rather than startup actions.
+
+T146 verification cache note: if the existing project_support/.pytest_cache/v/cache is inaccessible, preserve its ACL/files and pass -o cache_dir=<absolute fresh unique directory under data/workspace/v> to pytest. A fresh cache target run wrote its actual nodeids record (2 tests) without cache warnings. Continue using a separate fresh short --basetemp; neither directory is source or a reason to skip tests. Full545PASS remains recorded with its original ninth cache warning.

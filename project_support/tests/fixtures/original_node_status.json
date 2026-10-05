@@ -1,0 +1,1143 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_hashes": {
+    "digital_twin/simulation/browser/satellite_dynamics.js": "5580263519e45f6b3e1f7d2a5dbceae097d99d6949f8190ce8c87fe2145f6eb5",
+    "digital_twin/model_library/browser/satellite_nodes.js": "722323b356b8c0937896aff45f919300099aed789372054ec142148520eadafb",
+    "user_application/web/scripts/orbit/catalog.js": "90f98da034d2e6f8f44c35dc1c980828f177f23af6a8f435b18a9545ecbe4007",
+    "user_application/web/scripts/tabs/nodes.js": "cfd4bd6ab4e58deaf312c6de7b8e30adac462041d4a042457793cb4b5da7ab1a",
+    "user_application/web/scripts/orbit/satellite_models.js": "716492592ccd5bf91dcb1149e5766acb712f56b9bc79d74f8684af297f2d4d2d"
+  },
+  "epoch": 1791151272000,
+  "cases": [
+    {
+      "node": {
+        "schema": 1,
+        "id": "NODE-0",
+        "catalog_number": 900001,
+        "name": "source 0",
+        "bus": "flat_panel",
+        "model_key": "starlink_flat",
+        "mode": "nominal",
+        "mass_kg": 800,
+        "power": {
+          "generation_w": 4500,
+          "bus_w": 400,
+          "battery_wh": 8000
+        },
+        "orbit": {
+          "altitude_km": 550,
+          "eccentricity": 0,
+          "inclination": 53,
+          "raan": 0,
+          "argp": 0,
+          "mean_anomaly": 0,
+          "epoch": "2026-10-04T22:01:12.000Z"
+        },
+        "equipment": [
+          {
+            "id": "EQ-muud7yo0-1",
+            "catalog": "oisl_standard",
+            "role": "fore",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-2",
+            "catalog": "oisl_standard",
+            "role": "aft",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-3",
+            "catalog": "oisl_standard",
+            "role": "left",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-4",
+            "catalog": "oisl_standard",
+            "role": "right",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-5",
+            "catalog": "ka_user_link",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-6",
+            "catalog": "s_band_ttc",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-7",
+            "catalog": "gnss_receiver",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          }
+        ],
+        "formation": null,
+        "notes": "",
+        "created_at": "2026-10-04T22:01:12.000Z",
+        "updated_at": "2026-10-04T22:01:12.000Z"
+      },
+      "match": {
+        "quality": "assigned",
+        "provider": "spacetwin",
+        "label": "source model",
+        "title": "representative",
+        "credit": "source credit",
+        "thumbnail": "/static/assets/model.png",
+        "sizeMeters": 12
+      },
+      "state": {
+        "elements": {
+          "a": 6928.137,
+          "e": 0,
+          "i": 0.9250245035569946,
+          "raan0": 0,
+          "argp0": 0,
+          "m0": 0,
+          "epoch": 1791151272000,
+          "n0": 0.001094823692885802,
+          "meanMotion": 0.0010948888971088029,
+          "raanDot": -9.068426757877303e-7,
+          "argpDot": 6.10955768925239e-7,
+          "period": 5738.992815014798,
+          "perigeeAltitude": 550,
+          "apogeeAltitude": 550,
+          "definition": {
+            "altitude_km": 550,
+            "eccentricity": 0,
+            "inclination": 53,
+            "raan": 0,
+            "argp": 0,
+            "mean_anomaly": 0
+          }
+        },
+        "inertial": {
+          "r": [
+            6928.137,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            4.564820232396906,
+            6.057721051030391
+          ]
+        },
+        "fixed": {
+          "r": [
+            6656.539182728086,
+            1920.8249268412483,
+            0
+          ]
+        },
+        "geodetic": {
+          "longitude": 16.096135363976156,
+          "latitude": 0,
+          "altitude": 550,
+          "velocity": 7.5850885351587625
+        },
+        "basis": {
+          "x": [
+            0,
+            0.6018150231520482,
+            0.7986355100472928
+          ],
+          "y": [
+            0,
+            -0.7986355100472929,
+            0.6018150231520483
+          ],
+          "z": [
+            0.9999999999999999,
+            0,
+            0
+          ]
+        },
+        "radius": 6928.137,
+        "meanAnomaly": 0,
+        "trueAnomaly": 0,
+        "raan": 0,
+        "argp": 0,
+        "gmst": 343.90386463602385,
+        "sunDirection": [
+          -0.9792628907265961,
+          -0.18588094245337589,
+          -0.08057584053818692
+        ],
+        "sunlit": false
+      },
+      "allTerminalsPower": {
+        "generation_w": 0,
+        "consumption_w": 983,
+        "margin_w": -983,
+        "sunlit": false,
+        "items": [
+          {
+            "id": "EQ-muud7yo0-1",
+            "label": "OISL 광 단말 (표준)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 120
+          },
+          {
+            "id": "EQ-muud7yo0-2",
+            "label": "OISL 광 단말 (표준)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 120
+          },
+          {
+            "id": "EQ-muud7yo0-3",
+            "label": "OISL 광 단말 (표준)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 120
+          },
+          {
+            "id": "EQ-muud7yo0-4",
+            "label": "OISL 광 단말 (표준)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 120
+          },
+          {
+            "id": "EQ-muud7yo0-5",
+            "label": "Ka 대역 사용자 링크",
+            "kind": "rf",
+            "active": true,
+            "power_w": 90
+          },
+          {
+            "id": "EQ-muud7yo0-6",
+            "label": "S 대역 TT&C",
+            "kind": "rf",
+            "active": true,
+            "power_w": 8
+          },
+          {
+            "id": "EQ-muud7yo0-7",
+            "label": "GNSS 수신기",
+            "kind": "navigation",
+            "active": true,
+            "power_w": 5
+          }
+        ]
+      },
+      "frame": "\n    <header class=\"ns-status-head\">\n      <span class=\"ns-kicker\">평판형 통신위성 버스 · NODE-0 · 참조 900001</span>\n      <h3>source 0</h3>\n      <div class=\"ns-status-tags\"><span class=\"ns-tag nominal\">정상 운용</span><span class=\"ns-tag\">LEO</span><span class=\"ns-tag\">개별 배치</span></div>\n      <div class=\"ns-status-actions\"><button id=\"node-edit\">편집</button><button id=\"node-duplicate\">복제</button><button id=\"node-locate\">뷰 정렬</button><button id=\"node-remove\" class=\"danger\">삭제</button></div>\n    </header>\n    <section class=\"ns-section ns-shape\"><figure><img src=\"/static/assets/model.png\" alt=\"source credit 렌더링 · representative\" decoding=\"async\"><figcaption><b>source model</b><small>사용자 지정 모델 · 대표 치수 12.0 m</small></figcaption></figure></section>\n    <section class=\"ns-section\"><h4>궤도 <small>Kepler + J2 · 정의 2026-10-04 22:01 UTC</small></h4>\n      <dl class=\"ns-values\">\n        <div><dt>평균 고도</dt><dd>550.0 km</dd></div><div><dt>이심률 / 경사각</dt><dd>0.0000 / 53.00°</dd></div>\n        <div><dt>승교점 적경 (현재)</dt><dd data-live=\"raan\">—</dd></div><div><dt>근지점 편각 (현재)</dt><dd data-live=\"argp\">—</dd></div>\n        <div><dt>평균 근점 이각 (현재)</dt><dd data-live=\"anomaly\">—</dd></div><div><dt>주기</dt><dd>95.65 min</dd></div>\n        <div><dt>승교점 이동률</dt><dd>-4.489°/일</dd></div><div><dt>근지점 / 원지점</dt><dd>550 / 550 km</dd></div>\n      </dl>\n      <dl class=\"ns-values ns-live\">\n        <div><dt>위도 / 경도</dt><dd data-live=\"latlon\">—</dd></div><div><dt>타원체 고도</dt><dd data-live=\"altitude\">—</dd></div>\n        <div><dt>속력 (관성계)</dt><dd data-live=\"speed\">—</dd></div><div><dt>태양 조건</dt><dd data-live=\"sun\">—</dd></div>\n      </dl></section>\n    <section class=\"ns-section\"><h4>전력 <small>순간 수지 · 배터리 적분 아님</small></h4>\n      <div class=\"ns-power\"><span>발전 <b data-live=\"generation\">—</b></span><span>소비 <b data-live=\"consumption\">—</b></span><span data-live=\"margin-cell\">여유 <b data-live=\"margin\">—</b></span><span>배터리 <b>8,000 Wh</b></span></div>\n      <i class=\"ns-power-bar\"><b data-live=\"power-bar\" style=\"width:0%\"></b></i></section>\n    <section class=\"ns-section\"><h4>임무 장비 <small data-live=\"equipment-summary\">—</small></h4>\n      <div class=\"ns-eq-status\" data-live=\"equipment\"></div></section>\n    <section class=\"ns-section\"><h4>OISL 단말 <small data-live=\"terminal-summary\">—</small></h4>\n      <div data-live=\"terminals\"></div></section>\n    <p class=\"ns-note\">위치와 링크 상태는 Kepler+J2 모의 계산과 기하학적 가시선 판정입니다. 실측 텔레메트리나 링크 예산이 아닙니다.</p>",
+      "fleet": "<button class=\"ns-fleet-row\" role=\"option\" aria-selected=\"false\" data-node-id=\"NODE-0\"><span class=\"status-dot neutral\"></span><span class=\"ns-fleet-body\"><b>source 0</b><small>LEO · 550 km · i 53.0°</small></span><span class=\"ns-fleet-mode nominal\">정상 운용</span></button>",
+      "live": {
+        "texts": {
+          "raan": "0.00°",
+          "argp": "0.00°",
+          "anomaly": "0.00°",
+          "latlon": "0.000° / 16.096°",
+          "altitude": "550.0 km",
+          "speed": "7.585 km/s",
+          "sun": "지구 그림자 (식)",
+          "generation": "0 W",
+          "consumption": "503 W",
+          "margin": "-503 W",
+          "equipment-summary": "3 / 7 사용 중 · 총 질량 899 kg",
+          "terminal-summary": "0기 · 짐벌 지향과 포착 순서는 기하 모델"
+        },
+        "equipment": "<span class=\"off\"><b>OISL 광 단말 (표준)</b><small>꺼짐</small></span><span class=\"off\"><b>OISL 광 단말 (표준)</b><small>꺼짐</small></span><span class=\"off\"><b>OISL 광 단말 (표준)</b><small>꺼짐</small></span><span class=\"off\"><b>OISL 광 단말 (표준)</b><small>꺼짐</small></span><span class=\"on\"><b>Ka 대역 사용자 링크</b><small>90 W</small></span><span class=\"on\"><b>S 대역 TT&amp;C</b><small>8 W</small></span><span class=\"on\"><b>GNSS 수신기</b><small>5 W</small></span>",
+        "terminals": "<div class=\"ns-empty\">활성 OISL 단말이 없습니다. 운용 모드와 장비를 확인하세요.</div>",
+        "bar": {
+          "width": "100%"
+        }
+      }
+    },
+    {
+      "node": {
+        "schema": 1,
+        "id": "NODE-1",
+        "catalog_number": 900002,
+        "name": "source 1",
+        "bus": "comms_small",
+        "model_key": "oneweb",
+        "mode": "nominal",
+        "mass_kg": 150,
+        "power": {
+          "generation_w": 1200,
+          "bus_w": 120,
+          "battery_wh": 2000
+        },
+        "orbit": {
+          "altitude_km": 550,
+          "eccentricity": 0,
+          "inclination": 53,
+          "raan": 0,
+          "argp": 0,
+          "mean_anomaly": 0,
+          "epoch": "2026-10-04T22:01:12.000Z"
+        },
+        "equipment": [
+          {
+            "id": "EQ-muud7yo0-8",
+            "catalog": "oisl_standard",
+            "role": "fore",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-9",
+            "catalog": "oisl_standard",
+            "role": "aft",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-10",
+            "catalog": "oisl_standard",
+            "role": "left",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-11",
+            "catalog": "oisl_standard",
+            "role": "right",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-12",
+            "catalog": "ka_user_link",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-13",
+            "catalog": "s_band_ttc",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-14",
+            "catalog": "gnss_receiver",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          }
+        ],
+        "formation": null,
+        "notes": "",
+        "created_at": "2026-10-04T22:01:12.000Z",
+        "updated_at": "2026-10-04T22:01:12.000Z"
+      },
+      "match": null,
+      "state": {
+        "elements": {
+          "a": 6928.137,
+          "e": 0,
+          "i": 0.9250245035569946,
+          "raan0": 0,
+          "argp0": 0,
+          "m0": 0,
+          "epoch": 1791151272000,
+          "n0": 0.001094823692885802,
+          "meanMotion": 0.0010948888971088029,
+          "raanDot": -9.068426757877303e-7,
+          "argpDot": 6.10955768925239e-7,
+          "period": 5738.992815014798,
+          "perigeeAltitude": 550,
+          "apogeeAltitude": 550,
+          "definition": {
+            "altitude_km": 550,
+            "eccentricity": 0,
+            "inclination": 53,
+            "raan": 0,
+            "argp": 0,
+            "mean_anomaly": 0
+          }
+        },
+        "inertial": {
+          "r": [
+            6928.137,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            4.564820232396906,
+            6.057721051030391
+          ]
+        },
+        "fixed": {
+          "r": [
+            6656.539182728086,
+            1920.8249268412483,
+            0
+          ]
+        },
+        "geodetic": {
+          "longitude": 16.096135363976156,
+          "latitude": 0,
+          "altitude": 550,
+          "velocity": 7.5850885351587625
+        },
+        "basis": {
+          "x": [
+            0,
+            0.6018150231520482,
+            0.7986355100472928
+          ],
+          "y": [
+            0,
+            -0.7986355100472929,
+            0.6018150231520483
+          ],
+          "z": [
+            0.9999999999999999,
+            0,
+            0
+          ]
+        },
+        "radius": 6928.137,
+        "meanAnomaly": 0,
+        "trueAnomaly": 0,
+        "raan": 0,
+        "argp": 0,
+        "gmst": 343.90386463602385,
+        "sunDirection": [
+          -0.9792628907265961,
+          -0.18588094245337589,
+          -0.08057584053818692
+        ],
+        "sunlit": false
+      },
+      "allTerminalsPower": {
+        "generation_w": 0,
+        "consumption_w": 703,
+        "margin_w": -703,
+        "sunlit": false,
+        "items": [
+          {
+            "id": "EQ-muud7yo0-8",
+            "label": "OISL 광 단말 (표준)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 120
+          },
+          {
+            "id": "EQ-muud7yo0-9",
+            "label": "OISL 광 단말 (표준)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 120
+          },
+          {
+            "id": "EQ-muud7yo0-10",
+            "label": "OISL 광 단말 (표준)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 120
+          },
+          {
+            "id": "EQ-muud7yo0-11",
+            "label": "OISL 광 단말 (표준)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 120
+          },
+          {
+            "id": "EQ-muud7yo0-12",
+            "label": "Ka 대역 사용자 링크",
+            "kind": "rf",
+            "active": true,
+            "power_w": 90
+          },
+          {
+            "id": "EQ-muud7yo0-13",
+            "label": "S 대역 TT&C",
+            "kind": "rf",
+            "active": true,
+            "power_w": 8
+          },
+          {
+            "id": "EQ-muud7yo0-14",
+            "label": "GNSS 수신기",
+            "kind": "navigation",
+            "active": true,
+            "power_w": 5
+          }
+        ]
+      },
+      "frame": "\n    <header class=\"ns-status-head\">\n      <span class=\"ns-kicker\">소형 통신위성 버스 · NODE-1 · 참조 900002</span>\n      <h3>source 1</h3>\n      <div class=\"ns-status-tags\"><span class=\"ns-tag nominal\">정상 운용</span><span class=\"ns-tag\">LEO</span><span class=\"ns-tag\">개별 배치</span></div>\n      <div class=\"ns-status-actions\"><button id=\"node-edit\">편집</button><button id=\"node-duplicate\">복제</button><button id=\"node-locate\">뷰 정렬</button><button id=\"node-remove\" class=\"danger\">삭제</button></div>\n    </header>\n    <section class=\"ns-section ns-shape\"><figure><figcaption><b>3D 모델 없음</b><small>미배정</small></figcaption></figure></section>\n    <section class=\"ns-section\"><h4>궤도 <small>Kepler + J2 · 정의 2026-10-04 22:01 UTC</small></h4>\n      <dl class=\"ns-values\">\n        <div><dt>평균 고도</dt><dd>550.0 km</dd></div><div><dt>이심률 / 경사각</dt><dd>0.0000 / 53.00°</dd></div>\n        <div><dt>승교점 적경 (현재)</dt><dd data-live=\"raan\">—</dd></div><div><dt>근지점 편각 (현재)</dt><dd data-live=\"argp\">—</dd></div>\n        <div><dt>평균 근점 이각 (현재)</dt><dd data-live=\"anomaly\">—</dd></div><div><dt>주기</dt><dd>95.65 min</dd></div>\n        <div><dt>승교점 이동률</dt><dd>-4.489°/일</dd></div><div><dt>근지점 / 원지점</dt><dd>550 / 550 km</dd></div>\n      </dl>\n      <dl class=\"ns-values ns-live\">\n        <div><dt>위도 / 경도</dt><dd data-live=\"latlon\">—</dd></div><div><dt>타원체 고도</dt><dd data-live=\"altitude\">—</dd></div>\n        <div><dt>속력 (관성계)</dt><dd data-live=\"speed\">—</dd></div><div><dt>태양 조건</dt><dd data-live=\"sun\">—</dd></div>\n      </dl></section>\n    <section class=\"ns-section\"><h4>전력 <small>순간 수지 · 배터리 적분 아님</small></h4>\n      <div class=\"ns-power\"><span>발전 <b data-live=\"generation\">—</b></span><span>소비 <b data-live=\"consumption\">—</b></span><span data-live=\"margin-cell\">여유 <b data-live=\"margin\">—</b></span><span>배터리 <b>2,000 Wh</b></span></div>\n      <i class=\"ns-power-bar\"><b data-live=\"power-bar\" style=\"width:0%\"></b></i></section>\n    <section class=\"ns-section\"><h4>임무 장비 <small data-live=\"equipment-summary\">—</small></h4>\n      <div class=\"ns-eq-status\" data-live=\"equipment\"></div></section>\n    <section class=\"ns-section\"><h4>OISL 단말 <small data-live=\"terminal-summary\">—</small></h4>\n      <div data-live=\"terminals\"></div></section>\n    <p class=\"ns-note\">위치와 링크 상태는 Kepler+J2 모의 계산과 기하학적 가시선 판정입니다. 실측 텔레메트리나 링크 예산이 아닙니다.</p>",
+      "fleet": "<button class=\"ns-fleet-row\" role=\"option\" aria-selected=\"false\" data-node-id=\"NODE-1\"><span class=\"status-dot neutral\"></span><span class=\"ns-fleet-body\"><b>source 1</b><small>LEO · 550 km · i 53.0°</small></span><span class=\"ns-fleet-mode nominal\">정상 운용</span></button>",
+      "live": {
+        "texts": {
+          "raan": "0.00°",
+          "argp": "0.00°",
+          "anomaly": "0.00°",
+          "latlon": "0.000° / 16.096°",
+          "altitude": "550.0 km",
+          "speed": "7.585 km/s",
+          "sun": "지구 그림자 (식)",
+          "generation": "0 W",
+          "consumption": "223 W",
+          "margin": "-223 W",
+          "equipment-summary": "3 / 7 사용 중 · 총 질량 249 kg",
+          "terminal-summary": "0기 · 짐벌 지향과 포착 순서는 기하 모델"
+        },
+        "equipment": "<span class=\"off\"><b>OISL 광 단말 (표준)</b><small>꺼짐</small></span><span class=\"off\"><b>OISL 광 단말 (표준)</b><small>꺼짐</small></span><span class=\"off\"><b>OISL 광 단말 (표준)</b><small>꺼짐</small></span><span class=\"off\"><b>OISL 광 단말 (표준)</b><small>꺼짐</small></span><span class=\"on\"><b>Ka 대역 사용자 링크</b><small>90 W</small></span><span class=\"on\"><b>S 대역 TT&amp;C</b><small>8 W</small></span><span class=\"on\"><b>GNSS 수신기</b><small>5 W</small></span>",
+        "terminals": "<div class=\"ns-empty\">활성 OISL 단말이 없습니다. 운용 모드와 장비를 확인하세요.</div>",
+        "bar": {
+          "width": "100%"
+        }
+      }
+    },
+    {
+      "node": {
+        "schema": 1,
+        "id": "NODE-2",
+        "catalog_number": 900003,
+        "name": "source 2",
+        "bus": "eo_smallsat",
+        "model_key": "eo_1",
+        "mode": "nominal",
+        "mass_kg": 500,
+        "power": {
+          "generation_w": 900,
+          "bus_w": 150,
+          "battery_wh": 3000
+        },
+        "orbit": {
+          "altitude_km": 550,
+          "eccentricity": 0,
+          "inclination": 53,
+          "raan": 0,
+          "argp": 0,
+          "mean_anomaly": 0,
+          "epoch": "2026-10-04T22:01:12.000Z"
+        },
+        "equipment": [
+          {
+            "id": "EQ-muud7yo0-15",
+            "catalog": "eo_camera",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-16",
+            "catalog": "x_band_downlink",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-17",
+            "catalog": "oisl_standard",
+            "role": "auto",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-18",
+            "catalog": "dtn_store",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-19",
+            "catalog": "s_band_ttc",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-20",
+            "catalog": "gnss_receiver",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          }
+        ],
+        "formation": null,
+        "notes": "",
+        "created_at": "2026-10-04T22:01:12.000Z",
+        "updated_at": "2026-10-04T22:01:12.000Z"
+      },
+      "match": {
+        "quality": "assigned",
+        "provider": "nasa",
+        "label": "source model",
+        "title": "representative",
+        "credit": "source credit",
+        "thumbnail": "/static/assets/model.png",
+        "sizeMeters": 12
+      },
+      "state": {
+        "elements": {
+          "a": 6928.137,
+          "e": 0,
+          "i": 0.9250245035569946,
+          "raan0": 0,
+          "argp0": 0,
+          "m0": 0,
+          "epoch": 1791151272000,
+          "n0": 0.001094823692885802,
+          "meanMotion": 0.0010948888971088029,
+          "raanDot": -9.068426757877303e-7,
+          "argpDot": 6.10955768925239e-7,
+          "period": 5738.992815014798,
+          "perigeeAltitude": 550,
+          "apogeeAltitude": 550,
+          "definition": {
+            "altitude_km": 550,
+            "eccentricity": 0,
+            "inclination": 53,
+            "raan": 0,
+            "argp": 0,
+            "mean_anomaly": 0
+          }
+        },
+        "inertial": {
+          "r": [
+            6928.137,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            4.564820232396906,
+            6.057721051030391
+          ]
+        },
+        "fixed": {
+          "r": [
+            6656.539182728086,
+            1920.8249268412483,
+            0
+          ]
+        },
+        "geodetic": {
+          "longitude": 16.096135363976156,
+          "latitude": 0,
+          "altitude": 550,
+          "velocity": 7.5850885351587625
+        },
+        "basis": {
+          "x": [
+            0,
+            0.6018150231520482,
+            0.7986355100472928
+          ],
+          "y": [
+            0,
+            -0.7986355100472929,
+            0.6018150231520483
+          ],
+          "z": [
+            0.9999999999999999,
+            0,
+            0
+          ]
+        },
+        "radius": 6928.137,
+        "meanAnomaly": 0,
+        "trueAnomaly": 0,
+        "raan": 0,
+        "argp": 0,
+        "gmst": 343.90386463602385,
+        "sunDirection": [
+          -0.9792628907265961,
+          -0.18588094245337589,
+          -0.08057584053818692
+        ],
+        "sunlit": false
+      },
+      "allTerminalsPower": {
+        "generation_w": 0,
+        "consumption_w": 523,
+        "margin_w": -523,
+        "sunlit": false,
+        "items": [
+          {
+            "id": "EQ-muud7yo0-15",
+            "label": "광학 관측 카메라",
+            "kind": "payload",
+            "active": true,
+            "power_w": 150
+          },
+          {
+            "id": "EQ-muud7yo0-16",
+            "label": "X 대역 데이터 다운링크",
+            "kind": "rf",
+            "active": true,
+            "power_w": 60
+          },
+          {
+            "id": "EQ-muud7yo0-17",
+            "label": "OISL 광 단말 (표준)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 120
+          },
+          {
+            "id": "EQ-muud7yo0-18",
+            "label": "DTN 저장 전달 장치",
+            "kind": "storage",
+            "active": true,
+            "power_w": 30
+          },
+          {
+            "id": "EQ-muud7yo0-19",
+            "label": "S 대역 TT&C",
+            "kind": "rf",
+            "active": true,
+            "power_w": 8
+          },
+          {
+            "id": "EQ-muud7yo0-20",
+            "label": "GNSS 수신기",
+            "kind": "navigation",
+            "active": true,
+            "power_w": 5
+          }
+        ]
+      },
+      "frame": "\n    <header class=\"ns-status-head\">\n      <span class=\"ns-kicker\">지구관측 소형위성 · NODE-2 · 참조 900003</span>\n      <h3>source 2</h3>\n      <div class=\"ns-status-tags\"><span class=\"ns-tag nominal\">정상 운용</span><span class=\"ns-tag\">LEO</span><span class=\"ns-tag\">개별 배치</span></div>\n      <div class=\"ns-status-actions\"><button id=\"node-edit\">편집</button><button id=\"node-duplicate\">복제</button><button id=\"node-locate\">뷰 정렬</button><button id=\"node-remove\" class=\"danger\">삭제</button></div>\n    </header>\n    <section class=\"ns-section ns-shape\"><figure><img src=\"/static/assets/model.png\" alt=\"source credit 렌더링 · representative\" decoding=\"async\"><figcaption><b>source model</b><small>사용자 지정 모델 · 대표 치수 12.0 m</small></figcaption></figure></section>\n    <section class=\"ns-section\"><h4>궤도 <small>Kepler + J2 · 정의 2026-10-04 22:01 UTC</small></h4>\n      <dl class=\"ns-values\">\n        <div><dt>평균 고도</dt><dd>550.0 km</dd></div><div><dt>이심률 / 경사각</dt><dd>0.0000 / 53.00°</dd></div>\n        <div><dt>승교점 적경 (현재)</dt><dd data-live=\"raan\">—</dd></div><div><dt>근지점 편각 (현재)</dt><dd data-live=\"argp\">—</dd></div>\n        <div><dt>평균 근점 이각 (현재)</dt><dd data-live=\"anomaly\">—</dd></div><div><dt>주기</dt><dd>95.65 min</dd></div>\n        <div><dt>승교점 이동률</dt><dd>-4.489°/일</dd></div><div><dt>근지점 / 원지점</dt><dd>550 / 550 km</dd></div>\n      </dl>\n      <dl class=\"ns-values ns-live\">\n        <div><dt>위도 / 경도</dt><dd data-live=\"latlon\">—</dd></div><div><dt>타원체 고도</dt><dd data-live=\"altitude\">—</dd></div>\n        <div><dt>속력 (관성계)</dt><dd data-live=\"speed\">—</dd></div><div><dt>태양 조건</dt><dd data-live=\"sun\">—</dd></div>\n      </dl></section>\n    <section class=\"ns-section\"><h4>전력 <small>순간 수지 · 배터리 적분 아님</small></h4>\n      <div class=\"ns-power\"><span>발전 <b data-live=\"generation\">—</b></span><span>소비 <b data-live=\"consumption\">—</b></span><span data-live=\"margin-cell\">여유 <b data-live=\"margin\">—</b></span><span>배터리 <b>3,000 Wh</b></span></div>\n      <i class=\"ns-power-bar\"><b data-live=\"power-bar\" style=\"width:0%\"></b></i></section>\n    <section class=\"ns-section\"><h4>임무 장비 <small data-live=\"equipment-summary\">—</small></h4>\n      <div class=\"ns-eq-status\" data-live=\"equipment\"></div></section>\n    <section class=\"ns-section\"><h4>OISL 단말 <small data-live=\"terminal-summary\">—</small></h4>\n      <div data-live=\"terminals\"></div></section>\n    <p class=\"ns-note\">위치와 링크 상태는 Kepler+J2 모의 계산과 기하학적 가시선 판정입니다. 실측 텔레메트리나 링크 예산이 아닙니다.</p>",
+      "fleet": "<button class=\"ns-fleet-row\" role=\"option\" aria-selected=\"false\" data-node-id=\"NODE-2\"><span class=\"status-dot neutral\"></span><span class=\"ns-fleet-body\"><b>source 2</b><small>LEO · 550 km · i 53.0°</small></span><span class=\"ns-fleet-mode nominal\">정상 운용</span></button>",
+      "live": {
+        "texts": {
+          "raan": "0.00°",
+          "argp": "0.00°",
+          "anomaly": "0.00°",
+          "latlon": "0.000° / 16.096°",
+          "altitude": "550.0 km",
+          "speed": "7.585 km/s",
+          "sun": "지구 그림자 (식)",
+          "generation": "0 W",
+          "consumption": "403 W",
+          "margin": "-403 W",
+          "equipment-summary": "5 / 6 사용 중 · 총 질량 579 kg",
+          "terminal-summary": "0기 · 짐벌 지향과 포착 순서는 기하 모델"
+        },
+        "equipment": "<span class=\"on\"><b>광학 관측 카메라</b><small>150 W</small></span><span class=\"on\"><b>X 대역 데이터 다운링크</b><small>60 W</small></span><span class=\"off\"><b>OISL 광 단말 (표준)</b><small>꺼짐</small></span><span class=\"on\"><b>DTN 저장 전달 장치</b><small>30 W</small></span><span class=\"on\"><b>S 대역 TT&amp;C</b><small>8 W</small></span><span class=\"on\"><b>GNSS 수신기</b><small>5 W</small></span>",
+        "terminals": "<div class=\"ns-empty\">활성 OISL 단말이 없습니다. 운용 모드와 장비를 확인하세요.</div>",
+        "bar": {
+          "width": "100%"
+        }
+      }
+    },
+    {
+      "node": {
+        "schema": 1,
+        "id": "NODE-3",
+        "catalog_number": 900004,
+        "name": "source 3",
+        "bus": "cubesat_3u",
+        "model_key": "cubesat_3u",
+        "mode": "nominal",
+        "mass_kg": 4,
+        "power": {
+          "generation_w": 30,
+          "bus_w": 8,
+          "battery_wh": 60
+        },
+        "orbit": {
+          "altitude_km": 550,
+          "eccentricity": 0,
+          "inclination": 53,
+          "raan": 0,
+          "argp": 0,
+          "mean_anomaly": 0,
+          "epoch": "2026-10-04T22:01:12.000Z"
+        },
+        "equipment": [
+          {
+            "id": "EQ-muud7yo0-21",
+            "catalog": "oisl_mini",
+            "role": "auto",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-22",
+            "catalog": "s_band_ttc",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-23",
+            "catalog": "gnss_receiver",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          }
+        ],
+        "formation": null,
+        "notes": "",
+        "created_at": "2026-10-04T22:01:12.000Z",
+        "updated_at": "2026-10-04T22:01:12.000Z"
+      },
+      "match": {
+        "quality": "assigned",
+        "provider": "nasa",
+        "label": "source model",
+        "title": "representative",
+        "credit": "source credit",
+        "thumbnail": "/static/assets/model.png",
+        "sizeMeters": 12
+      },
+      "state": {
+        "elements": {
+          "a": 6928.137,
+          "e": 0,
+          "i": 0.9250245035569946,
+          "raan0": 0,
+          "argp0": 0,
+          "m0": 0,
+          "epoch": 1791151272000,
+          "n0": 0.001094823692885802,
+          "meanMotion": 0.0010948888971088029,
+          "raanDot": -9.068426757877303e-7,
+          "argpDot": 6.10955768925239e-7,
+          "period": 5738.992815014798,
+          "perigeeAltitude": 550,
+          "apogeeAltitude": 550,
+          "definition": {
+            "altitude_km": 550,
+            "eccentricity": 0,
+            "inclination": 53,
+            "raan": 0,
+            "argp": 0,
+            "mean_anomaly": 0
+          }
+        },
+        "inertial": {
+          "r": [
+            6928.137,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            4.564820232396906,
+            6.057721051030391
+          ]
+        },
+        "fixed": {
+          "r": [
+            6656.539182728086,
+            1920.8249268412483,
+            0
+          ]
+        },
+        "geodetic": {
+          "longitude": 16.096135363976156,
+          "latitude": 0,
+          "altitude": 550,
+          "velocity": 7.5850885351587625
+        },
+        "basis": {
+          "x": [
+            0,
+            0.6018150231520482,
+            0.7986355100472928
+          ],
+          "y": [
+            0,
+            -0.7986355100472929,
+            0.6018150231520483
+          ],
+          "z": [
+            0.9999999999999999,
+            0,
+            0
+          ]
+        },
+        "radius": 6928.137,
+        "meanAnomaly": 0,
+        "trueAnomaly": 0,
+        "raan": 0,
+        "argp": 0,
+        "gmst": 343.90386463602385,
+        "sunDirection": [
+          -0.9792628907265961,
+          -0.18588094245337589,
+          -0.08057584053818692
+        ],
+        "sunlit": false
+      },
+      "allTerminalsPower": {
+        "generation_w": 0,
+        "consumption_w": 46,
+        "margin_w": -46,
+        "sunlit": false,
+        "items": [
+          {
+            "id": "EQ-muud7yo0-21",
+            "label": "OISL 소형 단말 (큐브샛)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 25
+          },
+          {
+            "id": "EQ-muud7yo0-22",
+            "label": "S 대역 TT&C",
+            "kind": "rf",
+            "active": true,
+            "power_w": 8
+          },
+          {
+            "id": "EQ-muud7yo0-23",
+            "label": "GNSS 수신기",
+            "kind": "navigation",
+            "active": true,
+            "power_w": 5
+          }
+        ]
+      },
+      "frame": "\n    <header class=\"ns-status-head\">\n      <span class=\"ns-kicker\">3U 큐브샛 · NODE-3 · 참조 900004</span>\n      <h3>source 3</h3>\n      <div class=\"ns-status-tags\"><span class=\"ns-tag nominal\">정상 운용</span><span class=\"ns-tag\">LEO</span><span class=\"ns-tag\">개별 배치</span></div>\n      <div class=\"ns-status-actions\"><button id=\"node-edit\">편집</button><button id=\"node-duplicate\">복제</button><button id=\"node-locate\">뷰 정렬</button><button id=\"node-remove\" class=\"danger\">삭제</button></div>\n    </header>\n    <section class=\"ns-section ns-shape\"><figure><img src=\"/static/assets/model.png\" alt=\"source credit 렌더링 · representative\" decoding=\"async\"><figcaption><b>source model</b><small>사용자 지정 모델 · 대표 치수 12.0 m</small></figcaption></figure></section>\n    <section class=\"ns-section\"><h4>궤도 <small>Kepler + J2 · 정의 2026-10-04 22:01 UTC</small></h4>\n      <dl class=\"ns-values\">\n        <div><dt>평균 고도</dt><dd>550.0 km</dd></div><div><dt>이심률 / 경사각</dt><dd>0.0000 / 53.00°</dd></div>\n        <div><dt>승교점 적경 (현재)</dt><dd data-live=\"raan\">—</dd></div><div><dt>근지점 편각 (현재)</dt><dd data-live=\"argp\">—</dd></div>\n        <div><dt>평균 근점 이각 (현재)</dt><dd data-live=\"anomaly\">—</dd></div><div><dt>주기</dt><dd>95.65 min</dd></div>\n        <div><dt>승교점 이동률</dt><dd>-4.489°/일</dd></div><div><dt>근지점 / 원지점</dt><dd>550 / 550 km</dd></div>\n      </dl>\n      <dl class=\"ns-values ns-live\">\n        <div><dt>위도 / 경도</dt><dd data-live=\"latlon\">—</dd></div><div><dt>타원체 고도</dt><dd data-live=\"altitude\">—</dd></div>\n        <div><dt>속력 (관성계)</dt><dd data-live=\"speed\">—</dd></div><div><dt>태양 조건</dt><dd data-live=\"sun\">—</dd></div>\n      </dl></section>\n    <section class=\"ns-section\"><h4>전력 <small>순간 수지 · 배터리 적분 아님</small></h4>\n      <div class=\"ns-power\"><span>발전 <b data-live=\"generation\">—</b></span><span>소비 <b data-live=\"consumption\">—</b></span><span data-live=\"margin-cell\">여유 <b data-live=\"margin\">—</b></span><span>배터리 <b>60 Wh</b></span></div>\n      <i class=\"ns-power-bar\"><b data-live=\"power-bar\" style=\"width:0%\"></b></i></section>\n    <section class=\"ns-section\"><h4>임무 장비 <small data-live=\"equipment-summary\">—</small></h4>\n      <div class=\"ns-eq-status\" data-live=\"equipment\"></div></section>\n    <section class=\"ns-section\"><h4>OISL 단말 <small data-live=\"terminal-summary\">—</small></h4>\n      <div data-live=\"terminals\"></div></section>\n    <p class=\"ns-note\">위치와 링크 상태는 Kepler+J2 모의 계산과 기하학적 가시선 판정입니다. 실측 텔레메트리나 링크 예산이 아닙니다.</p>",
+      "fleet": "<button class=\"ns-fleet-row\" role=\"option\" aria-selected=\"false\" data-node-id=\"NODE-3\"><span class=\"status-dot neutral\"></span><span class=\"ns-fleet-body\"><b>source 3</b><small>LEO · 550 km · i 53.0°</small></span><span class=\"ns-fleet-mode nominal\">정상 운용</span></button>",
+      "live": {
+        "texts": {
+          "raan": "0.00°",
+          "argp": "0.00°",
+          "anomaly": "0.00°",
+          "latlon": "0.000° / 16.096°",
+          "altitude": "550.0 km",
+          "speed": "7.585 km/s",
+          "sun": "지구 그림자 (식)",
+          "generation": "0 W",
+          "consumption": "21 W",
+          "margin": "-21 W",
+          "equipment-summary": "2 / 3 사용 중 · 총 질량 11 kg",
+          "terminal-summary": "0기 · 짐벌 지향과 포착 순서는 기하 모델"
+        },
+        "equipment": "<span class=\"off\"><b>OISL 소형 단말 (큐브샛)</b><small>꺼짐</small></span><span class=\"on\"><b>S 대역 TT&amp;C</b><small>8 W</small></span><span class=\"on\"><b>GNSS 수신기</b><small>5 W</small></span>",
+        "terminals": "<div class=\"ns-empty\">활성 OISL 단말이 없습니다. 운용 모드와 장비를 확인하세요.</div>",
+        "bar": {
+          "width": "100%"
+        }
+      }
+    },
+    {
+      "node": {
+        "schema": 1,
+        "id": "NODE-4",
+        "catalog_number": 900005,
+        "name": "<name>",
+        "bus": "geo_relay",
+        "model_key": "ssl_1300",
+        "mode": "nominal",
+        "mass_kg": 3500,
+        "power": {
+          "generation_w": 12000,
+          "bus_w": 900,
+          "battery_wh": 20000
+        },
+        "orbit": {
+          "altitude_km": 550,
+          "eccentricity": 0,
+          "inclination": 53,
+          "raan": 0,
+          "argp": 0,
+          "mean_anomaly": 0,
+          "epoch": "2026-10-04T22:01:12.000Z"
+        },
+        "equipment": [
+          {
+            "id": "EQ-muud7yo0-24",
+            "catalog": "oisl_long_range",
+            "role": "auto",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-25",
+            "catalog": "oisl_long_range",
+            "role": "auto",
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-26",
+            "catalog": "ka_user_link",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          },
+          {
+            "id": "EQ-muud7yo0-27",
+            "catalog": "s_band_ttc",
+            "role": null,
+            "target": "auto",
+            "enabled": true
+          }
+        ],
+        "formation": null,
+        "notes": "",
+        "created_at": "2026-10-04T22:01:12.000Z",
+        "updated_at": "2026-10-04T22:01:12.000Z"
+      },
+      "match": {
+        "quality": "assigned",
+        "provider": "nasa",
+        "label": "source model",
+        "title": "representative",
+        "credit": "source credit",
+        "thumbnail": "/static/assets/model.png",
+        "sizeMeters": 12
+      },
+      "state": {
+        "elements": {
+          "a": 6928.137,
+          "e": 0,
+          "i": 0.9250245035569946,
+          "raan0": 0,
+          "argp0": 0,
+          "m0": 0,
+          "epoch": 1791151272000,
+          "n0": 0.001094823692885802,
+          "meanMotion": 0.0010948888971088029,
+          "raanDot": -9.068426757877303e-7,
+          "argpDot": 6.10955768925239e-7,
+          "period": 5738.992815014798,
+          "perigeeAltitude": 550,
+          "apogeeAltitude": 550,
+          "definition": {
+            "altitude_km": 550,
+            "eccentricity": 0,
+            "inclination": 53,
+            "raan": 0,
+            "argp": 0,
+            "mean_anomaly": 0
+          }
+        },
+        "inertial": {
+          "r": [
+            6928.137,
+            0,
+            0
+          ],
+          "v": [
+            0,
+            4.564820232396906,
+            6.057721051030391
+          ]
+        },
+        "fixed": {
+          "r": [
+            6656.539182728086,
+            1920.8249268412483,
+            0
+          ]
+        },
+        "geodetic": {
+          "longitude": 16.096135363976156,
+          "latitude": 0,
+          "altitude": 550,
+          "velocity": 7.5850885351587625
+        },
+        "basis": {
+          "x": [
+            0,
+            0.6018150231520482,
+            0.7986355100472928
+          ],
+          "y": [
+            0,
+            -0.7986355100472929,
+            0.6018150231520483
+          ],
+          "z": [
+            0.9999999999999999,
+            0,
+            0
+          ]
+        },
+        "radius": 6928.137,
+        "meanAnomaly": 0,
+        "trueAnomaly": 0,
+        "raan": 0,
+        "argp": 0,
+        "gmst": 343.90386463602385,
+        "sunDirection": [
+          -0.9792628907265961,
+          -0.18588094245337589,
+          -0.08057584053818692
+        ],
+        "sunlit": false
+      },
+      "allTerminalsPower": {
+        "generation_w": 0,
+        "consumption_w": 1358,
+        "margin_w": -1358,
+        "sunlit": false,
+        "items": [
+          {
+            "id": "EQ-muud7yo0-24",
+            "label": "OISL 광 단말 (장거리, GEO 중계)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 180
+          },
+          {
+            "id": "EQ-muud7yo0-25",
+            "label": "OISL 광 단말 (장거리, GEO 중계)",
+            "kind": "oisl",
+            "active": true,
+            "power_w": 180
+          },
+          {
+            "id": "EQ-muud7yo0-26",
+            "label": "Ka 대역 사용자 링크",
+            "kind": "rf",
+            "active": true,
+            "power_w": 90
+          },
+          {
+            "id": "EQ-muud7yo0-27",
+            "label": "S 대역 TT&C",
+            "kind": "rf",
+            "active": true,
+            "power_w": 8
+          }
+        ]
+      },
+      "frame": "\n    <header class=\"ns-status-head\">\n      <span class=\"ns-kicker\">정지궤도 중계위성 · NODE-4 · 참조 900005</span>\n      <h3>&lt;name&gt;</h3>\n      <div class=\"ns-status-tags\"><span class=\"ns-tag nominal\">정상 운용</span><span class=\"ns-tag\">LEO</span><span class=\"ns-tag\">개별 배치</span></div>\n      <div class=\"ns-status-actions\"><button id=\"node-edit\">편집</button><button id=\"node-duplicate\">복제</button><button id=\"node-locate\">뷰 정렬</button><button id=\"node-remove\" class=\"danger\">삭제</button></div>\n    </header>\n    <section class=\"ns-section ns-shape\"><figure><img src=\"/static/assets/model.png\" alt=\"source credit 렌더링 · representative\" decoding=\"async\"><figcaption><b>source model</b><small>사용자 지정 모델 · 대표 치수 12.0 m</small></figcaption></figure></section>\n    <section class=\"ns-section\"><h4>궤도 <small>Kepler + J2 · 정의 2026-10-04 22:01 UTC</small></h4>\n      <dl class=\"ns-values\">\n        <div><dt>평균 고도</dt><dd>550.0 km</dd></div><div><dt>이심률 / 경사각</dt><dd>0.0000 / 53.00°</dd></div>\n        <div><dt>승교점 적경 (현재)</dt><dd data-live=\"raan\">—</dd></div><div><dt>근지점 편각 (현재)</dt><dd data-live=\"argp\">—</dd></div>\n        <div><dt>평균 근점 이각 (현재)</dt><dd data-live=\"anomaly\">—</dd></div><div><dt>주기</dt><dd>95.65 min</dd></div>\n        <div><dt>승교점 이동률</dt><dd>-4.489°/일</dd></div><div><dt>근지점 / 원지점</dt><dd>550 / 550 km</dd></div>\n      </dl>\n      <dl class=\"ns-values ns-live\">\n        <div><dt>위도 / 경도</dt><dd data-live=\"latlon\">—</dd></div><div><dt>타원체 고도</dt><dd data-live=\"altitude\">—</dd></div>\n        <div><dt>속력 (관성계)</dt><dd data-live=\"speed\">—</dd></div><div><dt>태양 조건</dt><dd data-live=\"sun\">—</dd></div>\n      </dl></section>\n    <section class=\"ns-section\"><h4>전력 <small>순간 수지 · 배터리 적분 아님</small></h4>\n      <div class=\"ns-power\"><span>발전 <b data-live=\"generation\">—</b></span><span>소비 <b data-live=\"consumption\">—</b></span><span data-live=\"margin-cell\">여유 <b data-live=\"margin\">—</b></span><span>배터리 <b>20,000 Wh</b></span></div>\n      <i class=\"ns-power-bar\"><b data-live=\"power-bar\" style=\"width:0%\"></b></i></section>\n    <section class=\"ns-section\"><h4>임무 장비 <small data-live=\"equipment-summary\">—</small></h4>\n      <div class=\"ns-eq-status\" data-live=\"equipment\"></div></section>\n    <section class=\"ns-section\"><h4>OISL 단말 <small data-live=\"terminal-summary\">—</small></h4>\n      <div data-live=\"terminals\"></div></section>\n    <p class=\"ns-note\">위치와 링크 상태는 Kepler+J2 모의 계산과 기하학적 가시선 판정입니다. 실측 텔레메트리나 링크 예산이 아닙니다.</p>",
+      "fleet": "<button class=\"ns-fleet-row\" role=\"option\" aria-selected=\"false\" data-node-id=\"NODE-4\"><span class=\"status-dot neutral\"></span><span class=\"ns-fleet-body\"><b>&lt;name&gt;</b><small>LEO · 550 km · i 53.0°</small></span><span class=\"ns-fleet-mode nominal\">정상 운용</span></button>",
+      "live": {
+        "texts": {
+          "raan": "0.00°",
+          "argp": "0.00°",
+          "anomaly": "0.00°",
+          "latlon": "0.000° / 16.096°",
+          "altitude": "550.0 km",
+          "speed": "7.585 km/s",
+          "sun": "지구 그림자 (식)",
+          "generation": "0 W",
+          "consumption": "998 W",
+          "margin": "-998 W",
+          "equipment-summary": "2 / 4 사용 중 · 총 질량 3,588 kg",
+          "terminal-summary": "0기 · 짐벌 지향과 포착 순서는 기하 모델"
+        },
+        "equipment": "<span class=\"off\"><b>OISL 광 단말 (장거리, GEO 중계)</b><small>꺼짐</small></span><span class=\"off\"><b>OISL 광 단말 (장거리, GEO 중계)</b><small>꺼짐</small></span><span class=\"on\"><b>Ka 대역 사용자 링크</b><small>90 W</small></span><span class=\"on\"><b>S 대역 TT&amp;C</b><small>8 W</small></span>",
+        "terminals": "<div class=\"ns-empty\">활성 OISL 단말이 없습니다. 운용 모드와 장비를 확인하세요.</div>",
+        "bar": {
+          "width": "100%"
+        }
+      }
+    }
+  ]
+}

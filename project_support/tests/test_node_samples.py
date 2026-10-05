@@ -124,3 +124,28 @@ def test_query_track_leap_center_fails_before_native():
  def forbidden(*args):raise AssertionError('native should not run')
  with pytest.raises(ValueError,match='unsupported_node_time'):asyncio.run(NodeGeometryQuery(calculate=forbidden).track([definition()],'2016-12-31T23:59:60Z','leap'))
 
+
+
+def test_original_live_angles_are_named_native_degrees_and_null_on_error():
+ import struct
+ cases=[case for case in FIXTURE['cases'] if case['id'].startswith('state:')]
+ assert len(cases)==20
+ for case in cases:
+  original=case['expected']
+  def calculate(prepared,grids):
+   value=batch(prepared,grids);row=[0.0]*NODE_ROW_WIDTH
+   row[22]=original['meanAnomaly'];row[24]=original['raan'];row[25]=original['argp'];row[27]=1
+   return replace(value,_buffer=struct.pack('<'+'d'*NODE_ROW_WIDTH*len(value.utc),*(row*len(value.utc))))
+  nodes=[definition()];before=json.dumps(nodes)
+  query=NodeGeometryQuery(calculate=calculate)
+  result=asyncio.run(query.samples(nodes,'2016-12-31T23:59:59Z',3,1,'angles'))
+  rows=result['nodes'][0]['rows']
+  assert rows[0].get('mean_anomaly_deg')==original['meanAnomaly']
+  assert rows[0].get('raan_deg')==original['raan']
+  assert rows[0].get('argp_deg')==original['argp']
+  for key in ['mean_anomaly_deg','raan_deg','argp_deg']:
+   assert key in rows[1] and rows[1][key] is None
+  rows[0]['raan_deg']=-1
+  fresh=asyncio.run(query.track(nodes,'2026-10-04T22:01:12Z','angles-track'))
+  assert fresh['nodes'][0]['rows'][0]['raan_deg']==original['raan']
+  assert json.dumps(nodes)==before

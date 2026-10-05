@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-06 T146 상태·선택·툴팁 부분 이식 / N002 조회각도 해결
+- 변경: 원본상태/목록/terminalRow/phase색상·220ms툴팁 재사용, scopedDOM/store/display/native/model/action 주입. 원본5bus 정상출력일치; 현재각도 native22/24/25 DTO 추가(실패null/새계산없음). stale/error/누락결과수치리셋·focus차단, 클릭때재검사, 사본/cleanup/저장실패보존. 미확인통신은주값unknown+원본전체활성단말전력가정별도표시; 모델출처/렌더상태/가상번호구분.
+- 검증: source5hash+정확한원본3function VM; 두48217bytecapture SHAfd27d1df… 동일/5frame·fleet·live·가정값동일. angles2FAIL→52PASS1warning1.69s, UI RED/수정후최종전체Node430PASS1583.2346ms, 전체Python545PASS9warnings141.27s(session48056exit0)/syntax/stageddiffcheck. 8기존경고+oldcache접근불가경고1; 기존cache보존/새cache target2PASS1기존warning2.24s와실제nodeids2개쓰기확인. validation/t146_node_status.md.
+- 남음: T146unchecked 전체panel shell/추가·비우기/editor·store·formation연동/source scene callback controls. N002조회누락만closed/live8891증거아님; N003(T077) actualinertial r/basis 공급계약필요. N001동시창쓰기/T147–153/T079실제수락/전체T076/T075–84/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. fakeDOM/verifier true시험은실제통신·GPU·브라우저증거아님; 서버/native설치/사용자화면/원격PR·병합변경없음.
+
+
 ## 2026-10-06 T146 원본 편대 조절 부분 이식
 - 변경: 원본4preset/전체슬라이더/단위·힌트·비활성입력·pairedfield/phasingbound, scopedroot와store/time/ID/timer주입. 120ms마지막값반영, 기존편대ID재사용/prospectiveID, 개별분리위성보존, 선택·종료시예약작업차단. 빈/비유한입력은보존하고예약취소·명시생성차단.
 - 검증: 원본4hash+정확한3함수body capture, 4preset markup/summary동일; 두21925bytecapture SHA364fc05b… 동일. missingmodule RED/safety10PASS1FAIL후target11PASS175.9561ms/전체Node411PASS1616.6545ms/전체Python543PASS8기존warnings225.10s(session69780exit0)/syntax/stageddiffcheck. validation/t146_node_formation.md.
