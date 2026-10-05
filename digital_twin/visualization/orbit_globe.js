@@ -29,8 +29,8 @@ export class OrbitGlobe {
       point:{pixelSize:11,color:C.Color.CYAN,outlineColor:C.Color.WHITE,outlineWidth:2},
       label:{text:'ISS · GP 예측',font:'13px sans-serif',fillColor:C.Color.WHITE},
     });
-    this.entity.name=sample.name?`${sample.name} · GP epoch 모델`:'ISS · SGP4 모델';
-    this.entity.label.text=sample.name?`${sample.name} · epoch 모델`:'ISS · GP 예측';
+    this.entity.name=sample.name?`${sample.name} · SGP4 모델`:'ISS · SGP4 모델';
+    this.entity.label.text=sample.name?`${sample.name} · GP 모델`:'ISS · GP 예측';
     viewer.scene.requestRender();return true;
   }
   clearSatellite(){

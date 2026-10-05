@@ -367,3 +367,11 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 
 ## 2026-10-05 US13 지상국→기존 계산 연결
 원본좌표/최소각을명시초안으로전달하고기존적용·가시구간·거리/도플러를재사용. 높이datum미확인으로사용자타원체높이유지; 저장GP/UTC/주파수보존. 최종Node181PASS713.1441ms/Python385PASS140.61s(기존경고1),actual8891두해상도/대전8구간·스발바르없음/거리계산/단일canvas/error0. RED누락버튼및harness오류구분, no-input초안소실을선택first안내로보완. 서버재시작없음/8891유지. validation/t098_station_observer.md. T075partial/다른gap/F001/F002/F004–6/T032/W06diskunknown보존,stackedDraft리뷰/자동병합없음.
+
+
+## 2026-10-05 US14 카탈로그 시간·관측
+- 변경: 기존카탈로그/RustSGP4/EOP/UTCcodec/1초buffer로readonly samples601/localUTC·재생·배속·지상국초안·range/azimuth 및단일Viewer 연결. ADR0013/T099–103. 기준epoch와현재표시UTC/가정높이 설명보완.
+- 검증: Python399PASS145.73s/경고5,최종Node190PASS751.8215ms,실제8891두해상도/60x갱신·정지/지정UTC·범위/최소각오류·복구/창복원/canvas1/console0; live601/epochexact0m/저장GP상태불변. validation/t103_catalog_time.md.
+- 남음: T075multiple/3Dsun/T076–84/F001/F004–6/T032/W06diskunknown. 목표active/Draftreview/병합없음. 소유8891serverrestart SIM메모리초기화/이전snapshot보존/저장선택PUT복구; 초기helperPOST405/wrongGET정정. 시설·장비·실수신미확인.
+
+US14 최종renderer문구검토: epoch고정label을 GP/SGP4모델로정정,RED1FAIL→Node191PASS737.0542ms. fixtureexactquery치환실패는경로매핑으로수정. Python코드변경없음/399결과유지. DraftPR28후속commit/no merge.

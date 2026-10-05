@@ -20,6 +20,10 @@ test('ITRF metres are fixed-frame coordinates and clock uses the exact injected 
   assert.equal(viewer.items[0].position.frame,'fixed');assert.equal(viewer.clock.currentTime,sample.utc);assert.equal(viewer.clock.shouldAnimate,false);
   sample.position_m[0]=0;assert.equal(viewer.items[0].position.value.x,6202527.7);
 });
+test('catalog marker labels describe the current model rather than implying epoch time during playback',()=>{
+ const {globe,sample}=fixture();globe.update({...sample,name:'ISS (ZARYA)',epoch_utc:sample.utc,utc:'2020-07-12T21:17:01.000416000Z'});
+ assert.equal(globe.entity.label.text,'ISS (ZARYA) · GP 모델');assert.equal(globe.entity.name,'ISS (ZARYA) · SGP4 모델');
+});
 test('updates reuse one Viewer and unavailable or malformed data clears the previous marker',()=>{
   const {globe,viewers,sample}=fixture();globe.update(sample);globe.update({...sample,revision:4});assert.equal(viewers.length,1);assert.equal(viewers[0].items.length,1);
   for(const bad of [null,{...sample,frame:'TEME'},{...sample,position_m:[NaN,2,3]},{...sample,utc:'invalid'}]){globe.update(bad);assert.equal(viewers[0].items.length,0);assert.equal(globe.focus(),false);}
