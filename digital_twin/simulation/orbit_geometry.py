@@ -82,6 +82,18 @@ def elevation_deg(positions_m,site:GroundPoint):
     return _readonly(result)
 
 
+def observation_geometry(positions_m,site:GroundPoint):
+    """Range and clockwise-from-north ENU azimuth; zenith has no azimuth."""
+    delta=_vectors(positions_m)-station_itrf(site)
+    distance=np.linalg.norm(delta,axis=1)
+    if np.any(distance==0) or not np.isfinite(distance).all():raise ValueError('finite nonzero observer range required')
+    lat,lon=np.deg2rad([site.latitude_deg,site.longitude_deg])
+    east=-np.sin(lon)*delta[:,0]+np.cos(lon)*delta[:,1]
+    north=-np.sin(lat)*np.cos(lon)*delta[:,0]-np.sin(lat)*np.sin(lon)*delta[:,1]+np.cos(lat)*delta[:,2]
+    angles=np.degrees(np.arctan2(east,north))%360
+    return tuple((float(r),None if np.hypot(e,n)<1e-9 else float(a)) for r,e,n,a in zip(distance,east,north,angles))
+
+
 def teme_positions_to_itrf(positions_km,times:Time,eop:EarthOrientationVector):
     """Position-only form of the same GMST82/polar-motion kernel on vectors."""
     r=_vectors(positions_km);n=len(r)

@@ -80,3 +80,6 @@ US11 증거 갱신: validation/t089_catalog_position.md. C001은 일부 위치 �
 US12 증거: validation/t094_ground_stations.md. C00129지상국 목록/시각선택 연결추가; partial유지(다중/재생/동적기하/모델). 원본 프리셋 높이/장비의 실제값검증은 F001에남는다.
 
 US13: validation/t098_station_observer.md connects explicit station preset lat/lon/mask to existing saved-GP observer apply/elevation/range/visibility. Original browser observer h0 assumption is not imported as verified altitude. C001 partial remains for catalog dynamic observer geometry/playback/multiple/3D. Real conditionsF001 and othergap bundles unchanged.
+
+
+US14: validation/t103_catalog_time.md connects selected catalog UTC observation/local playback, native range/azimuth/elevation and station draft. C001 remains partial for original multiple-satellite/3D/sun functions. T075–T084 full goal unchanged. HTTP counts above are historical audit values; ADR0013 adds samples independently.

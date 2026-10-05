@@ -187,3 +187,11 @@ Dependency T090→91→92→93→94; T075 remains partial for catalogue playback
 - [x] T097 [US13] Add explicit use button in tabs/station_workspace.js and workspace_orbit.js role handoff; explain saved GP/catalog distinction, no auto apply.
 - [x] T098 [US13] Run full Python/Node, real8891 two-resolution apply/visibility/radio/restore checks; validation/t098_station_observer.md, audit/ledger/log and stacked Draft PR.
 Dependency T095→96→97→98. T075 remains partial for catalog live geometry/playback/multiple/3D. Other F001/F002/F004–6/T032/W06disk gaps unchanged.
+
+## US14 catalog time observation
+- [x] T099 [US14] Add RED native/readonly/hashpin/leap/partial/error/schema tests in project_support/tests/test_catalog_samples.py and geometry boundaries in test_catalog_observation.py.
+- [x] T100 [US14] Implement additive CatalogGeometryQuery.samples, strict HTTP request, ENU observation helper and communication/browser/api.js adapter; ADR0013, retain position API semantics.
+- [x] T101 [US14] Add tested catalog-time local UTC/playback/observer draft controller in user_application/web/scripts/catalog_timeline.js and catalog time controls using existing codec/samplebuffer; late/hash/height/clock errors.
+- [x] T102 [US14] Connect selected catalog observer/display time to shared globe and existing station selection in workspace_orbit/workspace_globe; preserve stored/SIM/Viewer and render errors.
+- [x] T103 [US14] Full Python/Node and actual8891twores/epoch equality/replay/observer/errors/restore/readonly; validation/t103_catalog_time.md, audit/ledger/log and Draft PR27base.
+Dependency T099→100→101→102→103. T075 remains open until remaining original multi/3D/sun also connected. Goal T075–T084 unchanged.

@@ -51,6 +51,7 @@ export const api = {
   bootstrap: ({ signal } = {}) => request("/api/bootstrap", { signal }),
   health: () => request("/api/health"),
   catalogPosition: (payload,{signal}={}) => request("/api/catalog/position",{method:"POST",headers:jsonHeaders,body:JSON.stringify(payload),signal}),
+  catalogSamples: (payload,{signal}={}) => request("/api/catalog/samples",{method:"POST",headers:jsonHeaders,body:JSON.stringify(payload),signal}),
   satelliteGroups: ({signal} = {}) => request("/api/satellite-groups", {signal}),
   satellites: ({ group = "active", limit = 0, offset = 0, query = "", orbit = "all" } = {}, {signal} = {}) => request(`/api/satellites?group=${encodeURIComponent(group)}&limit=${limit}&offset=${offset}&q=${encodeURIComponent(query)}&orbit=${encodeURIComponent(orbit)}`, {signal}),
   satelliteProfile: (catalogNumber, {signal} = {}) => request(`/api/satellites/${encodeURIComponent(catalogNumber)}`, {signal}),

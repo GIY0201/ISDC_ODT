@@ -15,7 +15,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       if(shown){
         if(!focused){globe.focus();focused=true;}
         focusButton.disabled=false;
-        if(catalog){describe(`카탈로그 ${catalog.name} (${catalog.catalog_number}) · epoch 정지 모델/실측 아님 | UTC ${catalog.utc} | ITRF m ${catalog.position_m.map(x=>x.toFixed(2)).join(', ')} | IERS-A UT1 ${catalog.eop_quality.ut1} / 극운동 ${catalog.eop_quality.polar_motion} | 실제 통신 미확인`);return;}
+        if(catalog){describe(`카탈로그 ${catalog.name} (${catalog.catalog_number}) · 시간 탐색 모델/실측 아님 | UTC ${catalog.utc} | ITRF m ${catalog.position_m.map(x=>x.toFixed(2)).join(', ')} | IERS-A UT1 ${catalog.eop_quality.ut1} / 극운동 ${catalog.eop_quality.polar_motion} | 실제 통신 미확인`);return;}
         describe(`ISS · GP 예측 / 실측 아님 | 표시 UTC ${latest.utc} | ITRF m ${latest.position_m.map(v=>v.toFixed(2)).join(', ')} | 고도각 ${latest.elevation_deg?.toFixed(4)??'미확인'}° | revision ${latest.revision} | 실제 통신 미확인`);
       }else describe('표시할 현재 UTC 계산 결과가 없습니다. 위성 창에서 저장 입력을 선택하고 계산하세요.');
     }catch{fail();}
@@ -45,7 +45,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     stations(values,onSelect){stations=structuredClone(values);onStationSelect=onSelect;globe?.setStations(stations,onStationSelect);},
     selectStation(key){selectedStation=key;globe?.selectStation(key);},
     focusStation(key){if(globe?.focusStation(key)){focused=true;return true;}return false;},
-    catalog(sample){if(disposed)return;catalog=sample?structuredClone(sample):null;focused=false;paint();},
+    catalog(sample){if(disposed)return;const changed=catalog?.catalog_number!==sample?.catalog_number||catalog?.normalized_gp_sha256!==sample?.normalized_gp_sha256;catalog=sample?structuredClone(sample):null;if(changed)focused=false;paint();},
     update(snapshot,display,displayUtc){
       if(disposed)return;
       const {state,result,status:phase}=snapshot;
