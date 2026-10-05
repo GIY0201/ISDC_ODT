@@ -103,6 +103,7 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
         ('/static/assets', WEB_DIR / 'assets'),
         ('/static/visualization', VISUALIZATION_DIR),
         ('/static/model_library', VISUALIZATION_DIR.parent / 'model_library' / 'browser'),
+        ('/static/satellite_display', VISUALIZATION_DIR.parent / 'model_library' / 'packages' / 'satellite_display' / 'v1'),
         ('/static/simulation', VISUALIZATION_DIR.parent / 'simulation' / 'browser'),
         ('/static/communication', CLIENT_DIR),
     ):

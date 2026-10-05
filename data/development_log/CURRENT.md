@@ -486,3 +486,8 @@ Official NASA pinnedtree/alternateGLB/FBX/archive checks show Terra exacttexture
 - 변경: 숨긴창과독립적인catalog 선택/profile 사본알림, 실제workspace modelselection/panel/lifecycle 연결. 재생frame마다catalog복사/재매칭하지않음.
 - 검증: Node323PASS1265.1034ms/Python439PASS5기존warnings186.66s/exit0; 실제JS조립 ISSexact/Viewer1/저장상태·명령0/clear/draft/정리. validation/t128_workspace_model_assembly.md.
 - 남음: package staticmount/8891소유서버확인·상태보존restart/nativehover/실제GPU/Terra/solar/fullT075–84·기존보류. 현고정manifest경로는mount전으로실제자료표시완료아님. 이번서버restart/포트/native/API/PR/병합 변경없음.
+
+## 2026-10-05 T128 위성 모델 파일 제공과 8891 복원
+- 변경: 버전v1 package만staticmount. 소유server19916/34668 확인·capture후동일venv/factory/0.0.0.0:8891 hiddenrestart, 새listener31524/launcher3780. 저장orbit선택/UTC/관측·재생설정복원; SIM메모리실행경과·runID초기화는별도기록.
+- 검증: Python440PASS5기존warnings184.08s/Node323PASS1238.6573ms/target3PASS; 실제HTTP101파일38015944bytes 원본일치/health정상. 복원clock/receipt3필드변경외상태동일; raw비교실패보존. validation/t128_satellite_mount.md.
+- 남음: 실제GPU/hover/follow/두해상도/Terra texture/all50수용/solar/fullT075–84·기존보류. 파일bytes제공은렌더링증거아님. 8891서버실행유지/native/wheel/API/PR/병합변경없음.

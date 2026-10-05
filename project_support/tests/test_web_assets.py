@@ -34,3 +34,18 @@ def test_python_source_and_generated_data_are_not_published():
             result = client.get(path)
             assert result.status_code == 404 or '<html' in result.text.lower()
             assert 'import FastAPI' not in result.text
+
+
+def test_versioned_satellite_package_serves_exact_original_assets_only():
+    import hashlib
+    from user_application.web.application import create_app
+    from user_application.configs.paths import VISUALIZATION_DIR
+    package = VISUALIZATION_DIR.parent / 'model_library/packages/satellite_display/v1'
+    with TestClient(create_app()) as client:
+        for name in ['manifest.json', 'iss.glb', 'iss.jpg', 'terra.glb']:
+            response = client.get('/static/satellite_display/' + name)
+            assert response.status_code == 200
+            assert 'text/html' not in response.headers['content-type']
+            assert hashlib.sha256(response.content).digest() == hashlib.sha256((package / name).read_bytes()).digest()
+        for path in ['%2e%2e/%2e%2e/network.py', '%2e%2e/%2e%2e/%2e%2e/runtime/state.py', 'missing.glb']:
+            assert client.get('/static/satellite_display/' + path).status_code == 404
