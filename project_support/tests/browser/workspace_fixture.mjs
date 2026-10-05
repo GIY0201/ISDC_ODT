@@ -25,7 +25,7 @@ import {LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
 const web=new URL('../../../user_application/web/scripts/',import.meta.url);
 const windowSource=(await readFile(new URL('workspace.js',web),'utf8')).replace(/^import .*;\r?\n/,'');
 const orbitSource=(await readFile(new URL('workspace_orbit.js',web),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/export function /g,'function ');
-const globeSource=(await readFile(new URL('workspace_globe.js',web),'utf8')).replace("'/static/visualization/orbit_globe.js?v=t093-r3'",JSON.stringify(new URL('../../../digital_twin/visualization/orbit_globe.js',import.meta.url).href));
+const globeSource=(await readFile(new URL('workspace_globe.js',web),'utf8')).replace(/'\/static\/visualization\/orbit_globe\.js(?:\?[^']*)?'/,JSON.stringify(new URL('../../../digital_twin/visualization/orbit_globe.js',import.meta.url).href));
 const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(globeSource).toString('base64')}`);
 
 export function fixture(width=1280,height=720,options={}){
