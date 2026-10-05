@@ -1,7 +1,7 @@
 /** Static GP display only. Caller supplies ITRF metres and UTC; no propagation or transport. */
 export class OrbitGlobe {
   constructor(Cesium,container){
-    this.C=Cesium;this.position=null;this.destroyed=false;this.stationEntities=new Map();this.stationSites=new Map();this.stationIds=new Map();this.selectedStation=null;
+    this.C=Cesium;this.position=null;this.destroyed=false;this.stationEntities=new Map();this.stationSites=new Map();this.stationIds=new Map();this.selectedStation=null;this.catalogPoints=new Map();this.catalogLabels=new Map();this.catalogHashes=new Map();this.catalogStyles=new Map();this.catalogEpochs=new Map();this.catalogValid=new Set();this.selectedCatalog=null;
     this.viewer=new Cesium.Viewer(container,{
       baseLayer:false,terrainProvider:new Cesium.EllipsoidTerrainProvider(),
       animation:false,timeline:false,geocoder:false,homeButton:false,
@@ -22,6 +22,7 @@ export class OrbitGlobe {
     let utc;
     try{utc=C.JulianDate.fromIso8601(sample.utc);}catch{this.clearSatellite();viewer.scene.requestRender();return false;}
     this.position=new C.Cartesian3(...coordinates);
+    this._selectCatalogMarker(sample.catalog_number,sample.normalized_gp_sha256);
     viewer.clock.currentTime=utc;
     if(this.entity)this.entity.position=new C.ConstantPositionProperty(this.position,C.ReferenceFrame.FIXED);
     else this.entity=viewer.entities.add({id:'stored-orbit-satellite',name:'ISS · SGP4 모델',
@@ -34,8 +35,81 @@ export class OrbitGlobe {
     viewer.scene.requestRender();return true;
   }
   clearSatellite(){
+    this._selectCatalogMarker(null);
     if(this.entity){if(this.viewer.entities.remove)this.viewer.entities.remove(this.entity);else this.viewer.entities.removeAll();}
     this.entity=null;this.position=null;
+  }
+  _selectCatalogMarker(number,gpHash){
+    const previous=this.catalogPoints.get(this.selectedCatalog);if(previous)previous.show=this.catalogValid.has(this.selectedCatalog);
+    const previousLabel=this.catalogLabels.get(this.selectedCatalog);if(previousLabel)previousLabel.show=this.catalogValid.has(this.selectedCatalog);
+    this.selectedCatalog=this.catalogHashes.get(number)===gpHash&&this.catalogPoints.has(number)?number:null;
+    const selected=this.catalogPoints.get(this.selectedCatalog);if(selected)selected.show=false;
+    const label=this.catalogLabels.get(this.selectedCatalog);if(label)label.show=false;
+  }
+  setCatalogScene(value,onSelect=()=>{}){
+    if(this.destroyed)return false;this.onCatalogSelect=onSelect;
+    const {C,viewer}=this;
+    if(!value){
+      if(this.catalogCollection)viewer.scene.primitives.remove(this.catalogCollection);
+      if(this.catalogLabelCollection)viewer.scene.primitives.remove(this.catalogLabelCollection);
+      this.catalogCollection=null;this.catalogLabelCollection=null;this.catalogSignature=null;
+      this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogValid.clear();this.selectedCatalog=null;
+      viewer.scene.requestRender();return true;
+    }
+    if(value.frame!=='ITRF'||!Array.isArray(value.rows)||value.count!==value.rows.length||value.rows.some(row=>row.status==='valid'&&(!Array.isArray(row.position_m)||row.position_m.length!==3||!row.position_m.every(Number.isFinite))))throw Error('Invalid catalog scene positions');
+    C.JulianDate.fromIso8601(value.utc);
+    if(this.catalogSignature!==value.scene_sha256){
+      this.setCatalogScene(null,onSelect);
+      this.catalogCollection=viewer.scene.primitives.add(new C.PointPrimitiveCollection());
+      this.catalogLabelCollection=viewer.scene.primitives.add(new C.LabelCollection());
+      this.catalogSignature=value.scene_sha256;
+    }
+    const size=value.count>10000?2.4:value.count>2000?3:value.count>200?4.5:6.5;
+    const colors={LEO:'#ff9f43',MEO:'#e6ed55',GEO:'#5ee277',HEO:'#53c8ff'};
+    const seen=new Set(),palette=new Map(),utcMilliseconds=Date.parse(value.utc);
+    // Cesium copies option values into each primitive. Share immutable styles,
+    // while keeping independently owned positions and point identities.
+    let pointScale,labelScale,labelOutline;
+    const color=(style,css,alpha)=>{if(!palette.has(style))palette.set(style,C.Color.fromCssColorString(css).withAlpha(alpha));return palette.get(style);};
+    for(const row of value.rows){
+      if(row.status!=='valid')continue;seen.add(row.catalog_number);
+      const position=new C.Cartesian3(...row.position_m);
+      let epoch=this.catalogEpochs.get(row.catalog_number);
+      if(!epoch||epoch.hash!==row.normalized_gp_sha256||epoch.utc!==row.epoch_utc){epoch={hash:row.normalized_gp_sha256,utc:row.epoch_utc,milliseconds:Date.parse(row.epoch_utc)};this.catalogEpochs.set(row.catalog_number,epoch);}
+      const age=(utcMilliseconds-epoch.milliseconds)/3600000;
+      const alpha=Number.isFinite(age)&&age>72?.56:value.count>1000?.9:.98,css=colors[row.orbit_regime]||'#ff9f43',style=`${css}:${alpha}`;
+      let point=this.catalogPoints.get(row.catalog_number);
+      if(!point){
+        const id={catalogNumber:row.catalog_number};
+        pointScale??=new C.NearFarScalar(1e6,1.35,5e8,.58);
+        point=this.catalogCollection.add({position,pixelSize:size,color:color(style,css,alpha),outlineColor:C.Color.TRANSPARENT,outlineWidth:0,scaleByDistance:pointScale,disableDepthTestDistance:0,id,show:true});
+        this.catalogPoints.set(row.catalog_number,point);
+        if(value.count<=80){labelScale??=new C.NearFarScalar(1e6,1,8e7,.38);labelOutline??=C.Color.fromCssColorString('#061528');this.catalogLabels.set(row.catalog_number,this.catalogLabelCollection.add({position,text:row.name,font:'600 12px Segoe UI',fillColor:C.Color.WHITE,outlineColor:labelOutline,outlineWidth:3,style:C.LabelStyle.FILL_AND_OUTLINE,pixelOffset:new C.Cartesian2(0,-18),scaleByDistance:labelScale,show:true,id}));}
+      }else{point.position=position;point.show=true;if(this.catalogStyles.get(row.catalog_number)!==style)point.color=color(style,css,alpha);}
+      this.catalogStyles.set(row.catalog_number,style);
+      this.catalogHashes.set(row.catalog_number,row.normalized_gp_sha256);
+      const label=this.catalogLabels.get(row.catalog_number);if(label){label.position=position;label.show=true;}
+    }
+    // The same GP can transition to/from a propagation failure at another UTC.
+    for(const [number,point]of this.catalogPoints){if(!seen.has(number)){point.show=false;const label=this.catalogLabels.get(number);if(label)label.show=false;}}
+    this.catalogValid=seen;
+    const selected=this.selectedCatalog;
+    if(selected!==null)this._selectCatalogMarker(selected,this.catalogHashes.get(selected));
+    this._ensurePickHandler();viewer.scene.requestRender();return true;
+  }
+  _ensurePickHandler(){
+    const {C,viewer}=this;
+    if(this.stationPickHandler||!C.ScreenSpaceEventHandler||!C.ScreenSpaceEventType)return;
+    this.stationPickHandler=new C.ScreenSpaceEventHandler(viewer.scene.canvas);
+    this.stationPickHandler.setInputAction(event=>{
+      if(this.destroyed)return;
+      const picked=viewer.scene.pick(event.position);const id=picked?.id?.id??picked?.id;
+      if(id?.catalogNumber&&this.catalogPoints.get(id.catalogNumber)?.show){this.onCatalogSelect?.(id.catalogNumber);return;}
+      if(id==='stored-orbit-satellite'&&this.selectedCatalog!==null){this.onCatalogSelect?.(this.selectedCatalog);return;}
+      let key=this.stationIds.get(id);
+      if(!key&&id==='virtual-ground-point'&&viewer.scene.drillPick)key=viewer.scene.drillPick(event.position,4).map(value=>this.stationIds.get(value?.id?.id??value?.id)).find(Boolean);
+      if(key)this.onStationSelect?.(key);
+    },C.ScreenSpaceEventType.LEFT_CLICK);
   }
   setGroundPoint(point){
     if(this.destroyed)return;
@@ -66,18 +140,7 @@ export class OrbitGlobe {
       }
       this.stationSignature=signature;this.selectStation(this.stationSites.has(this.selectedStation)?this.selectedStation:null);
     }
-    const {C,viewer}=this;
-    if(!this.stationPickHandler&&C.ScreenSpaceEventHandler&&C.ScreenSpaceEventType){
-      this.stationPickHandler=new C.ScreenSpaceEventHandler(viewer.scene.canvas);
-      this.stationPickHandler.setInputAction(event=>{
-        if(this.destroyed)return;
-        const picked=viewer.scene.pick(event.position);const id=picked?.id?.id??picked?.id;
-        let key=this.stationIds.get(id);
-        // A colocated virtual observer must not hide the reference-site selector.
-        if(!key&&id==='virtual-ground-point'&&viewer.scene.drillPick)key=viewer.scene.drillPick(event.position,4).map(value=>this.stationIds.get(value?.id?.id??value?.id)).find(Boolean);
-        if(key)this.onStationSelect?.(key);
-      },C.ScreenSpaceEventType.LEFT_CLICK);
-    }
+    const {viewer}=this;this._ensurePickHandler();
     viewer.scene.requestRender();return true;
   }
   selectStation(key){
@@ -103,5 +166,5 @@ export class OrbitGlobe {
     if(this.destroyed)return;
     this.viewer.imageryLayers.addImageryProvider(provider);this.viewer.scene.requestRender();
   }
-  destroy(){if(this.destroyed)return;this.destroyed=true;this.position=null;this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.viewer.destroy();}
+  destroy(){if(this.destroyed)return;this.destroyed=true;this.position=null;this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.viewer.destroy();}
 }

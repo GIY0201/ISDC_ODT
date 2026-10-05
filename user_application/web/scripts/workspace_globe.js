@@ -1,8 +1,8 @@
-import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t103-r3';
+import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t110-r3';
 
 /** Render-only copy, never a clock/selection authority. One controller per document. */
 export function createWorkspaceGlobe(container,status,focusButton,host=window){
-  let globe=null,latest=null,catalog=null,groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
+  let globe=null,latest=null,catalog=null,sceneInput=null,sceneMetadata=null,onCatalogSelect=()=>{},groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
   const describe=message=>{status.textContent=message;};
   function paint(){
     focusButton.disabled=true;
@@ -15,9 +15,10 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       if(shown){
         if(!focused){globe.focus();focused=true;}
         focusButton.disabled=false;
-        if(catalog){describe(`카탈로그 ${catalog.name} (${catalog.catalog_number}) · 시간 탐색 모델/실측 아님 | UTC ${catalog.utc} | ITRF m ${catalog.position_m.map(x=>x.toFixed(2)).join(', ')} | IERS-A UT1 ${catalog.eop_quality.ut1} / 극운동 ${catalog.eop_quality.polar_motion} | 실제 통신 미확인`);return;}
-        describe(`ISS · GP 예측 / 실측 아님 | 표시 UTC ${latest.utc} | ITRF m ${latest.position_m.map(v=>v.toFixed(2)).join(', ')} | 고도각 ${latest.elevation_deg?.toFixed(4)??'미확인'}° | revision ${latest.revision} | 실제 통신 미확인`);
-      }else describe('표시할 현재 UTC 계산 결과가 없습니다. 위성 창에서 저장 입력을 선택하고 계산하세요.');
+        const whole=sceneMetadata?` | 전체 ${sceneMetadata.count}개 / 성공 ${sceneMetadata.valid_count} / 실패 ${sceneMetadata.error_count} · 전체 snapshot UTC ${sceneMetadata.utc}`:'';
+        if(catalog){describe(`카탈로그 ${catalog.name} (${catalog.catalog_number}) · 시간 탐색 모델/실측 아님 | 선택 위성 UTC ${catalog.utc}${whole} | ITRF m ${catalog.position_m.map(x=>x.toFixed(2)).join(', ')} | IERS-A UT1 ${catalog.eop_quality.ut1} / 극운동 ${catalog.eop_quality.polar_motion} | 실제 통신 미확인`);return;}
+        describe(`ISS · GP 예측 / 실측 아님 | 표시 UTC ${latest.utc}${whole} | ITRF m ${latest.position_m.map(v=>v.toFixed(2)).join(', ')} | 고도각 ${latest.elevation_deg?.toFixed(4)??'미확인'}° | revision ${latest.revision} | 실제 통신 미확인`);
+      }else describe(sceneMetadata?`전체 ${sceneMetadata.count}개 / 성공 ${sceneMetadata.valid_count} / 실패 ${sceneMetadata.error_count} · snapshot UTC ${sceneMetadata.utc} · GP 모델/실측 아님 · 지구 위성을 선택하세요.`:'표시할 현재 UTC 계산 결과가 없습니다. 위성 창에서 저장 입력을 선택하고 계산하세요.');
     }catch{fail();}
   }
   function fail(){
@@ -31,6 +32,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     try{
       globe=new OrbitGlobe(host.Cesium,container);
       if(stations.length){globe.setStations(stations,onStationSelect);globe.selectStation(selectedStation);}
+      if(sceneInput){globe.setCatalogScene(sceneInput,onCatalogSelect);sceneInput=null;}
       removeError=globe.viewer.scene.renderError.addEventListener(fail);
       host.Cesium.SingleTileImageryProvider.fromUrl('/static/assets/nasa_blue_marble_september.jpg',{credit:'NASA Blue Marble'}).then(provider=>{
         if(!disposed&&globe)globe.setImagery(provider);
@@ -45,6 +47,12 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     stations(values,onSelect){stations=structuredClone(values);onStationSelect=onSelect;globe?.setStations(stations,onStationSelect);},
     selectStation(key){selectedStation=key;globe?.selectStation(key);},
     focusStation(key){if(globe?.focusStation(key)){focused=true;return true;}return false;},
+    catalogScene(value,onSelect){
+      if(disposed)return;onCatalogSelect=onSelect;
+      if(value){const {rows,...metadata}=value;sceneMetadata=structuredClone(metadata);}else sceneMetadata=null;
+      sceneInput=globe?null:value?structuredClone(value):null;
+      try{globe?.setCatalogScene(value,onSelect);container.dataset.catalogCount=String(value?.valid_count??0);paint();}catch{fail();}
+    },
     catalog(sample){if(disposed)return;const changed=catalog?.catalog_number!==sample?.catalog_number||catalog?.normalized_gp_sha256!==sample?.normalized_gp_sha256;catalog=sample?structuredClone(sample):null;if(changed)focused=false;paint();},
     update(snapshot,display,displayUtc){
       if(disposed)return;
@@ -55,8 +63,8 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       const valid=phase==='ready'&&!result?.stale&&row?.status==='valid'&&matchingUtc&&result.input_id===state?.input_id&&result.revision===state?.revision&&result.input_hash===state?.input_hash;
       latest=valid?structuredClone({...row,frame:result.frame,revision:result.revision}):null;
       paint();
-      if(!catalog&&!latest&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
+      if(!catalog&&!latest&&!sceneMetadata&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
     },
-    destroy(){if(disposed)return;disposed=true;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;},
+    destroy(){if(disposed)return;disposed=true;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;},
   };
 }

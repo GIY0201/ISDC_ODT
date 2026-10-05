@@ -375,3 +375,26 @@ read-only일관성분석: 첫묶음14기준/31task, critical/high finding0, 형�
 - 남음: T075multiple/3Dsun/T076–84/F001/F004–6/T032/W06diskunknown. 목표active/Draftreview/병합없음. 소유8891serverrestart SIM메모리초기화/이전snapshot보존/저장선택PUT복구; 초기helperPOST405/wrongGET정정. 시설·장비·실수신미확인.
 
 US14 최종renderer문구검토: epoch고정label을 GP/SGP4모델로정정,RED1FAIL→Node191PASS737.0542ms. fixtureexactquery치환실패는경로매핑으로수정. Python코드변경없음/399결과유지. DraftPR28후속commit/no merge.
+
+
+## 2026-10-05 US15 다중위성 native 기반
+- 변경: whole-group 원본limit0 확인/FR023·SC021·T104–110 설계 및 native0.2.0 manyOMM50000call 추가. 기존scalar/86401/profile보존,ADR0014. T105완료/T104부분.
+- 검증: Rustintegration4PASS/official33·668+manyscalarOMM668exact,cleanwheel2PASS7.03s/native6PASS0.68s/전체Python401PASS146.00s/경고5. 제품wheel repairedlicensehash확인, validation/t105_catalog_native.md.
+- 남음: T106–110 wholecatalogcache/API/renderer/actual16633; T075track/pass/sun/modes/imagery/SVG 및T076–84 active. 검증후묶음Draft/병합없음.8891소유41520재시작/SIM메모리초기화·이전snapshot보존/저장GP·UTC·observer복원/기존samples3valid. 비교기준·maturin경로·UTF8helper초기오류정정.
+
+## 2026-10-05 US15 전체 카탈로그 API
+- 변경: 불변GP/epoch준비 cache2snapshot, manyOMM chunk50000, 공유UTC/EOP정밀변환과strictreadonlyscene API/브라우저adapter. T106–107완료/ADR0014.
+- 검증: 최종Python417PASS165.14s/경고5,Node192PASS812.9899ms. 실제8891active16633모두성공/cold12.808s/warm0.804s/ISS13·GEO588·없음0/기존API모든ID·순서대조/409·422/저장선택불변. validation/t107_catalog_scene_api.md. 최초OpenAPI 추가허용목록 실패는 새path/schema명시후전체재검증.
+- 남음: T104browserRED/T108–110화면전체표시·pick·실제두해상도/render성능 및전체T075–84 active. 기존후속범위보존/묶음Draft후검토/병합없음. 소유2148서버8891재시작 SIM시간초기화/보고서·state보존/GP·UTC·관측지점PUT복구. Rust/wheel변경없음. 최초capture report경로HTML오류정정후재시작.
+
+## 2026-10-05 US15 UI integration evidence
+T104 browser RED and T108–T109 complete; validation/t109_catalog_scene_ui.md records whole16633/oneViewer/offpage mouse selection/windowrestore/hashpin/ownUTC and full Python418PASS162.17s/Node206PASS861.0495ms. Existing stack/constitution/checklist8of8/hooksabsent/scope unchanged. Exact identity lookup limit100 RED corrected to full limit0 without changing formulas/wire contracts. Actual two-size verification found 113–115ms validation/copy plus30–37ms renderer callback; T110 remains pending for responsive preparation and final verification/publication. T075–T084 all remain active/open; T032/F001/F004–6/download disk unknown retained. Local UI work recorded separately; no new PR/merge. Next implement owner: T110 responsiveness repair, generation fencing and atomic UTC coverage before final actual tests.
+
+## 2026-10-05 T110 bounded response preparation progress
+RED2 no-yield failures→PASS, full Node208PASS883.6242ms/Python418PASS170.47s/5warnings. Actual8891 active16633 allvalid, 1280/1920 max preparation slice10.4/10.9ms, preparation wall155.3/164.5ms (includes yields), renderer38.3/16.9ms; no total-latency/frame acceptance claim. Full snapshots publish only after validation/generation fence; clear/lateinvalid coverage maintained. API filter13/588/0 IDs/order,409/422 and post-UI savedGP/UTC/observer readonly passed. Static reload only/no restart. Evidence validation/t110_response_preparation.md; T110 still running for renderer responsiveness and final acceptance/DraftPR. WholeT075–T084 and original deferred requirements unchanged; no merge.
+
+## 2026-10-05 T110 renderer styles and epoch reuse
+RED allocation and repeat epoch parsing→PASS; finalNode210PASS974.953ms/Python418PASS170.42s/5warnings. Currentscene visual class styles reused, immutableGP epochcache invalidates byhash/text,72h opacity refresh restored. Actual8891twores16633allvalid/canvas1/console0; initial renderer36.6ms, repeated23.3/16.4ms; do not claim p95/game target or blanket speedup. Filter13/588/0 IDs/order/409/422/readonly rerunPASS, static reload/noSIMrestart. Evidence validation/t110_renderer_styles.md. T110 final acceptance report and DraftPR pending; next safe action consolidate US15 contract evidence, publish reviewed whole-group Draft abovePR28, continue original T075 tracks/pass/sun/modes/imagery/SVG and T076–T084. T032 and all original deferred scope retained; no merge.
+
+## 2026-10-05 US15 final verification consolidated
+validation/t110_catalog_scene.md maps FR023/SC021 against actual automated/8891 evidence and profiling. Productquery offline full16633 cold9.3884s/warm.3882s, native~.032s/sharedtransform.0007-.0021s/JSON5,168,774bytes; distinguishes serverHTTP/browser callbacks and unresolvedframe goals. FinalPython418/Node210 pass preserved, all native/wheel proof scopedT105. Functional verify complete; T110 Draftpublication pending until actualURL/remote tree verified. Do not close T075–T084 or T032/SC006/F001/F004–6/diskunknown. Next action existing authorized DraftPR above28, then original T075 remainder. No merge.

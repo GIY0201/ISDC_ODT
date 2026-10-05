@@ -69,7 +69,15 @@ assert all(abs(a-b)<=1e-9 for a,b in zip(row[3:],sample['velocity']))
 try: native.propagate_tle('bad','bad',[0.])
 except ValueError: pass
 else: raise AssertionError('invalid TLE accepted')
-print(json.dumps({'python':sys.version,'native_file':native.__file__,'profile':native.calculation_profile,'row':row}))
+assert native.__version__ == '0.2.0'
+assert native.MAX_CATALOG_BATCH_ROWS == 50000 and native.MAX_BATCH_ROWS == 86401
+assert native.propagate_omm_many([],[]) == (b'',[])
+failed, errors = native.propagate_omm_many(['bad'],[0.])
+assert errors == ['invalid OMM'] and all(__import__('math').isnan(v) for v in struct.unpack('<6d',failed))
+try: native.propagate_omm_many(['bad'],[])
+except ValueError: pass
+else: raise AssertionError('unaligned catalog rows accepted')
+print(json.dumps({'python':sys.version,'native_file':native.__file__,'profile':native.calculation_profile,'row':row,'version':native.__version__,'catalog_export':True}))
 """
     tle = {key: case[key] for key in ("line1", "line2")}
     sample = {key: expected[key] for key in ("time", "position", "velocity")}

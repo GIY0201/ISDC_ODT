@@ -18,6 +18,8 @@ test('empty UI choice restores server selection without clearing its result or s
     .replace(/import \{createGroundPanel\} from [^;]+;/,'const createGroundPanel=()=>({show(){},update(){},destroy(){}});')
     .replace(/import \{createCatalogTimePanel\} from [^;]+;/,'const createCatalogTimePanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createCatalogTimeline\} from [^;]+;/,'const createCatalogTimeline=()=>({select(){},destroy(){}});')
+    .replace(/import \{createCatalogScene\} from [^;]+;/,'const createCatalogScene=()=>({snapshot(){return {}},destroy(){}});')
+    .replace(/import \{createCatalogScenePanel\} from [^;]+;/,'const createCatalogScenePanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createCatalogGeometry\} from [^;]+;/,'const createCatalogGeometry=()=>({select(){},clear(){},snapshot(){return {}},destroy(){}});')
     .replace(/import \{createCatalogPanel\} from [^;]+;/,'const createCatalogPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createHilPanel\} from [^;]+;/,'const createHilPanel=()=>({show(){},update(){},receive(){},connection(){},applyDraft(){},destroy(){}});')
