@@ -472,7 +472,7 @@ Official NASA pinnedtree/alternateGLB/FBX/archive checks show Terra exacttexture
 - 검증: Node309PASS1108.2498ms/Python439PASS5기존warnings182.07s; 모듈 RED와 실패행 RED→PASS. validation/t127_model_presentation.md.
 - 남음: T127partial/T128조립·선택GP시간fence/T129실제렌더·두해상도/Terra/solar/전체T075–84 및기존보류. 서버restart/포트8891/native/API/PR/병합 변경없음.
 
-## 2026-10-05 T128 モデル接続境界 部分進行
+## 2026-10-05 T128 모델 연결 경계 부분 진행
 - 변경: 기존catalog timeline의 readonly currentUtc/sampleAt/advanceUtc, exact pin/native buffer/GP fence/윤초·gap보존. workspace_globe 단일renderer modelState/observeModel/show/카메라/status revision 및정리.
 - 검증: Node314PASS1177.5623ms/Python439PASS5기존warnings181.99s/exit0; missing method RED→PASS. validation/t128_model_boundaries.md.
 - 남음: 실제 선택·profile·manifest·panel·hover 조립/staticmount/8891 실제render/Terra/T129/solar/fullT075–84·기존보류. 서버restart/포트/native/API/PR/병합 변경없음.
