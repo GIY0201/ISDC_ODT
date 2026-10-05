@@ -1,5 +1,10 @@
 # 현재 개발 기록
 
+## 2026-10-05 T138 원본 노드 실행 비교 자료
+- 변경: 원본 hash 고정/명시시계 VM capture 도구, 91golden 및 source 변경 거부·결과 단위/배치 검증5시험. 원본 배치 버튼의 서버수락 경로를 추가 확인해 T076/T079 의존성 기록. 로컬store만의 설명을 전체흐름으로 확대하지 않음. 제품 코드 변경 없음.
+- 검증: RED missingmodule→target5PASS, 실제원본두실행499478bytes/hashbaaad063… 동일. 전체Node355PASS1588.4173ms/Python471PASS8기존warnings229.27s/session62273exit0/diffcheck. validation/t138_original_nodes.md 및 t076_source_boundaries.md.
+- 남음: T138만 완료, T139 node계약/native시간·근사프레임/서버배치와 상세task, T076실제이식/두해상도/리뷰. T075Terra/all50/T137게시인증/전체T075–84/T032/장비·통신·HIL/다운로드/AeroDT 유지. 서버8891/native/wheel/API/사용자화면/병합 변경 없음.
+
 ## 2026-10-05 T137 게시 시도와 T076 원본 경계 대조
 - 변경: 기존 HEAD0badd5f에서 `codex/catalog-solar-display` 브랜치로 분리. 모델 기준 c796847 보존, 원본 노드/편대/전력/시간·프레임 계약 사전 대조를 validation/t076_source_boundaries.md에 기록. 제품 코드 변경 없음.
 - 검증: 원본 HEAD1a1e002/4파일 SHA256·본문, PR31 open/Draft/head0634243 확인, whitespace 검사. 실제 Git push는 credential-manager 인증 대기 후 취소, 비대화 재시도는 저장 인증 없음으로 실패. GitHub branch 목록에서 두 새 원격 브랜치 없음 확인. 이 작업의 고아 인증 프로세스만 정리.

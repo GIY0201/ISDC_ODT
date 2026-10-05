@@ -28,3 +28,13 @@
 4. 노드와 편대 편집, 배치/회수, 장비/전력, 모델 표시, 원본 계산, scene/composer 조립, 두해상도 실제 수용까지 T076을 세분화한다. Terra 자산과 기존 T075 수용 미완료는 따로 유지한다.
 
 검증은 원본 파일 읽기/해시/HEAD 조회뿐이다. 원본 실행 동등성, 수치 정확도, 제품 UI 연결, 새 회귀 통과를 주장하지 않는다.
+
+## 추가 호출 경로 대조: 실제 배치 버튼은 서버 수락과 연결됨
+
+위의 브라우저 사본 설명은 `constellation.js` 함수 자체에 한정된다. 전체 UI의 배치/회수 의미를 로컬 변경만으로 설명하면 원본 기능을 누락한다. 추가로 `tabs/nodes.js`의 submitDeployment, `nodes/deployment_client.js`와 `nodes/data_deployment.js`를 직접 읽었다.
+
+- `data_deployment.js` SHA256 `3774b247d3fe3fb1048ea583b2f2ac1547e3c488f3e2b64d97b46a5900b438b4`; `deployment_client.js` SHA256 `6aa25932eac8c38a0d29ee4f38e9cebea03c994d630c5030187fe9e7d9052d10`.
+- UI 버튼은 공유 deployment client를 호출한다. `/api/data-management/deployment` GET/POST가 revision/run_id/scope_id/deployment_id 및 노드·장비 식별자를 관리한다. 확장된 장비 모델 값이나 궤도는 이 배치 요청에 포함하지 않는다.
+- 직렬 요청, 15초 timeout, 동일 요청 재시도 시 deployment_id 유지, expected_revision과409 재조회, 수락 응답의 ID/구성 대조 후에만 로컬 deploy/recall이 실행된다. 충돌 시 원본 UI가 사용자 확인을 받고 서버 구성을 덮어쓴다. 사본/초안/이전 배치를 실패 중 보존한다.
+- 원본 initialize는 revision0/null 서버에 저장된 브라우저 배치가 있으면 restore POST를 자동 수행한다. 새 제품의 복원 시 자동 명령 금지 계약과 충돌하는 동작이므로 승인되지 않은 restore POST로 그대로 이식하지 않는다. 표시 사본 복원과 명시 서버 배치 수락을 별도 계약/회귀로 다룬다.
+- T076 편집/표시와 T079 데이터 관리 배치 endpoint를 하나의 acceptance 연결로 추적한다. 로컬 배치만 구현한 상태를 원본 배치 기능 완료로 처리하지 않는다. 현재 제품 서버에 해당 endpoint를 새로 만들거나 호출하지 않았다.
