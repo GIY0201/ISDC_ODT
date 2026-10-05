@@ -224,7 +224,13 @@ function createNodeStatusPanel({host,store,readDisplay,geometryFor=()=>null,link
     return structuredClone(value);
   }
   function destroy(){if(destroyed)return;unbind();destroyed=true;}
-  return Object.freeze({refresh,destroy});
+  function canFocus(){if(destroyed||editor?.isOpen()||typeof onFocus!=='function')return false;const node=store.selected;if(!node)return false;const input=context(node);return validGeometry(node,input.geometry,input.utc);}
+  async function focusSelected(){
+    if(destroyed||editor?.isOpen()||typeof onFocus!=='function')return false;
+    const node=store.selected;if(!node)return false;const input=context(node);if(!validGeometry(node,input.geometry,input.utc))return false;
+    try{await onFocus(structuredClone(node),structuredClone(input.geometry),{userInitiated:true,focus:true});return true;}catch(error){report(error);return false;}
+  }
+  return Object.freeze({refresh,destroy,canFocus,focusSelected});
 }
 function statusFrame(node,{match=null}={}) {
   const item = library.nodeCatalogItem(node);
@@ -412,5 +418,125 @@ function createNodeDraftPanel({root,store,editorTools,now,timers,createFormation
   function destroy(){if(disposed)return;disposed=true;clearVersion++;unsubscribe();for(const remove of owned.splice(0))remove();formation.destroy();editor.destroy();}
   return Object.freeze({formation,editor,add,select,clear,openEditor,refresh,destroy});
 }
-return Object.freeze({formationControlsMarkup,formationSummaryText,createFormationPanel,statusFrame,fleetMarkup,terminalRow,statusPresentation,createNodeStatusPanel,createNodeFleetPanel,bindNodeTooltips,createNodeDraftPanel});
+
+function createNodeSceneControls({root,readScene=()=>null,readDisplay,actions={},canFocus=()=>false,onFocus,onError=()=>{}}={}){
+  if(!root||typeof readScene!=='function'||typeof readDisplay!=='function'||!actions||typeof actions!=='object')throw new TypeError('node_scene_controls_dependencies_required');
+  let disposed=false;const owned=[];
+  const report=error=>{if(!disposed)onError(error instanceof Error?error.message:String(error));};
+  const get=selector=>root.querySelector(selector);
+  const read=()=>{let scene=null,display=null;try{scene=readScene();display=readDisplay();}catch(error){report(error);}return {scene,display};};
+  const has=name=>typeof actions[name]==='function';
+  const speedsOf=display=>Array.isArray(display?.speeds)&&display.speeds.length>0&&display.speeds.length<=16&&display.speeds.every(value=>Number.isFinite(value)&&value>0)?[...new Set(display.speeds)]:null;
+  function enabled(mode,scene,display){
+    if(mode==='focus')return scene?.ready===true&&typeof onFocus==='function'&&canFocus();
+    if(mode==='home')return scene?.ready===true&&has('home')&&has('untrack');
+    if(mode==='untrack')return scene?.ready===true&&has('untrack');
+    if(mode==='tracks')return scene?.ready===true&&typeof scene.tracks==='boolean'&&has('toggleTracks');
+    if(mode==='links'||mode==='models'||mode==='lighting')return scene?.ready===true&&typeof scene[mode]==='boolean'&&has({links:'setLinksVisible',models:'setModelsVisible',lighting:'setLighting'}[mode]);
+    if(mode==='zoomBy'||mode==='setZoom')return scene?.ready===true&&Number.isFinite(scene.zoom)&&has(mode);
+    if(mode==='pause')return typeof display?.running==='boolean'&&has(display.running?'pause':'play');
+    if(mode==='speed')return Number.isFinite(display?.speed)&&display.speed>0&&speedsOf(display)?.includes(display.speed)&&has('setSpeed');
+    return typeof display?.utc==='string'&&has(mode);
+  }
+  function refresh(){
+    if(disposed)return;const {scene,display}=read();
+    root.querySelectorAll('[data-node-scene]').forEach(button=>{const mode=button.dataset.nodeScene;button.disabled=!enabled(mode,scene,display);if(['tracks','links','models'].includes(mode)){if(typeof scene?.[mode]==='boolean')button.setAttribute('aria-pressed',String(scene[mode]));else button.removeAttribute('aria-pressed');}});
+    for(const [id,mode]of [['node-lighting','lighting'],['node-zoom','setZoom'],['node-zoom-in','zoomBy'],['node-zoom-out','zoomBy'],['node-clock-pause','pause'],['node-clock-back','step'],['node-clock-forward','step'],['node-clock-now','live'],['node-clock-speed','speed']]){const el=get(`#${id}`);if(el)el.disabled=!enabled(mode,scene,display);}
+    const lighting=get('#node-lighting');if(lighting){if(typeof scene?.lighting==='boolean')lighting.setAttribute('aria-pressed',String(scene.lighting));else lighting.removeAttribute('aria-pressed');}
+    const zoom=get('#node-zoom');if(zoom&&Number.isFinite(scene?.zoom)){zoom.value=String(Math.max(0,Math.min(100,scene.zoom)));zoom.setAttribute('aria-valuetext',`확대 수준 ${Math.round(Number(zoom.value))}%`);}
+    const clock=get('#node-clock');if(clock)clock.textContent=display?.utc||'—';
+    const mode=get('#node-clock-mode');if(mode)mode.textContent=display?.mode==='live'?'현재 시각':display?.mode==='paused'?'분석 시각 · 정지':display?.running===true?'분석 시각 · 재생':'표시 시각 미확인';
+    const pause=get('#node-clock-pause');if(pause){pause.textContent=display?.running===true?'Ⅱ':'▶';pause.setAttribute('aria-label',display?.running===true?'분석 시계 일시정지':display?.running===false?'분석 시계 재생':'분석 시계 재생 상태 미확인');}
+    const speed=get('#node-clock-speed');if(speed){
+      const supported=speedsOf(display)??[],choices=[...new Set([...supported,1,10,60,600])].sort((a,b)=>a-b),key=JSON.stringify([choices,supported]);
+      if(speed.dataset.speedOptions!==key){speed.innerHTML=choices.map(value=>`<option value="${value}" ${supported.includes(value)?'':'disabled'}>×${value}</option>`).join('');speed.dataset.speedOptions=key;}
+      if(Number.isFinite(display?.speed))speed.value=String(display.speed);
+    }
+  }
+  async function perform(mode,fn){
+    if(disposed)return;const {scene,display}=read();if(!enabled(mode,scene,display))return;
+    try{await fn(scene,display);}catch(error){report(error);}if(!disposed)refresh();
+  }
+  const bind=(el,event,fn)=>{if(!el)return;const guarded=event=>{if(!disposed)return fn(event);};el.addEventListener(event,guarded);owned.push(()=>el.removeEventListener(event,guarded));};
+  root.querySelectorAll('[data-node-scene]').forEach(button=>{const mode=button.dataset.nodeScene;bind(button,'click',()=>perform(mode,async scene=>{
+    if(mode==='home'){await actions.untrack();if(!disposed)await actions.home();}
+    if(mode==='focus')await onFocus();
+    if(mode==='tracks')await actions.toggleTracks();
+    if(mode==='links')await actions.setLinksVisible(!scene.links);
+    if(mode==='models')await actions.setModelsVisible(!scene.models);
+  }));});
+  bind(get('#node-lighting'),'click',()=>perform('lighting',scene=>actions.setLighting(!scene.lighting)));
+  bind(get('#node-zoom-in'),'click',()=>perform('zoomBy',()=>actions.zoomBy(120)));
+  bind(get('#node-zoom-out'),'click',()=>perform('zoomBy',()=>actions.zoomBy(-120)));
+  bind(get('#node-zoom'),'input',()=>perform('setZoom',()=>{const raw=get('#node-zoom').value,value=Number(raw);if(!String(raw).trim()||!Number.isFinite(value))throw new Error('확대 수준을 확인하세요.');return actions.setZoom(Math.max(0,Math.min(100,value)));}));
+  bind(get('#node-clock-pause'),'click',()=>perform('pause',(_,display)=>actions[display.running?'pause':'play']()));
+  bind(get('#node-clock-back'),'click',()=>perform('step',()=>actions.step(-60)));
+  bind(get('#node-clock-forward'),'click',()=>perform('step',()=>actions.step(60)));
+  bind(get('#node-clock-now'),'click',()=>perform('live',()=>actions.live()));
+  bind(root,'keydown',event=>{if(event.key==='Escape')return perform('untrack',()=>actions.untrack({aimAtEarth:true}));});
+  bind(get('#node-clock-speed'),'change',()=>perform('speed',(_,display)=>{const raw=get('#node-clock-speed').value,value=Number(raw);if(!String(raw).trim()||!Number.isFinite(value)||!speedsOf(display)?.includes(value))throw new Error('연결된 분석 시계가 지원하는 배속을 선택하세요.');return actions.setSpeed(value);}));
+  refresh();return Object.freeze({refresh,destroy(){if(disposed)return;disposed=true;for(const remove of owned.splice(0))remove();}});
+}
+
+function createNodeWorkPanel({root,store,editorTools,now,timers,createFormationId,readDisplay,viewport,scrollTarget,
+  geometryFor,linksFor,verifyLinkSnapshot,oislPresentation,modelFor,modelReadinessFor,models,onModelChange,
+  confirmClear,onDefinitionsChanged,onResetTerminals,onSelected=()=>{},onFocus,readScene,actions,onError=()=>{},initialParams=FORMATION_DEFAULTS}={}){
+  if(!root||!store||typeof readDisplay!=='function'||typeof viewport!=='function')throw new TypeError('node_work_panel_dependencies_required');
+  const host=root.querySelector('#node-fleet'),statusHost=root.querySelector('#node-status'),tip=root.querySelector('#node-tip');
+  if(!host||!statusHost||!tip)throw new TypeError('node_work_panel_hosts_required');
+  let disposed=false,initializing=true,draft,fleet,status,controls,removeTooltips;const owned=[];
+  function refresh(){if(disposed||initializing)return;fleet.refresh();status.refresh();controls.refresh();}
+  function destroy(){if(disposed)return;disposed=true;for(const remove of owned.splice(0))remove();removeTooltips?.();controls?.destroy();fleet?.destroy();status?.destroy();draft?.destroy();}
+  try{
+    draft=createNodeDraftPanel({root,store,editorTools,now,timers,createFormationId,models,onModelChange,confirmClear,onDefinitionsChanged,onResetTerminals,onError,initialParams,onRefresh:refresh,onSelected});
+    status=createNodeStatusPanel({host:statusHost,store,readDisplay,geometryFor,linksFor,verifyLinkSnapshot,oislPresentation,modelFor,modelReadinessFor,onFocus,onError,editor:draft.editor,onEdit:node=>draft.openEditor(node.id)});
+    fleet=createNodeFleetPanel({host,count:root.querySelector('#node-count'),store,readDisplay,linksFor,verifyLinkSnapshot,onError,onSelected:node=>{draft.editor.close();refresh();return onSelected(structuredClone(node),{userInitiated:true,focus:false});}});
+    controls=createNodeSceneControls({root,readScene,readDisplay,actions,onError,canFocus:()=>status.canFocus(),onFocus:()=>status.focusSelected()});
+    const focus=async event=>{if(disposed)return;const row=event.target?.closest?.('[data-node-id]');if(!row||!Array.from(host.querySelectorAll('[data-node-id]')).includes(row)||store.selectedId!==row.dataset.nodeId)return;await status.focusSelected();if(!disposed)refresh();};
+    host.addEventListener('dblclick',focus);owned.push(()=>host.removeEventListener('dblclick',focus));
+    removeTooltips=bindNodeTooltips({root,tip,timers,viewport,scrollTarget});
+    // Source default live slider mode affects future explicit edits only; setLive doesn't generate.
+    draft.formation.setLive(true);initializing=false;refresh();
+  }catch(error){destroy();throw error;}
+  return Object.freeze({refresh,destroy,draft});
+}
+
+function workPanelMarkup(){return `<div class="satellite-node-work-panel">
+<header class="ns-scene-toolbar" aria-label="공용 지구의 내 위성 제어">
+<div><button type="button" data-node-scene="home">뷰 초기화</button><button type="button" data-node-scene="focus" disabled>뷰 정렬</button><button type="button" data-node-scene="tracks" aria-pressed="false" disabled>궤적</button><button type="button" data-node-scene="links" aria-pressed="false" disabled>OISL 링크</button><button type="button" data-node-scene="models" aria-pressed="false" disabled>3D 모델</button></div>
+<div class="ns-clock"><button type="button" id="node-lighting" aria-pressed="false" disabled>☀</button><span id="node-clock-mode">표시 시각 미확인</span><time id="node-clock">—</time><small>UTC</small><button type="button" id="node-clock-back" disabled>−60s</button><button type="button" id="node-clock-pause" aria-label="분석 시계 재생 상태 미확인" disabled>Ⅱ</button><button type="button" id="node-clock-forward" disabled>+60s</button><select id="node-clock-speed" aria-label="분석 배속" disabled><option value="1">×1</option><option value="10">×10</option><option value="60">×60</option><option value="600">×600</option></select><button type="button" id="node-clock-now" disabled>현재</button></div>
+<div class="ns-zoom"><button type="button" id="node-zoom-in" aria-label="공용 지구 확대" disabled>+</button><input id="node-zoom" type="range" min="0" max="100" step="0.1" value="50" aria-label="공용 지구 확대 수준" disabled><button type="button" id="node-zoom-out" aria-label="공용 지구 축소" disabled>−</button></div>
+</header><p class="ns-note">공용 지구와 표시 UTC를 사용합니다. Kepler+J2 모의 노드 · 실제 통신 미확인</p>
+<section class="ns-formation ns-panel" aria-label="편대 배치 도구">
+          <header class="ns-formation-head">
+            <h2>편대 배치</h2>
+            <div class="ns-preset" role="group" aria-label="배치 프리셋"><button data-formation-preset="single" aria-pressed="false">단일</button><button data-formation-preset="train" aria-pressed="false">열차형</button><button data-formation-preset="walker_delta" aria-pressed="true">Walker Δ</button><button data-formation-preset="walker_star" aria-pressed="false">Walker ★</button></div>
+            <label data-tip="생성되는 위성 이름의 접두사입니다. Walker는 접두사-면기호번호(ODT-A1), 열차형은 접두사-번호(ODT-1)로 이름을 붙입니다.">이름 접두사 <input type="text" id="formation-prefix" maxlength="12" value="ODT" autocomplete="off"></label>
+            <label>버스 <select id="formation-bus" aria-label="버스 프리셋" data-tip="위성 버스 프리셋"></select></label>
+            <label>OISL <select id="formation-links" aria-label="OISL 링크 정책" data-tip="OISL 링크 정책"></select></label>
+          </header>
+          <div class="ns-sliders" id="formation-controls"></div>
+          <footer class="ns-formation-foot">
+            <span class="ns-spacer"></span>
+            <label class="ns-live" data-tip="켜져 있으면 편대 생성 후 슬라이더를 움직일 때 같은 편대를 그 자리에서 다시 배치합니다."><input type="checkbox" id="formation-live" checked> 슬라이더 즉시 반영</label>
+            <button id="formation-generate" class="ns-primary" data-tip="이 설정으로 새 편대를 작업 세트에 추가합니다.">편대 생성</button>
+            <button id="formation-remove" disabled>편대 제거</button>
+            <button id="nodes-clear" data-tip="작업 세트의 모든 위성을 지웁니다. 대시보드에 반영된 위성은 회수 전까지 유지됩니다.">전체 비우기</button>
+            <span id="deploy-state">서버 배치 미확인</span>
+            <button id="nodes-deploy" class="ns-deploy" disabled data-tip="서버 수락 경로 연결 후 명시적으로 배치합니다. 현재는 서버 배치 미확인입니다.">배치 완료 → 대시보드</button>
+            <button id="nodes-recall" data-tip="서버 수락 경로 연결 후 명시적으로 회수합니다. 작업 세트는 유지됩니다." disabled>회수</button>
+          </footer>
+        </section>
+
+        <aside class="ns-inspector ns-panel" aria-label="내 위성과 선택 위성">
+          <header class="ns-fleet-head"><h2>내 위성 <span id="node-count" class="ns-count">0</span></h2><button id="node-add">＋ 위성 추가</button></header>
+          <div id="node-fleet" class="ns-fleet" role="listbox" aria-label="내 위성 목록"></div>
+          <div class="ns-detail">
+            <section id="node-status" class="ns-status" aria-live="polite"></section>
+            <form id="node-editor" class="ns-editor" hidden novalidate></form>
+          </div>
+        </aside>
+        <div id="node-tip" class="ns-tip" role="tooltip" hidden></div>
+</div>`;}
+return Object.freeze({formationControlsMarkup,formationSummaryText,createFormationPanel,statusFrame,fleetMarkup,terminalRow,statusPresentation,createNodeStatusPanel,createNodeFleetPanel,bindNodeTooltips,createNodeDraftPanel,workPanelMarkup,createNodeSceneControls,createNodeWorkPanel});
 }
