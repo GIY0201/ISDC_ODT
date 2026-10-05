@@ -172,3 +172,11 @@ Dependency T070→T071→T072→T073→T074. W08/F001/F002/F004~6/T032/W06 저�
 - [x] T088 browser/catalog_geometry.js/catalog_workspace/workspace_orbit/workspace_globe/orbit_globe에선택hook/단일Viewer/표시해제/latefence 조립, 실제assembly시험.
 - [x] T089 전체Python/Node/실제8891두해상도/원본계산·storedGP불변과validation/t089_catalog_position.md/ledger/log/DraftPR리뷰.
 Dependency T085→T086→T087→T088→T089. T075partial유지;원본전체범위/재생/지상국목록/모델/성능T032보존. 새agent없음.
+
+## US12 / T075 ground station list and selection
+- [x] T090 [US12] Add RED sourcegolden/selection/renderer/canvas ownership and real assembly tests in project_support/tests/browser/station_workspace.test.mjs and station_globe.test.mjs; original fixture project_support/tests/fixtures/original_station_sites.json.
+- [x] T091 [US12] Extract used original preset data and sites/groups in digital_twin/model_library/browser/station_presets.js and ground_station_sites.js; reuse card helpers user_application/web/scripts/orbit/station_card.js, static mount application.py and ADR0011.
+- [x] T092 [US12] Implement presentation selection/list/detail in user_application/web/scripts/tabs/station_workspace.js with no runtime commands; source metadata disclosure and null/error ownership.
+- [x] T093 [US12] Inject shared station display/select/focus callbacks through workspace_orbit.js/workspace_globe.js to digital_twin/visualization/orbit_globe.js; add one pick handler and stable29 markers; keep satellite and virtual point.
+- [x] T094 [US12] Complete full Python/Node and actual8891 two-resolution selection/click/clear/restore/readonly checks; validation/t094_ground_stations.md, audit/ledger/logs and stacked Draft review abovePR25.
+Dependency T090→91→92→93→94; T075 remains partial for catalogue playback/multi-satellite/3D-sun and dynamic station geometry. T032/F001/F002/F004–6/W06disk unknown preserved.

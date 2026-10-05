@@ -1,3 +1,5 @@
+import {GROUND_STATIONS,stationGroups} from '/static/model_library/ground_station_sites.js';
+import {createStationPanel} from './tabs/station_workspace.js?v=t093-r3';
 import {createCatalogGeometry} from './catalog_geometry.js?v=t088-r1';
 import {createCatalogPanel} from './tabs/catalog_workspace.js?v=t088-r1';
 import {createHilPanel} from './tabs/hil_workspace.js?v=t069-r2';
@@ -9,7 +11,7 @@ import {drawMultiLine,drawSparkline} from '/static/visualization/charts.js';
 import {createSimPanel} from './tabs/sim_workspace.js?v=t069-r2';
 import {createMissionPanel} from './tabs/mission_workspace.js?v=t069-r2';
 import {createOrbitSelection} from './orbit_selection.js?v=t031-r1';
-import {createWorkspaceGlobe} from './workspace_globe.js?v=t088-r1';
+import {createWorkspaceGlobe} from './workspace_globe.js?v=t093-r3';
 import {createWorkspacePlayback} from './workspace_playback.js';
 import {createGroundPanel} from './tabs/ground_visibility.js?v=t053-r1';
 import {createRadioSeriesPanel} from './tabs/orbit_radio_series.js?v=t053-r1';
@@ -20,6 +22,8 @@ import {createRfPanel} from './tabs/rf_link_budget.js?v=t039-r1';
 const escape=value=>String(value??'미확인').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let view=null,displayUtc=null,displayElevation='자료 준비 중';
 const globe=createWorkspaceGlobe(document.getElementById('stored-orbit-globe'),document.getElementById('orbit-globe-status'),document.getElementById('orbit-globe-focus'));
+const stationPanel=createStationPanel(GROUND_STATIONS,stationGroups(),{select:key=>globe.selectStation(key),focus:key=>globe.focusStation(key)});
+globe.stations(Object.values(GROUND_STATIONS),key=>stationPanel.controller.choose(key));
 const client=createOrbitSelection(api,render);
 const revisionSync=createWorkspaceRevisionSync(client);
 const seriesPanel=createRadioSeriesPanel(client,api);
@@ -40,7 +44,7 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   revisionSync.observe(client.snapshot());
@@ -55,6 +59,7 @@ function render(){
   kpiPanel.update();
   hilPanel.update();
   catalogPanel.update();
+  stationPanel.update();
   if(view!=='satellite')return;
   const screen=document.getElementById('screen');let panel=document.getElementById('stored-orbit');
   if(!panel){panel=document.createElement('section');panel.id='stored-orbit';panel.className='panel';screen.prepend(panel);}
@@ -74,7 +79,7 @@ function render(){
   panel.querySelector('#orbit-seek').addEventListener('click',()=>{const field=panel.querySelector('#orbit-utc'),utc=field.value.trim();delete field.dataset.dirty;command(()=>client.seek(utc));});
   panel.querySelector('#orbit-epoch').addEventListener('click',()=>{delete panel.querySelector('#orbit-utc').dataset.dirty;command(()=>client.seek(record.epoch_utc));});
 }
-export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);}
+export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);stationPanel.show(view);}
 client.load();
 
 export function applyWorkspaceDraft(items,remote=false){

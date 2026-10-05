@@ -1,0 +1,1918 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_sha256": {
+    "digital_twin/model_library/browser/ground_stations.js": "d63b55ab5d1e354de743f96a8998871d426217b62d551caeca131c39dc8c5ce4",
+    "digital_twin/model_library/browser/ground_station_sites.js": "bf0eba70afd8072fd2d28d374cc7c2dc98e84cd9062bba731954491f9f72834e",
+    "user_application/web/scripts/orbit/station_card.js": "5619d174a4fc72cbe5b0dea0122aaffcf5c7ed451b545ced6d688ecf7abcd01f"
+  },
+  "sites": {
+    "SEOUL": {
+      "key": "SEOUL",
+      "name": "서울",
+      "region": "대한민국",
+      "group": "korea",
+      "operator": "도시 기준 대표 관측점",
+      "network": "기준점",
+      "role": "관측 기준 (도시 좌표)",
+      "latitude": 37.5665,
+      "longitude": 126.978,
+      "altitudeKm": 0.04,
+      "dishMeters": 7.3,
+      "bands": [
+        "S",
+        "X",
+        "Ka"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": "seoul"
+    },
+    "DAEJEON": {
+      "key": "DAEJEON",
+      "name": "대전",
+      "region": "대한민국",
+      "group": "korea",
+      "operator": "한국항공우주연구원 (KARI)",
+      "network": "위성운영센터",
+      "role": "국가 위성 관제·추적",
+      "latitude": 36.3742,
+      "longitude": 127.3567,
+      "altitudeKm": 0.07,
+      "dishMeters": 13,
+      "bands": [
+        "S",
+        "X",
+        "Ka"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": "daejeon"
+    },
+    "JEJU": {
+      "key": "JEJU",
+      "name": "제주",
+      "region": "대한민국",
+      "group": "korea",
+      "operator": "한국항공우주연구원 (KARI)",
+      "network": "제주 추적소",
+      "role": "저궤도 위성 추적·수신",
+      "latitude": 33.4996,
+      "longitude": 126.5312,
+      "altitudeKm": 0.03,
+      "dishMeters": 7.3,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": "jeju"
+    },
+    "SVALBARD": {
+      "key": "SVALBARD",
+      "name": "스발바르",
+      "region": "노르웨이",
+      "group": "polar",
+      "operator": "KSAT",
+      "network": "SvalSat",
+      "role": "극궤도 위성 다중 패스 수신",
+      "latitude": 78.2298,
+      "longitude": 15.4078,
+      "altitudeKm": 0.45,
+      "dishMeters": 11,
+      "bands": [
+        "S",
+        "X",
+        "Ka"
+      ],
+      "minElevationDeg": 3,
+      "presetKey": "svalbard"
+    },
+    "TROMSO": {
+      "key": "TROMSO",
+      "name": "트롬쇠",
+      "region": "노르웨이",
+      "group": "polar",
+      "operator": "KSAT",
+      "network": "TrollSat·SvalSat 연계",
+      "role": "고위도 추적",
+      "latitude": 69.6627,
+      "longitude": 18.9401,
+      "altitudeKm": 0.1,
+      "dishMeters": 11,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": "tromso"
+    },
+    "FAIRBANKS": {
+      "key": "FAIRBANKS",
+      "name": "페어뱅크스",
+      "region": "미국 알래스카",
+      "group": "americas",
+      "operator": "NASA / 알래스카대 ASF",
+      "network": "NASA Near Space Network",
+      "role": "극궤도 지구관측 수신",
+      "latitude": 64.8378,
+      "longitude": -147.7164,
+      "altitudeKm": 0.14,
+      "dishMeters": 11,
+      "bands": [
+        "S",
+        "X",
+        "Ka"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": "fairbanks"
+    },
+    "INUVIK": {
+      "key": "INUVIK",
+      "name": "이누빅",
+      "region": "캐나다",
+      "group": "polar",
+      "operator": "캐나다 NRCan / DLR·SSC 공동",
+      "network": "Inuvik Satellite Station Facility",
+      "role": "고위도 지구관측 수신",
+      "latitude": 68.3607,
+      "longitude": -133.723,
+      "altitudeKm": 0.02,
+      "dishMeters": 13,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": "inuvik"
+    },
+    "SINGAPORE": {
+      "key": "SINGAPORE",
+      "name": "싱가포르",
+      "region": "싱가포르",
+      "group": "asia_oceania",
+      "operator": "상용 지상국 사업자 (대표)",
+      "network": "적도 부근 상용 지상국",
+      "role": "저경사 궤도 수신",
+      "latitude": 1.3521,
+      "longitude": 103.8198,
+      "altitudeKm": 0.02,
+      "dishMeters": 7.3,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 7,
+      "presetKey": "singapore"
+    },
+    "HAWAII": {
+      "key": "HAWAII",
+      "name": "하와이",
+      "region": "미국",
+      "group": "asia_oceania",
+      "operator": "SSC",
+      "network": "South Point",
+      "role": "태평양 중계·추적",
+      "latitude": 19.0136,
+      "longitude": -155.6634,
+      "altitudeKm": 0.2,
+      "dishMeters": 9,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": "hawaii"
+    },
+    "ATACAMA": {
+      "key": "ATACAMA",
+      "name": "아타카마",
+      "region": "칠레",
+      "group": "americas",
+      "operator": "고지대 대표 관측점",
+      "network": "기준점",
+      "role": "남반구 고지대 관측",
+      "latitude": -23.0229,
+      "longitude": -67.753,
+      "altitudeKm": 2.4,
+      "dishMeters": 7.3,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": "atacama"
+    },
+    "PUNTA_ARENAS": {
+      "key": "PUNTA_ARENAS",
+      "name": "푼타아레나스",
+      "region": "칠레",
+      "group": "americas",
+      "operator": "SSC / KSAT",
+      "network": "남미 남단 지상국",
+      "role": "극궤도 남반구 수신",
+      "latitude": -53.1638,
+      "longitude": -70.9171,
+      "altitudeKm": 0.03,
+      "dishMeters": 11,
+      "bands": [
+        "S",
+        "X",
+        "Ka"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": "punta_arenas"
+    },
+    "HOBART": {
+      "key": "HOBART",
+      "name": "호바트",
+      "region": "호주",
+      "group": "asia_oceania",
+      "operator": "도시 기준 대표 관측점",
+      "network": "기준점",
+      "role": "남반구 고위도 관측",
+      "latitude": -42.8821,
+      "longitude": 147.3272,
+      "altitudeKm": 0.02,
+      "dishMeters": 7.3,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": "hobart"
+    },
+    "KUMSAN": {
+      "key": "KUMSAN",
+      "name": "금산",
+      "region": "대한민국",
+      "group": "korea",
+      "operator": "KT SAT",
+      "network": "금산 위성지구국 (텔레포트)",
+      "role": "정지궤도 통신위성 관제·중계",
+      "latitude": 36.108,
+      "longitude": 127.487,
+      "altitudeKm": 0.1,
+      "dishMeters": 30,
+      "bands": [
+        "C",
+        "Ku",
+        "Ka"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "USUDA": {
+      "key": "USUDA",
+      "name": "우스다",
+      "region": "일본",
+      "group": "asia_oceania",
+      "operator": "JAXA",
+      "network": "우스다 심우주 관측소",
+      "role": "심우주 탐사선 추적",
+      "latitude": 36.133,
+      "longitude": 138.362,
+      "altitudeKm": 1.45,
+      "dishMeters": 64,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "BYALALU": {
+      "key": "BYALALU",
+      "name": "비얄랄루",
+      "region": "인도",
+      "group": "asia_oceania",
+      "operator": "ISRO ISTRAC",
+      "network": "Indian Deep Space Network",
+      "role": "심우주·달 탐사 추적",
+      "latitude": 12.9,
+      "longitude": 77.37,
+      "altitudeKm": 0.85,
+      "dishMeters": 32,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "NEW_NORCIA": {
+      "key": "NEW_NORCIA",
+      "name": "뉴노샤",
+      "region": "호주",
+      "group": "asia_oceania",
+      "operator": "ESA",
+      "network": "ESTRACK 심우주 안테나 DSA-1",
+      "role": "심우주 추적",
+      "latitude": -31.048,
+      "longitude": 116.191,
+      "altitudeKm": 0.25,
+      "dishMeters": 35,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "DONGARA": {
+      "key": "DONGARA",
+      "name": "동가라",
+      "region": "호주",
+      "group": "asia_oceania",
+      "operator": "SSC",
+      "network": "Western Australian Space Centre",
+      "role": "저궤도 상용 수신",
+      "latitude": -29.046,
+      "longitude": 115.349,
+      "altitudeKm": 0.24,
+      "dishMeters": 13,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "CANBERRA": {
+      "key": "CANBERRA",
+      "name": "캔버라",
+      "region": "호주",
+      "group": "asia_oceania",
+      "operator": "NASA / CSIRO",
+      "network": "Deep Space Network (Tidbinbilla)",
+      "role": "심우주 추적",
+      "latitude": -35.4014,
+      "longitude": 148.9819,
+      "altitudeKm": 0.7,
+      "dishMeters": 70,
+      "bands": [
+        "S",
+        "X",
+        "Ka"
+      ],
+      "minElevationDeg": 6,
+      "presetKey": null
+    },
+    "KIRUNA": {
+      "key": "KIRUNA",
+      "name": "키루나",
+      "region": "스웨덴",
+      "group": "europe_africa",
+      "operator": "ESA / SSC",
+      "network": "ESTRACK · Esrange",
+      "role": "극궤도 수신·추적",
+      "latitude": 67.857,
+      "longitude": 20.964,
+      "altitudeKm": 0.4,
+      "dishMeters": 15,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "WEILHEIM": {
+      "key": "WEILHEIM",
+      "name": "바일하임",
+      "region": "독일",
+      "group": "europe_africa",
+      "operator": "DLR",
+      "network": "GSOC 지상국",
+      "role": "위성 관제·추적",
+      "latitude": 47.881,
+      "longitude": 11.085,
+      "altitudeKm": 0.6,
+      "dishMeters": 15,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "MADRID": {
+      "key": "MADRID",
+      "name": "마드리드",
+      "region": "스페인",
+      "group": "europe_africa",
+      "operator": "NASA / INTA",
+      "network": "Deep Space Network (Robledo)",
+      "role": "심우주 추적",
+      "latitude": 40.4314,
+      "longitude": -4.2481,
+      "altitudeKm": 0.8,
+      "dishMeters": 70,
+      "bands": [
+        "S",
+        "X",
+        "Ka"
+      ],
+      "minElevationDeg": 6,
+      "presetKey": null
+    },
+    "MASPALOMAS": {
+      "key": "MASPALOMAS",
+      "name": "마스팔로마스",
+      "region": "스페인 카나리아",
+      "group": "europe_africa",
+      "operator": "ESA / INTA",
+      "network": "ESTRACK",
+      "role": "저궤도·발사 추적",
+      "latitude": 27.763,
+      "longitude": -15.634,
+      "altitudeKm": 0.2,
+      "dishMeters": 15,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "KOUROU": {
+      "key": "KOUROU",
+      "name": "쿠루",
+      "region": "프랑스령 기아나",
+      "group": "americas",
+      "operator": "ESA / CNES",
+      "network": "ESTRACK · 기아나 우주센터",
+      "role": "발사·초기 궤도 추적",
+      "latitude": 5.2515,
+      "longitude": -52.8047,
+      "altitudeKm": 0,
+      "dishMeters": 15,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "HARTEBEESTHOEK": {
+      "key": "HARTEBEESTHOEK",
+      "name": "하르테비스훅",
+      "region": "남아프리카공화국",
+      "group": "europe_africa",
+      "operator": "SANSA",
+      "network": "Hartebeesthoek 지상국",
+      "role": "저궤도·발사 추적",
+      "latitude": -25.887,
+      "longitude": 27.707,
+      "altitudeKm": 1.55,
+      "dishMeters": 12,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "GOLDSTONE": {
+      "key": "GOLDSTONE",
+      "name": "골드스톤",
+      "region": "미국 캘리포니아",
+      "group": "americas",
+      "operator": "NASA JPL",
+      "network": "Deep Space Network",
+      "role": "심우주 추적",
+      "latitude": 35.4267,
+      "longitude": -116.89,
+      "altitudeKm": 1,
+      "dishMeters": 70,
+      "bands": [
+        "S",
+        "X",
+        "Ka"
+      ],
+      "minElevationDeg": 6,
+      "presetKey": null
+    },
+    "WALLOPS": {
+      "key": "WALLOPS",
+      "name": "월롭스",
+      "region": "미국 버지니아",
+      "group": "americas",
+      "operator": "NASA",
+      "network": "Near Space Network",
+      "role": "저궤도 수신·발사 추적",
+      "latitude": 37.925,
+      "longitude": -75.476,
+      "altitudeKm": 0,
+      "dishMeters": 11,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "MALARGUE": {
+      "key": "MALARGUE",
+      "name": "말라르궤",
+      "region": "아르헨티나",
+      "group": "americas",
+      "operator": "ESA",
+      "network": "ESTRACK 심우주 안테나 DSA-3",
+      "role": "심우주 추적",
+      "latitude": -35.776,
+      "longitude": -69.398,
+      "altitudeKm": 1.55,
+      "dishMeters": 35,
+      "bands": [
+        "X",
+        "Ka"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "TROLL": {
+      "key": "TROLL",
+      "name": "트롤",
+      "region": "남극 (노르웨이 기지)",
+      "group": "polar",
+      "operator": "KSAT",
+      "network": "TrollSat",
+      "role": "극궤도 남극 수신",
+      "latitude": -72.012,
+      "longitude": 2.535,
+      "altitudeKm": 1.3,
+      "dishMeters": 7.3,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    },
+    "MCMURDO": {
+      "key": "MCMURDO",
+      "name": "맥머도",
+      "region": "남극 (미국 기지)",
+      "group": "polar",
+      "operator": "NASA / NSF",
+      "network": "Near Space Network",
+      "role": "극궤도 남극 수신",
+      "latitude": -77.846,
+      "longitude": 166.668,
+      "altitudeKm": 0.15,
+      "dishMeters": 10,
+      "bands": [
+        "S",
+        "X"
+      ],
+      "minElevationDeg": 5,
+      "presetKey": null
+    }
+  },
+  "groups": [
+    {
+      "key": "korea",
+      "label": "대한민국",
+      "sites": [
+        {
+          "key": "KUMSAN",
+          "name": "금산",
+          "region": "대한민국",
+          "group": "korea",
+          "operator": "KT SAT",
+          "network": "금산 위성지구국 (텔레포트)",
+          "role": "정지궤도 통신위성 관제·중계",
+          "latitude": 36.108,
+          "longitude": 127.487,
+          "altitudeKm": 0.1,
+          "dishMeters": 30,
+          "bands": [
+            "C",
+            "Ku",
+            "Ka"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "DAEJEON",
+          "name": "대전",
+          "region": "대한민국",
+          "group": "korea",
+          "operator": "한국항공우주연구원 (KARI)",
+          "network": "위성운영센터",
+          "role": "국가 위성 관제·추적",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitudeKm": 0.07,
+          "dishMeters": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": "daejeon"
+        },
+        {
+          "key": "SEOUL",
+          "name": "서울",
+          "region": "대한민국",
+          "group": "korea",
+          "operator": "도시 기준 대표 관측점",
+          "network": "기준점",
+          "role": "관측 기준 (도시 좌표)",
+          "latitude": 37.5665,
+          "longitude": 126.978,
+          "altitudeKm": 0.04,
+          "dishMeters": 7.3,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": "seoul"
+        },
+        {
+          "key": "JEJU",
+          "name": "제주",
+          "region": "대한민국",
+          "group": "korea",
+          "operator": "한국항공우주연구원 (KARI)",
+          "network": "제주 추적소",
+          "role": "저궤도 위성 추적·수신",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitudeKm": 0.03,
+          "dishMeters": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": "jeju"
+        }
+      ]
+    },
+    {
+      "key": "asia_oceania",
+      "label": "아시아·오세아니아",
+      "sites": [
+        {
+          "key": "NEW_NORCIA",
+          "name": "뉴노샤",
+          "region": "호주",
+          "group": "asia_oceania",
+          "operator": "ESA",
+          "network": "ESTRACK 심우주 안테나 DSA-1",
+          "role": "심우주 추적",
+          "latitude": -31.048,
+          "longitude": 116.191,
+          "altitudeKm": 0.25,
+          "dishMeters": 35,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "DONGARA",
+          "name": "동가라",
+          "region": "호주",
+          "group": "asia_oceania",
+          "operator": "SSC",
+          "network": "Western Australian Space Centre",
+          "role": "저궤도 상용 수신",
+          "latitude": -29.046,
+          "longitude": 115.349,
+          "altitudeKm": 0.24,
+          "dishMeters": 13,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "BYALALU",
+          "name": "비얄랄루",
+          "region": "인도",
+          "group": "asia_oceania",
+          "operator": "ISRO ISTRAC",
+          "network": "Indian Deep Space Network",
+          "role": "심우주·달 탐사 추적",
+          "latitude": 12.9,
+          "longitude": 77.37,
+          "altitudeKm": 0.85,
+          "dishMeters": 32,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "SINGAPORE",
+          "name": "싱가포르",
+          "region": "싱가포르",
+          "group": "asia_oceania",
+          "operator": "상용 지상국 사업자 (대표)",
+          "network": "적도 부근 상용 지상국",
+          "role": "저경사 궤도 수신",
+          "latitude": 1.3521,
+          "longitude": 103.8198,
+          "altitudeKm": 0.02,
+          "dishMeters": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 7,
+          "presetKey": "singapore"
+        },
+        {
+          "key": "USUDA",
+          "name": "우스다",
+          "region": "일본",
+          "group": "asia_oceania",
+          "operator": "JAXA",
+          "network": "우스다 심우주 관측소",
+          "role": "심우주 탐사선 추적",
+          "latitude": 36.133,
+          "longitude": 138.362,
+          "altitudeKm": 1.45,
+          "dishMeters": 64,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "CANBERRA",
+          "name": "캔버라",
+          "region": "호주",
+          "group": "asia_oceania",
+          "operator": "NASA / CSIRO",
+          "network": "Deep Space Network (Tidbinbilla)",
+          "role": "심우주 추적",
+          "latitude": -35.4014,
+          "longitude": 148.9819,
+          "altitudeKm": 0.7,
+          "dishMeters": 70,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "minElevationDeg": 6,
+          "presetKey": null
+        },
+        {
+          "key": "HAWAII",
+          "name": "하와이",
+          "region": "미국",
+          "group": "asia_oceania",
+          "operator": "SSC",
+          "network": "South Point",
+          "role": "태평양 중계·추적",
+          "latitude": 19.0136,
+          "longitude": -155.6634,
+          "altitudeKm": 0.2,
+          "dishMeters": 9,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": "hawaii"
+        },
+        {
+          "key": "HOBART",
+          "name": "호바트",
+          "region": "호주",
+          "group": "asia_oceania",
+          "operator": "도시 기준 대표 관측점",
+          "network": "기준점",
+          "role": "남반구 고위도 관측",
+          "latitude": -42.8821,
+          "longitude": 147.3272,
+          "altitudeKm": 0.02,
+          "dishMeters": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": "hobart"
+        }
+      ]
+    },
+    {
+      "key": "europe_africa",
+      "label": "유럽·아프리카",
+      "sites": [
+        {
+          "key": "MADRID",
+          "name": "마드리드",
+          "region": "스페인",
+          "group": "europe_africa",
+          "operator": "NASA / INTA",
+          "network": "Deep Space Network (Robledo)",
+          "role": "심우주 추적",
+          "latitude": 40.4314,
+          "longitude": -4.2481,
+          "altitudeKm": 0.8,
+          "dishMeters": 70,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "minElevationDeg": 6,
+          "presetKey": null
+        },
+        {
+          "key": "MASPALOMAS",
+          "name": "마스팔로마스",
+          "region": "스페인 카나리아",
+          "group": "europe_africa",
+          "operator": "ESA / INTA",
+          "network": "ESTRACK",
+          "role": "저궤도·발사 추적",
+          "latitude": 27.763,
+          "longitude": -15.634,
+          "altitudeKm": 0.2,
+          "dishMeters": 15,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "WEILHEIM",
+          "name": "바일하임",
+          "region": "독일",
+          "group": "europe_africa",
+          "operator": "DLR",
+          "network": "GSOC 지상국",
+          "role": "위성 관제·추적",
+          "latitude": 47.881,
+          "longitude": 11.085,
+          "altitudeKm": 0.6,
+          "dishMeters": 15,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "KIRUNA",
+          "name": "키루나",
+          "region": "스웨덴",
+          "group": "europe_africa",
+          "operator": "ESA / SSC",
+          "network": "ESTRACK · Esrange",
+          "role": "극궤도 수신·추적",
+          "latitude": 67.857,
+          "longitude": 20.964,
+          "altitudeKm": 0.4,
+          "dishMeters": 15,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "HARTEBEESTHOEK",
+          "name": "하르테비스훅",
+          "region": "남아프리카공화국",
+          "group": "europe_africa",
+          "operator": "SANSA",
+          "network": "Hartebeesthoek 지상국",
+          "role": "저궤도·발사 추적",
+          "latitude": -25.887,
+          "longitude": 27.707,
+          "altitudeKm": 1.55,
+          "dishMeters": 12,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        }
+      ]
+    },
+    {
+      "key": "americas",
+      "label": "북미·남미",
+      "sites": [
+        {
+          "key": "GOLDSTONE",
+          "name": "골드스톤",
+          "region": "미국 캘리포니아",
+          "group": "americas",
+          "operator": "NASA JPL",
+          "network": "Deep Space Network",
+          "role": "심우주 추적",
+          "latitude": 35.4267,
+          "longitude": -116.89,
+          "altitudeKm": 1,
+          "dishMeters": 70,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "minElevationDeg": 6,
+          "presetKey": null
+        },
+        {
+          "key": "MALARGUE",
+          "name": "말라르궤",
+          "region": "아르헨티나",
+          "group": "americas",
+          "operator": "ESA",
+          "network": "ESTRACK 심우주 안테나 DSA-3",
+          "role": "심우주 추적",
+          "latitude": -35.776,
+          "longitude": -69.398,
+          "altitudeKm": 1.55,
+          "dishMeters": 35,
+          "bands": [
+            "X",
+            "Ka"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "ATACAMA",
+          "name": "아타카마",
+          "region": "칠레",
+          "group": "americas",
+          "operator": "고지대 대표 관측점",
+          "network": "기준점",
+          "role": "남반구 고지대 관측",
+          "latitude": -23.0229,
+          "longitude": -67.753,
+          "altitudeKm": 2.4,
+          "dishMeters": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": "atacama"
+        },
+        {
+          "key": "WALLOPS",
+          "name": "월롭스",
+          "region": "미국 버지니아",
+          "group": "americas",
+          "operator": "NASA",
+          "network": "Near Space Network",
+          "role": "저궤도 수신·발사 추적",
+          "latitude": 37.925,
+          "longitude": -75.476,
+          "altitudeKm": 0,
+          "dishMeters": 11,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "KOUROU",
+          "name": "쿠루",
+          "region": "프랑스령 기아나",
+          "group": "americas",
+          "operator": "ESA / CNES",
+          "network": "ESTRACK · 기아나 우주센터",
+          "role": "발사·초기 궤도 추적",
+          "latitude": 5.2515,
+          "longitude": -52.8047,
+          "altitudeKm": 0,
+          "dishMeters": 15,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "FAIRBANKS",
+          "name": "페어뱅크스",
+          "region": "미국 알래스카",
+          "group": "americas",
+          "operator": "NASA / 알래스카대 ASF",
+          "network": "NASA Near Space Network",
+          "role": "극궤도 지구관측 수신",
+          "latitude": 64.8378,
+          "longitude": -147.7164,
+          "altitudeKm": 0.14,
+          "dishMeters": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": "fairbanks"
+        },
+        {
+          "key": "PUNTA_ARENAS",
+          "name": "푼타아레나스",
+          "region": "칠레",
+          "group": "americas",
+          "operator": "SSC / KSAT",
+          "network": "남미 남단 지상국",
+          "role": "극궤도 남반구 수신",
+          "latitude": -53.1638,
+          "longitude": -70.9171,
+          "altitudeKm": 0.03,
+          "dishMeters": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": "punta_arenas"
+        }
+      ]
+    },
+    {
+      "key": "polar",
+      "label": "극지",
+      "sites": [
+        {
+          "key": "MCMURDO",
+          "name": "맥머도",
+          "region": "남극 (미국 기지)",
+          "group": "polar",
+          "operator": "NASA / NSF",
+          "network": "Near Space Network",
+          "role": "극궤도 남극 수신",
+          "latitude": -77.846,
+          "longitude": 166.668,
+          "altitudeKm": 0.15,
+          "dishMeters": 10,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "SVALBARD",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "group": "polar",
+          "operator": "KSAT",
+          "network": "SvalSat",
+          "role": "극궤도 위성 다중 패스 수신",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitudeKm": 0.45,
+          "dishMeters": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "minElevationDeg": 3,
+          "presetKey": "svalbard"
+        },
+        {
+          "key": "INUVIK",
+          "name": "이누빅",
+          "region": "캐나다",
+          "group": "polar",
+          "operator": "캐나다 NRCan / DLR·SSC 공동",
+          "network": "Inuvik Satellite Station Facility",
+          "role": "고위도 지구관측 수신",
+          "latitude": 68.3607,
+          "longitude": -133.723,
+          "altitudeKm": 0.02,
+          "dishMeters": 13,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": "inuvik"
+        },
+        {
+          "key": "TROLL",
+          "name": "트롤",
+          "region": "남극 (노르웨이 기지)",
+          "group": "polar",
+          "operator": "KSAT",
+          "network": "TrollSat",
+          "role": "극궤도 남극 수신",
+          "latitude": -72.012,
+          "longitude": 2.535,
+          "altitudeKm": 1.3,
+          "dishMeters": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": null
+        },
+        {
+          "key": "TROMSO",
+          "name": "트롬쇠",
+          "region": "노르웨이",
+          "group": "polar",
+          "operator": "KSAT",
+          "network": "TrollSat·SvalSat 연계",
+          "role": "고위도 추적",
+          "latitude": 69.6627,
+          "longitude": 18.9401,
+          "altitudeKm": 0.1,
+          "dishMeters": 11,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "minElevationDeg": 5,
+          "presetKey": "tromso"
+        }
+      ]
+    }
+  ],
+  "facts": {
+    "SEOUL": [
+      [
+        "좌표",
+        "37.5665° N, 126.9780° E"
+      ],
+      [
+        "고도",
+        "0.04 km"
+      ],
+      [
+        "안테나",
+        "7.3 m 급"
+      ],
+      [
+        "대역",
+        "S · X · Ka"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "관측 기준 (도시 좌표)"
+      ]
+    ],
+    "DAEJEON": [
+      [
+        "좌표",
+        "36.3742° N, 127.3567° E"
+      ],
+      [
+        "고도",
+        "0.07 km"
+      ],
+      [
+        "안테나",
+        "13 m 급"
+      ],
+      [
+        "대역",
+        "S · X · Ka"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "국가 위성 관제·추적"
+      ]
+    ],
+    "JEJU": [
+      [
+        "좌표",
+        "33.4996° N, 126.5312° E"
+      ],
+      [
+        "고도",
+        "0.03 km"
+      ],
+      [
+        "안테나",
+        "7.3 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "저궤도 위성 추적·수신"
+      ]
+    ],
+    "SVALBARD": [
+      [
+        "좌표",
+        "78.2298° N, 15.4078° E"
+      ],
+      [
+        "고도",
+        "0.45 km"
+      ],
+      [
+        "안테나",
+        "11 m 급"
+      ],
+      [
+        "대역",
+        "S · X · Ka"
+      ],
+      [
+        "최소 고각",
+        "3°"
+      ],
+      [
+        "역할",
+        "극궤도 위성 다중 패스 수신"
+      ]
+    ],
+    "TROMSO": [
+      [
+        "좌표",
+        "69.6627° N, 18.9401° E"
+      ],
+      [
+        "고도",
+        "0.10 km"
+      ],
+      [
+        "안테나",
+        "11 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "고위도 추적"
+      ]
+    ],
+    "FAIRBANKS": [
+      [
+        "좌표",
+        "64.8378° N, 147.7164° W"
+      ],
+      [
+        "고도",
+        "0.14 km"
+      ],
+      [
+        "안테나",
+        "11 m 급"
+      ],
+      [
+        "대역",
+        "S · X · Ka"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "극궤도 지구관측 수신"
+      ]
+    ],
+    "INUVIK": [
+      [
+        "좌표",
+        "68.3607° N, 133.7230° W"
+      ],
+      [
+        "고도",
+        "0.02 km"
+      ],
+      [
+        "안테나",
+        "13 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "고위도 지구관측 수신"
+      ]
+    ],
+    "SINGAPORE": [
+      [
+        "좌표",
+        "1.3521° N, 103.8198° E"
+      ],
+      [
+        "고도",
+        "0.02 km"
+      ],
+      [
+        "안테나",
+        "7.3 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "7°"
+      ],
+      [
+        "역할",
+        "저경사 궤도 수신"
+      ]
+    ],
+    "HAWAII": [
+      [
+        "좌표",
+        "19.0136° N, 155.6634° W"
+      ],
+      [
+        "고도",
+        "0.20 km"
+      ],
+      [
+        "안테나",
+        "9 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "태평양 중계·추적"
+      ]
+    ],
+    "ATACAMA": [
+      [
+        "좌표",
+        "23.0229° S, 67.7530° W"
+      ],
+      [
+        "고도",
+        "2.40 km"
+      ],
+      [
+        "안테나",
+        "7.3 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "남반구 고지대 관측"
+      ]
+    ],
+    "PUNTA_ARENAS": [
+      [
+        "좌표",
+        "53.1638° S, 70.9171° W"
+      ],
+      [
+        "고도",
+        "0.03 km"
+      ],
+      [
+        "안테나",
+        "11 m 급"
+      ],
+      [
+        "대역",
+        "S · X · Ka"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "극궤도 남반구 수신"
+      ]
+    ],
+    "HOBART": [
+      [
+        "좌표",
+        "42.8821° S, 147.3272° E"
+      ],
+      [
+        "고도",
+        "0.02 km"
+      ],
+      [
+        "안테나",
+        "7.3 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "남반구 고위도 관측"
+      ]
+    ],
+    "KUMSAN": [
+      [
+        "좌표",
+        "36.1080° N, 127.4870° E"
+      ],
+      [
+        "고도",
+        "0.10 km"
+      ],
+      [
+        "안테나",
+        "30 m 급"
+      ],
+      [
+        "대역",
+        "C · Ku · Ka"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "정지궤도 통신위성 관제·중계"
+      ]
+    ],
+    "USUDA": [
+      [
+        "좌표",
+        "36.1330° N, 138.3620° E"
+      ],
+      [
+        "고도",
+        "1.45 km"
+      ],
+      [
+        "안테나",
+        "64 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "심우주 탐사선 추적"
+      ]
+    ],
+    "BYALALU": [
+      [
+        "좌표",
+        "12.9000° N, 77.3700° E"
+      ],
+      [
+        "고도",
+        "0.85 km"
+      ],
+      [
+        "안테나",
+        "32 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "심우주·달 탐사 추적"
+      ]
+    ],
+    "NEW_NORCIA": [
+      [
+        "좌표",
+        "31.0480° S, 116.1910° E"
+      ],
+      [
+        "고도",
+        "0.25 km"
+      ],
+      [
+        "안테나",
+        "35 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "심우주 추적"
+      ]
+    ],
+    "DONGARA": [
+      [
+        "좌표",
+        "29.0460° S, 115.3490° E"
+      ],
+      [
+        "고도",
+        "0.24 km"
+      ],
+      [
+        "안테나",
+        "13 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "저궤도 상용 수신"
+      ]
+    ],
+    "CANBERRA": [
+      [
+        "좌표",
+        "35.4014° S, 148.9819° E"
+      ],
+      [
+        "고도",
+        "0.70 km"
+      ],
+      [
+        "안테나",
+        "70 m 급"
+      ],
+      [
+        "대역",
+        "S · X · Ka"
+      ],
+      [
+        "최소 고각",
+        "6°"
+      ],
+      [
+        "역할",
+        "심우주 추적"
+      ]
+    ],
+    "KIRUNA": [
+      [
+        "좌표",
+        "67.8570° N, 20.9640° E"
+      ],
+      [
+        "고도",
+        "0.40 km"
+      ],
+      [
+        "안테나",
+        "15 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "극궤도 수신·추적"
+      ]
+    ],
+    "WEILHEIM": [
+      [
+        "좌표",
+        "47.8810° N, 11.0850° E"
+      ],
+      [
+        "고도",
+        "0.60 km"
+      ],
+      [
+        "안테나",
+        "15 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "위성 관제·추적"
+      ]
+    ],
+    "MADRID": [
+      [
+        "좌표",
+        "40.4314° N, 4.2481° W"
+      ],
+      [
+        "고도",
+        "0.80 km"
+      ],
+      [
+        "안테나",
+        "70 m 급"
+      ],
+      [
+        "대역",
+        "S · X · Ka"
+      ],
+      [
+        "최소 고각",
+        "6°"
+      ],
+      [
+        "역할",
+        "심우주 추적"
+      ]
+    ],
+    "MASPALOMAS": [
+      [
+        "좌표",
+        "27.7630° N, 15.6340° W"
+      ],
+      [
+        "고도",
+        "0.20 km"
+      ],
+      [
+        "안테나",
+        "15 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "저궤도·발사 추적"
+      ]
+    ],
+    "KOUROU": [
+      [
+        "좌표",
+        "5.2515° N, 52.8047° W"
+      ],
+      [
+        "고도",
+        "0.00 km"
+      ],
+      [
+        "안테나",
+        "15 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "발사·초기 궤도 추적"
+      ]
+    ],
+    "HARTEBEESTHOEK": [
+      [
+        "좌표",
+        "25.8870° S, 27.7070° E"
+      ],
+      [
+        "고도",
+        "1.55 km"
+      ],
+      [
+        "안테나",
+        "12 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "저궤도·발사 추적"
+      ]
+    ],
+    "GOLDSTONE": [
+      [
+        "좌표",
+        "35.4267° N, 116.8900° W"
+      ],
+      [
+        "고도",
+        "1.00 km"
+      ],
+      [
+        "안테나",
+        "70 m 급"
+      ],
+      [
+        "대역",
+        "S · X · Ka"
+      ],
+      [
+        "최소 고각",
+        "6°"
+      ],
+      [
+        "역할",
+        "심우주 추적"
+      ]
+    ],
+    "WALLOPS": [
+      [
+        "좌표",
+        "37.9250° N, 75.4760° W"
+      ],
+      [
+        "고도",
+        "0.00 km"
+      ],
+      [
+        "안테나",
+        "11 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "저궤도 수신·발사 추적"
+      ]
+    ],
+    "MALARGUE": [
+      [
+        "좌표",
+        "35.7760° S, 69.3980° W"
+      ],
+      [
+        "고도",
+        "1.55 km"
+      ],
+      [
+        "안테나",
+        "35 m 급"
+      ],
+      [
+        "대역",
+        "X · Ka"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "심우주 추적"
+      ]
+    ],
+    "TROLL": [
+      [
+        "좌표",
+        "72.0120° S, 2.5350° E"
+      ],
+      [
+        "고도",
+        "1.30 km"
+      ],
+      [
+        "안테나",
+        "7.3 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "극궤도 남극 수신"
+      ]
+    ],
+    "MCMURDO": [
+      [
+        "좌표",
+        "77.8460° S, 166.6680° E"
+      ],
+      [
+        "고도",
+        "0.15 km"
+      ],
+      [
+        "안테나",
+        "10 m 급"
+      ],
+      [
+        "대역",
+        "S · X"
+      ],
+      [
+        "최소 고각",
+        "5°"
+      ],
+      [
+        "역할",
+        "극궤도 남극 수신"
+      ]
+    ]
+  }
+}

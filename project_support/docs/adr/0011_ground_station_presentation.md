@@ -1,0 +1,14 @@
+# ADR0011 Ground station reference presentation
+
+Accepted for US12 (2026-10-05). Reuse the senior prototype pinned at1a1e00297a0301637455b0ef2cf48b2e74576b07: 12STATION_PRESETS data plus17 extra sites, grouped into5regions, and original coordinate/selector/card helpers. No newly invented site records or antenna parameters. Only used preset data is extracted into station_presets.js; ground_station_sites.js changes its import to a local relative module. The unused visibleSatelliteCount helper is excluded. Reused card facts are displayed; original live rows are not displayed because this increment does not calculate look angles or passes.
+
+Model data stays in digital_twin/model_library/browser and is served by a narrowly scoped /static/model_library mount. Application tabs/station_workspace.js owns an ephemeral presentation copy, shared between its satellite/ground views in one document. The shared globe owns stable reference-ground-{key} entities, one pick handler and callback injection. Source add/style/focus/pick semantics are adapted to the existing render-only OrbitGlobe; no original synthetic propagation or communication link rendering is copied. Selected site uses regional camera scale2,500,000m/duration1.2s and highlight. A virtual observer at identical geographic coordinates can overlap a preset; drillPick fallback only for that virtual marker resolves the reference-site selection. Satellite and unrelated picks remain ignored.
+
+Selecting/filtering/clearing a station cannot change stored GP/UTC/virtual point, SIM, RF inputs or native calculations. The existing manual virtual point apply is preserved. There is no new physical station RuntimeState/store or HTTP API; pick listener and scene resources are disposed once. Region filtering affects selector entries, all29 reference points remain displayed. No cross-window or reload persistence is newly promised.
+
+Original records are representative prototype settings, not verified current facility coordinates, measured heights, antenna specs or actual reception. The original altitudeKm is displayed as a representative preset height; Cartesian plotting assumes WGS84 ellipsoid height for this model. Current facility/communications confirmation stays F001. Dynamic station geometry, automatic observer application, catalogue multi-body/playback and 3D/sun remain T075 partial.
+
+Source fixture original_station_sites.json captures every site/group/card fact and these original SHA-256 values:
+- digital_twin/model_library/browser/ground_stations.js: d63b55ab5d1e354de743f96a8998871d426217b62d551caeca131c39dc8c5ce4
+- digital_twin/model_library/browser/ground_station_sites.js: bf0eba70afd8072fd2d28d374cc7c2dc98e84cd9062bba731954491f9f72834e
+- user_application/web/scripts/orbit/station_card.js: 5619d174a4fc72cbe5b0dea0122aaffcf5c7ed451b545ced6d688ecf7abcd01f
