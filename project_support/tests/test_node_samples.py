@@ -41,6 +41,27 @@ def test_bad_track_period_is_not_a_fallback_circle(period):
 def test_leap_track_center_is_explicitly_unsupported():
  with pytest.raises(ValueError,match='unsupported_node_time'):node_track_grid('2016-12-31T23:59:60Z',95.65)
 
+def test_browser_decoder_accepts_python_track_receipts_with_source_periods(tmp_path):
+ """Real Python grid/query and real JS decoder; injected native rows, no live/GPU claim."""
+ import subprocess
+ root=Path(__file__).resolve().parents[2]
+ nodes=[definition('N-'+str(i),900001+i,altitude) for i,altitude in enumerate([550,800,35786])]
+ center='2026-10-04T22:01:12.000900000Z'
+ result=asyncio.run(NodeGeometryQuery(calculate=batch).track(nodes,center,'cross-language'))
+ payload={'request':{'request_id':'cross-language','nodes':nodes,'center_utc':center},'response':result}
+ path=tmp_path/'tracks.json';path.write_text(json.dumps(payload),encoding='utf-8')
+ script="""
+ import {readFileSync} from 'node:fs';
+ import assert from 'node:assert/strict';
+ import {createNodeTrackBuffer} from './user_application/web/scripts/nodes/node_timeline.js';
+ import {catalogElements} from './digital_twin/simulation/browser/node_orbit_definition.js';
+ const f=JSON.parse(readFileSync(process.argv[1],'utf8'));
+ const buffer=createNodeTrackBuffer(f.request,f.response,{periodFor:n=>catalogElements(n.orbit).PERIOD_MINUTES});
+ for(const node of f.request.nodes){const path=buffer.pathFor(node);assert.equal(path.visible,true);assert.equal(path.positions_m.length,121);assert.deepEqual(path.positions_m[120],[1000,2000,3000]);}
+ """
+ value=subprocess.run(['node','--input-type=module','-e',script,str(path)],cwd=root,capture_output=True,text=True,timeout=30)
+ assert value.returncode==0,value.stdout+value.stderr
+
 def definition(identity='N-1',catalog=900001,altitude=550):
  orbit=dict(next(c for c in FIXTURE['cases'] if c['id']=='elements:0')['input']['orbit']);orbit['altitude_km']=altitude
  return {'schema':1,'id':identity,'catalog_number':catalog,'orbit':orbit}

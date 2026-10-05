@@ -648,3 +648,8 @@ Actualowned31524/3780 CIMconfirmed (standarddenied/read-onlyescalation), freshly
 - 변경: 기존Viewer/표시UTC 우선순위에 태양buffer·renderer 연결, 선배조명설정key/event/theme재사용·storage이벤트/정리, 기존지구설정에 UTC/품질/오류·재시도. 원본숨김CSS와 V6표식class 적용 차이 명시.
 - 검증: target8PASS145.5529ms/Node349PASS1291.5502ms/Python471PASS8warnings206.15s; validation/t135_workspace_solar.md. unknown status solar 우선순위 RED 수정. 실제브라우저T136 전.
 - 남음: T136–137 실제8891두해상도/복원/Draft, US18Terra/fullT075–84/T032/장비/HIL/다운로드/AeroDT. 서버restart/포트8891/native/wheel/runtime/API/PR/병합변경없음.
+
+## 2026-10-06 T147 궤적 응답 검증 부분 진행
+- 변경: 원본121점/공전주기/밀리초TimeClip/한점실패시전체숨김을 native 응답 decoder에 적용. 입력정의·hash·출처·UTC·실패·사본경계 보존, 새 시계·JS전파 없음.
+- 검증: missingexport RED; Node485PASS2832.0123ms/Python546PASS8기존warnings149.55s/session15231exit0. 실제Pythonquery와JSdecoder/sourceperiod 대조33PASS; native행은 주입값으로 live/GPU 증거 아님. validation/t147_node_track_buffer.md.
+- 남음: T147 공용UTC미리받기/30초갱신/표본·궤적취소소유권, T148/T079/T149–153 및전체T075–84/T032/장비/다운로드. 8891서버/native/browser/remotePR/병합 변경없음.

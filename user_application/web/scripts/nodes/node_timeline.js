@@ -80,6 +80,44 @@ export async function createNodeSampleBufferAsync(request,response,{yieldControl
   for(;;){check();const next=work.next();if(next.done)return next.value;await yieldControl({signal});check();}
 }
 
+// Calendar conversion for the source Date TimeClip grid, not a display clock.
+function trackCenterMillis(utc){
+  const match=typeof utc==='string'&&/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?(?:Z|\+00:00)$/.exec(utc);
+  if(!match)throw new Error('explicit node UTC required');
+  const [year,month,day,hour,minute,second]=match.slice(1,7).map(Number);
+  if(second===60)throw new Error('unsupported_node_time');
+  const date=new Date(0);date.setUTCFullYear(year,month-1,day);date.setUTCHours(hour,minute,second,0);
+  if(year<1||date.getUTCFullYear()!==year||date.getUTCMonth()!==month-1||date.getUTCDate()!==day||date.getUTCHours()!==hour||date.getUTCMinutes()!==minute||date.getUTCSeconds()!==second)throw new Error('invalid node UTC calendar');
+  return date.getTime()+Number('0.'+(match[7]??'0'))*1000;
+}
+
+export function createNodeTrackBuffer(request,response,{periodFor,expectedHashes={}}={}){
+  if(typeof periodFor!=='function')throw new TypeError('source static period resolver required');
+  if(!request||typeof request.request_id!=='string'||!request.request_id.trim()||request.request_id.length>128||!Array.isArray(request.nodes)||request.nodes.length<1||request.nodes.length>240)throw new Error('invalid node track request');
+  const center=trackCenterMillis(request.center_utc);
+  if(!response||response.schema_version!==1||response.request_id!==request.request_id||!['valid','partial','error'].includes(response.status)||Object.entries(metadata).some(([key,value])=>response[key]!==value)||!Array.isArray(response.nodes)||response.nodes.length!==request.nodes.length)throw new Error('node track metadata mismatch');
+  const entries=new Map(),catalogs=new Set();let errors=0;
+  for(const [index,node]of request.nodes.entries()){
+    const key=definitionKeyFor(node,entries,catalogs),period=periodFor(structuredClone(node)),result=response.nodes[index];
+    if(!Number.isFinite(period)||period<=0||!result||result.period_minutes!==period||result.node_id!==node.id||typeof result.definition_hash!=='string'||!/^[0-9a-f]{64}$/.test(result.definition_hash)||Object.hasOwn(expectedHashes,node.id)&&expectedHashes[node.id]!==result.definition_hash||!Array.isArray(result.rows)||result.rows.length!==121)throw new Error('node track identity/hash/period mismatch');
+    const failures=[],positions=[];
+    for(const [i,row]of result.rows.entries()){
+      const utc=codec.advance(new Date(Math.trunc(center+(i-60)*period*60000/120)).toISOString(),0);
+      if(!row||row.utc!==utc)throw new Error('node track UTC grid mismatch');
+      if(row.status==='error'){
+        if(typeof row.error_code!=='string'||!row.error_code.trim()||row.error_code.length>128||fields.some(field=>row[field]!==null))throw new Error('malformed native node track error');
+        errors++;failures.push({utc,error_code:row.error_code});
+      }else if(!valid(row))throw new Error('malformed native node track success');
+      else positions.push([...row.position_m]);
+    }
+    const visible=failures.length===0;
+    if(result.path_visible!==visible)throw new Error('node track visibility mismatch');
+    catalogs.add(node.catalog_number);entries.set(node.id,{key,path:{...metadata,node_id:node.id,node_definition:structuredClone(node),definition_hash:result.definition_hash,center_utc:request.center_utc,period_minutes:period,visible,positions_m:visible?positions:[],errors:failures}});
+  }
+  if(response.status!==(errors===request.nodes.length*121?'error':errors?'partial':'valid'))throw new Error('node track aggregate status mismatch');
+  return Object.freeze({pathFor(node){const entry=entries.get(node?.id);if(!entry)return null;try{return identity(node)===entry.key?structuredClone(entry.path):null;}catch{return null;}},nodeIds:()=>[...entries.keys()],definitionHashes:()=>Object.fromEntries([...entries].map(([id,entry])=>[id,entry.path.definition_hash]))});
+}
+
 // Application owns when to ask for a new shared UTC. This object owns only readonly sample buffers.
 export function createNodeTimeline({api,requestId,yieldControl,onChange=()=>{},onError=()=>{}}={}){
   if(typeof api?.nodeSamples!=='function'||typeof requestId!=='function'||typeof yieldControl!=='function')throw new TypeError('node timeline dependencies required');
