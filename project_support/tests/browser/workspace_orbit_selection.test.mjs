@@ -12,6 +12,7 @@ test('empty UI choice restores server selection without clearing its result or s
   globalThis.testOrbitClient={snapshot:()=>data,select:value=>calls.push(value),samples(){},load(){}};
   globalThis.window={addEventListener(){}};
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
+    .replace(/import \{createGlobeViewPanel\} from [^;]+;/,'const createGlobeViewPanel=()=>({show(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createCatalogTrack\} from [^;]+;/,'const createCatalogTrack=()=>({select(){},observe(){},destroy(){}});')
     .replace(/import \{createCatalogPasses\} from [^;]+;/,'const createCatalogPasses=()=>({update(){},destroy(){}});')
     .replace(/import \{createCatalogPassPanel\} from [^;]+;/,'const createCatalogPassPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')

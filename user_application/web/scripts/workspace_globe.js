@@ -1,8 +1,21 @@
-import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t115-r1';
+import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t119-r1';
 
 /** Render-only copy, never a clock/selection authority. One controller per document. */
 export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let globe=null,latest=null,catalog=null,sceneInput=null,sceneMetadata=null,trackInput=null,onCatalogSelect=()=>{},groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
+  let choice={mode:'3d',imagery:'blue_marble',theme:'dark',emphasis:true},imagery={requestedImagery:'blue_marble',displayedImagery:null,phase:'pending',error:null},mode={phase:'ready',error:null},modeRevision=0;
+  const viewObservers=new Set();
+  const viewState=()=>structuredClone({choice,imagery,mode,available:Boolean(globe)&&!failed&&!disposed});
+  const notifyView=()=>{if(!disposed)for(const fn of viewObservers)fn(viewState());};
+  function applyView(fields){
+    if(!globe||disposed)return;
+    if(fields.includes('theme')||fields.includes('emphasis'))globe.setViewStyle(choice.theme,choice.emphasis);
+    if(fields.includes('imagery'))void globe.setViewImagery(choice.imagery);
+    if(fields.includes('mode')){
+      const revision=++modeRevision;mode={phase:'pending',error:null};notifyView();
+      globe.setViewMode(choice.mode).then(ok=>{if(disposed||revision!==modeRevision)return;mode={phase:ok?'ready':'error',error:ok?null:'지구 전환이 완료되지 않았습니다.'};notifyView();}).catch(error=>{if(disposed||revision!==modeRevision)return;mode={phase:'error',error:String(error?.message||error)};notifyView();});
+    }
+  }
   const describe=message=>{status.textContent=message;};
   function paint(){
     focusButton.disabled=true;
@@ -25,19 +38,27 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     failed=true;focusButton.disabled=true;container.dataset.orbitVisible='false';
     removeError?.();removeError=null;globe?.destroy();globe=null;
     describe('지구 렌더링을 사용할 수 없습니다. 위성 창의 수치 결과를 확인하세요. 합성 위치는 표시하지 않습니다.');
+    notifyView();
   }
   function boot(){
     if(disposed||globe||failed)return;
     if(!host.Cesium){fail();return;}
     try{
-      globe=new OrbitGlobe(host.Cesium,container);
+      const C=host.Cesium;
+      const createProvider=async name=>{
+        if(name==='blue_marble')return C.SingleTileImageryProvider.fromUrl('/static/assets/nasa_blue_marble_september.jpg',{credit:'NASA Blue Marble'});
+        if(name==='satellite')return C.ArcGisMapServerImageryProvider.fromUrl('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',{enablePickFeatures:false});
+        if(name==='osm')return new C.OpenStreetMapImageryProvider({url:'https://tile.openstreetmap.org/'});
+        if(name==='natural')return C.TileMapServiceImageryProvider.fromUrl(C.buildModuleUrl('Assets/Textures/NaturalEarthII'));
+        throw Error('지원하지 않는 지도입니다.');
+      };
+      globe=new OrbitGlobe(C,container,{createProvider,onStatus:value=>{if(disposed)return;imagery=structuredClone(value);container.dataset.imagery=imagery.displayedImagery||'unavailable';notifyView();}});
       if(stations.length){globe.setStations(stations,onStationSelect);globe.selectStation(selectedStation);}
       if(sceneInput){globe.setCatalogScene(sceneInput,onCatalogSelect);sceneInput=null;}
       if(trackInput)globe.setCatalogTrack(trackInput);
       removeError=globe.viewer.scene.renderError.addEventListener(fail);
-      host.Cesium.SingleTileImageryProvider.fromUrl('/static/assets/nasa_blue_marble_september.jpg',{credit:'NASA Blue Marble'}).then(provider=>{
-        if(!disposed&&globe)globe.setImagery(provider);
-      }).catch(()=>{container.dataset.imagery='unavailable';});
+      applyView(['theme','emphasis','imagery',...(choice.mode==='2d'?['mode']:[])]);
+      notifyView();
       paint();
     }catch{fail();}
   }
@@ -45,6 +66,16 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   if(host.Cesium)boot();else host.addEventListener('load',boot,{once:true});
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
+    viewState,
+    observeView(fn){if(disposed)return()=>{};viewObservers.add(fn);fn(viewState());return()=>viewObservers.delete(fn);},
+    changeView(patch){
+      if(disposed||!patch||typeof patch!=='object'||Array.isArray(patch)||Object.keys(patch).some(key=>!['mode','imagery','theme','emphasis'].includes(key)))return false;
+      const next={...choice,...patch};
+      if(!['2d','3d'].includes(next.mode)||!['blue_marble','satellite','osm','natural'].includes(next.imagery)||!['dark','light'].includes(next.theme)||typeof next.emphasis!=='boolean')return false;
+      const changed=Object.keys(patch).filter(key=>next[key]!==choice[key]);choice=next;
+      try{applyView(changed);}catch(error){mode={phase:'error',error:String(error?.message||error)};}
+      notifyView();return true;
+    },
     stations(values,onSelect){stations=structuredClone(values);onStationSelect=onSelect;globe?.setStations(stations,onStationSelect);},
     selectStation(key){selectedStation=key;globe?.selectStation(key);},
     focusStation(key){if(globe?.focusStation(key)){focused=true;return true;}return false;},
@@ -67,6 +98,6 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       paint();
       if(!catalog&&!latest&&!sceneMetadata&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
     },
-    destroy(){if(disposed)return;disposed=true;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
+    destroy(){if(disposed)return;disposed=true;viewObservers.clear();++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
   };
 }

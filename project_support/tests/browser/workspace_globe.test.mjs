@@ -7,6 +7,7 @@ test('shared globe gates UTC/revision/hash, clears during requests, and disposes
     constructor(){this.updates=[];this.viewer={scene:{renderError:{addEventListener:()=>()=>{}}}};instances.push(this);}
     update(value){this.updates.push(value);return Boolean(value);}
     setGroundPoint(value){this.ground=value;}
+    setViewStyle(){}setViewImagery(){return Promise.resolve(true);}setViewMode(){return Promise.resolve(true);}
     focus(){}destroy(){this.destroyCount=(this.destroyCount||0)+1;}
   };
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.TestGlobe;');

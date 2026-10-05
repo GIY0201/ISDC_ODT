@@ -11,3 +11,7 @@ Additional actual mousepick on the globe,1280x720 at678,403, selected overlappin
 Readonly source review: strictresponse/provenance and partial-with-no-known-interval semantics match existing search_visibility; original error status preserved. Original dense period shape, explicitquery/AOSclock ownership and no failurebridge retained. No new dependency/stack or nativewheel. No actionable scoped blocker found; fullgoal not complete.
 
 Functional final verification is complete. T116 checkbox remains pending until actual Draft PR abovePR29 is created/attached and remote tree matches these committed bytes. T075sun/modes/imagery/labels/modelassets and all T076–T084 remain open. T032/SC006,F001/F004–6 and disk-saveunknown remain unresolved. No merge.
+
+
+## Publication confirmed
+Draft PR30 https://github.com/GIY0201/ISDC_ODT/pull/30 abovePR29 is attached/open/unmerged/mergeabletrue. All39changed source blobs matched local Git SHAs; remote tree6c98af43a6462ddb53781b2c8a78750bbc48d834 exactly equals validated local source749a999. Remote consolidatedhead6e1bef2c279e1a00a32da9675dcfc4cb65f7c384 fetched and tree rechecked. Localseries preserved codex/catalog-track-passes-local-749a999; clean/exacttree comparison preceded softreconciliation, no hardreset. T116 scopedcomplete; fullT075–T084 remainopen. Initial defaultnetwork fetch failed; authorized escalatedread succeeded. Publication bookkeeping follows separately; no new code/test or merge claim.
