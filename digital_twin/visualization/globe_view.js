@@ -8,28 +8,45 @@ export class GlobeView {
   async setMode(mode){
     if(!['2d','3d'].includes(mode))throw Error('Invalid globe mode');
     if(this.destroyed)return false;
-    const generation=++this.modeGeneration,{scene,camera}=this.viewer,C=this.C;
-    const transitioning=Boolean(this.cancelMorph)||scene.mode===C.SceneMode.MORPHING;
-    this.cancelMorph?.();this.cancelMorph=null;
-    if(transitioning)scene.completeMorph();
-    camera.cancelFlight();camera.lookAtTransform(C.Matrix4.IDENTITY);
-    const target=mode==='2d'?C.SceneMode.SCENE2D:C.SceneMode.SCENE3D;
-    if(scene.mode!==target){
-      const completed=await new Promise((resolve,reject)=>{
-        let remove=()=>{};
-        const settle=value=>{remove();if(this.cancelMorph===cancel)this.cancelMorph=null;resolve(value);};
-        const cancel=()=>settle(false);this.cancelMorph=cancel;
-        remove=scene.morphComplete.addEventListener(()=>settle(true));
-        try{if(mode==='2d')scene.morphTo2D(1.5);else scene.morphTo3D(1.5);}
-        catch(error){remove();if(this.cancelMorph===cancel)this.cancelMorph=null;reject(error);}
+    ++this.modeGeneration;
+    this.cancelMorph?.();
+    return new Promise((resolve,reject)=>{
+      const request={mode,resolve,reject};this.modeRequest=request;
+      this.cancelMorph=()=>{
+        if(this.modeRequest!==request)return;
+        this.modeRequest=null;this.cancelMorph=null;resolve(false);
+      };
+      this._advanceMode();
+    });
+  }
+  _advanceMode(){
+    const request=this.modeRequest;
+    if(this.destroyed||!request)return;
+    const {scene,camera}=this.viewer,C=this.C;
+    const target=request.mode==='2d'?C.SceneMode.SCENE2D:C.SceneMode.SCENE3D;
+    // User-input morph completion is deliberately disabled by our camera owner.
+    // Keep the physical transition listener when a caller is superseded; Cesium
+    // ignores another morph request until the current transition has finished.
+    if(scene.mode===C.SceneMode.MORPHING||scene.mode!==target){
+      if(this.removeMorph)return;
+      this.removeMorph=scene.morphComplete.addEventListener(()=>{
+        this.removeMorph?.();this.removeMorph=null;this._advanceMode();
       });
-      if(!completed||this.destroyed||generation!==this.modeGeneration)return false;
+      if(scene.mode===C.SceneMode.MORPHING)return;
+      camera.cancelFlight();camera.lookAtTransform(C.Matrix4.IDENTITY);
+      try{if(request.mode==='2d')scene.morphTo2D(1.5);else scene.morphTo3D(1.5);}
+      catch(error){
+        this.removeMorph?.();this.removeMorph=null;
+        if(this.modeRequest===request){this.modeRequest=null;this.cancelMorph=null;request.reject(error);}
+      }
+      return;
     }
-    if(scene.mode!==target)return false;
-    const is2D=mode==='2d',controller=scene.screenSpaceCameraController;
+    camera.cancelFlight();camera.lookAtTransform(C.Matrix4.IDENTITY);
+    const is2D=request.mode==='2d',controller=scene.screenSpaceCameraController;
     controller.enableRotate=!is2D;controller.enableTilt=!is2D;controller.minimumZoomDistance=is2D?1000:100000;
-    if(is2D){camera.lookAtTransform(C.Matrix4.IDENTITY);camera.direction=new C.Cartesian3(0,0,-1);camera.up=new C.Cartesian3(0,1,0);camera.right=new C.Cartesian3(1,0,0);}
-    this.mode=mode;scene.requestRender();return true;
+    if(is2D){camera.direction=new C.Cartesian3(0,0,-1);camera.up=new C.Cartesian3(0,1,0);camera.right=new C.Cartesian3(1,0,0);}
+    this.mode=request.mode;this.modeRequest=null;this.cancelMorph=null;
+    scene.requestRender();request.resolve(true);
   }
   async setImagery(mode){
     if(!['blue_marble','satellite','osm','natural'].includes(mode))throw Error('Invalid globe imagery');
@@ -85,7 +102,7 @@ export class GlobeView {
   }
   destroy(){
     if(this.destroyed)return;this.destroyed=true;++this.imageryGeneration;++this.modeGeneration;
-    this.cancelMorph?.();this.cancelMorph=null;this.removeTileError?.();this.removeTileError=null;
+    this.cancelMorph?.();this.cancelMorph=null;this.removeMorph?.();this.removeMorph=null;this.removeTileError?.();this.removeTileError=null;
     if(this.layer)this.viewer.imageryLayers.remove(this.layer,true);this.layer=null;
   }
 }

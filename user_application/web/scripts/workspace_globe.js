@@ -1,4 +1,4 @@
-import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t119-r1';
+import {OrbitGlobe} from '/static/visualization/orbit_globe.js?v=t136-r1';
 
 /** Render-only copy, never a clock/selection authority. One controller per document. */
 export function createWorkspaceGlobe(container,status,focusButton,host=window){

@@ -1,5 +1,10 @@
 # 현재 개발 기록
 
+## 2026-10-05 T136 2D/3D 빠른 전환 수정
+- 변경: Cesium 강제 morph 완료 불가 조건의 마지막 요청 대기 처리와 import 버전 갱신. 원본 입력 정책/1.5초 유지.
+- 검증: 회귀 RED2→대상7PASS, 전체Node350PASS1286.0838ms/Python471PASS8기존warnings213.18s. 실제8891 두해상도 mode3/inputflagfalse/onecanvas/console0/궤도상태 observedclock 외 동일. validation/t136_morph_repair.md.
+- 남음: T136 태양 실제 표시/가림 및 전체matrix/T137Draft/US18Terra와 전체T075–84/T032/장비·통신/다운로드·AerODT. 서버/포트/native/API/PR/병합 변경 없음.
+
 ## 2026-10-05 T126 카메라 입력·단일 지구 조립 부분 진행
 - 변경: 원본3D25/2D7카메라시나리오native계약대조, 원본Earth중심wheel추출/핀치보존·입력소유복원, OrbitGlobe모델진입점/초점·전환해제/정리연결. model UI아직미조립.
 - 검증: 전체Node300PASS1124.4004ms/Python439PASS5기존warnings180.70s. 실제8891두해상도wheel확대/2D→3D/canvas1/로그오류0; 궤도상태observed_monotonic_s제외동일. 불완전Viewer정리결함RED수정. validation/t126_model_camera.md.

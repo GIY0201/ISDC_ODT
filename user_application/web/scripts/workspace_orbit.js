@@ -24,7 +24,7 @@ import {drawMultiLine,drawSparkline} from '/static/visualization/charts.js';
 import {createSimPanel} from './tabs/sim_workspace.js?v=t069-r2';
 import {createMissionPanel} from './tabs/mission_workspace.js?v=t069-r2';
 import {createOrbitSelection} from './orbit_selection.js?v=t031-r1';
-import {createWorkspaceGlobe} from './workspace_globe.js?v=t135-r1';
+import {createWorkspaceGlobe} from './workspace_globe.js?v=t136-r1';
 import {createWorkspacePlayback} from './workspace_playback.js';
 import {createGroundPanel} from './tabs/ground_visibility.js?v=t097-r2';
 import {createRadioSeriesPanel} from './tabs/orbit_radio_series.js?v=t053-r1';

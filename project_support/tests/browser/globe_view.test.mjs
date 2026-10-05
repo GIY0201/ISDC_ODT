@@ -15,12 +15,30 @@ const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve
 test('rapid mode switch settles prior request and north-up2D; destroy cleans morph',async()=>{
   const {view,viewer,morph,calls}=fixture();
   const old=view.setMode('2d');const latest=view.setMode('3d');assert.equal(await old,false);
+  viewer.scene.mode=2;morph.raise();
+  assert.equal(viewer.scene.mode,0);assert.deepEqual(calls.filter(Array.isArray),[['2d',1.5],['3d',1.5]]);
   viewer.scene.mode=3;morph.raise();assert.equal(await latest,true);assert.equal(morph.listeners.size,0);
   const two=view.setMode('2d');viewer.scene.mode=2;morph.raise();assert.equal(await two,true);
   assert.equal(viewer.scene.screenSpaceCameraController.enableRotate,false);assert.equal(viewer.scene.screenSpaceCameraController.enableTilt,false);assert.equal(viewer.scene.screenSpaceCameraController.minimumZoomDistance,1000);
   assert.deepEqual({...viewer.camera.up},{x:0,y:1,z:0});assert.ok(calls.some(x=>Array.isArray(x)&&x[1]===1.5));
   const pending=view.setMode('3d');view.destroy();assert.equal(await pending,false);assert.equal(morph.listeners.size,0);
   await assert.rejects(()=>view.setMode('invalid'));assert.equal(await view.setMode('2d'),false);
+});
+test('non-interruptible morph waits for completion and applies only the latest queued mode',async()=>{
+  const {view,viewer,morph,calls}=fixture();
+  viewer.scene.completeMorphOnUserInput=false;
+  viewer.scene.completeMorph=()=>{calls.push('ineffective-complete');};
+  const first=view.setMode('2d'),obsolete=view.setMode('3d'),latest=view.setMode('2d');
+  assert.equal(await first,false);assert.equal(await obsolete,false);
+  assert.deepEqual(calls.filter(Array.isArray),[['2d',1.5]]);
+  assert.equal(morph.listeners.size,1);
+  viewer.scene.mode=2;morph.raise();assert.equal(await latest,true);
+  assert.equal(view.mode,'2d');assert.equal(morph.listeners.size,0);
+  assert.equal(viewer.scene.completeMorphOnUserInput,false);
+  assert.equal(calls.includes('ineffective-complete'),false);
+  const active=view.setMode('3d'),queued=view.setMode('2d');
+  assert.equal(await active,false);view.destroy();assert.equal(await queued,false);
+  viewer.scene.mode=3;morph.raise();assert.equal(view.mode,'2d');assert.equal(morph.listeners.size,0);
 });
 test('map load is atomic/latest-only and retains unrelated overlays; stale errors cannot fallback',async()=>{
   const requests=new Map(),{view,layers,states}=fixture(mode=>{const d=deferred();requests.set(mode,d);return d.promise;});
