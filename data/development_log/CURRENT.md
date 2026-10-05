@@ -1,5 +1,10 @@
 # 현재 개발 기록
 
+## 2026-10-05 T137 게시 시도와 T076 원본 경계 대조
+- 변경: 기존 HEAD0badd5f에서 `codex/catalog-solar-display` 브랜치로 분리. 모델 기준 c796847 보존, 원본 노드/편대/전력/시간·프레임 계약 사전 대조를 validation/t076_source_boundaries.md에 기록. 제품 코드 변경 없음.
+- 검증: 원본 HEAD1a1e002/4파일 SHA256·본문, PR31 open/Draft/head0634243 확인, whitespace 검사. 실제 Git push는 credential-manager 인증 대기 후 취소, 비대화 재시도는 저장 인증 없음으로 실패. GitHub branch 목록에서 두 새 원격 브랜치 없음 확인. 이 작업의 고아 인증 프로세스만 정리.
+- 남음: T137 게시/검토 미완료. Git 인증 복구 필요; 독립 T076 상세설계/원본 golden 준비는 진행 가능. T075/Terra/all50/T076–84/T032/장비·통신·HIL/다운로드/AeroDT 전체 유지. 서버8891/API/native/제품 동작/병합 변경 없음.
+
 ## 2026-10-05 T136 태양 통합 수용 검증 완료
 - 변경: 제품 코드 변경 없이 나머지 실제 두해상도 UTC/60x/우선순위/오류·복구/theme/두창 preference·복원 증거를 추가하고 T136만 완료 처리.
 - 검증: 52DOM 사본/canvas1/601요청·480초선행 약8초간격/pairedUTC/응답200, orbit observedclock 외 동일·SIM elapsed/sequence만 증가. 기존 최종471Python/350Node 유지. validation/t137_solar_display.md.
