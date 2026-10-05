@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-06 T146 원본 편집기 부분 이식
+- 변경: 원본 필드/장비/모드/버스/모델표시/궤도요약 편집기, library/정적요약/time 주입. 잘못된 날짜·빈 숫자·저장오류/미응답 시 편집 유지, 비동기저장 취소/늦은응답 차단, 소유listener정리/사본/복원focus:false. 사라진모델·상대는 선택값을미확인으로보존.
+- 검증: pinned원본4module hash검사, 실제5bus markup/summary 동일; 두63539bytecapture SHA3a7ad626… 동일. missingmodule RED 및 safety9PASS1FAIL 후target10PASS125.5196ms, 전체Node400PASS1482.8903ms/전체Python543PASS8기존warnings229.18s(session83298exit0)/syntax/stageddiffcheck. validation/t146_node_editor.md.
+- 남음: T146unchecked, 편대120ms슬라이더/패널·상태·동작 연결 다음. fakeDOM시험은 실제브라우저/성능증거아님. T147–153/T079실제수락/N001/전체T076/T075–84/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. 서버8891/native설치/사용자화면/원격PR·병합 변경 없음.
+
+
 ## 2026-10-05 T145 원본 초안·편대 store 이식
 - 변경: 원본 CRUD/선택/dirty/편대교체/키·schema·240상한, library/storage/time/수락검사 주입. 사본·중복/finite·전체복원 검사, 저장실패 memory/ID보존, 개별수정 편대분리, revision/token 충돌과명시reload, restore수락false. 실제수락은 T150/T079만.
 - 검증: 원본3sourcehash VM11상태 두capture65029bytes/SHA83edb7bc… 동일 및 전체11결과일치. missingmodule RED 후15PASS, 추가16PASS3FAIL보완 후target19PASS133.2599ms/최종Node390PASS1359.5967ms/전체Python543PASS8기존warnings218.57s(session48227exit0)/syntax/diffcheck. validation/t145_constellation.md.
