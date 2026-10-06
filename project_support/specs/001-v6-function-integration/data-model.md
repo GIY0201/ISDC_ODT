@@ -90,3 +90,17 @@ FR030/FR031/SC026, contracts/satellite_nodes.md. Design only.
 - NodeGeometryBatch: requestId/source commit/profile/definition hashes/explicit canonical UTC grid/frame/time model/copy-owned finite fixed_position_m and inertial_velocity_km_s/sunlit or aligned row errors. Fixed positions are EARTH_FIXED_GMST_UTC_APPROX; no GP hash or ITRF claim. Original calculations remain identified as engineering assumptions.
 - AcceptedDataDeployment: runtime-owned deployment_id/revision/nodes identity roster/run_id/scope_id. Candidate activation precedes commit; same ID+same nodes is idempotent, stale/reused mismatch conflicts, unavailable activation preserves previous receipt. No server orbit definitions or expanded equipment model fields in this roster.
 - PendingDeploymentCommand: captured identity-only nodes, deployment_id, expected_revision and operation kind; same ambiguous retry keeps IDs, successful receipt updates exact captured local copy,409 refresh requires explicit reapply. Initialization/restore performs read only. T079 owns verified data-module capability for activation.
+
+## N016 sampled network visual record
+
+Existing network owner privately retains a single latest captured analyticalrecord;
+NetworkSampledProjection is immutable and registered, not a second state store.
+NETWORK_SAMPLED_UI_V1 includes complete existing envelope/native metadata/full
+node_definitions/stations/faults/definition_hashes/network, utc=analysis_utc,
+display_utc, age_seconds, current_analysis, availability and reason. Opaque actual
+owner continuity and full captured optical analysis are private validation inputs.
+Fresh current view rechecks them, copied marker is not proof. Ordinary periodic
+pending retains still-valid analysis with availability=pending. Failure, invalid
+authority, changed source/config/node/station/fault scope, command and disposal
+invalidate at existing boundaries; pending alone never clears accepted analysis.
+Exact network/fabric/action DTOs are unchanged. See ADR0048/network_timeline contract.

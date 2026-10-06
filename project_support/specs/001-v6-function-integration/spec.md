@@ -223,3 +223,16 @@ seek/pause/play/rate and notify-only changes. Public display JSON, copied flags,
 UTC differences or catalog generation cannot replace that authority. Without its
 optional internal bridge, retained sampled visuals remain unavailable and exact
 current behavior is preserved. This requirement is pending implementation.
+
+## N016 same source migration boundary
+
+The 2026-10-07 design-only entry above is historical. Optical/catalog visual
+composition is implemented in36821fb and separately verified, with wholeacceptance
+stillopen. OriginalFR008/FR030/SC026/fullT077 now progresses to sampledgroundnetwork
+via ADR0048: unchangedexactanalyticalUTC/fullnative optical+node/station/fault scope,
+readonlycurrentendpoint/coverage/diagram/table with visibleanalysisUTC/age and
+unknowncurrentfabricquality. Leaveground/explicitclear disable publication until
+explicitreactivation; stillvalidoldownerlease cannot revivehiddenresources.
+Ordinaryperiodicpending retains verifiedanalysis; failures/invalidauthority clear.
+Currentexactaction/fabric/mission/data checks and wholeT032/tworesolution gates are
+unchanged. N016 is designonly untilits implementation/verification; N017/N018remain.

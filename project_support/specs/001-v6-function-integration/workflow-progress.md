@@ -1245,3 +1245,30 @@ Stable optical sampled application checkpoint: Node1368PASS12121.0829ms, indepen
 reviews and callback failures repaired. Additional real-owner two-resolution/full240
 fixture tests are being stabilized and will be a separate verified checkpoint.
 N016-N018/source communication remainder and wholeactualGPU/acceptance stay OPEN.
+
+## 2026-10-07 N016 prerequisite design
+
+Earlierturnmadeprogress: commit36821fb stable catalog/optical/renderer/status/fleet
+connection with fullNode1368PASS/Python965PASS and independent adversarial review.
+Root verified newrealowner/full240/tworesolution4PASS8006.0426ms (test adapters,
+notliveGPU); testonlyfixture checkpoint pending fullNode rerun. Preserve activegoal.
+N016 ADR0048/plan/contract/taskdependency repaired before networkdependentcode.
+Independent design review running; whole T075-T084 scope and T032 unchanged.
+Context7currentofficialdocs checked retained resource lifecycle; no globalsetup.
+
+Independent N016 design review identified and root repaired two ambiguities:
+consumeractivation is explicit in root and renderer (clear/leaveground cannot
+revive via old stillvalidlease); ordinaryperiodicpending retains verifiedanalysis
+and carriespendingavailability, whileactualfailure/invalidauthority clears.
+Source network.time retains originalUnix-ms ISO, outeranalysisUTC stayscanonical.
+Freshintrinsicopticalcontent comparison excludes onlysampledprojectionmetadata.
+Scenecoverage uses the fullactualprojection scope, neveroldexactinput/default.
+Read and verifythese amendedboundaries beforedependentcode.
+
+N016 stable design independent rereview: no blocker afterexplicitconsumeractive
+clear/reactivation andverifiedpendingretention. Tightened unverifiedpendingwording.
+Actualsetup-plan preservedexistingplan; constitutionunchanged; analyzeprerequisite
+RequireSpec/RequireTasks succeeded, quality8of8/extensionsabsent. Owner implementation
+nowauthorizedbyoriginalfullmigration; rootassembly andrendererowned separately.
+Additionalrealowner fixture fullNode1370PASS16342.0259ms exit0handle69486; rootfocused
+4PASS8006.0426ms. Python965PASS245.86s stableprevious product, nobackendchange.

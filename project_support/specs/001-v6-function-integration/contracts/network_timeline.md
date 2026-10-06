@@ -28,3 +28,38 @@ A separately declared optional binding/read/notification bridge covers notify-on
 commands; plain display callbacks or catalog generation numbers cannot prove
 continuity. Re-read the owner capability around awaits and visual publication;
 no capability means no past-result reuse, with the existing exact path retained.
+
+## N016 sampled network owner and visual consumers
+
+Implement the scoped decision in
+[ADR0048](../../../docs/adr/0048_sampled_network_visual_projection.md) inside the
+existing owner. Optional complete readContinuity/verifyContinuity pair; new
+updateSampled/sampledPresentation/verifySampledPresentation/cancelSampled keep one
+active analytical task/latest record and unchanged exact public checks. The actual
+readonly getter is sampledPresentation.
+Capture network analysis UTC from a fresh registered, verified optical sampled
+view; obtain full native states at that same UTC through existing serial owner.
+Reverify fresh current optical views with identical captured analysis content,
+complete nodes/stations/faults/native hashes/source/run/configuration and opaque
+lease around awaits and callbacks. No additional optical history advancement.
+Immutable registered NETWORK_SAMPLED_UI_V1 retains utc=analysis_utc and adds current
+UTC/age/availability. Sample-origin sameUTC approval requires still-current opaque
+owner authority; copying marker/value or revoking permit never promotes an exact
+receipt. Exact actions preempt/sampledrain and remain exact-current.
+
+NativeNetworkScene optional sampledNetwork read/verify ports and readonly ground
+panel ports use that separate authority; sampled outputs never go through existing
+setSnapshot/verifySnapshot/fabric actions. Scene uses current native endpoints,
+complete hashes, final proof after external getters, actual Viewer ownership and
+morph/toggle/disposal guards. Diagram/table/coverage retain historical labels and
+unknown quality without current remote acknowledgement. Root uses sameone-second
+scheduler chain, no newtimer/history/clock. WholeN017/N018/fullT077 and actualGPU
+acceptance remain pending. Design implementation requires RED and independent
+review before changes; existing exact behavior is preserved.
+
+N016 activation/pending clarification: root consumeractive gate plus renderer
+setSampledActive; clear/leaveground/dispose disable before cleanup, only explicit
+show/reactivation reads fresh registeredview. Ordinarynextperiodicpending keeps
+verifiedlastanalysis; failures/changedscope/authority clear. Source network.time
+stays originalUnixmsISO, canonicalanalysisUTC staysunchanged. Coverage adapter
+usesactualfullsampled definitions. ADR0048 is the binding implementation design.

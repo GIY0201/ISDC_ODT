@@ -565,3 +565,14 @@ inside the existing owner; preserve the exact public snapshot/action/fabric proo
 The existing one-second scheduler and optical history are shared rather than
 creating another history, native lane or clock. Automatic exchange requires its
 own exact current source/module/configuration contract before implementation.
+
+### N016 concrete owner/consumer design
+
+ADR0048 declares optional continuity capture/verify in existing networktimeline,
+registered NETWORK_SAMPLED_UI_V1 from same captured optical analysis and exactnative
+states, one analytical task/latest record, same sourceone-second scheduler chain,
+readonly sampled ground table/diagram/coverage with unchanged exactfabricactions.
+NativeNetworkScene receives optional sampledNetwork read/verify ports with current
+native endpoints, final ownerproof aftercallbacks and Viewer ownership. Contract:
+contracts/network_timeline.md. Independent design review is running before code.
+No newnative/history/clock/backendmath; N017/N018remain original lifecycle residuals.

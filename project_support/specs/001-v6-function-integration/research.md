@@ -140,3 +140,15 @@ Decision: original shared data deployment client/server transaction is required,
 
 
 2026-10-06 N004 original OISL priming discovery: source communication/network_twin.js PRIME_STEPS_S=[120,60] executes historical source states before current tick; source resolver is not equivalent to starting with empty history at current time. Existing shared native sample coordinator has one601-row forward/reverse window; forward first-start omits historical prime instants. Preserve source priming via actual native common-time receipts coordinated with existing sample/track query ownership. Retain no-new-clock/JS-propagation/full-node/future-grid/explicit-failure constraints. Verified snapshot producer remains pending until this prerequisite is implemented and tested. Source resolveLinks component evidence validation/t077_node_link_resolution.md.
+
+## N016 original ground network cadence
+
+Readonly pinned senior communication.js165-180/909-916 computes networkTwin.tick
+and sends source snapshot at1000ms; onFrame876 onlysyncsgeometry. Current exact
+V6 network owner/manualground panel is already connected but exactUTC expires
+on naturalframe, hidesgroundlines/coverage. Preserve captured analysisUTC and full
+native input via existing network owner; compose behind same optical1000ms request,
+registered readonly NETWORK_SAMPLED_UI_V1 and current native visualendpoints.
+Remaining source status30s/passes>=60s/quality48/OISLroute/3Dstation/periodicfabric
+are separatelytrackedN017/N018. Automaticexchange must use exactnative/module
+context ratherthan sampled visuals. ADR0048 declares the boundary; no newphysics.

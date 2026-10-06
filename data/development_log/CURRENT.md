@@ -1228,3 +1228,18 @@ checkpoint on the existing branch. New actual-owner/full240/two-resolution fixtu
 remains in progress and is excluded from this checkpoint until stable; pending
 visual601 native fills are distinct from analytical point requests. No whole
 connection/GPU acceptance claim or PR wait. N016-N018 remain next connection work.
+
+## 2026-10-07 real-owner assembly and next network prerequisite
+
+Root independently rannewfull240 actual-owner composition attworesolutions plus
+prioractualbinding4PASS8006.0426ms. FullNode1370PASS16342.0259ms exit0handle69486,
+no exclusions; optionalfixtureclock/RAFcallbacks preserve defaults. This is test
+adapters, notactualGPU. ExistingstablePython965PASS1PillowSKIP8warnings245.86s.
+
+N016 prerequisitedesign inADR0048 andexistingSpecKit artifacts passedindependent
+review afterclear/reactivation andpending-retention wordingfixes. Constitution
+unchanged/requirementsquality8of8/extensionsabsent, plan setup preservedexisting
+feature, analyzeprerequisite RequireSpec/RequireTasks passed. ActualGitbranch stays
+codex/satellite-node-integration despiteSpecKitlogicalfeature001. Code beginsonly
+againstthese stablecontracts withmeaningfulRED anddisjointownership. No newbranch,
+serverrestart/nativeinstall/source reset/GP-SIM mutation orPRwait.

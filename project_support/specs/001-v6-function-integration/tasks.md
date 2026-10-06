@@ -610,3 +610,13 @@ Preserve the source communication residuals as new implementation prerequisites:
 N016-N018 are still design/implementation work; no backend physics replacement,
 clock duplication, source reset, new branch or port change. Original T075-T084,
 N015 and T032 status/thresholds remain unchanged.
+
+### N016 dependency order
+
+N016a meaningfulfullscope/sourcecapturedUTC RED → existing networkowner sampled
+path+readonlyregisteredprojection → N016b optionalnativegroundrenderer+RED fences
+→ N016c groundpanel+actualscheduler chain/root ports with explicitage/unknown
+quality → independentreviews/fullsuites/actualtworesolutionmount/liveGPU. Before
+implementation reconcile ADR0048 and network_timeline contract; no code changes
+against stale design. N017/N018 can proceed separately only after their exact
+contracts/source behaviors are verified. Optical-only N012-N014do notcloseN016.
