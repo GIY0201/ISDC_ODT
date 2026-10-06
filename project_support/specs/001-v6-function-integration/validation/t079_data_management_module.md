@@ -14,3 +14,9 @@
 전체Python에 계층경계/syntax/static source검사 포함. staged diff whitespace gate는 커밋 전 실행했다.
 
 Staged whitespace gate caught mixed CRLF in transplanted original tests. Normalized that test file only, verified AST identical before/after, and reran original4tests; product semantics unchanged after full Python gate.
+
+## 2026-10-07 04:28 current accepted-deployment UI
+
+Actual fixed8891 in-app browser query used accepted RUN-904CE008D00B's forty-node deployment while preserving that browser's unrelated five-node unaccepted editor draft. The current response explicitly identified stand_in v0.1 / ICD-01 and deployment scope RUN-904CE008D00B:deployment:366518f4-1cfa-4f9c-8d9b-72fa5a980b58. At paused SIM884.681s it showed40available storage nodes,1169objects,2267/2347verified replicas, stability98.3 and one existing successful service request; these are source SIM results, not physical storage proof.
+
+Selected OBJ-001091 actually displayed NODE-0041:telemetry:29, the SIM checksum, SDC-A1 verified and SDC-B5 synchronizing with expected SIM886s completion. Changing the imagery draft filter leaves the last query until the explicit Data state query button is pressed. The next actual response showed nine imagery objects and cleared the out-of-scope telemetry selection/detail. A deliberately unmatched search produced zero object rows, then clearing it and explicitly querying restored the nine imagery objects. No operational action, service request, deletion, fault or runtime transport was issued; the parallel original PoC remained the owner of scenario actions. Full operational/failure/two-resolution matrix remains open.

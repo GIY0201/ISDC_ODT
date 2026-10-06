@@ -32,6 +32,14 @@
 
 추가한 `source_settings_workspace.test.mjs`의 1280×720/1920×1080 실제 V6 조립 회귀에서 원래 launcher에 settings 경로가 없음을 RED로 확인했다. 상위 담당자가 명시적 ‘모듈 연결 설정’ 작업창을 추가했고 다시 실행한 두 조립 회귀를 통과했다. 패널은 settings에서만 표시하고 EM/HIL 화면은 기존 책임을 유지한다.
 
+## 2026-10-07 04:21 fixed-8891 live diagnosis
+
+The existing Codex in-app browser was inspected on the current application tree, with the current server run `RUN-904CE008D00B`. No setup, deployment, runtime transport, settings save or server restart was issued. Its previously preserved five-node editor draft was not replaced with the other browser's forty-node configuration.
+
+The visible **현재 모드 연결 확인** button completed at `2026-10-06T19:21:28+00:00`: 17 links, 8 connected, 0 disconnected, 6 pending, 1 disabled and 2 unverified. L01/L02/L03 explicitly identified their actual embedded SIM stand-in responses and separately displayed the planned TCP/UDP endpoint; L09 read the existing WebSocket telemetry owner on 8891; L16 reported the source SIM security-rule contract, not physical authentication. L05 and L10 remained unverified because the original stub/planned module has no health contract. The six mode-excluded links remained pending and L17 remained disabled. A later explicit **선택 링크 확인** on L10, at `2026-10-06T19:23:00+00:00`, preserved the same two unverified results rather than promoting a framework response to module health.
+
+Actual viewport overrides at 1440×900 and 1920×1080 both retained the diagnosis counts and exactly one canvas. The DOM body scroll width equalled the viewport width at both sizes; the existing movable task pane remained 640 pixels wide with internal scrolling. A screenshot was visually inspected at 1440×900. These observations prove the bounded live topology/probe presentation, not the unexecuted dirty-settings, remote-change, transport-error or render-profile matrix. No umbrella task is closed from these checks.
+
 ## 소켓 상태와 실제 ICD 클라이언트 확인
 
 `createSimWorkspace`가 소유한 `connection`은 `idle/open/closed/error` 문자열이다. 원본 topology의 console 링크는 `open`만 활성으로 계산한다. 타입을 변환하거나 연결 상태를 별도로 저장할 필요가 없다. 새 settings 작업창이 기존 SIM 소켓 연결 시작 목록에 없고, SIM 상태 callback이 설정 패널을 갱신하지 않은 조립 공백을 확인해 상위 담당자에게 전달했다. 상위 담당자가 같은 owner의 `connect()`와 status callback에서 패널 `update()`를 호출하도록 연결했다. 실제 SIM controller의 connector를 transport 경계에서 대체한 시험에서 connect/open/closed 후 동일 owner의 snapshot을 읽고 패널을 갱신하면 L09가 실제 상태에 맞게 바뀜을 확인했다. 새 소켓이나 타이머를 패널에 추가하지 않았다.
