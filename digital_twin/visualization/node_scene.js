@@ -9,9 +9,9 @@ const vector=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite);
 function signature(value){const ordered=v=>Array.isArray(v)?v.map(ordered):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,ordered(v[k])])):v;return JSON.stringify(ordered(value));}
 
 export class NodeScene{
-  constructor({viewer,cesium,timeSource,advanceUtc,geometryFor,pathFor,palette=()=>({}),tracksVisible=()=>true,isTransitioning=()=>false,onStatus=()=>{},verifyLinkSnapshot,animationNow=()=>0}={}){
+  constructor({viewer,cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,palette=()=>({}),tracksVisible=()=>true,isTransitioning=()=>false,onStatus=()=>{},verifyLinkSnapshot,animationNow=()=>0}={}){
     if(typeof advanceUtc!=='function'||typeof geometryFor!=='function'||typeof pathFor!=='function')throw new TypeError('node scene native display dependencies required');
-    Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,advanceUtc,geometryFor,pathFor,palette,tracksVisible,isTransitioning,onStatus,verifyLinkSnapshot,animationNow});
+    Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,palette,tracksVisible,isTransitioning,onStatus,verifyLinkSnapshot,animationNow});
     this.links=new Map();this.linkPolylines=null;this.linkOwner=null;this.linkReceipt=null;this.definitionScope='[]';this.linksVisible=true;this.models=new Map();this.descriptions=new Map();this.paths=new Map();this.points=new Map();this.labels=new Map();this.selectedId=null;this.hoveredId=null;this.visibleIds=null;this.sdcMode=false;this.theme='dark';this.loadToken=0;this.modelsVisible=true;this.disposed=false;this.dataSource=null;this.dataSourceOwner=null;this.markerOwner=null;this.pointCollection=null;this.labelCollection=null;
   }
   get viewer(){return typeof this.viewerProvider==='function'?this.viewerProvider():this.viewerProvider;}
@@ -113,13 +113,21 @@ export class NodeScene{
   rebuildPaths(){
     if(!this.descriptions.size)return;const C=this.cesium,entities=this.entityCollection();if(!C?.Cartesian3||!entities)return;
     for(const [id,description]of this.descriptions){
-      let receipt;try{receipt=this.pathFor(structuredClone(description.definition));}catch{receipt=null;}
-      const valid=this.matches(receipt,id)&&receipt.visible===true&&Array.isArray(receipt.positions_m)&&receipt.positions_m.length===121&&receipt.positions_m.every(vector);
-      const points=valid?receipt.positions_m.map(v=>new C.Cartesian3(...v)):[];
-      let entry=this.paths.get(id);if(!entry){entry={positions:points,entity:null};entry.entity=entities.add({id:`node-path-${id}`,show:false,polyline:{positions:C.CallbackProperty?new C.CallbackProperty(()=>entry.positions,false):points,width:1.3,material:this.pathColor(C,id),arcType:C.ArcType?.NONE}});this.paths.set(id,entry);}else{entry.positions=points;if(!C.CallbackProperty)entry.entity.polyline.positions=points;}
-      entry.entity.show=points.length>1&&id!==this.selectedId&&this.tracksVisible()!==false;
+      let entry=this.paths.get(id),revision=null;
+      const versioned=typeof this.pathRevisionFor==='function';
+      const readRevision=()=>{try{const token=this.pathRevisionFor(structuredClone(description.definition));return token&&typeof token==='object'&&!Array.isArray(token)&&Object.isFrozen(token)?token:null;}catch{return null;}};
+      if(versioned)revision=readRevision();
+      if(!entry||!versioned||entry.revision!==revision){
+        let receipt;try{receipt=!versioned||revision?this.pathFor(structuredClone(description.definition)):null;}catch{receipt=null;}
+        const valid=(!versioned||revision&&readRevision()===revision)&&this.matches(receipt,id)&&receipt.visible===true&&Array.isArray(receipt.positions_m)&&receipt.positions_m.length===121&&receipt.positions_m.every(vector);
+        const points=valid?receipt.positions_m.map(v=>new C.Cartesian3(...v)):[];
+        if(!entry){entry={positions:points,revision,entity:null};entry.entity=entities.add({id:`node-path-${id}`,show:false,polyline:{positions:C.CallbackProperty?new C.CallbackProperty(()=>entry.positions,false):points,width:1.3,material:this.pathColor(C,id),arcType:C.ArcType?.NONE}});this.paths.set(id,entry);}
+        else{entry.positions=points;entry.revision=revision;if(!C.CallbackProperty)entry.entity.polyline.positions=points;}
+      }
+      entry.entity.show=entry.positions.length>1&&id!==this.selectedId&&this.tracksVisible()!==false;
     }
   }
+
   removePath(id){const entry=this.paths.get(id);if(!entry)return;try{this.dataSource?.entities.remove(entry.entity);}catch{/* Owned entity already gone. */}this.paths.delete(id);}
 
   // The renderer consumes a T077 verified snapshot; it never calculates terminal success.

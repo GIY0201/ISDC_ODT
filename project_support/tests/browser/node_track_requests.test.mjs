@@ -63,3 +63,9 @@ test('fast playback coalesces pending automatic refresh instead of aborting work
  const pending=s.timeline.refresh(codec.advance(start,60));assert.equal(s.calls.length,1);assert.equal(s.calls[0].signal.aborted,false);
  finish();assert.equal(await first,true);assert.equal(await pending,true);assert.equal(s.timeline.snapshot().centerUtc,start);s.timeline.destroy();
 });
+
+test('track revision survives background pending work, changes on acceptance and clears on failure/cancel',async()=>{
+ let finish,failing=false;const s=setup(p=>{if(failing)throw Error('native unavailable');return finish===null?new Promise(resolve=>{finish=()=>resolve(response(p));}):response(p);});await s.timeline.refresh(start);
+ const token=s.timeline.pathRevisionFor(nodes()[0]);assert.ok(token);finish=null;const work=s.timeline.refresh(codec.advance(start,30));await until(()=>typeof finish==='function');assert.equal(s.timeline.pathRevisionFor(nodes()[0]),token);finish();await work;assert.notEqual(s.timeline.pathRevisionFor(nodes()[0]),token);
+ failing=true;await s.timeline.refresh(codec.advance(start,60));assert.equal(s.timeline.pathRevisionFor(nodes()[0]),null);failing=false;await s.timeline.calculate(start);s.timeline.cancel();assert.equal(s.timeline.pathRevisionFor(nodes()[0]),null);s.timeline.destroy();assert.equal(s.timeline.pathRevisionFor(nodes()[0]),null);
+});

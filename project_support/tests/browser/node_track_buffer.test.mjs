@@ -56,3 +56,11 @@ test('all failed vertices retain121 aligned errors and reject nonnull failure ge
  assert.equal(createNodeTrackBuffer(f.request,f.response,options).pathFor(f.request.nodes[0]).errors.length,121);
  f.response.nodes[0].rows[0].height_km=0;assert.throws(()=>createNodeTrackBuffer(f.request,f.response,options));
 });
+
+test('readonly revision identities remain stable per node and change only with a new accepted buffer',()=>{
+ const f=fixture(),buffer=createNodeTrackBuffer(f.request,f.response,options),node=f.request.nodes[0];const token=buffer.pathRevisionFor(node);
+ assert.ok(token&&Object.isFrozen(token));assert.equal(buffer.pathRevisionFor(structuredClone(node)),token);assert.deepEqual(Object.keys(token),[]);
+ const changed=structuredClone(node);changed.name='edited';assert.equal(buffer.pathRevisionFor(changed),null);
+ buffer.pathFor(node).positions_m[0][0]=999;assert.equal(buffer.pathRevisionFor(node),token);assert.equal(buffer.pathFor(node).positions_m[0][0],0);
+ const newer=createNodeTrackBuffer(f.request,f.response,options);assert.notEqual(newer.pathRevisionFor(node),token);assert.equal(buffer.pathRevisionFor(null),null);
+});

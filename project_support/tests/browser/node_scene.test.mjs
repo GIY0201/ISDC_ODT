@@ -13,7 +13,7 @@ class Collection{constructor(){this.items=[];}add(v){this.items.push(v);return v
 const plain=v=>JSON.parse(JSON.stringify(v));
 const definition=id=>({schema:1,id,catalog_number:900000+Number(id),orbit:{epoch:1791062400000,altitude_km:550,inclination:53}});
 const description=id=>({url:'/models/'+id+'.glb',scale:2,minimumPixelSize:12,orientation:{heading:90}});
-function fixture({load,geometry,path,palette,verifyLinkSnapshot,animationNow=()=>2000}={}){
+function fixture({load,geometry,path,palette,verifyLinkSnapshot,pathRevisionFor,animationNow=()=>2000}={}){
  const loads=[],statuses=[],primitives=new Collection(),sources=new Collection();let display=utc,morph=false,tracks=true;
  const C={Cartesian3,Color,CustomDataSource:class{constructor(){this.entities=new Collection();}},CallbackProperty:class{constructor(getter){this.getter=getter;}},ArcType:{NONE:'none'},SceneMode:{MORPHING:0,SCENE3D:3},Matrix3:class{static fromHeadingPitchRoll(hpr){return {hpr};}static multiply(a,b){a.trim=b;return a;}},Matrix4:class{static fromRotationTranslation(rotation,translation){return {rotation,translation};}},HeadingPitchRoll:class{constructor(h,p,r){Object.assign(this,{h,p,r});}},Math:{toRadians:v=>v*Math.PI/180},Ellipsoid:{WGS84:{}},Transforms:{rotationMatrixFromPositionVelocity:(position,velocity)=>({position,velocity}),eastNorthUpToFixedFrame:position=>({enu:position})},ImageBasedLighting:class{constructor(options){this.options=options;}},Model:{async fromGltfAsync(options){loads.push(options);return load?load(options):{options,show:false,destroyed:false,destroy(){this.destroyed=true;}};}}};
  Object.assign(C,{PointPrimitiveCollection:Collection,LabelCollection:Collection,Cartesian2:class{constructor(x,y){Object.assign(this,{x,y});}},NearFarScalar:class{constructor(near,nearValue,far,farValue){Object.assign(this,{near,nearValue,far,farValue});}},LabelStyle:{FILL_AND_OUTLINE:'fill_outline'}});
@@ -23,7 +23,7 @@ function fixture({load,geometry,path,palette,verifyLinkSnapshot,animationNow=()=
  const meta={model_profile:'SOURCE_KEPLER_J2_V1',frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',source_commit:golden.source_commit,quality:'engineering_assumption'};
  const geometryFor=(node,{utc:stamp})=>{const row={utc:stamp,status:'valid',error_code:null,position_m:[Number(node.id)+codec.difference(stamp,utc)*10,10,550000]};const value={...meta,node_id:node.id,node_definition:structuredClone(node),definition_hash:hash,row};return geometry?geometry(value):value;};
  const pathFor=node=>{const value={...meta,node_id:node.id,node_definition:structuredClone(node),definition_hash:hash,center_utc:utc,visible:true,positions_m:golden.paths['1'].positions.map(p=>[p.x+Number(node.id)-1,p.y,p.z])};return path?path(value):value;};
- const scene=new NodeScene({viewer,cesium:C,verifyLinkSnapshot,animationNow,timeSource:()=>display,advanceUtc:codec.advance,geometryFor,pathFor,palette:palette??(()=>markers.palettes.dark),tracksVisible:()=>tracks,isTransitioning:()=>morph,onStatus:v=>statuses.push(v)});
+ const scene=new NodeScene({viewer,cesium:C,verifyLinkSnapshot,pathRevisionFor,animationNow,timeSource:()=>display,advanceUtc:codec.advance,geometryFor,pathFor,palette:palette??(()=>markers.palettes.dark),tracksVisible:()=>tracks,isTransitioning:()=>morph,onStatus:v=>statuses.push(v)});
  return {scene,loads,statuses,viewer,set display(v){display=v;},set morph(v){morph=v;},set tracks(v){tracks=v;}};
 }
 const entries=(count=2)=>Array.from({length:count},(_,i)=>({id:String(i+1),definition:definition(String(i+1)),model:description(String(i+1)),orbit_regime:'LEO'}));
@@ -142,4 +142,28 @@ test('verifier that changes live UTC cannot accept a captured old snapshot',asyn
 });
 test('render shader is preserved byte-for-byte from the pinned original source',async()=>{
  const {createHash}=await import('node:crypto');const bytes=await readFile(new URL('../../../digital_twin/visualization/link_flow.js',import.meta.url));assert.equal(createHash('sha256').update(bytes).digest('hex'),linksGolden.source_hashes['digital_twin/visualization/link_flow.js']);
+});
+
+test('all240 paths reuse native vectors across unchanged revisions and rebuild only on atomic acceptance',async()=>{
+ let reads=0,token=Object.freeze({});const f=fixture({pathRevisionFor:()=>token,path:p=>{reads++;return p;}});const nodes=entries(240).map(n=>({...n,model:null}));await f.scene.setNodes(nodes);assert.equal(reads,240);const positions=f.scene.paths.get('1').positions;
+ for(let i=0;i<20;i++)f.scene.update(utc);assert.equal(reads,240);assert.equal(f.scene.paths.get('1').positions,positions);
+ f.tracks=false;f.scene.update(utc);assert.equal(f.scene.paths.get('1').entity.show,false);f.tracks=true;f.scene.update(utc);assert.equal(f.scene.paths.get('1').entity.show,true);assert.equal(reads,240);
+ token=Object.freeze({});f.scene.update(utc);assert.equal(reads,480);assert.notEqual(f.scene.paths.get('1').positions,positions);f.scene.destroy();
+});
+test('missing failed or changed path revisions cannot keep an old successful line',async()=>{
+ let token=Object.freeze({}),failed=false;const f=fixture({pathRevisionFor:()=>token,path:p=>failed?{...p,visible:false,positions_m:[]}:p});await f.scene.setNodes(entries());assert.equal(f.scene.paths.get('1').entity.show,true);
+ token=null;f.scene.update(utc);assert.equal(f.scene.paths.get('1').entity.show,false);assert.deepEqual(f.scene.paths.get('1').positions,[]);
+ token=Object.freeze({});failed=true;f.scene.update(utc);assert.equal(f.scene.paths.get('1').entity.show,false);failed=false;token=Object.freeze({});f.scene.update(utc);assert.equal(f.scene.paths.get('1').entity.show,true);
+ const changed=entries();changed[0].definition.orbit.altitude_km++;await f.scene.setNodes(changed);assert.equal(f.scene.paths.get('1').entity.show,true);f.scene.destroy();
+});
+test('revision changed while copying a path rejects the mixed receipt',async()=>{
+ let token=Object.freeze({}),mutate=false;const f=fixture({pathRevisionFor:()=>token,path:p=>{if(mutate)token=Object.freeze({});return p;}});await f.scene.setNodes(entries(1));mutate=true;token=Object.freeze({});f.scene.update(utc);assert.equal(f.scene.paths.get('1').entity.show,false);assert.deepEqual(f.scene.paths.get('1').positions,[]);f.scene.destroy();
+});
+
+test('actual native track decoder revisions drive renderer reuse and whole-path failure replacement',async()=>{
+ const {createNodeTrackBuffer}=await import('../../../user_application/web/scripts/nodes/node_timeline.js');const nodes=entries(),period=95.651;let buffer,reads=0;
+ const build=(failed=false)=>{const request={request_id:'render-track',nodes:nodes.map(n=>n.definition),center_utc:utc};const response={schema_version:1,request_id:request.request_id,status:failed?'error':'valid',model_profile:'SOURCE_KEPLER_J2_V1',frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',source_commit:golden.source_commit,quality:'engineering_assumption',nodes:request.nodes.map(n=>({node_id:n.id,definition_hash:hash,period_minutes:period,path_visible:!failed,rows:Array.from({length:121},(_,i)=>({utc:codec.advance(new Date(Math.trunc(Date.parse(utc)+(i-60)*period*60000/120)).toISOString(),0),status:failed?'error':'valid',error_code:failed?'native_failure':null,position_m:failed?null:[i,Number(n.id),3],inertial_velocity_km_s:failed?null:[1,2,3],raan_deg:failed?null:1,argp_deg:failed?null:2,mean_anomaly_deg:failed?null:3,sunlit:failed?null:true,longitude_deg:failed?null:4,latitude_deg:failed?null:5,height_km:failed?null:550}))}))};return createNodeTrackBuffer(request,response,{periodFor:()=>period});};
+ buffer=build();const f=fixture({pathRevisionFor:n=>buffer?.pathRevisionFor(n)??null,path:p=>{reads++;return buffer?.pathFor(p.node_definition)??null;}});await f.scene.setNodes(nodes);const positions=f.scene.paths.get('1').positions;assert.equal(reads,2);
+ for(let i=0;i<30;i++)f.scene.update(utc);assert.equal(reads,2);assert.equal(f.scene.paths.get('1').positions,positions);assert.deepEqual(plain(positions[120]),{x:120,y:1,z:3});
+ buffer=build(true);f.scene.update(utc);assert.equal(reads,4);assert.equal(f.scene.paths.get('1').entity.show,false);assert.deepEqual(f.scene.paths.get('1').positions,[]);buffer=null;f.scene.update(utc);assert.equal(reads,4);f.scene.destroy();
 });

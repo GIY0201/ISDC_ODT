@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-06 T148 native 궤적 재사용 부분 보완
+- 변경: immutable track buffer의 노드별 opaque revision을 track/display owner에서 전달. 동일결과는Cartesian121정점 재사용; 새/없음/실패/읽는중변경 결과는oldline숨김·교체. 원본240개/121정점/30s refresh/선택·테마·layer보존. wire/native/시간/HTTP 변경없음.
+- 검증: RED53PASS6FAIL→target60PASS1399.0408ms. 240개20update 후path읽기240유지, 새결과시480; 실제decoder→renderer 구성시험 포함. 전체Node540PASS3148.9647ms/Python546PASS8기존warnings155.13s(session46419exit0)/syntax/diffcheck. validation/t148_node_path_reuse.md. 주입rows/Cesiumdouble/callcounts는실제FPS증거아님.
+- 남음: T148unchecked 실제T077 verifiedproducer/N003와assembly T151/T152. 다음T079 isolated-v1 실제module/activation→T149–153. T075–84/Terra/all50/N001/N003/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. 8891서버/native설치/사용자화면/원격PR·병합 변경없음.
+
+
 ## 2026-10-06 T148 검증 결과 기반 통신선 표시 부분 이식
 - 변경: 원본7상태 colors/width2/dash12/flow spacing96/rate1.4/shader bytes 재사용. currentUTC/full roster/source/quality/copied T077 verifier strict true 수락; 기본미확인/실패 clear. stale/morph/숨김/native오류 freeze, 같은상태 material 유지, own primitive cleanup. render-phase callback은 정성적 효과이며 통신량·SIM clock 아님.
 - 검증: 원본클래스 두5617bytes/SHA6ebca8ac… 동일. RED16PASS5FAIL→target25PASS541.7998ms. 최종Node533PASS2983.1631ms/전체Python546PASS8기존warnings154.07s(session42056exit0)/syntax/diffcheck. validation/t148_node_links.md.

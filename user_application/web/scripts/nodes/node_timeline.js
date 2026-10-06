@@ -115,11 +115,13 @@ function* prepareNodeTrackBuffer(request,response,{periodFor,expectedHashes={}}=
     }
     const visible=failures.length===0;
     if(result.path_visible!==visible)throw new Error('node track visibility mismatch');
-    catalogs.add(node.catalog_number);entries.set(node.id,{key,path:{...metadata,node_id:node.id,node_definition:structuredClone(node),definition_hash:result.definition_hash,center_utc:request.center_utc,period_minutes:period,visible,positions_m:visible?positions:[],errors:failures}});
+    catalogs.add(node.catalog_number);entries.set(node.id,{key,revision:Object.freeze({}),path:{...metadata,node_id:node.id,node_definition:structuredClone(node),definition_hash:result.definition_hash,center_utc:request.center_utc,period_minutes:period,visible,positions_m:visible?positions:[],errors:failures}});
     yield;
   }
   if(responseStatus!==(errors===request.nodes.length*121?'error':errors?'partial':'valid'))throw new Error('node track aggregate status mismatch');
-  return Object.freeze({pathFor(node){const entry=entries.get(node?.id);if(!entry)return null;try{return identity(node)===entry.key?structuredClone(entry.path):null;}catch{return null;}},nodeIds:()=>[...entries.keys()],definitionHashes:()=>Object.fromEntries([...entries].map(([id,entry])=>[id,entry.path.definition_hash]))});
+  const entryFor=node=>{const entry=entries.get(node?.id);if(!entry)return null;try{return identity(node)===entry.key?entry:null;}catch{return null;}};
+  // Opaque per-node identities refer only to this immutable accepted buffer, never runtime state.
+  return Object.freeze({pathFor:node=>{const entry=entryFor(node);return entry?structuredClone(entry.path):null;},pathRevisionFor:node=>entryFor(node)?.revision??null,nodeIds:()=>[...entries.keys()],definitionHashes:()=>Object.fromEntries([...entries].map(([id,entry])=>[id,entry.path.definition_hash]))});
 }
 
 export function createNodeTrackBuffer(request,response,options){
@@ -178,7 +180,7 @@ export function createNodeTrackTimeline({api,periodFor,requestId,yieldControl,on
   }
   function cancel(){requireOpen();invalidate(true);emit();}
   function destroy(){if(disposed)return;invalidate(true);disposed=true;definitions=[];hashes={};}
-  return Object.freeze({setDefinitions,calculate,refresh,pathFor:node=>disposed?null:buffer?.pathFor(node)??null,snapshot,cancel,destroy});
+  return Object.freeze({setDefinitions,calculate,refresh,pathFor:node=>disposed?null:buffer?.pathFor(node)??null,pathRevisionFor:node=>disposed?null:buffer?.pathRevisionFor(node)??null,snapshot,cancel,destroy});
 }
 
 // Application owns when to ask for a new shared UTC. This object owns only readonly sample buffers.
@@ -281,5 +283,5 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
   function retry(){requireOpen();samples.cancel();tracks.cancel();inputError='';return schedule();}
   function clear(){requireOpen();utc=null;direction=1;inputError='';samples.cancel();tracks.cancel();emit();}
   function destroy(){if(disposed)return;disposed=true;utc=null;samples.destroy();tracks.destroy();}
-  return Object.freeze({setDefinitions,observe,retry,clear,snapshot,geometryFor:(node,display={utc})=>disposed||inputError?null:samples.geometryFor(node,display),pathFor:node=>disposed||inputError?null:tracks.pathFor(node),destroy});
+  return Object.freeze({setDefinitions,observe,retry,clear,snapshot,geometryFor:(node,display={utc})=>disposed||inputError?null:samples.geometryFor(node,display),pathFor:node=>disposed||inputError?null:tracks.pathFor(node),pathRevisionFor:node=>disposed||inputError?null:tracks.pathRevisionFor(node),destroy});
 }

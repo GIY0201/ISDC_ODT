@@ -67,3 +67,9 @@ test('pending fixed prefetch keeps old complete geometry until commit; repeated 
  const work=s.timeline.observe(codec.advance(start,300));await until(()=>finish);const pending=s.timeline.observe(codec.advance(start,301));assert.equal(s.calls.filter(c=>c.kind==='samples').length,2);assert.ok(s.timeline.geometryFor(defs()[0]));
  finish();await work;await pending;assert.equal(s.timeline.snapshot().samples.startUtc,codec.advance(start,300));assert.equal(s.max,1);s.timeline.destroy();
 });
+
+test('shared display exposes stable track revisions without queries and invalidates on clear/disposal',async()=>{
+ const s=setup();await s.timeline.observe(start);const node=defs()[0],token=s.timeline.pathRevisionFor(node);assert.ok(token);
+ for(let i=0;i<20;i++){assert.equal(s.timeline.pathRevisionFor(node),token);await s.timeline.observe(start);}assert.equal(s.calls.length,2);
+ await s.timeline.observe(codec.advance(start,30));assert.notEqual(s.timeline.pathRevisionFor(node),token);s.timeline.clear();assert.equal(s.timeline.pathRevisionFor(node),null);s.timeline.destroy();assert.equal(s.timeline.pathRevisionFor(node),null);
+});
