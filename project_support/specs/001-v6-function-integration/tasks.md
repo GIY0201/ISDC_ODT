@@ -591,3 +591,22 @@ recovery never resurrects an old lease, and same-valid-buffer background accepta
 retains continuity. A staged active catalog capability is partial; paused/missing/
 stored/SIM fallback remains exact and every remaining owner/network/ground gate stays
 open until explicitly implemented and verified.
+
+## Functional connection priority and source communication residuals
+
+2026-10-07: User requires connection first, followed by parallel PR and validation.
+Keep existing scope and partial acceptance. Catalog-to-globe capability, optical
+sampled owner, scheduler and sampled renderer/UI are now composed; fullNode1368PASS
+12121.0829ms. Full Python handle40607 is running. See
+validation/sampled_optical_connection.md for independent reviews, meaningful failures
+and the explicitly requested Context7 official-reference comparison. Actual GPU and
+real active-owner two-resolution assembly evidence remain pending.
+
+Preserve the source communication residuals as new implementation prerequisites:
+- [ ] N016 Define and implement a distinct registered sampled network/ground visual projection inside the existing network owner; retain full native definitions/stations/faults/hashes, captured analysis UTC, current endpoint guards and unchanged exact action/fabric approval. Connect diagram/table/coverage and 3D lines during natural playback. Optical-only cannot close T077.
+- [ ] N017 Reconnect original read-only communication lifecycle: 30-second module status, 60-second progression/changed-station future-pass refresh, bounded48 quality history/sparkline, OISL plus ground route emphasis, 3D station selection/focus. Preserve exact source behavior and capture meaningful regressions before edits.
+- [ ] N018 Define guarded periodic network exchange/DTN/selected-route behavior using exact current native and module/configuration authority. Reuse original fabric owner; sampled visual receipts never grant execution. Connect only after the contract and full late/reentry/failure/disposal fences are verified.
+
+N016-N018 are still design/implementation work; no backend physics replacement,
+clock duplication, source reset, new branch or port change. Original T075-T084,
+N015 and T032 status/thresholds remain unchanged.

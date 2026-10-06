@@ -12,6 +12,27 @@ import * as stationModel from '../../../digital_twin/model_library/browser/groun
 import {createGroundLinkModel} from '../../../digital_twin/simulation/browser/ground_links.js';
 import {createNetworkSnapshotModel} from '../../../digital_twin/simulation/browser/network_snapshot.js';
 
+test('mounted catalog consumer samples once per analysis tick and revokes same-UTC control immediately',async()=>{
+ const codec=createUtcCodec(LEAP_SHA256),start=codec.advance('2026-10-04T22:01:12Z',0),lease=Object.freeze({});
+ let valid=true,listener=null,sequence=0;const scheduled=new Map();
+ const f=fixture({native:true,timers:{set(fn,ms){if(ms===1000){const id=++sequence;scheduled.set(id,fn);return id;}return setTimeout(fn,ms);},clear(id){if(scheduled.has(id))scheduled.delete(id);else clearTimeout(id);}},view:{captureDisplayContinuity:()=>valid?lease:null,verifyDisplayContinuity:value=>valid&&value===lease,observeDisplayContinuity(fn){listener=fn;return()=>{listener=null;};}}});
+ const flush=async()=>{for(let i=0;i<100;i++)await Promise.resolve();await new Promise(resolve=>setTimeout(resolve,15));};
+ try{
+  await f.workspace.start();f.workspace.show('satellite');f.attach();f.options.store.add({name:'sampled source'});
+  f.context({utc:start,key:'catalog:1:hash',source:'catalog'});await flush();
+  assert.equal(typeof listener,'function');assert.equal(scheduled.size,1);
+  const view=f.options.sampledLinksPresentationFor();assert.equal(view.status,'valid');assert.equal(f.options.verifySampledLinkPresentation(view,{utc:start}),true);
+  const before=f.calls.filter(c=>c[0]==='samples').length;
+  for(let i=1;i<=100;i++)f.context({utc:codec.advance(start,i/100),key:'catalog:1:hash',source:'catalog'});
+  await flush();assert.equal(f.calls.filter(c=>c[0]==='samples').length,before,'natural frames retain analysis rather than query each fractional UTC');
+  assert.equal(f.options.sampledLinksPresentationFor().analysis_utc,start);
+  const pendingTimer=[...scheduled.entries()][0];scheduled.delete(pendingTimer[0]);pendingTimer[1]();await flush();assert.equal(f.options.sampledLinksPresentationFor().analysis_utc,codec.advance(start,1),'timer advances analysis even when native states are already cached');
+  valid=false;listener({phase:'invalidated',reason:'pause'});assert.equal(f.options.verifySampledLinkPresentation(view,{utc:start}),false);
+  listener({phase:'settled',reason:'pause'});await flush();assert.notEqual(f.options.sampledLinksPresentationFor().status,'valid');
+  f.workspace.destroy();assert.equal(scheduled.size,0);assert.equal(listener,null);
+ }finally{f.workspace.destroy();}
+});
+
 for(const [width,height] of [[1280,720],[1920,1080]])test(`accepted receipt with denied local persistence preserves drafts and identical reviewed retry ${width}x${height}`,async()=>{
  const records=new Map(),posts=[];let deny=false,server={revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]};
  const storage={getItem:key=>records.get(key)??null,setItem(key,value){if(deny&&key==='spacetwin-nodes-deployed-v1')throw Error('denied');records.set(key,value);}};
@@ -134,9 +155,10 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 source node
  }finally{f.dispose();}
 });
 
-function fixture({native=false,solar=null,view=null,storage=null,storageGetter=null,fetchOverride=null,onHover=()=>{},networkInputs=null,readClock=()=>({}),networkSceneClass=null,panelRefresh=null,onSampleRequest=null,sceneUpdate=null,sceneLinks=null}={}){
+function fixture({native=false,solar=null,view=null,storage=null,storageGetter=null,fetchOverride=null,onHover=()=>{},networkInputs=null,readClock=()=>({}),networkSceneClass=null,panelRefresh=null,onSampleRequest=null,sceneUpdate=null,sceneLinks=null,timers=null}={}){
  let id=0,context=null,displayListener,rendererFactory,panelOptions,interaction,renderer,removeCount=0;const calls=[],sections=new Map();
  const host={innerWidth:1280,innerHeight:720,localStorage:storage,crypto:{randomUUID:()=>`test-${++id}`},setTimeout,clearTimeout,addEventListener(){},removeEventListener(){},confirm:()=>true};
+ if(timers){host.setTimeout=timers.set;host.clearTimeout=timers.clear;}
  if(storageGetter)Object.defineProperty(host,'localStorage',{get:storageGetter});
  const buttons=new Map(['nodes-deploy','nodes-recall','nodes-reapply','nodes-recall-reviewed','deploy-state','node-server-configuration','node-scene-summary'].map(key=>[key,{disabled:false,textContent:'',addEventListener(k,fn){this.fn=fn;},removeEventListener(){}}]));
  const document={getElementById:id=>id==='screen'?{prepend:root=>sections.set(root.id,root)}:sections.get(id)??null,createElement:()=>({querySelector:selector=>buttons.get(selector.slice(1))??null,remove(){sections.delete(this.id);}})};
@@ -474,5 +496,13 @@ test('mounted readonly optical UI proof is current registered owner output and c
  try{await f.workspace.start();f.workspace.show('satellite');assert.equal(typeof f.options.linksPresentationFor,'function');assert.equal(typeof f.options.verifyLinkPresentation,'function');f.context({utc});await new Promise(resolve=>setImmediate(resolve));
   const view=f.options.linksPresentationFor();assert.equal(view.presentation_kind,'OPTICAL_UI_V1');assert.equal(Object.isFrozen(view),true);assert.equal(f.options.verifyLinkPresentation(view,{utc}),true);assert.equal(f.options.verifyLinkSnapshot(view,{nodes:f.options.store.drafts,utc}),false);assert.equal(f.options.verifyLinkPresentation(structuredClone(view),{utc}),false);
   f.context(null);assert.equal(f.options.verifyLinkPresentation(view,{utc}),false);f.workspace.destroy();assert.equal(f.options.linksPresentationFor(),null);assert.equal(f.options.verifyLinkPresentation(view,{utc}),false);
+ }finally{f.workspace.destroy();}
+});
+
+test('mounted node renderer and panels borrow separately verified sampled views without granting action proof',async()=>{
+ const f=fixture(),utc=createUtcCodec(LEAP_SHA256).advance('2026-10-04T22:01:12Z',0);
+ try{await f.workspace.start();f.workspace.show('satellite');const scene=f.attach();assert.equal(typeof scene.options.sampledLinks?.read,'function');assert.equal(typeof scene.options.sampledLinks?.verify,'function');assert.equal(typeof f.options.sampledLinksPresentationFor,'function');assert.equal(typeof f.options.verifySampledLinkPresentation,'function');f.context({utc});await new Promise(resolve=>setImmediate(resolve));
+  const before=f.calls.length,view=scene.options.sampledLinks.read({utc});assert.equal(view.presentation_kind,'OPTICAL_SAMPLED_UI_V1');assert.equal(Object.isFrozen(view),true);assert.equal(view.display_utc,utc);assert.equal(view.status,'unavailable');assert.equal(scene.options.sampledLinks.verify(view,{utc}),false);assert.equal(f.options.verifyLinkSnapshot(view,{nodes:f.options.store.drafts,utc}),false);assert.equal(f.options.verifySampledLinkPresentation(structuredClone(view),{utc}),false);assert.equal(f.calls.length,before,'sampled presentation reads do not issue native or server commands');
+  f.workspace.destroy();assert.equal(scene.options.sampledLinks.read({utc}),null);assert.equal(scene.options.sampledLinks.verify(view,{utc}),false);assert.equal(f.options.sampledLinksPresentationFor(),null);
  }finally{f.workspace.destroy();}
 });

@@ -8,6 +8,45 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let choice={mode:'3d',imagery:'blue_marble',theme:'dark',emphasis:true},imagery={requestedImagery:'blue_marble',displayedImagery:null,phase:'pending',error:null},mode={phase:'ready',error:null},modeRevision=0;
   const viewObservers=new Set();
   const displayObservers=new Set();let displayKey=null,solarFactory=null,solarRenderer=null;
+  let catalogContinuity=null,continuityCache=null,continuityEpoch=0,continuitySourceKey=null;
+  const continuityProofs=new WeakMap(),continuityObservers=new Set();
+  const sameCatalogIdentity=(a,b)=>Boolean(a&&b)&&['catalog_number','normalized_gp_sha256','leap_sha256','eop_sha256'].every(key=>a[key]===b[key]);
+  function catalogIdentity(){
+    const current=displayContext();
+    if(!current||scenarioContext||!validPosition(catalog)||catalog.status!=='valid'||current.key!==`catalog:${catalog.catalog_number}:${catalog.normalized_gp_sha256}`)return null;
+    return {catalog_number:catalog.catalog_number,normalized_gp_sha256:catalog.normalized_gp_sha256,leap_sha256:catalog.leap_sha256,eop_sha256:catalog.eop_sha256};
+  }
+  function notifyContinuity(event){
+    if(disposed)return;
+    if(!event||!['invalidated','settled','availability'].includes(event.phase)||typeof event.reason!=='string')return;
+    if(event.phase!=='settled')continuityEpoch++;
+    continuityCache=null;
+    for(const fn of continuityObservers){try{fn({phase:event.phase,reason:event.reason});}catch{/* A readonly observer cannot own clock control. */}}
+  }
+  function verifyDisplayContinuity(value){
+    if(disposed||failed)return false;
+    const proof=continuityProofs.get(value),binding=catalogContinuity;
+    if(!proof||proof.binding!==binding||proof.epoch!==continuityEpoch)return false;
+    try{
+      const before=catalogIdentity();
+      if(!sameCatalogIdentity(before,proof.identity)||binding.port.isCurrent(proof.lease,{...before})!==true)return false;
+      const after=catalogIdentity();
+      return !disposed&&!failed&&catalogContinuity===binding&&proof.epoch===continuityEpoch&&sameCatalogIdentity(after,before)&&binding.port.isCurrent(proof.lease,{...after})===true&&sameCatalogIdentity(catalogIdentity(),after)&&catalogContinuity===binding&&proof.epoch===continuityEpoch&&!disposed&&!failed;
+    }catch{return false;}
+  }
+  function captureDisplayContinuity(){
+    if(disposed||failed||!catalogContinuity)return null;
+    const binding=catalogContinuity,epoch=continuityEpoch,before=catalogIdentity();if(!before||epoch!==continuityEpoch)return null;
+    try{
+      const lease=binding.port.capture();
+      if(!lease||epoch!==continuityEpoch||catalogContinuity!==binding||!sameCatalogIdentity(catalogIdentity(),before)||epoch!==continuityEpoch||binding.port.isCurrent(lease,{...before})!==true||epoch!==continuityEpoch||catalogContinuity!==binding)return null;
+      if(continuityCache?.binding===binding&&continuityCache.lease===lease&&sameCatalogIdentity(continuityCache.identity,before)&&verifyDisplayContinuity(continuityCache.value))return continuityCache.value;
+      if(epoch!==continuityEpoch||catalogContinuity!==binding)return null;
+      const value=Object.freeze({}),proof={binding,lease,identity:before,value,epoch};continuityProofs.set(value,proof);
+      if(!verifyDisplayContinuity(value))return null;
+      continuityCache=proof;return value;
+    }catch{return null;}
+  }
   const cameraObservers=new Set();let cameraKey=null;
   const cameraState=()=>!disposed&&!failed&&globe?globe.cameraState?.()??{ready:false,zoom:null}:{ready:false,zoom:null};
   function notifyCamera(){const value=cameraState(),key=JSON.stringify(value);if(key===cameraKey)return;cameraKey=key;for(const fn of cameraObservers){try{fn({...value});}catch{/* Readonly camera observer. */}}}
@@ -80,7 +119,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     if(sceneMetadata?.frame==='ITRF'&&sceneMetadata.valid_count>0)return{key:`scene:${sceneMetadata.scene_sha256}`,utc:sceneMetadata.utc,leap_sha256:sceneMetadata.leap_sha256,eop_sha256:sceneMetadata.eop_sha256};
     return null;
   }
-  function notifyDisplay(){const value=displayContext(),key=JSON.stringify(value);if(key===displayKey)return;displayKey=key;for(const fn of displayObservers)fn(value?structuredClone(value):null);}
+  function notifyDisplay(){const value=displayContext(),key=JSON.stringify(value),sourceKey=JSON.stringify(value?[value.key,value.leap_sha256,value.eop_sha256]:null);if(sourceKey!==continuitySourceKey){continuitySourceKey=sourceKey;notifyContinuity({phase:'availability',reason:'display-source-changed'});}if(key===displayKey)return;displayKey=key;for(const fn of displayObservers)fn(value?structuredClone(value):null);}
   function attachSolar(){solarRenderer?.destroy();solarRenderer=globe&&solarFactory?solarFactory(host.Cesium,globe.viewer):null;}
   const hoverObservers=new Set();
   const notifyHover=value=>{if(!disposed)for(const fn of hoverObservers)fn(value?structuredClone(value):null,host.Cesium);};
@@ -173,6 +212,20 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
     displayContext,
+    captureDisplayContinuity,verifyDisplayContinuity,
+    observeDisplayContinuity(fn){if(typeof fn!=='function')throw new TypeError('display continuity observer required');if(disposed)return()=>{};continuityObservers.add(fn);return()=>continuityObservers.delete(fn);},
+    bindCatalogDisplayContinuity(port){
+      if(!port||['capture','isCurrent','observe'].some(key=>typeof port[key]!=='function'))throw new TypeError('actual catalog continuity owner required');
+      if(disposed)return()=>{};
+      const previous=catalogContinuity,binding={port,remove:null};catalogContinuity=binding;continuityCache=null;
+      try{
+        previous?.remove?.();
+        const remove=port.observe(event=>{if(catalogContinuity===binding&&!disposed)notifyContinuity(event);});
+        if(typeof remove!=='function')throw new TypeError('catalog continuity observer cleanup required');
+        if(catalogContinuity!==binding||disposed){remove();return()=>{};}binding.remove=remove;
+      }catch(error){if(catalogContinuity===binding){catalogContinuity=null;notifyContinuity({phase:'invalidated',reason:'catalog-owner-binding-failed'});}throw error;}
+      return()=>{if(catalogContinuity!==binding)return;catalogContinuity=null;continuityCache=null;try{binding.remove?.();}finally{notifyContinuity({phase:'invalidated',reason:'catalog-owner-unbound'});}};
+    },
     bindScenarioRuntime(readRuntime,utcOfRuntime,{projectDisplay=null}={}){
       if(typeof readRuntime!=='function'||typeof utcOfRuntime!=='function')throw new TypeError('actual SIM runtime and canonical UTC accessors required');
       if(disposed)return()=>{};const binding={readRuntime,utcOfRuntime,projectDisplay};scenarioBinding=binding;notifyDisplay();
@@ -256,6 +309,6 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       paint();
       if(!scenarioContext&&!catalog&&!latest&&!sceneMetadata&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
     },
-    destroy(){if(disposed)return;disposed=true;scenarioBinding=null;scenarioContext=null;sceneCopy=null;cameraObservers.clear();nodeInteractionBinding=null;nodeObservers.clear();detachNodes();nodeBinding=null;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;displayObservers.clear();hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
+    destroy(){if(disposed)return;disposed=true;const continuity=catalogContinuity;catalogContinuity=null;continuityCache=null;continuityObservers.clear();try{continuity?.remove?.();}catch{/* Release other renderer owners. */}scenarioBinding=null;scenarioContext=null;sceneCopy=null;cameraObservers.clear();nodeInteractionBinding=null;nodeObservers.clear();detachNodes();nodeBinding=null;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;displayObservers.clear();hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
   };
 }

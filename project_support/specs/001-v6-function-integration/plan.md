@@ -552,3 +552,16 @@ register again. Display null/error/availability gap revokes; recovery cannot
 resurrect a prior lease. Background acceptance is natural only if the same valid
 buffer remained available. This planned stage cannot close the remaining owners,
 network/ground sampled visual integration or whole T076/T077/T075–T084.
+
+## Source communication remaining connection boundary
+
+User priority is functional connection first, then PR in parallel with validation.
+The catalog/optical capability and renderer/UI stage is implemented but remains
+unaccepted pending complete actual owner composition, full regression and GPU
+measurements. See validation/sampled_optical_connection.md. N016-N018 keep the
+remaining source network/ground display, read-only lifecycle/quality/selection and
+exact guarded periodic fabric behavior explicit. Implement sampled network views
+inside the existing owner; preserve the exact public snapshot/action/fabric proof.
+The existing one-second scheduler and optical history are shared rather than
+creating another history, native lane or clock. Automatic exchange requires its
+own exact current source/module/configuration contract before implementation.

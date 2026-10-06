@@ -9,12 +9,14 @@ const vector=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite);
 function signature(value){const ordered=v=>Array.isArray(v)?v.map(ordered):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,ordered(v[k])])):v;return JSON.stringify(ordered(value));}
 
 export class NodeScene{
-  constructor({viewer,cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry=null,palette=()=>({}),tracksVisible=()=>true,isTransitioning=()=>false,onStatus=()=>{},verifyLinkSnapshot,animationNow=()=>0}={}){
+  constructor({viewer,cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry=null,sampledLinks=null,palette=()=>({}),tracksVisible=()=>true,isTransitioning=()=>false,onStatus=()=>{},verifyLinkSnapshot,animationNow=()=>0}={}){
     if(typeof advanceUtc!=='function'||typeof geometryFor!=='function'||typeof pathFor!=='function')throw new TypeError('node scene native display dependencies required');
     if(displayGeometry!==null&&['revision','viewFor','isCurrent','sampleAt','verifySample'].some(key=>typeof displayGeometry?.[key]!=='function'))throw new TypeError('registered readonly native display geometry port required');
-    Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry,palette,tracksVisible,isTransitioning,onStatus,verifyLinkSnapshot,animationNow});
+    if(sampledLinks!==null&&['read','verify'].some(key=>typeof sampledLinks?.[key]!=='function'))throw new TypeError('registered sampled links read/verify port required');
+    Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry,sampledLinks,palette,tracksVisible,isTransitioning,onStatus,verifyLinkSnapshot,animationNow});
     this.links=new Map();this.linkPolylines=null;this.linkOwner=null;this.linkReceipt=null;this.definitionScope='[]';this.linksVisible=true;this.models=new Map();this.descriptions=new Map();this.paths=new Map();this.points=new Map();this.labels=new Map();this.selectedId=null;this.hoveredId=null;this.visibleIds=null;this.sdcMode=false;this.theme='dark';this.loadToken=0;this.modelsVisible=true;this.disposed=false;this.dataSource=null;this.dataSourceOwner=null;this.markerOwner=null;this.pointCollection=null;this.labelCollection=null;
     this.frameMemo=null;
+    this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.linkGeneration=0;this.sampledFrozen=new WeakSet();this.sampledScopes=new WeakMap();this.sampledPairValidation=null;
   }
   get viewer(){return typeof this.viewerProvider==='function'?this.viewerProvider():this.viewerProvider;}
   get cesium(){return typeof this.cesiumProvider==='function'?this.cesiumProvider():this.cesiumProvider;}
@@ -186,6 +188,7 @@ export class NodeScene{
   // The renderer consumes a T077 verified snapshot; it never calculates terminal success.
   setLinks(snapshot){
     if(this.disposed)return false;
+    if(snapshot?.presentation_kind==='OPTICAL_SAMPLED_UI_V1'){this.clearLinks();return false;}
     let captured;
     try{
       captured=structuredClone(snapshot);
@@ -206,10 +209,10 @@ export class NodeScene{
         keep.add(link.key);let entry=this.links.get(link.key);
         if(!entry){entry={a:link.a,b:link.b,state:link.state,positions:[],line:lines.add({id:`node-link-${link.key}`,positions:[],show:false,width:2,material:this.linkMaterial(C,link.state)})};this.links.set(link.key,entry);}
         else if(entry.state!==link.state){entry.line.material=this.linkMaterial(C,link.state);entry.state=link.state;}
-        entry.a=link.a;entry.b=link.b;entry.material=entry.line.material;
+        entry.a=link.a;entry.b=link.b;entry.material=entry.line.material;delete entry.presentation_kind;delete entry.analysis_utc;
       }
       for(const key of [...this.links.keys()])if(!keep.has(key))this.removeLink(key);
-      this.linkReceipt={utc:captured.utc,scope:signature(captured.node_definitions)};this.placeLinks(this.timeSource?.());return true;
+      this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.linkGeneration++;this.linkReceipt={utc:captured.utc,scope:signature(captured.node_definitions)};this.placeLinks(this.timeSource?.());return true;
     }catch{this.clearLinks();return false;}
   }
   linkMaterial(C,state){
@@ -231,22 +234,95 @@ export class NodeScene{
       if(drawable){entry.positions=[a,b];entry.line.positions=entry.positions;}entry.line.show=drawable;
     }
   }
+  sampledReadonly(value){
+    if(!value||typeof value!=='object')return true;
+    if(this.sampledFrozen.has(value))return true;
+    if(!Object.isFrozen(value)||!Object.values(value).every(child=>this.sampledReadonly(child)))return false;
+    this.sampledFrozen.add(value);return true;
+  }
+  // Separate visual authority: receipt.utc stays at the captured analysis time.
+  // Exact setLinks/placeLinks never receive or approve a retained sample.
+  placeSampledLinks(utc){
+    const port=this.sampledLinks,frame=this.frameMemo;
+    if(!port||this.disposed)return false;
+    const hide=()=>this.hideSampledLinks();
+    try{
+      const generation=this.linkGeneration,descriptions=this.descriptions,scope=this.definitionScope,viewerProvider=this.viewerProvider,cesiumProvider=this.cesiumProvider,viewer=this.viewer,C=this.cesium,mode=viewer?.scene?.mode,visible=this.linksVisible,transition=this.isTransitioning(),read=port.read,verify=port.verify;
+      const bound=()=>!this.disposed&&this.sampledLinks===port&&port.read===read&&port.verify===verify&&this.linkGeneration===generation&&this.descriptions===descriptions&&this.definitionScope===scope&&this.viewerProvider===viewerProvider&&this.cesiumProvider===cesiumProvider&&this.linksVisible===visible&&viewer?.scene?.mode===mode;
+      // External getters may synchronously clear/switch the renderer. Check the
+      // internal generation again after them, including direct non-frame calls.
+      const current=()=>bound()&&this.viewer===viewer&&this.cesium===C&&this.timeSource?.()===utc&&this.isTransitioning()===transition&&(!frame||this.frameCurrent(frame))&&bound();
+      if(!current())throw Error('sampled visual context changed');
+      const view=port.read({utc});
+      if(!current())throw Error('sampled visual context changed during read');
+      if(!view||view.presentation_kind!=='OPTICAL_SAMPLED_UI_V1'||view.status!=='valid'){
+        if(this.sampledLinkReceipt)hide();return false;
+      }
+      if(!this.sampledReadonly(view)||!['sampled','pending'].includes(view.availability)||view.error!==null||view.display_utc!==utc||view.utc!==view.analysis_utc||typeof view.analysis_utc!=='string'||!Number.isFinite(view.age_seconds)||view.current_analysis!==(view.analysis_utc===utc)||Object.entries(metadata).some(([key,value])=>view[key]!==value)||!Array.isArray(view.node_definitions)||!Array.isArray(view.terminals)||!Array.isArray(view.pairs)||!view.definition_hashes||typeof view.definition_hashes!=='object'||Array.isArray(view.definition_hashes))throw Error('invalid sampled visual receipt');
+      if(this.advanceUtc(utc,0)!==utc||this.advanceUtc(view.analysis_utc,0)!==view.analysis_utc||!current())throw Error('invalid sampled visual UTC');
+      let receiptScope=this.sampledScopes.get(view.node_definitions);
+      if(receiptScope===undefined){receiptScope=signature(view.node_definitions);this.sampledScopes.set(view.node_definitions,receiptScope);}
+      if(receiptScope!==scope||Object.keys(view.definition_hashes).length!==descriptions.size||[...descriptions.keys()].some(id=>!Object.hasOwn(view.definition_hashes,id)||typeof view.definition_hashes[id]!=='string'||!/^[a-f0-9]{64}$/.test(view.definition_hashes[id])))throw Error('invalid sampled visual definitions');
+      if(this.sampledPairValidation?.pairs!==view.pairs||this.sampledPairValidation.scope!==scope){
+        if(view.pairs.length>descriptions.size*(descriptions.size-1)/2)throw Error('invalid sampled visual pair count');
+        const keys=new Set(),pairs=new Set();
+        for(const pair of view.pairs){
+          if(typeof pair?.key!=='string'||!pair.key.trim()||keys.has(pair.key)||typeof pair.a!=='string'||typeof pair.b!=='string'||pair.a===pair.b||!descriptions.has(pair.a)||!descriptions.has(pair.b)||!Object.hasOwn(LINK_COLORS,pair.state))throw Error('invalid sampled visual pair');
+          const key=JSON.stringify([pair.a,pair.b].sort());if(pairs.has(key))throw Error('duplicate sampled visual endpoints');keys.add(pair.key);pairs.add(key);
+        }
+        this.sampledPairValidation={pairs:view.pairs,scope};
+      }
+      if(port.verify(view,{utc})!==true||!current())throw Error('unregistered sampled visual receipt');
+      // Morph/visibility suppress endpoint work and flow without changing analysis.
+      if(!visible||transition||C?.SceneMode&&mode===C.SceneMode.MORPHING){hide();return true;}
+      const positions=new Map(),endpoints=new Map();
+      const endpoint=id=>{if(!endpoints.has(id))endpoints.set(id,this.cartesianAt(id,utc,view.definition_hashes[id]));return endpoints.get(id);};
+      for(const pair of view.pairs){
+        const a=!['blocked','idle','none'].includes(pair.state)?endpoint(pair.a):null,b=a?endpoint(pair.b):null;
+        positions.set(pair.key,a&&b?[a,b]:null);
+      }
+      if(port.verify(view,{utc})!==true||!current())throw Error('sampled authority changed during endpoints');
+      const lines=this.linkCollection();if(!C?.Color||!C?.Material?.fromType||!lines||this.linkOwner!==viewer||!current())throw Error('sampled renderer unavailable');
+      const keep=new Set();
+      for(const pair of view.pairs){
+        keep.add(pair.key);let entry=this.links.get(pair.key);
+        if(!entry){entry={a:pair.a,b:pair.b,state:pair.state,positions:[],line:lines.add({id:`node-link-${pair.key}`,positions:[],show:false,width:2,material:this.linkMaterial(C,pair.state)})};this.links.set(pair.key,entry);}
+        else if(entry.state!==pair.state){entry.line.material=this.linkMaterial(C,pair.state);entry.state=pair.state;}
+        entry.a=pair.a;entry.b=pair.b;entry.material=entry.line.material;entry.presentation_kind=view.presentation_kind;entry.analysis_utc=view.analysis_utc;
+        const value=positions.get(pair.key);if(value){entry.positions=value;entry.line.positions=value;}entry.line.show=!!value;
+      }
+      for(const key of [...this.links.keys()])if(!keep.has(key))this.removeLink(key);
+      if(port.verify(view,{utc})!==true||!current())throw Error('sampled authority changed during publication');
+      // The final context getters can revoke the analytical lease without a
+      // renderer generation change. Owner proof must follow those callbacks;
+      // only internal binding checks may follow the final owner verification.
+      if(port.verify(view,{utc})!==true||!bound())throw Error('sampled lease changed after publication callbacks');
+      this.linkReceipt=null;this.sampledLinkReceipt={presentation_kind:view.presentation_kind,analysis_utc:view.analysis_utc,display_utc:utc,age_seconds:view.age_seconds,scope,view};
+      this.sampledFlowGuard=()=>{try{return current()&&port.verify(view,{utc})===true&&current()&&port.verify(view,{utc})===true&&bound();}catch{return false;}};return true;
+    }catch{hide();return true;}
+  }
+  hideSampledLinks(){for(const entry of this.links.values())entry.line.show=false;this.sampledLinkReceipt=null;this.sampledFlowGuard=null;}
+  placeDisplayLinks(utc){if(!this.placeSampledLinks(utc))this.placeLinks(utc);}
   animateLinkFlow(nowMs,utc=this.timeSource?.()){
     if(this.disposed)return;
     // Always recheck scope and endpoints; direct animation calls cannot revive stale results.
-    this.placeLinks(utc);
-    if(nowMs===undefined)try{nowMs=this.animationNow();}catch{return;}
+    this.placeDisplayLinks(utc);
+    const sampledGuard=this.sampledFlowGuard;
+    if(nowMs===undefined)try{nowMs=this.animationNow();}catch{if(sampledGuard)this.hideSampledLinks();return;}
+    if(sampledGuard&&!sampledGuard()){this.hideSampledLinks();return;}
     if(!Number.isFinite(nowMs))return;
-    for(const entry of this.links.values()){const uniforms=entry.line.material?.uniforms;if(entry.line.show&&entry.state==='locked'&&uniforms&&'time'in uniforms)uniforms.time=nowMs/1000*OISL_FLOW_RATE;}
+    const previous=sampledGuard?[]:null;
+    for(const entry of this.links.values()){const uniforms=entry.line.material?.uniforms;if(entry.line.show&&entry.state==='locked'&&uniforms&&'time'in uniforms){previous?.push([uniforms,uniforms.time]);uniforms.time=nowMs/1000*OISL_FLOW_RATE;}}
+    if(sampledGuard&&!sampledGuard()){for(const [uniforms,time]of previous)uniforms.time=time;this.hideSampledLinks();}
   }
-  setLinksVisible(visible){if(this.disposed)return false;this.linksVisible=visible!==false;this.placeLinks(this.timeSource?.());return this.linksVisible;}
-  removeLink(key){const entry=this.links.get(key);if(!entry)return;try{this.linkPolylines?.remove(entry.line);}catch{/* Owned primitive already gone. */}this.links.delete(key);}
-  clearLinks(){for(const key of [...this.links.keys()])this.removeLink(key);this.linkReceipt=null;}
+  setLinksVisible(visible){if(this.disposed)return false;this.linksVisible=visible!==false;this.placeDisplayLinks(this.timeSource?.());return this.linksVisible;}
+  removeLink(key){const entry=this.links.get(key);if(!entry)return;entry.line.show=false;try{this.linkPolylines?.remove(entry.line);}catch{/* Owned primitive already gone. */}this.links.delete(key);}
+  clearLinks(){this.linkGeneration++;for(const key of [...this.links.keys()])this.removeLink(key);this.linkReceipt=null;this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.sampledPairValidation=null;}
 
   select(id){if(this.disposed)return;this.selectedId=id==null?null:String(id);this.refreshMarkerStyles();this.placePoints(this.timeSource?.());this.placeModels(this.timeSource?.());for(const [key,p]of this.paths)p.entity.show=p.positions.length>1&&key!==this.selectedId&&this.tracksVisible()!==false;}
   setModelsVisible(visible){this.modelsVisible=visible!==false;this.placeModels(this.timeSource?.());return this.modelsVisible;}
   setTheme(theme){this.theme=theme==='light'?'light':'dark';this.refreshMarkerStyles();const C=this.cesium;if(C?.Color)for(const [id,p]of this.paths)p.entity.polyline.material=this.pathColor(C,id);}
-  update(utc=this.timeSource?.()){if(this.disposed)return;this.placePoints(utc);this.placeModels(utc);this.placeLinks(utc);this.rebuildPaths();}
+  update(utc=this.timeSource?.()){if(this.disposed)return;this.placePoints(utc);this.placeModels(utc);this.placeDisplayLinks(utc);this.rebuildPaths();}
   syncFrame(utc,nowMs){
     if(this.disposed)return;
     const frame={utc,viewer:this.viewer,cesium:this.cesium,descriptions:this.descriptions,scope:this.definitionScope,transition:this.isTransitioning(),mode:this.viewer?.scene?.mode,geometry:new Map(),utcAdvances:new Map(),displayGeometry:this.displayGeometry,nativeRevision:null,advanceUtc:this.advanceUtc,invalid:false};

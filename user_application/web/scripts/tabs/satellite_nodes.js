@@ -185,23 +185,59 @@ function statusPresentation(node,{utc,geometry=null,links=null,nodes=[node],veri
   return {texts,equipmentMarkup,terminalMarkup,powerAssumption,canLocate:hasGeometry,geometryStatus:hasGeometry?'valid':geometry?.row?.status==='error'?'error':geometry?'unavailable':'unknown',linksStatus:hasLinks?'valid':links?.status==='error'?'error':'unknown',
     sunClass:row?(row.sunlit?'sunlit':'eclipse'):'',marginClass:marginKnown?(power.margin_w>=0?'ok':'bad'):'unknown',powerBar:{width,className:marginKnown?(power.margin_w>=0?'':'bad'):'unknown'}};
 }
-function createNodeStatusPanel({host,store,readPresentation=null,readDisplay,geometryFor=()=>null,linksFor=()=>null,linksPresentationFor=null,verifyLinkSnapshot,verifyLinkPresentation,oislPresentation,modelFor=()=>null,modelReadinessFor=()=>null,editor,onEdit,onFocus,onError=()=>{}}={}){
+const sampledReadonlyValues=new WeakSet();
+function sampledReadonly(value){
+  if(!value||typeof value!=='object')return true;if(sampledReadonlyValues.has(value))return true;
+  if(!Object.isFrozen(value)||!Object.values(value).every(sampledReadonly))return false;sampledReadonlyValues.add(value);return true;
+}
+function validSampledLinkPresentation(view,nodes,utc,verify){
+  try{
+    if(view?.presentation_kind!=='OPTICAL_SAMPLED_UI_V1'||view.status!=='valid'||!sampledReadonly(view)||view.error!==null||!['sampled','pending'].includes(view.availability)||view.display_utc!==utc||view.utc!==view.analysis_utc||typeof view.analysis_utc!=='string'||!Number.isFinite(Date.parse(view.analysis_utc))||!Number.isFinite(view.age_seconds)||view.current_analysis!==(view.analysis_utc===utc)||Object.entries(nativeMetadata).some(([key,value])=>view[key]!==value)||!Array.isArray(nodes)||!Array.isArray(view.node_definitions)||!Array.isArray(view.terminals)||!Array.isArray(view.pairs)||presentationDefinitionKey(view.node_definitions)!==presentationDefinitionKey(nodes)||typeof verify!=='function')return false;
+    if(!view.definition_hashes||Array.isArray(view.definition_hashes)||Object.keys(view.definition_hashes).length!==nodes.length||nodes.some(node=>!Object.hasOwn(view.definition_hashes,node.id)||!/^[a-f0-9]{64}$/.test(view.definition_hashes[node.id])))return false;
+    const ids=new Set(nodes.map(node=>node.id)),keys=new Set(),pairs=new Set();
+    for(const pair of view.pairs){const key=JSON.stringify([pair?.a,pair?.b].sort());if(typeof pair?.key!=='string'||!pair.key.trim()||keys.has(pair.key)||pairs.has(key)||pair.a===pair.b||!ids.has(pair.a)||!ids.has(pair.b)||!['locked','one_way','acquiring','slewing','blocked','idle','none'].includes(pair.state))return false;keys.add(pair.key);pairs.add(key);}
+    return verify(view,{utc})===true;
+  }catch{return false;}
+}
+function sampledAnalysisText(view,utc){
+  if(!view)return `표시 UTC ${utc||'미확인'} · 현재 시각 통신 분석 미확인`;
+  return `OISL 분석 시각 ${view.analysis_utc} · 표시 UTC ${utc} · 분석 나이 ${displayNumber(view.age_seconds,3)} s · 원본 Kepler+J2 기하 모델 (engineering_assumption) · ${view.current_analysis?'현재 UTC 기하 분석 (표시 전용)':'현재 시각 통신 분석 미확인'}${view.availability==='pending'?' · 다음 분석 대기':''}`;
+}
+function sampledStatusPresentation(node,input){
+  const {utc,geometry,nodes,sampled,verifySampledLinkPresentation,oislPresentation}=input;
+  const value=statusPresentation(node,{utc,geometry,nodes});
+  if(!validSampledLinkPresentation(sampled,nodes,utc,verifySampledLinkPresentation))return value;
+  try{
+    const terminals=sampled.terminals.filter(terminal=>terminal.nodeId===node.id);
+    if(terminals.length&&['acquisitionProgress','blockedLabel','phaseLabel'].some(key=>typeof oislPresentation?.[key]!=='function'))return value;
+    const activeTerminals=new Set(terminals.filter(terminal=>terminal.targetId).map(terminal=>terminal.equipmentId)),power=library.powerBudget(node,{sunlit:geometry?.row?.sunlit===true,activeTerminals});
+    value.terminalMarkup=terminals.map(terminal=>terminalRow(terminal,new Date(sampled.analysis_utc),{...oislPresentation,findNode:id=>nodes.find(next=>next.id===id)})).join('')||'<div class="ns-empty">분석 시각에 활성 OISL 단말이 없습니다.</div>';
+    value.texts.consumption=`${displayNumber(power.consumption_w,0)} W (분석 시각)`;value.texts.margin='미확인';value.marginClass='unknown';value.powerBar={width:'0%',className:'unknown'};
+    value.texts['equipment-summary']=`${power.items.filter(entry=>entry.active).length} / ${power.items.length} 사용 중 (분석 시각) · 총 질량 ${displayNumber(library.nodeMass(node),0)} kg`;
+    value.equipmentMarkup=power.items.map(entry=>`<span class="${entry.active?'on':'off'}"><b>${esc(entry.label)}</b><small>${entry.active?`${esc(entry.power_w)} W`:'꺼짐'} (분석 시각)</small></span>`).join('')||'장비 없음';
+    value.texts['terminal-summary']=`${terminals.length}기 · 분석 시각의 짐벌 지향과 포착 상태`;value.texts['power-assumption']='';value.powerAssumption=null;
+    if(!validSampledLinkPresentation(sampled,nodes,utc,verifySampledLinkPresentation))return statusPresentation(node,{utc,geometry,nodes});
+    value.linksStatus='sampled';return value;
+  }catch{return statusPresentation(node,{utc,geometry,nodes});}
+}
+function createNodeStatusPanel({host,store,readPresentation=null,readDisplay,geometryFor=()=>null,linksFor=()=>null,linksPresentationFor=null,sampledLinksPresentationFor=null,verifySampledLinkPresentation,verifyLinkSnapshot,verifyLinkPresentation,oislPresentation,modelFor=()=>null,modelReadinessFor=()=>null,editor,onEdit,onFocus,onError=()=>{}}={}){
   if(!host||!store||typeof readDisplay!=='function')throw new TypeError('node_status_dependencies_required');
   if(readPresentation!==null&&typeof readPresentation!=='function')throw new TypeError('node_status_presentation_reader_required');
   if(linksPresentationFor!==null&&typeof linksPresentationFor!=='function')throw new TypeError('node_status_link_presentation_reader_required');
-  let destroyed=false,key=null,generation=0,lastError=null;const owned=[];
+  if(sampledLinksPresentationFor!==null&&(typeof sampledLinksPresentationFor!=='function'||typeof verifySampledLinkPresentation!=='function'))throw new TypeError('node_status_sampled_link_presentation_dependencies_required');
+  let destroyed=false,key=null,generation=0,lastError=null,refreshSerial=0;const owned=[];
   const requireOpen=()=>{if(destroyed)throw new Error('node_status_disposed');};
   const report=error=>{const message=error instanceof Error?error.message:String(error);if(message!==lastError){lastError=message;onError(message);}};
   function unbind(){generation++;for(const remove of owned.splice(0))remove();}
   function geometryContext(node){
     let display=null,geometry=null;
     try{display=readDisplay();if(display?.utc)geometry=geometryFor(structuredClone(node),structuredClone(display));}catch(error){report(error);}
-    return {utc:display?.utc,geometry};
+    return {utc:display?.utc,geometry,display};
   }
   function context(node,presentation){
-    const input=geometryContext(node),nodes=readPresentation?presentation?.drafts??[]:null;let links=null;
-    try{if(input.utc)links=linksPresentationFor?linksPresentationFor({utc:input.utc}):linksFor({nodes:readPresentation?structuredClone(nodes):store.drafts,utc:input.utc});}catch(error){report(error);}
-    return {...input,links,nodes:readPresentation?nodes:store.drafts,verifyLinkSnapshot:linksPresentationFor?undefined:verifyLinkSnapshot,verifyLinkPresentation:linksPresentationFor?verifyLinkPresentation:undefined,oislPresentation};
+    const input=geometryContext(node),nodes=readPresentation?presentation?.drafts??[]:store.drafts;let links=null,sampled=null;
+    try{if(input.utc){if(sampledLinksPresentationFor)sampled=sampledLinksPresentationFor({utc:input.utc});if(!sampled||sampled.status!=='valid')links=linksPresentationFor?linksPresentationFor({utc:input.utc}):linksFor({nodes:structuredClone(nodes),utc:input.utc});}}catch(error){report(error);}
+    return {...input,links,sampled,nodes,verifySampledLinkPresentation,verifyLinkSnapshot:linksPresentationFor?undefined:verifyLinkSnapshot,verifyLinkPresentation:linksPresentationFor?verifyLinkPresentation:undefined,oislPresentation};
   }
   function bind(selector,node,action){
     const element=host.querySelector(selector);if(!element)return;
@@ -216,7 +252,7 @@ function createNodeStatusPanel({host,store,readPresentation=null,readDisplay,geo
     unbind();const shape=describeMatch(match);
     const credit=shape.credit||'출처 미확인';const url=typeof shape.creditUrl==='string'&&/^https?:\/\//i.test(shape.creditUrl)?shape.creditUrl:null;
     const creditMarkup=url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(credit)}</a>`:esc(credit);
-    host.innerHTML=statusFrame(node,{match})+`<p class="ns-note">샌드박스 가상 번호 ${esc(node.catalog_number)} · 실제 NORAD 등록 번호가 아닙니다.</p><p class="ns-note" data-live="model-status">${esc(shape.note)} 출처: ${creditMarkup} · 렌더링 ${esc(readiness?.status||'미확인')}</p><p class="ns-note" data-live="native-status"></p><p class="ns-note" data-live="power-assumption"></p>`;
+    host.innerHTML=statusFrame(node,{match})+`<p class="ns-note">샌드박스 가상 번호 ${esc(node.catalog_number)} · 실제 NORAD 등록 번호가 아닙니다.</p><p class="ns-note" data-live="model-status">${esc(shape.note)} 출처: ${creditMarkup} · 렌더링 ${esc(readiness?.status||'미확인')}</p><p class="ns-note" data-live="native-status"></p><p class="ns-note" data-live="power-assumption"></p>${sampledLinksPresentationFor?'<p class="ns-note" data-live="sampled-analysis"></p>':''}`;
     bind('#node-edit',node,next=>typeof onEdit==='function'?onEdit(next):editor?.open(next));
     const edit=host.querySelector('#node-edit');if(edit)edit.disabled=typeof onEdit!=='function'&&typeof editor?.open!=='function';
     bind('#node-duplicate',node,next=>store.duplicate(next.id));
@@ -227,12 +263,20 @@ function createNodeStatusPanel({host,store,readPresentation=null,readDisplay,geo
     });
   }
   function refresh(){
-    requireOpen();if(editor?.isOpen()){host.hidden=true;unbind();key=null;return;}
-    host.hidden=false;const presentation=readPresentation?.(),node=readPresentation?presentation?.selected??null:store.selected;
+    requireOpen();const serial=++refreshSerial;if(editor?.isOpen()){host.hidden=true;unbind();key=null;return;}
+    host.hidden=false;let presentation,node;
+    try{presentation=readPresentation?.();node=readPresentation?presentation?.selected??null:store.selected;}
+    catch(error){if(!sampledLinksPresentationFor)throw error;host.hidden=true;unbind();key=null;report(error);return;}
     if(!node){if(key!=='empty'){unbind();host.innerHTML='<div class="ns-empty tall">위성을 선택하면 궤도, 전력, 장비와 OISL 단말 상태를 표시합니다.</div>';key='empty';}return;}
     let match=null,readiness=null;try{match=modelFor(structuredClone(node));readiness=modelReadinessFor(structuredClone(node));}catch(error){report(error);}
     const nextKey=JSON.stringify([node,match,readiness]);if(nextKey!==key){key=nextKey;renderFrame(node,match,readiness);}
-    const input=context(node,presentation),value=statusPresentation(node,input);
+    const input=context(node,presentation),version=generation;
+    const bound=()=>!destroyed&&serial===refreshSerial&&generation===version;
+    const scopeCurrent=()=>{try{if(!bound())return false;const current=readPresentation?.(),selected=readPresentation?current?.selected:store.selected,nodes=readPresentation?current?.drafts??[]:store.drafts;return sameDefinition(selected,node)&&presentationDefinitionKey(nodes)===presentationDefinitionKey(input.nodes)&&sameDefinition(readDisplay(),input.display)&&bound();}catch{return false;}};
+    const sampledCurrent=()=>{try{return scopeCurrent()&&validSampledLinkPresentation(input.sampled,input.nodes,input.utc,verifySampledLinkPresentation)&&scopeCurrent()&&verifySampledLinkPresentation(input.sampled,{utc:input.utc})===true&&bound();}catch{return false;}};
+    let value=sampledLinksPresentationFor&&input.sampled?.status==='valid'?sampledStatusPresentation(node,input):statusPresentation(node,input);
+    if(sampledLinksPresentationFor){if(!bound())return;if(!scopeCurrent()){host.hidden=true;unbind();key=null;return;}if(value.linksStatus==='sampled'&&(!sampledCurrent()||validGeometry(node,input.geometry,input.utc)&&input.geometry.definition_hash!==input.sampled.definition_hashes[node.id]))value=statusPresentation(node,{utc:input.utc,geometry:input.geometry,nodes:input.nodes});}
+    function paint(value){
     for(const [name,text]of Object.entries(value.texts)){const el=host.querySelector(`[data-live="${name}"]`);if(el)el.textContent=text;}
     const update=(name,action)=>{const el=host.querySelector(`[data-live="${name}"]`);if(el)action(el);};
     update('power-assumption',el=>el.hidden=!value.powerAssumption);
@@ -241,9 +285,13 @@ function createNodeStatusPanel({host,store,readPresentation=null,readDisplay,geo
     update('equipment',el=>el.innerHTML=value.equipmentMarkup);update('terminals',el=>el.innerHTML=value.terminalMarkup);
     update('native-status',el=>el.textContent=value.geometryStatus==='valid'?`Kepler+J2 모의 위치 · GMST 근사 좌표 · ${input.utc}`:value.geometryStatus==='error'?'위치 계산 오류 · 수치와 뷰 정렬을 사용할 수 없습니다.':'현재 시각의 위치 계산 미확인');
     const locate=host.querySelector('#node-locate');if(locate)locate.disabled=!value.canLocate||typeof onFocus!=='function';
+    update('sampled-analysis',el=>{el.textContent=sampledAnalysisText(value.linksStatus==='sampled'?input.sampled:null,input.utc);el.hidden=value.linksStatus==='valid';});
+    }
+    paint(value);
+    if(sampledLinksPresentationFor){if(!bound())return;if(!scopeCurrent()){host.hidden=true;unbind();key=null;return;}if(value.linksStatus==='sampled'&&!sampledCurrent()){value=statusPresentation(node,{utc:input.utc,geometry:input.geometry,nodes:input.nodes});paint(value);}}
     return structuredClone(value);
   }
-  function destroy(){if(destroyed)return;unbind();destroyed=true;}
+  function destroy(){if(destroyed)return;if(sampledLinksPresentationFor)host.hidden=true;unbind();destroyed=true;}
   function canFocus(){if(destroyed||editor?.isOpen()||typeof onFocus!=='function')return false;const node=store.selected;if(!node)return false;const input=geometryContext(node);return validGeometry(node,input.geometry,input.utc);}
   async function focusSelected(){
     if(destroyed||editor?.isOpen()||typeof onFocus!=='function')return false;
@@ -312,15 +360,23 @@ function linkStateOf(nodeId,links) {
   return "danger";
 }
 
-function createNodeFleetPanel({host,count=null,store,readPresentation=null,readDisplay,linksFor=()=>null,linksPresentationFor=null,verifyLinkSnapshot,verifyLinkPresentation,onSelected=()=>{},onError=()=>{}}={}){
+function createNodeFleetPanel({host,count=null,analysisHost=null,store,readPresentation=null,readDisplay,linksFor=()=>null,linksPresentationFor=null,sampledLinksPresentationFor=null,verifySampledLinkPresentation,verifyLinkSnapshot,verifyLinkPresentation,onSelected=()=>{},onError=()=>{}}={}){
   if(!host||!store||typeof readDisplay!=='function')throw new TypeError('node_fleet_dependencies_required');
   if(readPresentation!==null&&typeof readPresentation!=='function')throw new TypeError('node_fleet_presentation_reader_required');
   if(linksPresentationFor!==null&&typeof linksPresentationFor!=='function')throw new TypeError('node_fleet_link_presentation_reader_required');
-  let destroyed=false,key=null,generation=0;const owned=[];
+  if(sampledLinksPresentationFor!==null&&(typeof sampledLinksPresentationFor!=='function'||typeof verifySampledLinkPresentation!=='function'))throw new TypeError('node_fleet_sampled_link_presentation_dependencies_required');
+  let destroyed=false,key=null,generation=0,refreshSerial=0;const owned=[];
   const requireOpen=()=>{if(destroyed)throw new Error('node_fleet_disposed');};
   function unbind(){generation++;for(const remove of owned.splice(0))remove();}
+  function neutralize(){
+    host.querySelectorAll('[data-node-id]').forEach(row=>{const dot=row.querySelector('.status-dot');if(dot){dot.className='status-dot neutral';dot.title='현재 시각 통신 분석 미확인';dot.setAttribute('aria-label',dot.title);}});
+    if(analysisHost){analysisHost.hidden=false;analysisHost.textContent=sampledAnalysisText(null,null);}
+  }
   function refresh(){
-    requireOpen();const presentation=readPresentation?.(),nodes=readPresentation?presentation?.drafts??[]:store.drafts,nextKey=JSON.stringify(nodes.map(node=>[node.id,node.updated_at,node.name,node.mode,node.orbit,node.formation]));
+    requireOpen();const serial=++refreshSerial;let presentation,nodes;
+    try{presentation=readPresentation?.();nodes=readPresentation?presentation?.drafts??[]:store.drafts;}
+    catch(error){if(!sampledLinksPresentationFor)throw error;neutralize();onError(error instanceof Error?error.message:String(error));return;}
+    const nextKey=JSON.stringify(nodes.map(node=>[node.id,node.updated_at,node.name,node.mode,node.orbit,node.formation]));
     if(count)count.textContent=String(nodes.length);
     if(nextKey!==key){
       key=nextKey;unbind();host.innerHTML=fleetMarkup(nodes);const version=generation;
@@ -333,14 +389,29 @@ function createNodeFleetPanel({host,count=null,store,readPresentation=null,readD
         row.addEventListener('click',handler);owned.push(()=>row.removeEventListener('click',handler));
       });
     }
-    let links=null,utc=null;try{utc=readDisplay()?.utc;if(utc)links=linksPresentationFor?linksPresentationFor({utc}):linksFor({nodes:structuredClone(nodes),utc});}catch(error){onError(error instanceof Error?error.message:String(error));}
-    const verified=linksPresentationFor?validLinkPresentation(links,nodes,utc,verifyLinkPresentation):validLinks(links,nodes,utc,verifyLinkSnapshot);
+    const version=generation;let links=null,sampled=null,utc=null,display=null;try{display=readDisplay();utc=display?.utc;if(utc){if(sampledLinksPresentationFor)sampled=sampledLinksPresentationFor({utc});if(!sampled||sampled.status!=='valid')links=linksPresentationFor?linksPresentationFor({utc}):linksFor({nodes:structuredClone(nodes),utc});}}catch(error){onError(error instanceof Error?error.message:String(error));}
+    const bound=()=>!destroyed&&serial===refreshSerial&&version===generation;
+    const scopeCurrent=()=>{try{if(!bound())return false;const currentNodes=readPresentation?readPresentation()?.drafts??[]:store.drafts;return presentationDefinitionKey(nodes)===presentationDefinitionKey(currentNodes)&&sameDefinition(display,readDisplay())&&bound();}catch{return false;}};
+    const sampledCurrent=()=>{try{return scopeCurrent()&&validSampledLinkPresentation(sampled,nodes,utc,verifySampledLinkPresentation)&&scopeCurrent()&&verifySampledLinkPresentation(sampled,{utc})===true&&bound();}catch{return false;}};
+    let sampledVerified=sampledLinksPresentationFor&&sampled?.status==='valid'&&sampledCurrent();
+    const verified=!sampledVerified&&(linksPresentationFor?validLinkPresentation(links,nodes,utc,verifyLinkPresentation):validLinks(links,nodes,utc,verifyLinkSnapshot));
+    if(sampledLinksPresentationFor&&!bound())return;
+    function paint(sampledVerified,verified){
+    const selection=sampledLinksPresentationFor?(readPresentation?readPresentation()?.selected_id:store.selectedId):(readPresentation?presentation?.selected_id:store.selectedId);
+    // Selection is another owner callback: it may dispose this panel or run a
+    // newer refresh. Obsolete publication must leave that newer result intact.
+    if(sampledLinksPresentationFor&&!bound())return false;
     host.querySelectorAll('[data-node-id]').forEach(row=>{
-      row.setAttribute('aria-selected',String(row.dataset.nodeId===(readPresentation?presentation?.selected_id:store.selectedId)));const dot=row.querySelector('.status-dot');
-      if(dot){dot.className=`status-dot ${verified?linkStateOf(row.dataset.nodeId,links):'neutral'}`;dot.title=verified?'원본 기하 모델의 통신 상태':'통신 결과 미확인';}
+      row.setAttribute('aria-selected',String(row.dataset.nodeId===selection));const dot=row.querySelector('.status-dot');
+      if(dot){dot.className=`status-dot ${sampledVerified?linkStateOf(row.dataset.nodeId,sampled):verified?linkStateOf(row.dataset.nodeId,links):'neutral'}`;dot.title=sampledVerified?`분석 시각의 통신 상태 · ${sampledAnalysisText(sampled,utc)}`:verified?'원본 기하 모델의 통신 상태':'통신 결과 미확인';if(sampledLinksPresentationFor)dot.setAttribute('aria-label',dot.title);}
     });
+    if(analysisHost){analysisHost.hidden=!sampledLinksPresentationFor||verified;analysisHost.textContent=sampledAnalysisText(sampledVerified?sampled:null,utc);}
+    return true;
+    }
+    try{if(paint(sampledVerified,verified)===false)return;}catch(error){if(sampledLinksPresentationFor){if(bound()){neutralize();onError(error instanceof Error?error.message:String(error));}return;}sampledVerified=false;paint(false,false);}
+    if(sampledLinksPresentationFor&&bound()&&(!scopeCurrent()||sampledVerified&&!sampledCurrent()))paint(false,false);
   }
-  function destroy(){if(destroyed)return;unbind();destroyed=true;}
+  function destroy(){if(destroyed)return;if(sampledLinksPresentationFor)neutralize();unbind();destroyed=true;}
   return Object.freeze({refresh,destroy});
 }
 function bindNodeTooltips({root,tip,timers,viewport,contains,scrollTarget=null}={}){
@@ -501,7 +572,7 @@ function createNodeSceneControls({root,readScene=()=>null,readDisplay,actions={}
 }
 
 function createNodeWorkPanel({root,store,readPresentation=null,editorTools,now,timers,createFormationId,readDisplay,viewport,scrollTarget,
-  geometryFor,linksFor,linksPresentationFor,verifyLinkSnapshot,verifyLinkPresentation,oislPresentation,modelFor,modelReadinessFor,models,onModelChange,
+  geometryFor,linksFor,linksPresentationFor,sampledLinksPresentationFor,verifySampledLinkPresentation,verifyLinkSnapshot,verifyLinkPresentation,oislPresentation,modelFor,modelReadinessFor,models,onModelChange,
   confirmClear,onDefinitionsChanged,onResetTerminals,onSelected=()=>{},onFocus,readScene,actions,onError=()=>{},initialParams=FORMATION_DEFAULTS}={}){
   if(!root||!store||typeof readDisplay!=='function'||typeof viewport!=='function')throw new TypeError('node_work_panel_dependencies_required');
   const host=root.querySelector('#node-fleet'),statusHost=root.querySelector('#node-status'),tip=root.querySelector('#node-tip');
@@ -511,8 +582,8 @@ function createNodeWorkPanel({root,store,readPresentation=null,editorTools,now,t
   function destroy(){if(disposed)return;disposed=true;for(const remove of owned.splice(0))remove();removeTooltips?.();controls?.destroy();fleet?.destroy();status?.destroy();draft?.destroy();}
   try{
     draft=createNodeDraftPanel({root,store,editorTools,now,timers,createFormationId,models,onModelChange,confirmClear,onDefinitionsChanged,onResetTerminals,onError,initialParams,onRefresh:refresh,onSelected});
-    status=createNodeStatusPanel({host:statusHost,store,readPresentation,readDisplay,geometryFor,linksFor,linksPresentationFor,verifyLinkSnapshot,verifyLinkPresentation,oislPresentation,modelFor,modelReadinessFor,onFocus,onError,editor:draft.editor,onEdit:node=>draft.openEditor(node.id)});
-    fleet=createNodeFleetPanel({host,count:root.querySelector('#node-count'),store,readPresentation,readDisplay,linksFor,linksPresentationFor,verifyLinkSnapshot,verifyLinkPresentation,onError,onSelected:node=>{draft.editor.close();refresh();return onSelected(structuredClone(node),{userInitiated:true,focus:false});}});
+    status=createNodeStatusPanel({host:statusHost,store,readPresentation,readDisplay,geometryFor,linksFor,linksPresentationFor,sampledLinksPresentationFor,verifySampledLinkPresentation,verifyLinkSnapshot,verifyLinkPresentation,oislPresentation,modelFor,modelReadinessFor,onFocus,onError,editor:draft.editor,onEdit:node=>draft.openEditor(node.id)});
+    fleet=createNodeFleetPanel({host,count:root.querySelector('#node-count'),analysisHost:root.querySelector('#node-fleet-analysis'),store,readPresentation,readDisplay,linksFor,linksPresentationFor,sampledLinksPresentationFor,verifySampledLinkPresentation,verifyLinkSnapshot,verifyLinkPresentation,onError,onSelected:node=>{draft.editor.close();refresh();return onSelected(structuredClone(node),{userInitiated:true,focus:false});}});
     controls=createNodeSceneControls({root,readScene,readDisplay,actions,onError,canFocus:()=>status.canFocus(),onFocus:()=>status.focusSelected()});
     const focus=async event=>{if(disposed)return;const row=event.target?.closest?.('[data-node-id]');if(!row||!Array.from(host.querySelectorAll('[data-node-id]')).includes(row)||store.selectedId!==row.dataset.nodeId)return;await status.focusSelected();if(!disposed)refresh();};
     host.addEventListener('dblclick',focus);owned.push(()=>host.removeEventListener('dblclick',focus));
@@ -523,7 +594,7 @@ function createNodeWorkPanel({root,store,readPresentation=null,editorTools,now,t
   return Object.freeze({refresh,refreshScene:()=>{if(!disposed&&!initializing)controls.refresh();},destroy,draft});
 }
 
-function workPanelMarkup(){return `<div class="satellite-node-work-panel">
+function workPanelMarkup({sampledLinks=false}={}){return `<div class="satellite-node-work-panel">
 <header class="ns-scene-toolbar" aria-label="공용 지구의 내 위성 제어">
 <div><button type="button" data-node-scene="home">뷰 초기화</button><button type="button" data-node-scene="focus" disabled>뷰 정렬</button><button type="button" data-node-scene="tracks" aria-pressed="false" disabled>궤적</button><button type="button" data-node-scene="links" aria-pressed="false" disabled>OISL 링크</button><button type="button" data-node-scene="models" aria-pressed="false" disabled>3D 모델</button></div>
 <div class="ns-clock"><button type="button" id="node-lighting" aria-pressed="false" disabled>☀</button><span id="node-clock-mode">표시 시각 미확인</span><time id="node-clock">—</time><small>UTC</small><button type="button" id="node-clock-back" disabled>−60s</button><button type="button" id="node-clock-pause" aria-label="분석 시계 재생 상태 미확인" disabled>Ⅱ</button><button type="button" id="node-clock-forward" disabled>+60s</button><select id="node-clock-speed" aria-label="분석 배속" disabled><option value="1">×1</option><option value="10">×10</option><option value="60">×60</option><option value="600">×600</option></select><button type="button" id="node-clock-now" disabled>현재</button></div>
@@ -552,7 +623,7 @@ function workPanelMarkup(){return `<div class="satellite-node-work-panel">
 
         <aside class="ns-inspector ns-panel" aria-label="내 위성과 선택 위성">
           <header class="ns-fleet-head"><h2>내 위성 <span id="node-count" class="ns-count">0</span></h2><button id="node-add">＋ 위성 추가</button></header>
-          <div id="node-fleet" class="ns-fleet" role="listbox" aria-label="내 위성 목록"></div>
+          ${sampledLinks?'<p id="node-fleet-analysis" class="ns-note" aria-live="polite" hidden></p>\n          ':''}<div id="node-fleet" class="ns-fleet" role="listbox" aria-label="내 위성 목록"></div>
           <div class="ns-detail">
             <section id="node-status" class="ns-status" aria-live="polite"></section>
             <form id="node-editor" class="ns-editor" hidden novalidate></form>

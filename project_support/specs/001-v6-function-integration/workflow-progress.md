@@ -1220,3 +1220,28 @@ Remaining visual acceptance explicitly includes Aura/EO1 clipped/edge-on appenda
 Existing feature reused through speckit-plan setup (existing plan preserved), speckit-analyze prerequisite and bounded cross-artifact analysis. Requirementsquality8/8checked, extensions.yml absent. Independent review of9stable amended design documents found no blocker: FR030/SC026/fullT076/T077/sourcegoldens/currentactionproof/T032 thresholds remain unchanged; new N012-N015 are OPEN. ADR0047 describes solehistory/native serialization, exactcapturedUTC, distinct visual-only authority, owner-issued continuity, command-entry/transaction/gap/late-failure invalidation and catalog-first partial stageddelivery. Previous fullregression does not verify this new design behavior.
 
 Implementation is now running with disjoint code ownership: catalog_timeline capability +newtest; optical_timeline sampled owner +newtest. Root owns later globe/assembly; independent renderer/UI investigation is readonly until API alignment. No newbranch/serverreset/clock/physicalformula. Network/ground/otherowner continuous sampled paths and actualtwores/gameframe/current-source/fullmigration gates remain open. New code requires meaningful RED, independent review/fullregression and livevalidation before acceptance.
+
+## 2026-10-07 functional connection first checkpoint
+
+Latest user steering: finish connection before PR; then PR and actual validation
+in parallel. Explicit Context7 request handled with installed ctx7 CLI and official
+Cesium reference queries; no setup/automatic global rule/upgrade was performed.
+Catalog/globe opaque continuity, optical exact-captured sampled view, 1000ms
+scheduler and sampled NodeScene/status/fleet application ports are composed.
+Root actual mounted scheduler66PASS; independent renderer/scheduler157PASS;
+UI callback dispose/nested bugs repaired with4RED regressions (75focusedPASS).
+FullNode1368PASS12121.0829ms; required freshPython running handle40607, no pass yet.
+Real active-owner two-resolution composition test is being added independently.
+
+N012/N013/N014 are implemented partial, not accepted; N015 remains pending.
+New N016-N018 explicitly retain proven original communication lifecycle gaps;
+see validation/sampled_optical_connection.md and appended task/plan boundaries.
+Do not mark wholeT077 or 75-84 complete from optical-only work. ActualGPU/repeated
+trials/source history comparison/currentaction/network/fullwhole/multiwindow/review
+remain. Original8891 runtime/SIM/40accepted/held2 and source history preserved.
+
+FreshPython handle40607 completed965PASS1PillowSKIP8existingwarnings245.86s.
+Stable optical sampled application checkpoint: Node1368PASS12121.0829ms, independent
+reviews and callback failures repaired. Additional real-owner two-resolution/full240
+fixture tests are being stabilized and will be a separate verified checkpoint.
+N016-N018/source communication remainder and wholeactualGPU/acceptance stay OPEN.

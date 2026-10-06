@@ -1202,3 +1202,29 @@ Verified terminal40673 exit0: fullPython965PASS/1PillowSKIP/8existingERFAwarning
 Existing feature reused through speckit-plan setup (existing plan preserved), speckit-analyze prerequisite and bounded cross-artifact analysis. Requirementsquality8/8checked, extensions.yml absent. Independent review of9stable amended design documents found no blocker: FR030/SC026/fullT076/T077/sourcegoldens/currentactionproof/T032 thresholds remain unchanged; new N012-N015 are OPEN. ADR0047 describes solehistory/native serialization, exactcapturedUTC, distinct visual-only authority, owner-issued continuity, command-entry/transaction/gap/late-failure invalidation and catalog-first partial stageddelivery. Previous fullregression does not verify this new design behavior.
 
 Implementation is now running with disjoint code ownership: catalog_timeline capability +newtest; optical_timeline sampled owner +newtest. Root owns later globe/assembly; independent renderer/UI investigation is readonly until API alignment. No newbranch/serverreset/clock/physicalformula. Network/ground/otherowner continuous sampled paths and actualtwores/gameframe/current-source/fullmigration gates remain open. New code requires meaningful RED, independent review/fullregression and livevalidation before acceptance.
+
+## 2026-10-07 sampled optical application connection
+
+Catalog opaque continuity is bound to the shared globe and existing optical owner;
+source1000ms analysis now feeds separately registered renderer/status/fleet views.
+One native lane/history, full240 scope, exact action authority and current endpoints
+are retained. Actual scheduler test66PASS; independent renderer/scheduler157PASS;
+reentrant UI disposal/nested refresh repaired with4RED regressions/75focusedPASS.
+FullNode1368PASS12121.0829ms. FreshPython handle40607 running; no success claim yet.
+Actual active-owner two-resolution assembly is being added, GPUspeed unmeasured.
+
+User requested Context7 checks for repeated issues: installed ctx7 official Cesium
+Event/PrimitiveCollection/PolylineCollection/Scene docs support retained scoped
+cleanup/reused hidden lines; reproduced failures are application stale-authority
+races, not evidence requiring a library upgrade. Application remains pinned1.143.
+Source audit found network/ground natural playback, periodic guarded fabric/DTN,
+status/pass refresh, qualityhistory, OISL emphasis/stationpicking stillto connect;
+N016-N018 recordthese. CompleteconnectionsbeforeparallelPRwork; do notpause forGit.
+Evidence: project_support/specs/001-v6-function-integration/validation/sampled_optical_connection.md.
+
+Fresh fullPython handle40607 exit0:965PASS1PillowSKIP8existingERFAwarnings245.86s.
+FullNode1368PASS12121.0829ms. Stable optical application code is ready for a local
+checkpoint on the existing branch. New actual-owner/full240/two-resolution fixture
+remains in progress and is excluded from this checkpoint until stable; pending
+visual601 native fills are distinct from analytical point requests. No whole
+connection/GPU acceptance claim or PR wait. N016-N018 remain next connection work.

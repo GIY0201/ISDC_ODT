@@ -10,10 +10,40 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
  const now=host.now??(()=>performance.now()),requestFrame=host.requestFrame??(fn=>requestAnimationFrame(fn)),cancelFrame=host.cancelFrame??(id=>cancelAnimationFrame(id)),requestId=host.requestId??(()=>createBrowserId());
  const s={selected:null,observer:null,minimumElevation:5,utc:'',playing:false,rate:1,pending:false,buffer:null,display:null,error:''};
  let dead=false,generation=0,abort=null,frame=null,codec=null,sampleBuffer=null,anchorUtc=null,anchorMs=0,lastNotify=-Infinity;
+ const continuityProofs=new WeakMap(),continuityObservers=new Set();
+ let continuityToken=Object.freeze({}),continuityLease=null,commandDepth=0,displayAvailable=false;
+ const freeze=value=>{if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;};
+ function continuityEvent(phase,reason){if(dead)return;for(const fn of [...continuityObservers]){try{fn(Object.freeze({phase,reason}));}catch{/* Observers cannot own the catalog clock. */}}}
+ function revokeContinuity(reason,phase='invalidated'){continuityToken=Object.freeze({});continuityLease=null;continuityEvent(phase,reason);}
+ function command(reason,work){
+  commandDepth++;revokeContinuity(reason);
+  const finish=()=>{commandDepth--;continuityEvent('settled',reason);};
+  try{const result=work();if(result&&typeof result.then==='function')return Promise.resolve(result).finally(finish);finish();return result;}catch(error){finish();throw error;}
+ }
+ function continuityReady(){
+  const row=s.display,selected=s.selected;
+  return !dead&&commandDepth===0&&displayAvailable&&s.playing===true&&!s.error&&!!s.buffer&&!!sampleBuffer&&!!s.observer&&!!selected&&!!row&&row.status==='valid'&&row.error_code===null&&row.utc===s.utc&&row.frame==='ITRF'&&row.catalog_number===selected.catalog_number&&row.group===selected.group&&row.normalized_gp_sha256===selected.normalized_gp_sha256&&row.eop_sha256===selected.eop_sha256&&row.leap_sha256===selected.leap_sha256&&row.profile===selected.profile&&Array.isArray(row.position_m)&&row.position_m.length===3&&row.position_m.every(Number.isFinite);
+ }
+ function currentProof(proof){return !!proof&&continuityReady()&&proof.token===continuityToken&&proof.selected===s.selected&&proof.observer===s.observer&&proof.minimum===s.minimumElevation&&proof.rate===s.rate;}
+ const displayContinuity=Object.freeze({
+  capture(){
+   if(!continuityReady())return null;
+   if(continuityLease&&currentProof(continuityProofs.get(continuityLease)))return continuityLease;
+   const proof={token:continuityToken,selected:s.selected,observer:s.observer,minimum:s.minimumElevation,rate:s.rate};
+   const lease=freeze(copy({contract:'catalog-display-continuity-v1',source:'catalog',key:`catalog:${s.selected.catalog_number}:${s.selected.normalized_gp_sha256}`,selected:s.selected,observer:s.observer,minimumElevation:s.minimumElevation,rate:s.rate}));
+   if(!currentProof(proof))return null;continuityProofs.set(lease,proof);continuityLease=lease;return lease;
+  },
+  isCurrent(lease,expected=null){
+   const proof=continuityProofs.get(lease);if(!currentProof(proof))return false;
+   if(expected!==null&&(!expected||['catalog_number','normalized_gp_sha256','leap_sha256','eop_sha256'].some(key=>expected[key]!==proof.selected[key])))return false;
+   return currentProof(proof);
+  },
+  observe(fn){if(typeof fn!=='function')throw new TypeError('catalog continuity observer required');if(dead)return()=>{};continuityObservers.add(fn);return()=>continuityObservers.delete(fn);},
+ });
  const emit=()=>{if(!dead)notify();};
  function pause(){if(s.playing)paint();s.playing=false;if(frame!==null)cancelFrame(frame);frame=null;emit();}
  function cancel(){generation++;abort?.abort();abort=null;s.pending=false;s.buffer=null;sampleBuffer=null;s.error='';pause();}
- function display(value){s.display=value?copy(value):null;if(!dead)onDisplay(value?copy(value):null);}
+ function display(value){const previous=displayAvailable;displayAvailable=!!value;s.display=value?copy(value):null;if(previous&&!displayAvailable)revokeContinuity('display unavailable','availability');if(!dead)onDisplay(value?copy(value):null);if(!previous&&displayAvailable)continuityEvent('availability','display available');}
  function reset(){cancel();display(s.selected);emit();}
  function paint(){
   if(dead||!s.buffer||!codec)return;
@@ -48,7 +78,7 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
    abort=new AbortController();s.pending=true;emit();const v=await api.catalogSamples(p,{signal:abort.signal});
    if(dead||ticket!==generation)return;validate(v,p);s.buffer=copy(v);sampleBuffer=createSampleBuffer(v.rows,codec.difference);
    if(!background){s.utc=utc;anchorUtc=utc;anchorMs=now();}paint();
-  }catch(e){if(dead||ticket!==generation)return;s.buffer=null;sampleBuffer=null;s.error=String(e.message||e);pause();display(null);}
+  }catch(e){if(dead||ticket!==generation)return;s.buffer=null;sampleBuffer=null;s.error=String(e.message||e);revokeContinuity('failure');pause();display(null);}
   if(!dead&&ticket===generation){abort=null;s.pending=false;emit();}
  }
  // Readonly display-model projection. Never fetch, paint, seek or create a
@@ -73,17 +103,17 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
   return copy({...row,interpolated:false});
  }
  return{snapshot:()=>copy({...s,buffer:s.buffer?{start_utc:s.buffer.start_utc,count:s.buffer.count,status:s.buffer.status}:null}),
-  sampleAt,advanceUtc,currentUtc:()=>dead?null:s.utc||null,
-  select(base,pin=null){if(dead)return;cancel();s.selected=base?copy(base):null;codec=null;let first=base?{...base,...projectCatalogDetails(base)}:base;try{codec=base?createUtcCodec(base.leap_sha256):null;
+  displayContinuity,sampleAt,advanceUtc,currentUtc:()=>dead?null:s.utc||null,
+  select(base,pin=null){if(dead)return;return command('select',()=>{cancel();s.selected=base?copy(base):null;codec=null;let first=base?{...base,...projectCatalogDetails(base)}:base;try{codec=base?createUtcCodec(base.leap_sha256):null;
    if(base&&pin){if(pin.normalized_gp_sha256!==base.normalized_gp_sha256||!Array.isArray(pin.position_m)||pin.position_m.length!==3||!pin.position_m.every(Number.isFinite))throw Error('지구 선택 GP/위치가 일치하지 않습니다.');const utc=codec.advance(pin.utc,0);first={...base,...(utc===base.utc?projectCatalogDetails(base):{geodetic:null,teme_speed_km_s:null,details_utc:null}),utc,position_m:copy(pin.position_m)};}
-  }catch(e){s.error=e.message;first=pin?null:base;}s.utc=first?.utc??base?.epoch_utc??'';anchorUtc=s.utc;display(first);emit();},
-  observer(point,minimum){if(dead)return false;if(!point||!['latitude_deg','longitude_deg','ellipsoid_height_m'].every(k=>Number.isFinite(point[k]))||Math.abs(point.latitude_deg)>90||Math.abs(point.longitude_deg)>180||point.virtual!==true||point.ellipsoid!=='WGS84'||!Number.isFinite(minimum)||minimum<0||minimum>90)return false;s.observer=copy(point);s.minimumElevation=minimum;reset();return true;},
-  seek(utc){if(dead||!codec)return;const canonical=codec.advance(utc,0);cancel();s.utc=canonical;anchorUtc=canonical;display(null);emit();},
-  calculate(){return query(s.utc);},
-  invalidate(){if(!dead)reset();},
-  play(){if(dead||!s.buffer||s.playing)return;s.playing=true;anchorUtc=s.utc;anchorMs=now();frame=requestFrame(tick);emit();},pause,
-  rate(value){if(dead||![.1,1,10,60].includes(value))return;const playing=s.playing;pause();s.rate=value;anchorUtc=s.utc;anchorMs=now();if(playing){s.playing=true;frame=requestFrame(tick);}emit();},
-  clear(){if(dead)return;cancel();s.selected=null;s.utc='';codec=null;display(null);emit();},
-  destroy(){if(dead)return;cancel();display(null);dead=true;},
+  }catch(e){s.error=e.message;first=pin?null:base;}s.utc=first?.utc??base?.epoch_utc??'';anchorUtc=s.utc;display(first);emit();});},
+  observer(point,minimum){if(dead)return false;if(!point||!['latitude_deg','longitude_deg','ellipsoid_height_m'].every(k=>Number.isFinite(point[k]))||Math.abs(point.latitude_deg)>90||Math.abs(point.longitude_deg)>180||point.virtual!==true||point.ellipsoid!=='WGS84'||!Number.isFinite(minimum)||minimum<0||minimum>90)return false;return command('observer',()=>{s.observer=copy(point);s.minimumElevation=minimum;reset();return true;});},
+  seek(utc){if(dead||!codec)return;const canonical=codec.advance(utc,0);return command('seek',()=>{cancel();s.utc=canonical;anchorUtc=canonical;display(null);emit();});},
+  calculate(){if(dead)return query(s.utc);return command('calculate',()=>query(s.utc));},
+  invalidate(){if(!dead)return command('invalidate',reset);},
+  play(){if(dead||!s.buffer||s.playing)return;return command('play',()=>{s.playing=true;anchorUtc=s.utc;anchorMs=now();frame=requestFrame(tick);emit();});},pause(){if(!dead)return command('pause',pause);},
+  rate(value){if(dead||![.1,1,10,60].includes(value))return;return command('rate',()=>{const playing=s.playing;pause();s.rate=value;anchorUtc=s.utc;anchorMs=now();if(playing){s.playing=true;frame=requestFrame(tick);}emit();});},
+  clear(){if(dead)return;return command('clear',()=>{cancel();s.selected=null;s.utc='';codec=null;display(null);emit();});},
+  destroy(){if(dead)return;return command('destroy',()=>{cancel();display(null);dead=true;continuityObservers.clear();continuityLease=null;});},
  };
 }
