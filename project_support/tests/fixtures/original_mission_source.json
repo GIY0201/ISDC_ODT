@@ -1,0 +1,7 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "model_source_sha256": "96029696673face63dd10ac3fd210c4d17911b695a5d1bd15237880d770ff152",
+  "model_body_sha256": "f463fd400fd69d072f713da977d108680de02933bb2cab83f7b1f47c16da31d4",
+  "store_source_sha256": "3d7b97be392e8c63801c5e6b11c96463fa35ecfa8a8d41cc5772379d16a14737",
+  "adaptation": "Mission model unchanged body with equipment factory injection; source store methods preserved with copied ports, strict load, atomic failure rollback and optimistic storage token; no import-time singleton."
+}
