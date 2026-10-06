@@ -27,6 +27,7 @@ class MissionPlanningExchange:
         self._clients = {}
         self._receipt = None
         self._plans = {}
+        self._decisions = {}
 
     @staticmethod
     def _copy(value):
@@ -45,6 +46,7 @@ class MissionPlanningExchange:
                 raise ValueError("mission module capacity reached; accepted records retained")
             self._module = candidate
             self._plans.pop(request.get("mission_id") or request.get("mission", {}).get("id"), None)
+            self._decisions.pop(request.get("mission_id") or request.get("mission", {}).get("id"), None)
             self._receipt = None
             return reply
 
@@ -57,7 +59,9 @@ class MissionPlanningExchange:
     def status(self) -> dict:
         with self._lock:
             return {**self._copy(self._module.status()), "instance_id": self._instance_id,
-                    "exchange_contract": self.exchange_contract}
+                    "exchange_contract": self.exchange_contract,
+                    "accepted_plans": self._copy(self._plans),
+                    "accepted_decisions": self._copy(self._decisions)}
 
 
     def _guarded(self, operation, message, request_id, sequence, instance_id,
@@ -122,6 +126,7 @@ class MissionPlanningExchange:
                 self._plans[mission_id] = self._copy(receipt)
             else:
                 receipt.update(mission_version=accepted["mission_version"], plan_sequence=version_or_plan)
+                self._decisions[mission_id] = self._copy(receipt)
                 if request["decision"] == "commit":
                     self._plans[mission_id] = accepted
             self._clients[client] = (counter, fingerprint, reply["sequence"])

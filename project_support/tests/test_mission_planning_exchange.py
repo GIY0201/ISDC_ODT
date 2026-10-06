@@ -59,3 +59,21 @@ def test_original_scheduler_and_stand_in_hashes_are_preserved():
         assert sha256(port.encode()).hexdigest()==expected['port_sha256']
         normalized=port.replace('from digital_twin.simulation.mission_planning.scheduler import Planner, parse_time','from .scheduler import Planner, parse_time')
         assert sha256(normalized.encode()).hexdigest()==expected['normalized_source_sha256']
+
+
+def test_status_exposes_detached_guarded_plan_receipts_until_abort():
+    module=MissionPlanningExchange();instance=module.status()['instance_id'];context='a'*64
+    plan=module.guarded_plan(message(),'proof:1',0,instance,context,1)
+    status=module.status()
+    assert status['accepted_plans'][plan['mission_id']]==plan
+    status['accepted_plans'][plan['mission_id']]['tasks'].clear()
+    assert module.status()['accepted_plans'][plan['mission_id']]==plan
+    assert module.status()['accepted_decisions']=={}
+    module.guarded_commit({'time':plan['time'],'mission_id':plan['mission_id'],'decision':'commit','version':1,'tasks':plan['tasks']},'proof:2',1,instance,1,context)
+    assert module.status()['accepted_plans'][plan['mission_id']]==plan
+    assert module.status()['accepted_decisions'][plan['mission_id']]['request_id']=='proof:2'
+    module.guarded_commit({'time':plan['time'],'mission_id':plan['mission_id'],'decision':'abort','version':1,'tasks':[]},'proof:3',2,instance,1,context)
+    assert module.status()['accepted_plans']=={}
+    decisions=module.status()['accepted_decisions'];assert decisions[plan['mission_id']]['request_id']=='proof:3'
+    decisions.clear();assert module.status()['accepted_decisions'][plan['mission_id']]['decision']=='abort'
+    module.plan(message());assert module.status()['accepted_decisions']=={}
