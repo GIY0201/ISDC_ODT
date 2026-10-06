@@ -2,7 +2,8 @@
 import {readFile} from 'node:fs/promises';
 import {gunzipSync} from 'node:zlib';
 import assert from 'node:assert/strict';
-import {createNodeDisplayTimeline} from '../../../user_application/web/scripts/nodes/node_timeline.js';
+import {createNodeDisplayTimeline,createNodeSampleBuffer} from '../../../user_application/web/scripts/nodes/node_timeline.js';
+import {SatelliteModelLayer} from '../../../digital_twin/visualization/satellite_model.js';
 import {createNodeOpticalTimeline} from '../../../user_application/web/scripts/nodes/optical_timeline.js';
 import {createNodeLinkResolver,linkSummary} from '../../../user_application/web/scripts/nodes/links.js';
 import {createNodeLibrary} from '../../../digital_twin/model_library/browser/satellite_nodes.js';
@@ -40,4 +41,16 @@ compare({terminals:value.terminals,pairs:value.pairs,histories:optical.historyEn
 assert.equal(optical.verifyLinkSnapshot(value,{nodes,utc}),true);
 const altered=structuredClone(value);altered.pairs[0].state='idle';assert.equal(optical.verifyLinkSnapshot(altered,{nodes,utc}),false);
 assert.equal(calls,3);assert.equal(timeline.snapshot().utc,null);optical.destroy();timeline.destroy();
-process.stdout.write(JSON.stringify({native_rows:60,prime_steps_seconds:[-120,-60,0],maxNumericError,maxTimeErrorMs,source_semantics_equal:true,verified_snapshot:true})+'\n');
+let selectedNodePoses=0;
+const poseLayer=new SatelliteModelLayer({advanceUtc:createUtcCodec(LEAP_SHA256).advance});
+for(const receipt of wire){
+ const buffer=createNodeSampleBuffer(receipt.request,receipt.response),at=receipt.request.start_utc;
+ for(const node of receipt.request.nodes){
+  await poseLayer.show({pose_source:{kind:'source_node',node_definition:node,definition_hash:buffer.definitionHashes()[node.id]}},time=>buffer.geometryFor(node,{utc:time}),at);
+  const pose=poseLayer.nativeAt(at),sample=buffer.geometryFor(node,{utc:at});assert.ok(pose);
+  assert.equal(pose.node_id,node.id);assert.equal(pose.frame,'EARTH_FIXED_GMST_UTC_APPROX');assert.equal(pose.quality,'engineering_assumption');assert.deepEqual(pose.position_m,sample.row.position_m);
+  pose.position_m[0]=0;assert.deepEqual(poseLayer.nativeAt(at).position_m,sample.row.position_m);selectedNodePoses++;
+ }
+}
+poseLayer.dispose();assert.equal(selectedNodePoses,60);
+process.stdout.write(JSON.stringify({native_rows:60,prime_steps_seconds:[-120,-60,0],maxNumericError,maxTimeErrorMs,source_semantics_equal:true,verified_snapshot:true,selected_node_poses:selectedNodePoses})+'\n');

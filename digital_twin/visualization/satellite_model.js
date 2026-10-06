@@ -1,7 +1,7 @@
 import { CameraRangeMotion, cameraNow, cameraEase, cameraDirection, cameraBasis, cameraAttitude } from './camera_motion.js';
 
 // One glTF model for the selected satellite plus an optional follow camera. The caller supplies
-// the model description and a native ITRF sampler; this layer never reads application state,
+// the model description and a native ITRF or explicitly tagged source-node sampler; this layer never reads application state,
 // transport, or the catalog. Orientation is a display approximation: the body x-axis follows
 // a buffered forward difference and the z-axis points away from Earth. It is not an attitude estimate.
 // Scale is metres per native model unit so the body appears at its approximate real size.
@@ -19,6 +19,22 @@ const MAP_FOCUS_WIDTH_METERS = 500_000;
 const MAP_MINIMUM_WIDTH_METERS = 1_000;
 const MAP_MAXIMUM_WIDTH_METERS = 40_000_000;
 const MAP_RELEASE_WIDTH_METERS = 20_000_000;
+const NODE_POSE_METADATA = Object.freeze({model_profile:'SOURCE_KEPLER_J2_V1',frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',source_commit:'1a1e00297a0301637455b0ef2cf48b2e74576b07',quality:'engineering_assumption'});
+function definitionSignature(value) {
+  const ordered = item => {
+    if (item === null || typeof item === 'string' || typeof item === 'boolean') return item;
+    if (typeof item === 'number' && Number.isFinite(item)) return item;
+    if (Array.isArray(item)) return item.map(ordered);
+    if (item && Object.getPrototypeOf(item) === Object.prototype) return Object.fromEntries(Object.keys(item).sort().map(key => [key, ordered(item[key])]));
+    throw new TypeError('finite JSON node definition required');
+  };
+  return JSON.stringify(ordered(value));
+}
+function nodePoseIdentity(description) {
+  const source = description?.pose_source, node = source?.node_definition;
+  if (source?.kind !== 'source_node' || node?.schema !== 1 || typeof node.id !== 'string' || !node.id.trim() || typeof source.definition_hash !== 'string' || !/^[a-f0-9]{64}$/.test(source.definition_hash)) return null;
+  try { return `source_node|${source.definition_hash}|${definitionSignature(node)}`; } catch { return null; }
+}
 
 export class SatelliteModelLayer {
   constructor(options = {}) {
@@ -74,7 +90,7 @@ export class SatelliteModelLayer {
     if (this.disposed) return null;
     const Cesium = this.cesium;
     const viewer = this.viewer;
-    const targetId = description?.satelliteId == null ? null : `${description.satelliteId}|${description.normalized_gp_sha256 || ''}`;
+    const targetId = description?.pose_source ? nodePoseIdentity(description) : description?.satelliteId == null ? null : `gp|${description.satelliteId}|${description.normalized_gp_sha256 || ''}`;
     if (this.targetId !== null && targetId !== this.targetId) {
       // Selecting another body only selects it: never teleport a follow camera onto it.
       this.pendingFocus = false;
@@ -114,7 +130,7 @@ export class SatelliteModelLayer {
     try {
       model = await Cesium.Model.fromGltfAsync({
         url: description.url,
-        id: { satelliteId: this.current.satelliteId },
+        id: this.description.pose_source ? {node_id:this.description.pose_source.node_definition?.id} : { satelliteId: this.current.satelliteId },
         scale,
         minimumPixelSize: this.current.minimumPixelSize,
         allowPicking: true,
@@ -164,6 +180,13 @@ export class SatelliteModelLayer {
   nativeAt(date) {
     if (typeof date !== 'string' || !date.endsWith('Z')) return null;
     const sample = this.sampleAt?.(date);
+    if (this.description?.pose_source) {
+      try {
+        const source = this.description.pose_source, row = sample?.row;
+        if (!nodePoseIdentity(this.description) || this.advanceUtc?.(date,0) !== date || !sample || Object.entries(NODE_POSE_METADATA).some(([key,value]) => sample[key] !== value) || sample.node_id !== source.node_definition.id || sample.definition_hash !== source.definition_hash || definitionSignature(sample.node_definition) !== definitionSignature(source.node_definition) || row?.utc !== date || row.status !== 'valid' || row.error_code !== null || !Array.isArray(row.position_m) || row.position_m.length !== 3 || !row.position_m.every(Number.isFinite)) return null;
+        return {...NODE_POSE_METADATA,node_id:sample.node_id,definition_hash:sample.definition_hash,utc:date,position_m:[...row.position_m]};
+      } catch { return null; }
+    }
     if (!sample || sample.frame !== 'ITRF' || sample.utc !== date || !Array.isArray(sample.position_m) || sample.position_m.length !== 3 || !sample.position_m.every(Number.isFinite)) return null;
     if (this.description?.satelliteId != null && String(sample.catalog_number) !== String(this.description.satelliteId)) return null;
     if (this.description?.normalized_gp_sha256 && sample.normalized_gp_sha256 !== this.description.normalized_gp_sha256) return null;
@@ -181,7 +204,7 @@ export class SatelliteModelLayer {
   status(phase, errorKind = null, error = null) {
     if (this.phase === phase && this.errorKind === errorKind && this.error === error) return;
     this.phase = phase; this.errorKind = errorKind; this.error = error;
-    this.onStatus({phase, errorKind, error, satelliteId:this.description?.satelliteId ?? null, orientation:'display_approximation'});
+    this.onStatus({phase, errorKind, error, ...(this.description?.pose_source ? {node_id:this.description.pose_source.node_definition?.id ?? null,definition_hash:this.description.pose_source.definition_hash,...NODE_POSE_METADATA} : {satelliteId:this.description?.satelliteId ?? null}), orientation:'display_approximation'});
   }
 
   async retry() {

@@ -22,6 +22,12 @@ async function fixture(){
 }
 const description=(id=25544,hash='a'.repeat(64))=>({satelliteId:id,normalized_gp_sha256:hash,url:'/static/satellite_display/iss.glb',key:'iss',quality:'exact',orientation:{heading:0}});
 const source=()=>({timeSource:()=> '2026-10-05T00:00:00.000000000Z',advanceUtc:()=>null,sampleAt:()=>null});
+test('native selected node identity stays separate from NORAD catalog identity and is copied',async()=>{
+ const f=await fixture(),d={url:'/node.glb',pose_source:{kind:'source_node',node_definition:{schema:1,id:'N-1'},definition_hash:'b'.repeat(64)}};
+ f.ui.setSatelliteModel(d,source());
+ assert.deepEqual(f.ui.modelState().selected,{node_id:'N-1',definition_hash:'b'.repeat(64)});
+ d.pose_source.node_definition.id='foreign';assert.equal(f.ui.modelState().selected.node_id,'N-1');f.ui.destroy();
+});
 test('hover subscriptions forward owned presentation values and stop after removal or destroy',async()=>{
  const f=await fixture(),a=[],b=[];const remove=f.ui.observeSatelliteHover(v=>{a.push(v);if(v)v.position.position_m[0]=0;});f.ui.observeSatelliteHover(v=>b.push(v));f.boot();
  const payload={id:1,item:{OBJECT_NAME:'ISS'},position:{frame:'ITRF',utc:'2026-10-05T00:00:00Z',catalog_number:1,position_m:[1,2,3]},screen:{x:20,y:30}};

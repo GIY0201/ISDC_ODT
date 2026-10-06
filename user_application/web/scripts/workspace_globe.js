@@ -55,13 +55,15 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   const notifyHover=value=>{if(!disposed)for(const fn of hoverObservers)fn(value?structuredClone(value):null,host.Cesium);};
   let modelDescription=null,modelSource=null,modelRevision=0,modelStatus={phase:'unassigned'},modelManifest={phase:'pending',error:null};
   const modelObservers=new Set();
-  const modelState=()=>structuredClone({selected:modelDescription?{catalog_number:modelDescription.satelliteId,normalized_gp_sha256:modelDescription.normalized_gp_sha256}:null,match:modelDescription?.url?modelDescription:null,status:modelStatus,manifest:modelManifest,tracking:Boolean(globe?.modelLayer?.tracking)});
+  const modelState=()=>structuredClone({selected:modelDescription?(modelDescription.pose_source?.kind==='source_node'?{node_id:modelDescription.pose_source.node_definition?.id,definition_hash:modelDescription.pose_source.definition_hash}:{catalog_number:modelDescription.satelliteId,normalized_gp_sha256:modelDescription.normalized_gp_sha256}):null,match:modelDescription?.url?modelDescription:null,status:modelStatus,manifest:modelManifest,tracking:Boolean(globe?.modelLayer?.tracking)});
   const notifyModel=()=>{if(!disposed)for(const fn of modelObservers)fn(modelState());};
   function applyModel(){
     if(!globe||disposed||!modelDescription||!modelSource)return;
     const revision=modelRevision,description=structuredClone(modelDescription);
     const report=value=>{
       if(disposed||revision!==modelRevision)return;
+      if(value.node_id!=null&&value.node_id!==description.pose_source?.node_definition?.id)return;
+      if(value.definition_hash!=null&&value.definition_hash!==description.pose_source?.definition_hash)return;
       if(value.satelliteId!=null&&String(value.satelliteId)!==String(description.satelliteId))return;
       modelStatus=structuredClone(value);notifyModel();
     };
