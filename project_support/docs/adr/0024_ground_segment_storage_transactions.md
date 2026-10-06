@@ -9,3 +9,5 @@
 입력 숫자는 유한 number, 대역은 S/X/Ka의 비어 있지 않은 배열이어야 한다. 원본 생성자의 묵시적 대체값으로 잘못된 편집을 숨기지 않는다. 다만 원본 통신 UI의 직접 추가 버튼이 보내는 name:''는 순번 이름 요청으로 유지한다. 저장된 오래된 선택 ID는 원본처럼 null로 정리한다. 초기화는 원본처럼 번호를 유지한다. storage:null은 명시적 memory_only이며 영구 저장이라고 표시하지 않는다.
 
 원본 고정 hash 실행 trace, 실패 시 원자성·복구·사본·수용량 시험을 별도로 검증한다. 실제 UI/다중 창 편집 충돌·계산 입력 차단·통신망 연결은 T077/N008 완료 조건으로 남는다. 단순 reload 시험을 전체 다중 창 검증으로 주장하지 않는다.
+
+2026-10-06: last loaded/written storage token is checked before writes; other-window changes reject the candidate and set ready=false, retaining old in-memory values and other-window bytes until explicit load. Actual V6 editor preserves pending fields on reconstruction and storage events; source markup body remains exact. This guard cannot provide atomic compare-and-set across simultaneous localStorage writers; full multiwindow acceptance stays open. See validation/t077_ground_network_panel.md.

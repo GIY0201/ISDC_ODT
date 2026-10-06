@@ -78,3 +78,11 @@ test('explicit reload atomically replaces browser configuration without writing 
   bytes = '{'; b.load(); assert.equal(b.ready, false); assert.equal(b.stations.length, 4);
   assert.throws(() => b.remove('GS-JEJU')); bytes = saved; b.load(); assert.equal(b.ready, true);
 });
+test('stale browser writes cannot overwrite another window configuration without explicit reload', () => {
+  let bytes=null;const storage={getItem:()=>bytes,setItem:(_,value)=>{bytes=value;}};
+  const a=createGroundSegmentStore({model,storage}),b=createGroundSegmentStore({model,storage});a.load();b.load();
+  a.add({preset:'fairbanks'});const saved=bytes,before=b.stations;
+  assert.throws(()=>b.update('GS-JEJU',{name:'old editor'}),/충돌/);
+  assert.equal(bytes,saved);assert.deepEqual(b.stations,before);assert.equal(b.ready,false);
+  b.load();assert.deepEqual(b.update('GS-JEJU',{name:'reviewed editor'}),[]);
+});

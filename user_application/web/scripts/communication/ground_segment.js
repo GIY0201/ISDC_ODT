@@ -12,6 +12,7 @@ export function createGroundSegmentStore({ model, storage = null } = {}) {
   const { DEFAULT_STATION_KEYS, STATION_PRESETS, BANDS, createStation, normalizeStation, stationIdFor, validateStation } = model;
   let stations = []; let selectedId = null; let sequence = 0;
   let ready = false; let error = null; let destroyed = false;
+  let storageToken = null; let tokenKnown = false;
   const listeners = new Set();
   const internalFind = id => stations.find(station => station.id === id) || null;
   const defaults = () => DEFAULT_STATION_KEYS.map(key => createStation({ preset: key }, { id: stationIdFor(key) }));
@@ -52,7 +53,11 @@ export function createGroundSegmentStore({ model, storage = null } = {}) {
     if (persist && storage !== null) {
       try {
         if (typeof storage.setItem !== 'function') throw Error('저장 기능이 없습니다.');
-        storage.setItem(STATIONS_KEY, JSON.stringify(next));
+        if (tokenKnown && storage.getItem(STATIONS_KEY) !== storageToken) {
+          ready = false; throw Error('다른 창의 지상국 변경과 충돌했습니다. 확인 후 다시 불러오세요.');
+        }
+        const encoded = JSON.stringify(next);
+        storage.setItem(STATIONS_KEY, encoded); storageToken = encoded; tokenKnown = true;
       } catch (cause) {
         error = `지상국 설정 저장 실패: ${cause.message}`; notify('error'); throw new Error(error, { cause });
       }
@@ -69,6 +74,7 @@ export function createGroundSegmentStore({ model, storage = null } = {}) {
         if (typeof storage.getItem !== 'function') throw Error('읽기 기능이 없습니다.');
         raw = storage.getItem(STATIONS_KEY);
       }
+      storageToken = raw; tokenKnown = true;
       if (raw === null) accept({ schema: 1, sequence: 0, selectedId: null, stations: defaults() }, 'load', false);
       else {
         const saved = validateSaved(JSON.parse(raw));

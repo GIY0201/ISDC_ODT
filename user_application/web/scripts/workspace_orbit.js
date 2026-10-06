@@ -1,6 +1,11 @@
 import {createBrowserId} from './browser_identity.js';
 import {createWorkspaceSolar} from './workspace_solar.js?v=t135-r1';
 import {createWorkspaceNodes} from './workspace_nodes.js?v=t151-r1';
+import {createGroundSegmentStore} from './communication/ground_segment.js';
+import {createGroundNetworkPanel} from './tabs/ground_network.js';
+import * as sourceStationModel from '/static/model_library/ground_stations.js';
+import {createGroundLinkModel} from '/static/simulation/ground_links.js';
+import {createNetworkSnapshotModel} from '/static/simulation/network_snapshot.js';
 import {createNodeClockControls} from './nodes/clock_controls.js';
 import {createUtcCodec,LEAP_SHA256} from './orbit_utc.js';
 import {createNodeLibrary} from '/static/model_library/satellite_nodes.js';
@@ -51,6 +56,7 @@ const globeViewPanel=createGlobeViewPanel(globe,solar);
 const modelPanel=createSatelliteModelPanel(globe);
 let satelliteHover=null;
 let nodeWorkspace=null;
+let groundNetworkPanel=null;
 let nodeClock=null;
 function renderSatelliteHover(payload,C,kind='gp'){
   if(!satelliteHover&&payload&&C)satelliteHover=createSatelliteHover(document.getElementById('stored-orbit-globe'),C);
@@ -82,21 +88,27 @@ catalogPanel=createCatalogPanel(api,catalogGeometry,{applied:p=>catalogScene.con
 modelSelection=createSatelliteModelSelection({api,globe,timeline:catalogTimeline,validateManifest:validateSatelliteManifest,createResolver:createModelResolver});
 const removeModelSelection=catalogPanel.controller.observeSelection(syncModel);
 const nodeLibrary=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>createBrowserId(window.crypto)});
+let groundStorage=null;const groundStoragePort={getItem:key=>window.localStorage.getItem(key),setItem:(key,value)=>window.localStorage.setItem(key,value)};
+try{if(window.localStorage)groundStorage=groundStoragePort;}catch{groundStorage=groundStoragePort;}
+const sourceGround=createGroundSegmentStore({model:sourceStationModel,storage:groundStorage});sourceGround.load();
+const sourceNetworkModel=createNetworkSnapshotModel({library:nodeLibrary,oisl:nodeOisl,groundLinks:createGroundLinkModel({library:nodeLibrary,stationModel:sourceStationModel})});
 nodeClock=createNodeClockControls({readContext:()=>nodeWorkspace?.snapshot().display,stored:client,catalog:catalogTimeline,advanceUtc:createUtcCodec(LEAP_SHA256).advance,now:()=>Date.now(),runStored:command});
-nodeWorkspace=createWorkspaceNodes({api,globe,solar,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window),readClock:context=>nodeClock.read(context),clockActions:nodeClock.actions,onHover:payload=>renderSatelliteHover(payload,window.Cesium,'source_node')});
+nodeWorkspace=createWorkspaceNodes({api,globe,solar,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window),readClock:context=>nodeClock.read(context),clockActions:nodeClock.actions,onHover:payload=>renderSatelliteHover(payload,window.Cesium,'source_node'),networkInputs:{model:sourceNetworkModel,validateStation:sourceStationModel.validateStation,readStations:()=>{if(!sourceGround.ready||groundNetworkPanel?.hasExternalChange())throw Error('지상국 설정을 다시 확인하세요.');return sourceGround.stations;},readFaults:()=>{const state=simPanel.controller.snapshot();if(!state.runtime||state.error)throw Error(state.error||'SIM 상태 미확인');return state.runtime.active_faults;},onChange:()=>groundNetworkPanel?.update()}});
 void nodeWorkspace.start().then(()=>nodeWorkspace.show(view));
 void modelSelection.load().then(()=>nodeWorkspace.refreshModels());
 const hilPanel=createHilPanel(api,hilTopology,drawSparkline);
 const simPanel=createSimPanel(api,telemetrySocket,values=>missionPanel.controller.receiveMissions(values),{frame:value=>{kpiPanel.receive(value);hilPanel.receive(value);},status:value=>{kpiPanel.connection(value);hilPanel.connection(value);}});
+groundNetworkPanel=createGroundNetworkPanel({store:sourceGround,model:sourceStationModel,network:nodeWorkspace,document,host:window,refreshRuntime:async()=>{await simPanel.controller.load();const state=simPanel.controller.snapshot();if(!state.runtime||state.error)throw Error(state.error||'SIM 상태 미확인');}});
 const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   displayUtc=utc;displayElevation=row?`${row.elevation_deg.toFixed(4)}°`:'자료 준비 중 / 위치 미표시';globe.update(error?{...snapshot,status:'error',error}:snapshot,row,utc);
   const clock=document.getElementById('orbit-display-utc');if(clock)clock.textContent=utc||'미선택';
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();nodeClock?.destroy();nodeWorkspace?.destroy();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();nodeClock?.destroy();groundNetworkPanel?.destroy();sourceGround.destroy();nodeWorkspace?.destroy();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
+  groundNetworkPanel?.update();
   nodeWorkspace?.refresh();
   revisionSync.observe(client.snapshot());
   playback.update(client.snapshot());
@@ -134,7 +146,7 @@ function render(){
   panel.querySelector('#orbit-seek').addEventListener('click',()=>{const field=panel.querySelector('#orbit-utc'),utc=field.value.trim();delete field.dataset.dirty;command(()=>client.seek(utc));});
   panel.querySelector('#orbit-epoch').addEventListener('click',()=>{delete panel.querySelector('#orbit-utc').dataset.dirty;command(()=>client.seek(record.epoch_utc));});
 }
-export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);globeViewPanel.show(view);modelPanel.show(view);nodeWorkspace?.show(view);}
+export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);globeViewPanel.show(view);modelPanel.show(view);nodeWorkspace?.show(view);groundNetworkPanel?.show(view);}
 client.load();
 
 export function applyWorkspaceDraft(items,remote=false){

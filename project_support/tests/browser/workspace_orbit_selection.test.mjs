@@ -17,6 +17,11 @@ test('empty UI choice restores server selection without clearing its result or s
     // the unchanged stored-orbit select handler and its no-command assertion.
     .replace(/import \{createWorkspaceSolar\} from [^;]+;/,'const createWorkspaceSolar=()=>({destroy(){}});')
     .replace(/import \{createWorkspaceNodes\} from [^;]+;/,'const createWorkspaceNodes=()=>({async start(){},show(){},refresh(){},refreshModels(){},destroy(){}});')
+    .replace(/import \{createGroundSegmentStore\} from [^;]+;/,'const createGroundSegmentStore=()=>({load(){},destroy(){}});')
+    .replace(/import \{createGroundNetworkPanel\} from [^;]+;/,'const createGroundNetworkPanel=()=>({show(){},update(){},destroy(){}});')
+    .replace(/import \* as sourceStationModel from [^;]+;/,'const sourceStationModel={};')
+    .replace(/import \{createGroundLinkModel\} from [^;]+;/,'const createGroundLinkModel=()=>({});')
+    .replace(/import \{createNetworkSnapshotModel\} from [^;]+;/,'const createNetworkSnapshotModel=()=>({});')
     .replace(/import \{createNodeClockControls\} from [^;]+;/,'const createNodeClockControls=()=>({read(){return{}},actions:{},destroy(){}});')
     .replace(/import \{createUtcCodec,LEAP_SHA256\} from [^;]+;/,'const createUtcCodec=()=>({}),LEAP_SHA256="test";')
     .replace(/import \{createNodeLibrary\} from [^;]+;/,'const createNodeLibrary=()=>({});')

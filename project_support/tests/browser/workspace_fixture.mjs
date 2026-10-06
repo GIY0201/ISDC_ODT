@@ -37,6 +37,11 @@ import {orbitElements,catalogElements} from '../../../digital_twin/simulation/br
 import * as nodeOisl from '../../../digital_twin/simulation/browser/oisl.js';
 import {NodeScene} from '../../../digital_twin/visualization/node_scene.js';
 import {createSatelliteNodePanelTools} from '../../../user_application/web/scripts/tabs/satellite_nodes.js';
+import {createGroundSegmentStore} from '../../../user_application/web/scripts/communication/ground_segment.js';
+import {createGroundNetworkPanel} from '../../../user_application/web/scripts/tabs/ground_network.js';
+import * as sourceStationModel from '../../../digital_twin/model_library/browser/ground_stations.js';
+import {createGroundLinkModel} from '../../../digital_twin/simulation/browser/ground_links.js';
+import {createNetworkSnapshotModel} from '../../../digital_twin/simulation/browser/network_snapshot.js';
 
 // Execute the real window handlers and orbit assembly. Only DOM layout, HTTP,
 // Cesium and scheduling are adapters; expected bounds are acceptance criteria.
@@ -54,14 +59,14 @@ export function fixture(width=1280,height=720,options={}){
   class Element {
     constructor(id='',tag='div'){this.id=id;this.tag=tag;this.style={};this.dataset={};this.attributes={};this.listeners=new Map();this.children=[];this.hidden=false;this.isConnected=true;this._value='';this._html='';this.textContent='';this.scrollTop=0;this.capture=null;const classes=new Set();this.classList={contains:v=>classes.has(v),add:v=>classes.add(v),remove:v=>classes.delete(v)};}
     set value(value){this._value=String(value??'');}get value(){return this._value;}
-    set innerHTML(value){for(const child of this.descendants()){child.isConnected=false;if(elements.get(child.id)===child)elements.delete(child.id);}this.children=[];this._html=value;for(const match of value.matchAll(/<([a-z]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){const child=new Element(match[3],match[1]);child.value=match[2].match(/\bvalue="([^"]*)"/)?.[1]||'';this.prepend(child);}}
+    set innerHTML(value){for(const child of this.descendants()){child.isConnected=false;if(elements.get(child.id)===child)elements.delete(child.id);}this.children=[];this._html=value;for(const match of value.matchAll(/<([a-z]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){const child=new Element(match[3],match[1]);child.value=match[2].match(/\bvalue="([^"]*)"/)?.[1]||'';child.checked=/\bchecked\b/.test(match[2]);this.prepend(child);}}
     get innerHTML(){return this._html;}
     *descendants(){for(const child of this.children){yield child;yield* child.descendants();}}
     prepend(child){child.parent=this;child.isConnected=true;this.children.unshift(child);if(child.id)elements.set(child.id,child);}
     append(...children){for(const child of children){child.parent=this;child.isConnected=true;this.children.push(child);}}
     remove(){this.isConnected=false;if(this.parent)this.parent.children=this.parent.children.filter(child=>child!==this);}
     get ownerDocument(){return doc;}
-    querySelector(selector){if(selector.startsWith('#'))return elements.get(selector.slice(1))||null;return [...this.descendants()].find(el=>el.tag===selector)||null;}
+    querySelector(selector){if(selector.startsWith('#'))return [...this.descendants()].find(el=>el.id===selector.slice(1))||null;return [...this.descendants()].find(el=>el.tag===selector)||null;}
     querySelectorAll(selector){return [...this.descendants()].filter(el=>selector.includes('input')?['input','select','textarea'].includes(el.tag):el.tag==='button');}
     addEventListener(name,fn){if(!this.listeners.has(name))this.listeners.set(name,new Set());this.listeners.get(name).add(fn);}
     removeEventListener(name,fn){this.listeners.get(name)?.delete(fn);}
@@ -125,6 +130,7 @@ export function fixture(width=1280,height=720,options={}){
   Object.assign(context,{createWorkspaceSolar:args=>createWorkspaceSolar({...args,host:win,createDisplay:()=>({setStyle(){},clear(){},update(){},destroy(){}})}),createSatelliteHover,createSatelliteModelPanel,createSatelliteModelSelection,createModelResolver,validateSatelliteManifest,createGlobeViewPanel,createCatalogTrack,createCatalogPasses,createCatalogPassPanel,createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
   // Imported ground UI uses the same adapted document as the VM assembly.
   Object.assign(context,{createBrowserId,createWorkspaceNodes,createNodeLibrary,orbitElements,catalogElements,nodeOisl,NodeScene,createSatelliteNodePanelTools,createNodeClockControls,createUtcCodec,LEAP_SHA256});
+  Object.assign(context,{createGroundSegmentStore,createGroundNetworkPanel,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
   globalThis.document=doc;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}
