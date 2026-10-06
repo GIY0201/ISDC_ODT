@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-06 T079 원본 범위 분리 데이터 모듈 부분 이식
+- 변경: 원본policy/catalog/placement/stand_in/scopes 재사용을 기존model_library/simulation/runtime 안에배치. 원본isolated-v1·RLock·빈초기scope/SIM입력시간 보존. reason입력/조회와nested event3곳 deepcopy로statealias차단; 계산·정책은원본AST일치. 운영서버조립/실파일기능아님.
+- 검증: 원본19command 전체result/5report와7scopecommand 두311087bytes/SHAe0d0c233… 동일. missingmodule RED→10PASS1FAILalias수정. 원본4component시험포함target16PASS0.13s. AST문서줄바꿈1FAIL수정. 전체Node540PASS3060.8802ms/Python562PASS8기존warnings154.81s(session50186exit0)/계층/syntax/diffcheck. validation/t079_data_management_module.md.
+- 남음: T079unchecked 배치profiles/products/strictICD/remoteadapter/activation T149/client T150/actualT151–153/dataUI/다운로드. 모의checksum/random integrity/latency는실측증거아님. T148/T077/N003/전체T075–84/Terra/all50/N001/T137인증/T032/장비·RF·HIL/AeroDT 유지. 8891서버/native설치/사용자화면/원격PR·병합 변경없음.
+
+
 ## 2026-10-06 T148 native 궤적 재사용 부분 보완
 - 변경: immutable track buffer의 노드별 opaque revision을 track/display owner에서 전달. 동일결과는Cartesian121정점 재사용; 새/없음/실패/읽는중변경 결과는oldline숨김·교체. 원본240개/121정점/30s refresh/선택·테마·layer보존. wire/native/시간/HTTP 변경없음.
 - 검증: RED53PASS6FAIL→target60PASS1399.0408ms. 240개20update 후path읽기240유지, 새결과시480; 실제decoder→renderer 구성시험 포함. 전체Node540PASS3148.9647ms/Python546PASS8기존warnings155.13s(session46419exit0)/syntax/diffcheck. validation/t148_node_path_reuse.md. 주입rows/Cesiumdouble/callcounts는실제FPS증거아님.
