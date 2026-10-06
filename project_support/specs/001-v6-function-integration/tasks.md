@@ -566,3 +566,28 @@ Chrome의 실제8891에서 군집 서비스 화면은 표시됐다. 실행 중�
 T078/N010/N011과 전체 T075–T084는 미완료 유지. 실제8891 새 factory 적용과 live lifecycle, 모든5종 native feasibility/failure, 재시작 후 계획 adoption/reconciliation, multiwindow/성능/원격 module/통신 window·mesh 독립 증거, 나머지 영역·Terra/모든GPU/T032/N001/N008/N009/T137인증/실장비RF-HIL/다운로드 bytes/리뷰가 남았다. 같은 codex/satellite-node-integration 브랜치를 유지하고 remote push/merge/신규 branch는 수행하지 않았다. 사용자 시한은 한국시간10월7일01:00이다.
 
 최종 코드 검증: fullPython821PASS, 기존 ERFA warning8개,207.20s(session69135 exit0). fullNode838PASS,4895.2763ms이며 이후 복제·초안삭제 버튼 추가는 source panel4PASS로 확인했다. 전체 시험에서 제외한 항목은 없다. 실제 factory 설치 native/수락 deployment/3task lifecycle를 포함한 focused10PASS도 확인했다. 현재 live8891 backend 적용은 다음 단계다.
+
+## Source analysis cadence / sampled visual implementation backlog (2026-10-07)
+
+ADR0047 and the contract amendments are design only. Existing T076/T077/T032/T084
+checkboxes and all numerical acceptance gates remain unchanged.
+
+- [ ] N012 Add meaningful source1000ms cadence and exact captured-UTC RED regressions, then implement the sampled analytical lease in the existing optical owner/native lane. Preserve one history, one active calculation, at most one latest display intent, exact action proof and full240 native/source/hash/config/late/disposal guards.
+- [ ] N013 Add independently registered immutable sampled visual projection and renderer/UI ports. Preserve unchanged analysis UTC, visible age/source/incomplete-current status and full scope/authority/endpoints validation; reject forged/copied/stale views and keep existing current setLinks/network/mission/fabric/data actions unchanged.
+- [ ] N014 Compose the lifecycle scheduler with existing display authority and explicit seek/pause/reverse/config/source/run discontinuity events. Test immediate actions, delayed periodic dedupe/latest intent, one history commit, ignored-abort serialization, mount/hide/disposal cleanup and per-frame native visual poses with zero analytical HTTP. Preserve whole source network/ground behavior; optical-only delivery does not close T077.
+- [ ] N015 Compare original priming/acquisition/history and whole fleet/status/equipment at the same instants; run complete regressions and actual8891 two-resolution/source-label/GPU performance trials. Keep all T032/SC-006 thresholds and trial requirements; failed/partial/unit/CPU evidence cannot close full T075–T084 or operational RF/HIL/equipment acceptance.
+
+N014 specifically includes actual owner-issued opaque continuity binding and
+read/notification bridge tests: same-UTC seek, pause final-running-paint, play and
+rate notify-only commands rotate at entry; natural RAF/background same-input
+buffer does not. Missing/foreign bridge rejects past reuse. Public JSON display
+and current proof contracts stay unchanged. This is additional pending validation,
+not a completed task or relaxed gate.
+
+N014 additionally requires meaningful RED reentrant command and availability-gap
+tests: capture during pause/rate/play synchronous paint/notify is refused after
+entry revocation; only final completed mode/rate registers. Null/error gaps revoke,
+recovery never resurrects an old lease, and same-valid-buffer background acceptance
+retains continuity. A staged active catalog capability is partial; paused/missing/
+stored/SIM fallback remains exact and every remaining owner/network/ground gate stays
+open until explicitly implemented and verified.

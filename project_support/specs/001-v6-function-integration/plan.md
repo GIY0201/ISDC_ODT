@@ -507,3 +507,48 @@ Chrome의 실제8891에서 군집 서비스 화면은 표시됐다. 실행 중�
 T078/N010/N011과 전체 T075–T084는 미완료 유지. 실제8891 새 factory 적용과 live lifecycle, 모든5종 native feasibility/failure, 재시작 후 계획 adoption/reconciliation, multiwindow/성능/원격 module/통신 window·mesh 독립 증거, 나머지 영역·Terra/모든GPU/T032/N001/N008/N009/T137인증/실장비RF-HIL/다운로드 bytes/리뷰가 남았다. 같은 codex/satellite-node-integration 브랜치를 유지하고 remote push/merge/신규 branch는 수행하지 않았다. 사용자 시한은 한국시간10월7일01:00이다.
 
 최종 코드 검증: fullPython821PASS, 기존 ERFA warning8개,207.20s(session69135 exit0). fullNode838PASS,4895.2763ms이며 이후 복제·초안삭제 버튼 추가는 source panel4PASS로 확인했다. 전체 시험에서 제외한 항목은 없다. 실제 factory 설치 native/수락 deployment/3task lifecycle를 포함한 focused10PASS도 확인했다. 현재 live8891 backend 적용은 다음 단계다.
+
+## 2026-10-07 T076/T077 sampled analysis versus RAF — planned, not implemented
+
+Source cadence evidence and the pending internal contract are recorded in
+[ADR0047](../../docs/adr/0047_sampled_analysis_visual_boundary.md). Amend N003/N004
+and source assembly only by adding a captured exact-UTC analytical lease in the
+existing optical/native owners and a separate registered visual-only projection.
+Do not change their exact current snapshot/action verifier semantics. Source wall
+cadence1000ms reads the existing clock; RAF still uses current valid native display
+interpolation. Explicit seek/pause/source/run/config changes revoke the visual
+lease and request immediate current analysis. One active analytical request plus
+at most one latest pending display intent share one original history and serial
+native lane; ignored abort cannot publish or release the lane early. Full node
+scope/hash and relevant stations/faults are rechecked before atomic sampled
+publication, even while natural play moves the display. Past analysis UTC remains
+unchanged and visibly labeled with age/source/incomplete-current state.
+
+Implement owner/scheduler/visual ports with meaningful RED regressions, then
+composition/panel/renderer regressions and complete source-equivalent cadence,
+history and approval comparisons. Full current network/fabric/mission/data actions
+remain exact. Sampled ground/network visuals are a separate bounded integration
+under the same whole T077 requirement. Amend contracts listed in ADR0047; record
+fresh full-suite and actual two-resolution/GPU/performance evidence only after
+implementation. No implementation, timer, changed renderer behavior or performance
+success is claimed by this plan amendment. T032 frame p95<=16.7ms and every
+original timing/accuracy/source/whole-migration gate remain open and unchanged.
+
+ADR0047 continuity refinement: add an optional internal clock-owner capability
+bridge rather than modifying JSON display/current proof contracts. Real opaque
+continuity rotates at explicit command entry (same-UTC seek, pause/play/rate,
+source/run/config/failure), before final running paint. Natural RAF/background
+same-input buffer acceptance does not rotate. Recheck the actual owner before
+and after analytical awaits/render; missing bridge fails closed. N014 must include
+notify-only command and same-UTC regressions, not numeric-generation/UTC-delta
+proxies. This remains unimplemented design.
+
+A first bounded implementation may supply registered catalog capture/isCurrent
+continuity only for actual active-play GP/EOP/leap display priority and complete
+source/observer/min-elevation/rate/mode scope. Missing/paused/stored/SIM remain on
+the unchanged exact-current path. Command-entry invalidation suppresses capture
+through the entire reentrant transaction; only final completed mode/rate may
+register again. Display null/error/availability gap revokes; recovery cannot
+resurrect a prior lease. Background acceptance is natural only if the same valid
+buffer remained available. This planned stage cannot close the remaining owners,
+network/ground sampled visual integration or whole T076/T077/T075–T084.

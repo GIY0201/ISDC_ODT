@@ -267,3 +267,15 @@ Constellation supplies a private recursively frozen FULL ordered roster cloned o
 Optical presentation is deeply frozen and WeakMap-registered inside the owner, exact full canonical scope and UTC checked with pre/post accepted/request/failure/generation/disposal fences. Its marker fails the unchanged public action verifier. Public snapshot/onChange/action/render receipts remain independent mutable copies. Complete per-node canonical definitions are cached only under the existing trusted owner token. Pending240 UI reads clone zero rosters; public snapshots still copy. Data deployment review JSON is an immutable string cached by actual accepted server object (never numeric revision alone); server is only assigned copied responses, never mutated in place. Same-revision changed response regenerates text; hidden/disposed clears the single bounded memo.
 
 Meaningful RED→GREEN owner/panel/mounted tests: optical21, node panel87, composition/metadata118. Independent readonly reviews found no remaining blocker. Combined fullNode1222PASS/0FAIL/0SKIP10373.3538ms (`full_migration_node_0731.log`). Backend unchanged after Python965PASS/1PillowSKIP223.97s. This code follows the331RAF109.5ms failed trial; new actual measurement is required before claiming performance acceptance.
+
+## Pending cadence design clarification (2026-10-07)
+
+The implemented readonly display/UI projections in this ADR remain exact-current
+under their existing owners. They do not authorize retaining past optical/network
+analysis across display UTC changes. [ADR0047](0047_sampled_analysis_visual_boundary.md)
+proposes a separately registered sampled-visual contract following pinned
+source1000ms analysis/per-frame endpoint separation, with unchanged exact action
+verifiers, one optical history, explicit discontinuity leases and visible analysis
+UTC/age/source/incomplete-current status. **That cadence/render extension has no
+implementation or acceptance evidence yet.** Existing full1222/local results above
+must not be attributed to the pending design; T032 and whole-source gates remain.

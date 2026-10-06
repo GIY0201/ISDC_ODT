@@ -154,3 +154,33 @@ Existing production code passes new actual V6 twores accepted-receipt/local-stor
 Prepared ignored isdc_odt_node_worktree/project_support/.venv CPython3.14.6/pinned requirements/native0.3.0, wheelSHA d6a62057b9cd62e5c37b3bad18473aa08c6514952c18770211f10c24ecb1bc97. pipcheckPASS; native import/current factory/OpenAPI approved pathsPASS. New environment target108PASS: nodeapp/http/deployment48/1existingdeprecationwarning2.21s, officialSGP4golden4/0.91s, nodegeometry/samples56/1.41s. Native originalenv0.2.0 rechecked unchanged. Corrected readonly FastAPI route probe from .path assumption to OpenAPI; no product repair. Runtime receipt/logs ignored data/workspace/validation/ground_stations/t151_runtime_environment*. Evidence validation/t151_failure_runtime.md.
 T151/T152/T153/fullT075–T084 remain OPEN. Next immediate before-state storedGP/observer/UTC/SIM-memory capture, exact restore/rollback, controlled owned8891 replacement using separate newenv/current branch, live twores/browser matrix. Runtime preparation is not live acceptance. Full activation failure, Terra/allassets/N001/N005/T032/T137auth/scenario/equipment/RF/HIL/file bytes/review remain. Same branch; no originalenv native installation/remoteGit/live restart.
 2026-10-06 copy-name contract: existing name maximum40 Unicode codepoints is exposed readonly as MAX_NODE_NAME_LENGTH; store-generated copy names reserve the source suffix within this limit without changing original names/IDs/physics. Existing240cap and atomic rejection remain. ADR0022 and validation/t152_presets_capacity.md.
+
+## Pending source-cadence visual extension (ADR0047, design only)
+
+Pinned source nodes tick performs analytical states/links/status once1000ms wall
+interval, while its model-layer frame callback synchronizes visual poses and line
+endpoints only. The proposed workspace scheduler reads the existing display
+owner and captures exact canonical UTC/full ordered definitions/source/run and
+explicit discontinuity lease. It neither rounds time nor owns another clock.
+Native communication states remain exact-point/hash/profile/full240 validated;
+current display interpolation remains a visual-only input.
+
+The same optical-history owner serves periodic and exact requests, with one active
+calculation and one latest pending display intent. Accepted history commits once
+per final validated lease; explicit discontinuity/failure/definition/source/run
+change/clear/disposal fence pending results and revoke sampled visuals. A new
+registered immutable sampled visual port carries unchanged analysis UTC,
+current display UTC, age/source/quality and incomplete-current status. Current
+full action verifiers remain exact and reject stale/visual-only receipts.
+Existing setLinks remains exact; a new sampled-render port must independently
+verify registration/full scope/owner lease/current native endpoints. It cannot
+silently preserve old locked lines after failure, seek or unavailable geometry.
+Full source status/fleet/definitions/equipment, native assumptions and T032 gates
+remain. All details/tests are in [ADR0047](../../../docs/adr/0047_sampled_analysis_visual_boundary.md). **This extension is not implemented or accepted.**
+
+The planned sampled port additionally requires an actual clock-owner opaque
+continuity capability, via a separate optional internal read/notification bridge.
+Pause/play/rate changes and same-UTC seek rotate it at command entry, before any
+final display paint; natural RAF/background same-input buffer acceptance does
+not. Numeric generation/UTC deltas/copied display flags are not authority. Missing
+bridge fails closed for sampled visuals and preserves generic exact-current use.

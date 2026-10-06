@@ -36,3 +36,16 @@ Consequences: original equations/presets/formation/power values remain directly 
 2026-10-06 N004 historical native delivery: keep current601-row sample/121-point track ownership and budgets. Add point work to the same serial application runner, using existing count1/step1 native sample wire API for complete current scope. Existing exact native rows may be reused; missing/fractional rows require an actual exact-time point receipt. Do not replace buffers or reconstitute LVLH from display interpolation. Point caller cancellation and definition/seek/clear/disposal fences are independent of display buffer publication; ignored-abort transports retain the serial lane until terminal response. Native/server/schema/frame/math remain unchanged. Actual Rust0.3.0 clean-venv60-row priming chain validates copied adapter/query/JS optical input semantics against original source, not live8891 or frame performance. Production verified history owner/Unix-ms priming remains T077 before T148/T151.
 
 2026-10-06 T151 server composition decision: create_app mounts existing node_geometry and data_deployment routers. Default NodeGeometryQuery shares the same BoundedOrbitExecutor instance as GP/catalog/solar calculations; no second native thread pool or timed propagation. Query injection remains explicit for controlled deployments/testing; source-profile unavailable/busy/invalid receipts retain503/502. Each app owns a fresh original ScopedDataManagement isolated-v1 embedded simulation module and a DataManagementBridge delivery cursor; injected external capabilities retain caller ownership. Bridge wall UTC is only provenance, SIM elapsed remains runtime-owned. Startup/GET neither activate a scope nor create/backfill products. Explicit deployment activates source module under existing runtime transaction; conflict/failure preserve previous acceptance. Original native0.2.0 remains installed until the later controlled T151 wheel/restart step; absence of its additive node exports is an explicit unavailable result, never an alternate propagator. Additive public paths are /api/nodes/samples, /api/nodes/track and GET/POST /api/data-management/deployment. Existing wire schemas and paths remain byte-for-byte OpenAPI-compatible after excluding precisely these approved additions and their five schema definitions. Actual browser/one-Viewer UI composition and owned8891 restart remain pending; this server composition alone does not close T151/T076/T077/T079.
+
+## 2026-10-07 planned sampled-visual exception — no implementation yet
+
+ADR0047 documents pinned source1000ms analytical cadence and per-frame visual
+poses. Paragraph27/T148's existing exact setLinks/action path still hides old UTC
+snapshots; paragraphs33/36 exact native communication state requirements remain.
+A distinct registered visual-only path is proposed to render explicitly labeled
+sampled analytical states at current valid native endpoints, retaining the original
+analysis UTC/age/source/incomplete-current status. It must not alter current
+verifiers or relabel old states as current approval. One existing optical history,
+full240/hash/native guards and explicit discontinuity/failure revocation apply.
+This planned exception is not implemented or accepted and does not close T077,
+T032 or whole-source migration. See [ADR0047](0047_sampled_analysis_visual_boundary.md).

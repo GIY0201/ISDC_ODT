@@ -208,3 +208,18 @@ SC-023: 원본 표시 설정 값, 2D 북쪽 방향/회전·기울기 제한, 빠
 - SC026: 원본 91golden과 노드·편대·전력의 입력/결과/사본/저장·복원·동시편집 경계를 대조한다. 이식한 시간별 계산의 위치/높이/반경1e-7km, 속도1e-10km/s, 방향벡터1e-10, 각도1e-7도를 원본 구현과 대조하며 이를 실제 궤도 오차 기준으로 부르지 않는다. 기존 GP/native 계산 회귀 및 제품wheel 설치를 보존하고 전체 Python/Node/Rust와 실제8891 두해상도 단일지구·편집/편대/시간/모델·상태보존·서버수락/실패·창복원 검증과 별도 Draft 리뷰를 요구한다. 원본 근사 모델을 정밀 ITRF나 실제 통신 결과로 표시하면 실패다. 게임 프레임 기준은 T032로 유지한다.
 
 수용 예: 편대 슬라이더로 재생성해도 분리한 개별 위성은 유지된다. 편집 초안만 바꾸면 서버 수락 버전은 그대로다. 명시 배치가 timeout이면 이전 배치를 유지하고 동일 요청 ID로 재시도한다. 서버409 후 자동 덮어쓰기하지 않는다. 새 창 복원은 기존 구성 조회만 수행한다. 근사 노드 좌표와 GP 정밀 좌표는 한 지구에서 각각 출처/시각을 확인할 수 있다.
+
+## 2026-10-07 US20/T077 source analysis cadence amendment — design only
+
+FR030/SC026 and the whole T076/T077 migration distinguish source analysis from
+continuous visualization. Pinned source `nodes.js:132–146,623–628` and
+`communication.js:165–180,909–916` analyze at1000ms wall cadence; `nodes.js:595`
+updates visual poses/endpoints per frame. Preserve immediate explicit time/config
+analysis and full240 node scope. The proposed boundary is [ADR0047](../../docs/adr/0047_sampled_analysis_visual_boundary.md): capture exact authoritative UTC/native states in the same optical-history owner, and show retained analysis only through a separately registered immutable visual projection with analysis UTC, age, provenance and incomplete-current status. Interpolated display geometry is never a communication receipt. Existing exact-current action approvals, clocks/runtime, source tolerances and SC-006/T032 acceptance are unchanged. **The sampled path is not implemented or accepted yet.** Whole network/ground behavior and T075–T084 remain in scope; an optical-only improvement cannot close them.
+
+The planned sampled continuity must come from an actual owner-issued opaque
+clock/source capability, rotated at explicit command entry including same-UTC
+seek/pause/play/rate and notify-only changes. Public display JSON, copied flags,
+UTC differences or catalog generation cannot replace that authority. Without its
+optional internal bridge, retained sampled visuals remain unavailable and exact
+current behavior is preserved. This requirement is pending implementation.
