@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Protocol
 
 
-from foundation.data_fabric_errors import DataFabricUnavailable
+from foundation.data_fabric_errors import DataFabricUnavailable, DataFabricConflict
 
 
 class DataFabricLink(Protocol):
@@ -21,3 +21,9 @@ class DataFabricLink(Protocol):
 
     def status(self) -> dict:
         """Implementation, version, placement, endpoint, sequence and last update."""
+
+    def guarded_update(self, snapshot: dict, request_id: str, expected_sequence: int, instance_id: str) -> dict:
+        """guarded-v1 explicit exchange with replay and instance/sequence fencing."""
+
+    def guarded_route(self, source: str, target: str, objective: str, expected_sequence: int, instance_id: str) -> dict:
+        """Query only the accepted module instance and sequence."""
