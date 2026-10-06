@@ -13,9 +13,9 @@ import {createUtcCodec,LEAP_SHA256} from './orbit_utc.js';
 export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements,catalogElements,oisl,Scene,NetworkScene=null,tools,document,host,now,resolveModel,models,fetchImpl,clockActions={},readClock=()=>({}),onHover=()=>{},networkInputs=null,scenarioClock=null}={}){
  const codec=createUtcCodec(LEAP_SHA256),advanceUtc=codec.advance;
  let dead=false,started=false,root=null,panel=null,scene=null,display=null,deployment=null,activeSelection=false,selectedSignature=null,definitionsSignature=null,error='';
- let networkScene=null,networkSceneInput=null,groundLinksVisible=true,coverageVisible=true;
+ let networkScene=null,networkSceneInput=null,groundLinksVisible=true,coverageVisible=true,networkVisualActive=false,network=null,networkComposition=0,displayLease=null;
  let tracks=true,links=true,modelsVisible=true;const readiness=new Map(),removers=[];
- let restorePromise=null,scenarioReceipt=null;
+ let restorePromise=null,scenarioReceipt=null,networkFaultSignature=null;
  let applyingSelectedPose=false;
  let reviewedRevision=null,refreshingPanel=false;
  const id=()=>createBrowserId(host.crypto);
@@ -33,13 +33,16 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  const timeline=createNodeDisplayTimeline({api,periodFor:node=>Math.round(orbitElements(node.orbit)?.period/60*1000)/1000,requestId:id,yieldControl:()=>new Promise(resolve=>host.setTimeout(resolve,0)),onChange:(_snapshot,reason)=>{if(dead)return;if(reason?.kind==='communication'){refreshPanel({metadataOnly:true});return;}refreshPose();scene?.update(display?.utc??null);refreshPanel();},onError:report});
  let opticalScopeRevision=Object.freeze({});
  const optical=createNodeOpticalTimeline({resolver:createNodeLinkResolver({library,oisl}),requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>store.drafts,nodeScopeRevision:()=>dead?null:opticalScopeRevision,readDisplay:readAnalyticalDisplay,advanceUtc,readContinuity,verifyContinuity,onChange:value=>{if(dead)return;const sampled=optical.sampledPresentation();if(sampled.status==='valid'&&optical.verifySampledPresentation(sampled,{utc:display?.utc}))scene?.update(display?.utc??null);else scene?.setLinks(value);refreshPanel();}});
- const opticalScheduler=createOpticalDisplayScheduler({readDisplay:readAnalyticalDisplay,readContinuity,verifyContinuity,requestSampled:()=>optical.updateSampled(),requestExact:()=>optical.update(),cancelSampled:()=>optical.cancelSampled(),onError:report,setTimer:host.setTimeout.bind(host),clearTimer:host.clearTimeout.bind(host)});
+ const opticalScheduler=createOpticalDisplayScheduler({readDisplay:readAnalyticalDisplay,readContinuity,verifyContinuity,
+  requestSampled:async(_display,lease)=>{const ticket=networkComposition;if(verifyContinuity?.(lease)===true)displayLease=lease;await optical.updateSampled();if(!dead&&networkVisualActive&&ticket===networkComposition&&verifyContinuity?.(lease)===true)return network?.updateSampled();},
+  requestExact:async value=>{const ticket=networkComposition;await optical.update();if(!dead&&networkVisualActive&&ticket===networkComposition&&display?.utc===value?.utc)return network?.update();},
+  cancelSampled:()=>{networkComposition++;optical.cancelSampled();network?.cancelSampled();if(networkVisualActive&&!dead)networkInputs?.onChange?.();},onError:report,setTimer:host.setTimeout.bind(host),clearTimer:host.clearTimeout.bind(host)});
  const removeContinuity=hasContinuity&&typeof globe.observeDisplayContinuity==='function'?globe.observeDisplayContinuity(event=>{if(!dead)opticalScheduler.continuityEvent(event);}):()=>{};
  // Communication consumers use these existing owners; no mutable owner escapes this port.
- const network=networkInputs===null?null:createNodeNetworkTimeline({model:networkInputs.model,optical,
+ network=networkInputs===null?null:createNodeNetworkTimeline({model:networkInputs.model,optical,
   requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>{
    if(!started||!store.loaded)throw Error('노드 설정 불러오기 미완료');return store.drafts;
-  },nodeScopeRevision:()=>dead?null:opticalScopeRevision,readDisplay,readStations:networkInputs.readStations,readFaults:networkInputs.readFaults,
+  },nodeScopeRevision:()=>dead?null:opticalScopeRevision,readDisplay:readAnalyticalDisplay,readContinuity,verifyContinuity,readStations:networkInputs.readStations,readFaults:networkInputs.readFaults,
   validateNode:library.validateNode,validateStation:networkInputs.validateStation,advanceUtc,
   onChange:value=>{if(!dead)networkInputs.onChange?.(value);}});
  const geometryFor=(node,at)=>timeline.geometryFor(node,at);
@@ -117,7 +120,8 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  const removeStore=store.subscribe(()=>{opticalScopeRevision=Object.freeze({});syncDefinitions();});
  const removeDisplay=globe.observeDisplayContext(value=>{
   if(dead)return;const previousUtc=display?.utc??null,wasProjected=projectedSim(display);display=value?structuredClone(value):null;
-  if(previousUtc!==(display?.utc??null))network?.clear();
+  const lease=readContinuity?.()??null,sameContinuous=lease!==null&&lease===displayLease&&verifyContinuity?.(lease)===true;displayLease=lease;
+  if(previousUtc!==(display?.utc??null)&&!sameContinuous)network?.clear();
   if(display?.utc){void timeline.observe(display.utc);if(projectedSim(display)){if(!wasProjected)optical.resetHistories();}else if(hasContinuity)opticalScheduler.observe();else void optical.update();}else{timeline.clear();optical.resetHistories();opticalScheduler.observe();}
   refreshPose();refreshPanel();
  });
@@ -125,7 +129,8 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   scene=new Scene({cesium,viewer,timeSource:()=>display?.utc??null,advanceUtc,geometryFor,displayGeometry:timeline.displayGeometry,pathFor:timeline.pathFor,pathRevisionFor:timeline.pathRevisionFor,tracksVisible:()=>tracks,palette:theme=>globe.palette?.(theme)??{},isTransitioning:()=>typeof globe.isTransitioning==='function'?globe.isTransitioning():globe.viewState?.().mode.phase!=='ready',sampledLinks:{read:()=>dead?null:optical.sampledPresentation(),verify:(value,options)=>!dead&&optical.verifySampledPresentation(value,options)===true},verifyLinkSnapshot:optical.verifyLinkSnapshot,onStatus:value=>{if(dead)return;readiness.set(value.node_id,structuredClone(value));refreshPanel();}});
   scene.setTheme(globe.viewState?.().choice.theme??'dark');refreshModels();
   if(!NetworkScene||!network)return scene;
-  const nodeRenderer=scene,groundRenderer=networkScene=new NetworkScene({cesium,viewer,timeSource:()=>display?.utc??null,geometryFor,verifyNetworkSnapshot:value=>!dead&&network.verifySnapshot(value),readFabricState:()=>networkInputs.readFabricState?.(),coverageRadiusKm:station=>networkInputs.coverageRadiusKm?.(station,networkSceneInput?.snapshot?.node_definitions??[])??0,isTransitioning:()=>typeof globe.isTransitioning==='function'?globe.isTransitioning():globe.viewState?.().mode.phase!=='ready'});
+  const nodeRenderer=scene,groundRenderer=networkScene=new NetworkScene({cesium,viewer,timeSource:()=>display?.utc??null,geometryFor,verifyNetworkSnapshot:value=>!dead&&network.verifySnapshot(value),sampledNetwork:{read:()=>!dead&&networkVisualActive?network.sampledPresentation():null,verify:(value,options)=>!dead&&networkVisualActive&&network.verifySampledPresentation(value,options)===true},readFabricState:()=>networkInputs.readFabricState?.(),coverageRadiusKm:(station,snapshot)=>networkInputs.coverageRadiusKm?.(station,snapshot?.node_definitions??[])??0,isTransitioning:()=>typeof globe.isTransitioning==='function'?globe.isTransitioning():globe.viewState?.().mode.phase!=='ready'});
+  groundRenderer.setSampledActive?.(networkVisualActive);
   groundRenderer.setGroundLinksVisible(groundLinksVisible);groundRenderer.setCoverageVisible(coverageVisible);if(networkSceneInput)groundRenderer.setSnapshot(networkSceneInput);
   return {syncFrame(...args){nodeRenderer.syncFrame(...args);groundRenderer.syncFrame(...args);},destroy(){try{groundRenderer.destroy();}finally{nodeRenderer.destroy();if(networkScene===groundRenderer)networkScene=null;}}};
  });
@@ -236,7 +241,8 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   setNetworkScene:value=>{if(dead)return false;networkSceneInput=value?structuredClone(value):null;return networkScene?.setSnapshot(networkSceneInput??{})??false;},
   setGroundLinksVisible:value=>{if(dead)return;groundLinksVisible=Boolean(value);networkScene?.setGroundLinksVisible(groundLinksVisible);},
   setCoverageVisible:value=>{if(dead)return;coverageVisible=Boolean(value);networkScene?.setCoverageVisible(coverageVisible);},
-  clearNetworkScene:()=>{networkSceneInput=null;networkScene?.clear();},
+  setNetworkVisualActive:value=>{if(dead)return;const active=value===true;if(networkVisualActive===active)return;networkVisualActive=active;networkComposition++;networkScene?.setSampledActive?.(active);if(active)opticalScheduler.force();else network?.cancelSampled();},
+  clearNetworkScene:()=>{networkVisualActive=false;networkComposition++;network?.cancelSampled();networkScene?.setSampledActive?.(false);networkSceneInput=null;networkScene?.clear();},
   updateNetwork:()=>dead?Promise.resolve(null):network?.update()??Promise.resolve(null),
   // UI status/time only; full receipts remain on the original action/render ports.
   networkPresentation:()=>{
@@ -245,8 +251,18 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
    const proof=network.snapshot();return {proof,verified:proof?network.verifySnapshot(proof)===true:false};
   },
   networkSnapshot:()=>dead?null:network?.snapshot()??null,
+  networkSampledPresentation:()=>dead?null:network?.sampledPresentation()??null,
+  verifySampledNetworkPresentation:(value,options)=>!dead&&network?.verifySampledPresentation(value,options)===true,
   verifyNetworkSnapshot:value=>!dead&&network?.verifySnapshot(value)===true,
-  clearNetwork:()=>{if(!dead)network?.clear();},
+  clearNetwork:()=>{if(dead)return;networkComposition++;network?.clear();if(networkVisualActive)opticalScheduler.force();},
+  observeNetworkInputs(){
+   if(dead||!network)return;
+   let signature;try{signature=JSON.stringify({faults:networkInputs.readFaults()});}catch{signature='unavailable';}
+   if(signature===networkFaultSignature)return;
+   const previous=networkFaultSignature;networkFaultSignature=signature;
+   if(previous===null)return;
+   networkComposition++;network.clear();if(networkVisualActive)opticalScheduler.force();
+  },
   destroy(){if(dead)return;dead=true;scenarioReceipt=null;opticalScheduler.destroy();removeContinuity();try{onHover(null);}catch{/* Scoped presentation cleanup. */}for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeModel();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();network?.destroy();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
  });
 }

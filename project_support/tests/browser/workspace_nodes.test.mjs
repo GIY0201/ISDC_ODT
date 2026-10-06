@@ -12,6 +12,29 @@ import * as stationModel from '../../../digital_twin/model_library/browser/groun
 import {createGroundLinkModel} from '../../../digital_twin/simulation/browser/ground_links.js';
 import {createNetworkSnapshotModel} from '../../../digital_twin/simulation/browser/network_snapshot.js';
 
+test('mounted network consumer shares sampled analysis cadence and explicit activation authority',async()=>{
+ const codec=createUtcCodec(LEAP_SHA256),start=codec.advance('2026-10-04T22:01:12Z',0),lease=Object.freeze({});
+ let valid=true,listener,rendererOptions,sequence=0,faults=[];const scheduled=new Map(),activation=[];
+ const NetworkScene=class{constructor(options){rendererOptions=options;}setGroundLinksVisible(){}setCoverageVisible(){}setSampledActive(v){activation.push(v);}clear(){}destroy(){}syncFrame(){}};
+ const f=fixture({native:true,networkInputs:{readStations:()=>stationModel.DEFAULT_STATION_KEYS.map(preset=>stationModel.createStation({preset})),readFaults:()=>faults},networkSceneClass:NetworkScene,
+  timers:{set(fn,ms){if(ms===1000){const id=++sequence;scheduled.set(id,fn);return id;}return setTimeout(fn,ms);},clear(id){if(scheduled.has(id))scheduled.delete(id);else clearTimeout(id);}},
+  view:{captureDisplayContinuity:()=>valid?lease:null,verifyDisplayContinuity:v=>valid&&v===lease,observeDisplayContinuity(fn){listener=fn;return()=>{};}}});
+ const flush=async()=>{for(let i=0;i<100;i++)await Promise.resolve();await new Promise(resolve=>setTimeout(resolve,20));};
+ try{
+  await f.workspace.start();f.workspace.show('satellite');f.attach();f.options.store.add({name:'network scope'});f.context({utc:start,key:'catalog:scope',source:'catalog'});await flush();
+  assert.equal(typeof f.workspace.setNetworkVisualActive,'function');assert.equal(rendererOptions.sampledNetwork.read({utc:start}),null);
+  f.workspace.setNetworkVisualActive(true);await flush();const first=f.workspace.networkSampledPresentation();assert.equal(first.status,'valid');assert.equal(first.analysis_utc,start);assert.equal(f.workspace.verifySampledNetworkPresentation(first,{utc:start}),true);assert.equal(f.workspace.verifyNetworkSnapshot(first),false);
+  const requests=f.calls.filter(c=>c[0]==='samples').length;
+  for(let i=1;i<=30;i++)f.context({utc:codec.advance(start,i/30),key:'catalog:scope',source:'catalog'});await flush();
+  const retained=f.workspace.networkSampledPresentation();assert.equal(retained.analysis_utc,start);assert.equal(retained.age_seconds,1);assert.equal(f.workspace.verifySampledNetworkPresentation(retained,{utc:codec.advance(start,1)}),true);assert.equal(f.calls.filter(c=>c[0]==='samples').length,requests);
+  const [id,tick]=scheduled.entries().next().value;scheduled.delete(id);tick();await flush();assert.equal(f.workspace.networkSampledPresentation().analysis_utc,codec.advance(start,1));assert.equal(scheduled.size,1);
+  f.workspace.clearNetworkScene();assert.equal(rendererOptions.sampledNetwork.read({utc:codec.advance(start,1)}),null);f.context({utc:codec.advance(start,2),key:'catalog:scope',source:'catalog'});await flush();assert.equal(rendererOptions.sampledNetwork.read({utc:codec.advance(start,2)}),null);
+  f.workspace.setNetworkVisualActive(true);await flush();assert.equal(f.workspace.networkSampledPresentation().analysis_utc,codec.advance(start,2));assert.ok(activation.includes(false));
+  f.workspace.observeNetworkInputs();faults=[{kind:'link_loss',target:f.options.store.drafts[0].id}];f.workspace.observeNetworkInputs();await flush();assert.deepEqual(f.workspace.networkSampledPresentation().faults,faults,'actual fault change refreshes sameUTC through existing scheduler');
+  const current=f.workspace.networkSampledPresentation();valid=false;listener({phase:'invalidated',reason:'pause'});assert.equal(f.workspace.verifySampledNetworkPresentation(current,{utc:codec.advance(start,2)}),false);assert.notEqual(f.workspace.networkSampledPresentation().status,'valid');
+ }finally{f.workspace.destroy();}
+});
+
 test('mounted catalog consumer samples once per analysis tick and revokes same-UTC control immediately',async()=>{
  const codec=createUtcCodec(LEAP_SHA256),start=codec.advance('2026-10-04T22:01:12Z',0),lease=Object.freeze({});
  let valid=true,listener=null,sequence=0;const scheduled=new Map();

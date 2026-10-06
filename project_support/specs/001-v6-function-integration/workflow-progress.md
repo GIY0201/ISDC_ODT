@@ -1272,3 +1272,22 @@ RequireSpec/RequireTasks succeeded, quality8of8/extensionsabsent. Owner implemen
 nowauthorizedbyoriginalfullmigration; rootassembly andrendererowned separately.
 Additionalrealowner fixture fullNode1370PASS16342.0259ms exit0handle69486; rootfocused
 4PASS8006.0426ms. Python965PASS245.86s stableprevious product, nobackendchange.
+
+N016 implementation checkpoint: same scheduler chains optical/network, current
+fault-change notification forces only changed inputs, explicit ground activation
+and full native scope/coverage are connected. Meaningful real-owner firstframe
+RED repaired by recording validated dispatch lease; actual two-resolution/full240
+owner composition2PASS13334.9982ms (controlled HTTP/Cesium/DOM, not GPU).
+Independent UI21/renderer25/owner72 tests pass after callback repairs. FullNode
+1426PASS23280.4358ms; Python965PASS1PillowSKIP8existingERFAwarnings230.58s handle22040exit0. N016 actual
+screen/GPU and N017/N018 plus whole original scope stay OPEN. No PR wait, server
+reset, newbranch, port or runtime mutation. See validation/sampled_network_connection.md.
+
+Next N017 prerequisite finding: existing explicit contact query requires paused
+mission authority, so it cannot be reused blindly each advancing60seconds. Existing
+mission-windows API also offers readonly raw native geometry without approval
+header. Plan must define a separate fullacceptedroster future-visual receipt with
+opaque current display authority and complete source/hash/station checks, retaining
+exactmission approval untouched. Automatic module status polling must not invoke
+explicit review refresh that clears an uncertain mutation. Owner stage=plan before
+dependent N017 implementation; no API/contract weakening or automatic pause.

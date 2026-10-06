@@ -5,11 +5,36 @@ export const GROUND_LINK_COLORS=Object.freeze({usable:'#4ac4ee',visible:'#7a95ab
 export const ROUTE_COLOR='#a78bfa',STATION_COLOR='#ffbf47';
 const ROUTE_WIDTH=4.5,SELECTED_WIDTH=4,BASE_WIDTH=2;
 const signature=value=>JSON.stringify(value);
+const NATIVE_PROFILE=Object.freeze({frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',model_profile:'SOURCE_KEPLER_J2_V1',source_commit:'1a1e00297a0301637455b0ef2cf48b2e74576b07',quality:'engineering_assumption'});
+const nativeProfile=value=>Object.entries(NATIVE_PROFILE).every(([key,v])=>value?.[key]===v);
+function deeplyFrozen(value,seen=new Set()){
+ if(!value||typeof value!=='object')return true;if(seen.has(value))return true;seen.add(value);
+ const descriptors=Object.values(Object.getOwnPropertyDescriptors(value));
+ return Object.isFrozen(value)&&descriptors.every(d=>'value'in d&&deeplyFrozen(d.value,seen));
+}
+// Structural display checks supplement, never replace, the injected private owner proof.
+function sampledScope(value,utc){
+ if(value?.presentation_kind!=='NETWORK_SAMPLED_UI_V1'||value.schema_version!==1||value.status!=='valid'||value.error!==null||!nativeProfile(value)||!deeplyFrozen(value)||value.utc!==value.analysis_utc||value.display_utc!==utc||!['sampled','pending'].includes(value.availability)||!Number.isFinite(value.age_seconds)||value.current_analysis!==(value.utc===utc))return false;
+ const analysis=Date.parse(value.utc),display=Date.parse(utc);
+ if(!Number.isFinite(analysis)||!Number.isFinite(display)||value.network?.time!==new Date(analysis).toISOString()||value.age_seconds!==(display-analysis)/1000)return false;
+ const nodes=value.node_definitions,stations=value.stations,hashes=value.definition_hashes,network=value.network;
+ if(!Array.isArray(nodes)||nodes.length>240||!Array.isArray(stations)||stations.length>24||!Array.isArray(value.faults)||!hashes||!Array.isArray(network?.nodes)||!Array.isArray(network.links))return false;
+ const ids=new Set(),ground=new Set();
+ for(const n of nodes){if(!n||typeof n.id!=='string'||!n.id||ids.has(n.id)||!/^[a-f0-9]{64}$/.test(hashes[n.id]??''))return false;ids.add(n.id);}
+ if(Object.keys(hashes).length!==ids.size)return false;
+ for(const s of stations){if(!s||typeof s.id!=='string'||!s.id||ids.has(s.id)||ground.has(s.id)||['longitude','latitude','altitude_km'].some(k=>!Number.isFinite(s[k]))||Math.abs(s.longitude)>180||Math.abs(s.latitude)>90)return false;ground.add(s.id);}
+ const enabled=new Set(stations.filter(s=>s.enabled).map(s=>s.id)),networkIds=new Set();
+ for(const n of network.nodes){if(networkIds.has(n?.id)||!(n?.kind==='satellite'?ids.has(n.id):n?.kind==='ground'&&enabled.has(n.id)))return false;networkIds.add(n.id);}
+ if(networkIds.size!==ids.size+enabled.size)return false;
+ const links=new Set();for(const l of network.links){if(!l||typeof l.id!=='string'||links.has(l.id)||!networkIds.has(l.a)||!networkIds.has(l.b))return false;links.add(l.id);if(l.kind==='ground'&&(!enabled.has(l.a)||!ids.has(l.b)||!['visible','below_mask','no_radio'].includes(l.state)))return false;}
+ return true;
+}
 export class NativeNetworkScene {
- constructor({viewer,cesium,timeSource,geometryFor,verifyNetworkSnapshot,readFabricState,coverageRadiusKm,isTransitioning=()=>false}={}){
+ constructor({viewer,cesium,timeSource,geometryFor,verifyNetworkSnapshot,readFabricState,coverageRadiusKm,isTransitioning=()=>false,sampledNetwork=null}={}){
   if([timeSource,geometryFor,verifyNetworkSnapshot,coverageRadiusKm].some(fn=>typeof fn!=='function'))throw TypeError('verified native network rendering ports required');
   Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,geometryFor,verifyNetworkSnapshot,readFabricState,coverageRadiusKm,isTransitioning});
   this.stations=new Map();this.groundLinks=new Map();this.routeIds=new Set();this.selectedLinkId=null;this.groundLinksVisible=true;this.coverageVisible=true;this.disposed=false;this.snapshot=null;this.dataSource=null;this.linkPolylines=null;
+  this.sampledNetwork=sampledNetwork;this.sampledActive=false;this.sampledSnapshot=null;this.sampledGeneration=0;this.sampledFrame=0;
  }
  get viewer(){return typeof this.viewerProvider==='function'?this.viewerProvider():this.viewerProvider;}
  get cesium(){return typeof this.cesiumProvider==='function'?this.cesiumProvider():this.cesiumProvider;}
@@ -29,7 +54,7 @@ export class NativeNetworkScene {
  }
  setSnapshot({snapshot,receipt=null,route=null,selectedLinkId=null}={}){
   if(this.disposed)return false;
-  try{const copy=structuredClone(snapshot);if(copy?.status!=='valid'||!Array.isArray(copy.node_definitions)||copy.node_definitions.length>240||!Array.isArray(copy.stations)||copy.stations.length>24||!Array.isArray(copy.network?.links))throw Error('network scope unavailable');if(copy.stations.some(s=>!s||['longitude','latitude','altitude_km'].some(k=>!Number.isFinite(s[k]))||Math.abs(s.longitude)>180||Math.abs(s.latitude)>90))throw Error('invalid station geometry');this.snapshot=copy;if(!this.valid(copy.utc))throw Error('stale native scope');
+  try{const copy=structuredClone(snapshot);if(copy?.presentation_kind==='NETWORK_SAMPLED_UI_V1'||copy?.status!=='valid'||!Array.isArray(copy.node_definitions)||copy.node_definitions.length>240||!Array.isArray(copy.stations)||copy.stations.length>24||!Array.isArray(copy.network?.links))throw Error('network scope unavailable');if(copy.stations.some(s=>!s||['longitude','latitude','altitude_km'].some(k=>!Number.isFinite(s[k]))||Math.abs(s.longitude)>180||Math.abs(s.latitude)>90))throw Error('invalid station geometry');this.snapshot=copy;if(!this.valid(copy.utc))throw Error('stale native scope');
    this.receipt=structuredClone(receipt);this.route=structuredClone(route);this.selectedLinkId=selectedLinkId==null?null:String(selectedLinkId);
    this.setStations(copy.stations.filter(s=>s.enabled));this.refreshGroundLinks();this.syncFrame(copy.utc,0);return true;
   }catch{this.clear();return false;}
@@ -51,16 +76,17 @@ export class NativeNetworkScene {
 
   // stations: [{ id, name, latitude, longitude, altitude_km, min_elevation_deg, bands }]. Coverage is
   // the ground range inside which a satellite at the constellation altitude clears the mask.
-  setStations(stations) {
-    const Cesium = this.cesium;
-    const entities = this.entityCollection();
+  setStations(stations,prepared=null) {
+    const Cesium = prepared?.cesium??this.cesium;
+    const entities = prepared?.entities??this.entityCollection();
     if (!Cesium?.Color || !entities) return;
     const keep = new Set();
     for (const station of stations || []) {
       const id = String(station.id);
       keep.add(id);
-      const position = this.stationPosition(station);
-      const radiusKm=this.coverageRadiusKm(station,this.snapshot);
+      if(prepared&&!prepared.bound())return;
+      const position = prepared?prepared.positions.get(id):this.stationPosition(station);
+      const radiusKm=prepared?prepared.radii.get(id):this.coverageRadiusKm(station,this.snapshot);
       const radius=Number.isFinite(radiusKm)?Math.max(0,radiusKm)*1000:0;
       let entry = this.stations.get(id);
       if (!entry) {
@@ -68,6 +94,7 @@ export class NativeNetworkScene {
         entry = { station, entity: null, coverage: null };
         entry.entity = entities.add({
           id: `station-${id}`,
+          ...(prepared?{show:false}:{}),
           position,
           properties: { stationId: id },
           point: { pixelSize: 10, color, outlineColor: Cesium.Color.WHITE, outlineWidth: 2, disableDepthTestDistance: 0 },
@@ -79,10 +106,12 @@ export class NativeNetworkScene {
         });
         entry.coverage = entities.add({
           id: `station-coverage-${id}`,
+          ...(prepared?{show:false}:{}),
           position,
           properties: { stationId: id },
           ellipse: { semiMajorAxis: Math.max(1, radius), semiMinorAxis: Math.max(1, radius), height: 0, material: color.withAlpha(0.07), outline: true, outlineColor: color.withAlpha(0.55), outlineWidth: 1 },
         });
+        if(prepared&&!prepared.bound()){entities.remove(entry.entity);entities.remove(entry.coverage);return;}
         this.stations.set(id, entry);
       } else {
         entry.station = station;
@@ -91,7 +120,7 @@ export class NativeNetworkScene {
         if (entry.entity.label) entry.entity.label.text = station.name || id;
         if (entry.coverage.ellipse) { entry.coverage.ellipse.semiMajorAxis = Math.max(1, radius); entry.coverage.ellipse.semiMinorAxis = Math.max(1, radius); }
       }
-      entry.coverage.show = this.coverageVisible && radius > 0;
+      entry.coverage.show = !prepared&&this.coverageVisible && radius > 0;
     }
     for (const id of [...this.stations.keys()]) if (!keep.has(id)) this.removeStation(id);
     for (const key of [...this.groundLinks.keys()]) if (!keep.has(this.groundLinks.get(key).station)) this.removeGroundLink(key);
@@ -100,7 +129,8 @@ export class NativeNetworkScene {
   removeStation(id) {
     const entry = this.stations.get(id);
     if (!entry) return;
-    const entities = this.entityCollection();
+    entry.entity.show=false;entry.coverage.show=false;
+    const entities = this.dataSource?.entities;
     try { entities?.remove(entry.entity); entities?.remove(entry.coverage); } catch { /* already gone */ }
     this.stations.delete(id);
   }
@@ -131,12 +161,13 @@ export class NativeNetworkScene {
 
   // links: [{ id, station, satellite, state }] where satellite is the globe record id and state is
   // usable (fabric accepted), visible (above the mask but not usable), fault or unusable (not drawn).
-  setGroundLinks(links) {
-    const Cesium = this.cesium;
-    const lines = this.linkCollection();
+  setGroundLinks(links,prepared=null) {
+    const Cesium = prepared?.cesium??this.cesium;
+    const lines = prepared?.lines??this.linkCollection();
     if (!Cesium?.Color || !lines) return;
     const keep = new Set();
     for (const link of links || []) {
+      if(prepared&&!prepared.bound())return;
       const key = String(link.id);
       keep.add(key);
       let entry = this.groundLinks.get(key);
@@ -148,22 +179,25 @@ export class NativeNetworkScene {
         });
         entry.state = link.state;
         entry.material = entry.line.material;
+        if(prepared&&!prepared.bound()){entry.line.show=false;lines.remove(entry.line);return;}
         this.groundLinks.set(key, entry);
       } else if (entry.state !== link.state) {
-        entry.line.material = this.groundMaterial(Cesium, link.state);
+        const material=this.groundMaterial(Cesium, link.state);
+        if(prepared&&!prepared.bound())return;
+        entry.line.material = material;
         entry.material = entry.line.material;
         entry.state = link.state;
       }
       entry.station = String(link.station); entry.satellite = String(link.satellite);
     }
     for (const key of [...this.groundLinks.keys()]) if (!keep.has(key)) this.removeGroundLink(key);
-    this.applyEmphasis();
-    this.placeGroundLinks(this.timeSource());
+    if(!prepared){this.applyEmphasis();this.placeGroundLinks(this.timeSource());}
   }
 
   removeGroundLink(key) {
     const entry = this.groundLinks.get(key);
     if (!entry) return;
+    entry.line.show=false;
     try { this.linkPolylines?.remove(entry.line); } catch { /* already gone */ }
     this.groundLinks.delete(key);
   }
@@ -172,14 +206,14 @@ export class NativeNetworkScene {
   // for everything else so a route that moves on does not leave thick lines behind.
   setGroundLinksVisible(visible) {
     this.groundLinksVisible = visible !== false;
-    this.placeGroundLinks(this.timeSource());
+    if(this.sampledActive)this.placeSampledNetwork(this.timeSource());else this.placeGroundLinks(this.timeSource());
     return this.groundLinksVisible;
   }
 
   setCoverageVisible(visible) {
     this.coverageVisible = visible !== false;
     for (const entry of this.stations.values()) entry.coverage.show = this.coverageVisible && (entry.coverage.ellipse?.semiMajorAxis ?? 0) > 1;
-    this.placeGroundLinks(this.timeSource());
+    if(this.sampledActive)this.placeSampledNetwork(this.timeSource());else this.placeGroundLinks(this.timeSource());
     return this.coverageVisible;
   }
 
@@ -196,7 +230,54 @@ export class NativeNetworkScene {
  if(current&&!this.valid(utc)){for(const entry of this.stations.values()){entry.entity.show=false;entry.coverage.show=false;}for(const entry of this.groundLinks.values())entry.line.show=false;}
  }
  applyEmphasis(){const C=this.cesium;if(!C?.Color)return;for(const [key,entry]of this.groundLinks){const routed=this.routeIds.has(key);if(entry.material?.uniforms&&'time'in entry.material.uniforms){entry.material.uniforms.color=C.Color.fromCssColorString(routed?ROUTE_COLOR:GROUND_LINK_COLORS.usable).withAlpha(.55);entry.line.material=entry.material;}else entry.line.material=routed?C.Material.fromType('Color',{color:C.Color.fromCssColorString(ROUTE_COLOR).withAlpha(.95)}):entry.material;entry.line.width=routed?ROUTE_WIDTH:key===this.selectedLinkId?SELECTED_WIDTH:BASE_WIDTH;}}
- syncFrame(utc,nowMs=0){if(this.disposed)return;if(this.valid(utc))this.refreshGroundLinks();else this.placeGroundLinks(utc);if(Number.isFinite(nowMs))for(const e of this.groundLinks.values())if(e.line.show&&e.state==='usable'&&e.line.material?.uniforms&&'time'in e.line.material.uniforms)e.line.material.uniforms.time=nowMs/1000*1.4;}
- clear(){for(const id of [...this.stations.keys()])this.removeStation(id);for(const id of [...this.groundLinks.keys()])this.removeGroundLink(id);this.snapshot=null;this.receipt=null;this.route=null;this.routeIds=new Set();this.selectedLinkId=null;}
+ hideSampledNetwork(){for(const e of this.stations.values()){e.entity.show=false;e.coverage.show=false;}for(const e of this.groundLinks.values())e.line.show=false;this.sampledSnapshot=null;}
+ setSampledActive(active){this.sampledGeneration++;this.sampledActive=active===true&&!this.disposed;this.sampledSnapshot=null;if(!this.sampledActive)this.hideSampledNetwork();return this.sampledActive;}
+ placeSampledNetwork(utc){
+  const frame=++this.sampledFrame,generation=this.sampledGeneration,port=this.sampledNetwork,read=port?.read,verify=port?.verify;
+  const bound=()=>!this.disposed&&this.sampledActive&&generation===this.sampledGeneration&&frame===this.sampledFrame&&this.sampledNetwork===port&&port?.read===read&&port?.verify===verify;
+  const fail=()=>{if(bound())this.hideSampledNetwork();return false;};
+  if(!bound()||typeof read!=='function'||typeof verify!=='function')return fail();
+  try{
+   const C=this.cesium,v=this.viewer,mode=v?.scene?.mode,viewerProvider=this.viewerProvider,cesiumProvider=this.cesiumProvider,geometryFor=this.geometryFor,timeSource=this.timeSource,transition=this.isTransitioning,coverageRadiusKm=this.coverageRadiusKm,linksVisible=this.groundLinksVisible,coverageVisible=this.coverageVisible;
+   const scopeBound=()=>bound()&&v?.scene?.mode===mode&&viewerProvider===this.viewerProvider&&cesiumProvider===this.cesiumProvider&&geometryFor===this.geometryFor&&timeSource===this.timeSource&&transition===this.isTransitioning&&coverageRadiusKm===this.coverageRadiusKm&&linksVisible===this.groundLinksVisible&&coverageVisible===this.coverageVisible&&(!this.sourceOwner||this.sourceOwner===v)&&(!this.linkOwner||this.linkOwner===v);
+   // Verify around actual provider reads: a verifier callback can replace the Viewer,
+   // and a provider callback can revoke the lease without changing UTC/generation.
+   // This is deliberately bounded. The terminal registered-owner verifier is an
+   // observational authority port, not a renderer-mutating callback; arbitrary
+   // mutually mutating owners require a transaction contract, not an infinite loop.
+   const current=value=>{
+    const changing=transition(),currentC=this.cesium,currentViewer=this.viewer,currentUtc=timeSource(),morph=changing||C?.SceneMode&&currentViewer?.scene?.mode===C.SceneMode.MORPHING;
+    if(morph||currentUtc!==utc||currentViewer!==v||currentC!==C||this.viewer!==v||this.cesium!==C||timeSource()!==utc||!scopeBound()||verify(value,{utc})!==true||!scopeBound())return false;
+    if(this.viewer!==v||this.cesium!==C||timeSource()!==utc||!scopeBound())return false;
+    // Final proof follows every external getter; only internal fences follow it.
+    return verify(value,{utc})===true&&scopeBound();
+   };
+   const value=read({utc});if(!scopeBound()||!sampledScope(value,utc)||!current(value))return fail();
+   const positions=new Map(),radii=new Map(),endpoints=new Map();
+   for(const s of value.stations.filter(s=>s.enabled)){
+    const position=C.Cartesian3.fromDegrees(s.longitude,s.latitude,Math.max(0,s.altitude_km)*1000),radius=coverageRadiusKm(s,value);
+    if(!scopeBound()||!Number.isFinite(radius))return fail();positions.set(s.id,position);radii.set(s.id,Math.max(0,radius));
+   }
+   for(const n of value.node_definitions){const g=geometryFor(structuredClone(n),{utc}),row=g?.row;
+    if(!scopeBound()||!nativeProfile(g)||g.node_id!==n.id||signature(g.node_definition)!==signature(n)||g.definition_hash!==value.definition_hashes[n.id]||row?.utc!==utc||row.status!=='valid'||row.error_code!==null||!Array.isArray(row.position_m)||row.position_m.length!==3||!row.position_m.every(Number.isFinite))return fail();
+    endpoints.set(n.id,new C.Cartesian3(...row.position_m));
+   }
+   if(!current(value))return fail();
+   const entities=this.entityCollection(),lines=this.linkCollection();if(!scopeBound()||!entities||!lines)return fail();
+   const prepared={cesium:C,entities,lines,positions,radii,bound:scopeBound};
+   this.setStations(value.stations.filter(s=>s.enabled),prepared);if(!scopeBound())return fail();
+   this.setGroundLinks(value.network.links.filter(l=>l.kind==='ground'&&l.state!=='no_radio').map(l=>({id:l.id,station:l.a,satellite:l.b,state:l.faulted?'fault':l.state==='visible'?'visible':'unusable'})),prepared);
+   if(!scopeBound())return fail();
+   // No fabric receipt or route can give this historical visual command authority.
+   this.routeIds=new Set();this.receipt=null;this.route=null;this.selectedLinkId=null;
+   if(!current(value))return fail();
+   this.sampledSnapshot=value;
+   for(const e of this.stations.values()){e.entity.show=true;e.coverage.show=coverageVisible&&(e.coverage.ellipse?.semiMajorAxis??0)>1;}
+   for(const e of this.groundLinks.values()){const a=positions.get(e.station),b=endpoints.get(e.satellite);e.line.width=BASE_WIDTH;e.line.material=e.material;e.positions=[a,b];e.line.positions=e.positions;e.line.show=linksVisible&&!!a&&!!b&&e.state!=='unusable';}
+   return true;
+  }catch{return fail();}
+ }
+ syncFrame(utc,nowMs=0){if(this.disposed)return;if(this.sampledActive){this.placeSampledNetwork(utc);return;}if(this.valid(utc))this.refreshGroundLinks();else this.placeGroundLinks(utc);if(Number.isFinite(nowMs))for(const e of this.groundLinks.values())if(e.line.show&&e.state==='usable'&&e.line.material?.uniforms&&'time'in e.line.material.uniforms)e.line.material.uniforms.time=nowMs/1000*1.4;}
+ clear(){this.setSampledActive(false);for(const id of [...this.stations.keys()])this.removeStation(id);for(const id of [...this.groundLinks.keys()])this.removeGroundLink(id);this.snapshot=null;this.receipt=null;this.route=null;this.routeIds=new Set();this.selectedLinkId=null;}
  destroy(){if(this.disposed)return;this.clear();this.disposed=true;if(this.linkPolylines)this.linkOwner?.scene?.primitives?.remove?.(this.linkPolylines);if(this.dataSource)this.sourceOwner?.dataSources?.remove?.(this.dataSource,true);this.linkPolylines=null;this.dataSource=null;}
 }

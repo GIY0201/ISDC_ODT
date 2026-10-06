@@ -1,0 +1,81 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {gunzipSync} from 'node:zlib';
+import {createNodeNetworkTimeline} from '../../../user_application/web/scripts/nodes/network_timeline.js';
+import {createNodeOpticalTimeline} from '../../../user_application/web/scripts/nodes/optical_timeline.js';
+import {createNodeLinkResolver} from '../../../user_application/web/scripts/nodes/links.js';
+import {createNodeLibrary} from '../../../digital_twin/model_library/browser/satellite_nodes.js';
+import {orbitElements,catalogElements} from '../../../digital_twin/simulation/browser/node_orbit_definition.js';
+import * as stationModel from '../../../digital_twin/model_library/browser/ground_stations.js';
+import * as oisl from '../../../digital_twin/simulation/browser/oisl.js';
+import {createGroundLinkModel} from '../../../digital_twin/simulation/browser/ground_links.js';
+import {createNetworkSnapshotModel} from '../../../digital_twin/simulation/browser/network_snapshot.js';
+import {NODE_COMMUNICATION_METADATA} from '../../../user_application/web/scripts/nodes/node_timeline.js';
+import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
+const fixture=JSON.parse(gunzipSync(await readFile(new URL('../fixtures/original_node_link_resolution.json.gz',import.meta.url))));
+const scenario=fixture.cases.find(c=>c.id==='dense-two-plane:0'),codec=createUtcCodec(LEAP_SHA256);
+function setup(action,observer,options={}){
+ let lease=Object.freeze({}),available=true,hook=null;let nodes=structuredClone(scenario.rows[0].input.nodes),utc=codec.advance(new Date(fixture.epoch).toISOString(),0),stations=[stationModel.createStation({preset:'daejeon'})],faults=[];
+ let eq=0;const calls=[],events=[],library=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>`EQ-NET-SAMPLE-${++eq}`});
+ if(options.count)nodes=Array.from({length:options.count},(_,i)=>library.cloneNode(nodes[0],{epoch:fixture.epoch,id:'NET-'+i,catalogNumber:900001+i}));
+ const request=async(stamp,options)=>{
+  calls.push({utc:stamp,signal:options.signal});
+  const source=new Map(scenario.rows.find(r=>r.input.date===Date.parse(stamp))?.input.states??scenario.rows.at(-1).input.states);
+  const value={utc:stamp,node_definitions:structuredClone(nodes),states:nodes.map(node=>[node.id,{...NODE_COMMUNICATION_METADATA,...structuredClone(source.get(node.id)??source.get(scenario.rows[0].input.nodes.find(n=>n.catalog_number===node.catalog_number)?.id)??source.values().next().value),node_id:node.id,node_definition:structuredClone(node),definition_hash:'a'.repeat(64),utc:stamp,interpolated:false}])};
+  return action?action(value,options,calls):value;
+ };
+ const optical=createNodeOpticalTimeline({resolver:createNodeLinkResolver({library,oisl}),requestCommunicationStates:request,readNodes:()=>nodes,readDisplay:()=>{const value={utc,key:'catalog:sampled',source:'catalog',leap_sha256:LEAP_SHA256};hook?.();return value;},advanceUtc:codec.advance,readContinuity:()=>available?lease:null,verifyContinuity:v=>available&&v===lease});
+ const model=createNetworkSnapshotModel({library,groundLinks:createGroundLinkModel({library,stationModel}),oisl});
+ const network=createNodeNetworkTimeline({model,optical:options.opticalFacade?.(optical)??optical,requestCommunicationStates:request,readNodes:options.readNodes??(()=>nodes),nodeScopeRevision:options.nodeScopeRevision??null,readDisplay:()=>{const value={utc,key:'catalog:sampled',source:'catalog',leap_sha256:LEAP_SHA256};hook?.();return value;},readStations:()=>stations,readFaults:()=>faults,validateNode:library.validateNode,validateStation:stationModel.validateStation,advanceUtc:codec.advance,readContinuity:options.noContinuity?null:()=>available?lease:null,verifyContinuity:options.noContinuity?null:v=>available&&v===lease,onChange:value=>{events.push(value);observer?.(value);}});
+ return {network,optical,calls,events,model,revoke(){lease=Object.freeze({});},set hook(v){hook=v;},unavailable(){available=false;},recover(){available=true;lease=Object.freeze({});},get nodes(){return structuredClone(nodes);},set nodes(v){nodes=structuredClone(v);},get utc(){return utc;},set utc(v){utc=v;},get stations(){return structuredClone(stations);},set stations(v){stations=structuredClone(v);},get faults(){return structuredClone(faults);},set faults(v){faults=structuredClone(v);}};
+}
+
+const until=async predicate=>{for(let i=0;i<100&&!predicate();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(predicate());};
+const close=s=>{s.network.destroy();s.optical.destroy();};
+test('moving display network sample joins unchanged sole optical analysis and source full native network without action approval',async()=>{
+ let finish;const s=setup(async(value,_,calls)=>{if(calls.length===4)await new Promise(resolve=>finish=resolve);return value;});try{const optical=await s.optical.updateSampled(),analysis=s.utc,history=s.optical.historyEntries(),work=s.network.updateSampled();await until(()=>finish);s.utc=codec.advance(s.utc,.5);finish();const view=await work;assert.equal(view.status,'valid');assert.equal(view.presentation_kind,'NETWORK_SAMPLED_UI_V1');assert.equal(view.utc,analysis);assert.equal(view.analysis_utc,analysis);assert.equal(view.display_utc,s.utc);assert.equal(view.age_seconds,.5);assert.equal(view.current_analysis,false);assert.equal(view.availability,'sampled');assert.equal(view.reason,'current_analysis_unavailable');assert.equal(view.network.time,new Date(Date.parse(analysis)).toISOString());assert.equal(s.network.verifySampledPresentation(view,{utc:s.utc,nodes:s.nodes}),true);assert.equal(s.network.verifySnapshot(view),false);assert.equal(s.network.snapshot().status,'unavailable');assert.equal(s.calls.length,4);assert.deepEqual(s.optical.historyEntries(),history);const states=new Map(scenario.rows.at(-1).input.states),expected=s.model.buildNetworkSnapshot({date:Date.parse(analysis),nodes:s.nodes,states,pairs:optical.pairs,stations:s.stations,faults:s.faults});assert.deepEqual(view.network,expected);assert.ok(Object.isFrozen(view.network.links));}finally{finish?.();close(s);}
+});
+for(const change of ['node','station','fault','lease','sourcegap','optical','clear','destroy'])test(`sampled network pending publication rejects ${change} invalidation`,async()=>{
+ let finish;const s=setup(async(v,_,calls)=>{if(calls.length===4)await new Promise(resolve=>finish=resolve);return v;});try{await s.optical.updateSampled();const work=s.network.updateSampled();await until(()=>finish);if(change==='node'){const nodes=s.nodes;nodes[0].notes='changed';s.nodes=nodes;}else if(change==='station')s.stations=s.stations.map(st=>({...st,dish_m:st.dish_m+1}));else if(change==='fault')s.faults=[{kind:'node_outage',target:s.nodes[0].id,active:true}];else if(change==='lease')s.revoke();else if(change==='sourcegap')s.unavailable();else if(change==='optical')s.optical.resetHistories();else if(change==='clear')s.network.clear();else s.network.destroy();finish();assert.notEqual((await work)?.status,'valid');assert.notEqual(s.network.sampledPresentation().status,'valid');}finally{finish?.();close(s);}
+});
+
+for(const failure of ['missing','duplicate','hash','utc','frame','axes','geodetic','throw'])test(`sampled full native ${failure} failure clears retained network`,async()=>{
+ let bad=false;const s=setup(value=>{if(bad){if(failure==='missing')value.states.pop();else if(failure==='duplicate')value.states.push(value.states[0]);else if(failure==='hash')value.states[0][1].definition_hash='b'.repeat(64);else if(failure==='utc')value.states[0][1].utc=codec.advance(value.utc,1);else if(failure==='frame')value.states[0][1].frame='ITRF';else if(failure==='axes')value.states[0][1].basis.x=[0,0,0];else if(failure==='geodetic')value.states[0][1].geodetic.latitude=91;else throw Error('native failed');}return value;});try{await s.optical.updateSampled();await s.network.updateSampled();s.network.clear();bad=true;const result=await s.network.updateSampled();assert.equal(result.status,'error');assert.equal(result.network,null);assert.equal(s.network.verifySampledPresentation(result,{utc:s.utc}),false);}finally{close(s);}
+});
+test('sampled private registration, frame UTC and sameUTC revocation cannot authorize exact or resurrect after cancellation',async()=>{
+ const s=setup();try{await s.optical.updateSampled();const view=await s.network.updateSampled(),raw=s.network.snapshot();assert.equal(s.network.verifySnapshot(raw),true);assert.equal(s.network.verifySnapshot(view),false);assert.equal(s.network.verifySampledPresentation(structuredClone(view),{utc:s.utc}),false);assert.equal(s.network.verifySampledPresentation(view,{utc:s.utc,nodes:[]}),false);s.revoke();assert.equal(s.network.verifySnapshot(raw),false);assert.notEqual(s.network.snapshot().status,'valid');assert.notEqual(s.network.presentation().proof.status,'valid');s.network.cancelSampled();assert.notEqual(s.network.snapshot().status,'valid');assert.equal(s.network.verifySampledPresentation(view,{utc:s.utc}),false);const exact=await s.network.update();assert.equal(exact.status,'valid');assert.equal(s.network.verifySnapshot(exact),true);}finally{close(s);}
+});
+test('network query never advances optical history, deduplicates sampled work and serially drains cancel before exact preemption',async()=>{
+ let finish;const s=setup(async(v,_,calls)=>{if(calls.length===4)await new Promise(resolve=>finish=resolve);return v;});try{await s.optical.updateSampled();const history=s.optical.historyEntries(),sample=s.network.updateSampled();await until(()=>finish);s.utc=codec.advance(s.utc,1);assert.equal(s.network.updateSampled(),sample);s.network.cancelSampled();const exact=s.network.update();assert.equal(s.network.update(),exact,'same exact current requests must share even while old sampled transport drains');await new Promise(resolve=>setImmediate(resolve));assert.equal(s.calls.length,4);assert.equal(s.calls[3].signal.aborted,true);finish();assert.notEqual((await sample)?.status,'valid');assert.equal((await exact).status,'valid');assert.equal(s.calls.length,6);assert.notDeepEqual(s.optical.historyEntries(),history,'exact update advances the existing optical owner once at its new UTC');}finally{finish?.();close(s);}
+});
+test('next optical analysis pending retains verified old network analysis with explicit pending availability until failure',async()=>{
+ let gate=false,finish;const s=setup(async v=>{if(gate)await new Promise((resolve,reject)=>finish=()=>reject(Error('native failure')));return v;});try{await s.optical.updateSampled();const old=await s.network.updateSampled();s.utc=codec.advance(s.utc,1);gate=true;const work=s.optical.updateSampled();await until(()=>finish);const view=s.network.sampledPresentation();assert.equal(view.status,'valid');assert.equal(view.availability,'pending');assert.equal(view.analysis_utc,old.analysis_utc);assert.equal(view.display_utc,s.utc);assert.equal(s.network.verifySampledPresentation(view,{utc:s.utc}),true);finish();await work;assert.notEqual(s.network.sampledPresentation().status,'valid');}finally{finish?.();close(s);}
+});
+test('optional absent continuity and sampled optical ports leave generic exact calculation intact',async()=>{
+ const s=setup(undefined,undefined,{noContinuity:true});try{assert.notEqual((await s.network.updateSampled()).status,'valid');assert.equal(s.calls.length,0);assert.equal((await s.network.update()).status,'valid');assert.equal(s.network.verifySnapshot(s.network.snapshot()),true);}finally{close(s);}
+});
+test('full240 roster, all24 stations and complete faults/hashes survive registered network publication',async()=>{
+ const s=setup(undefined,undefined,{count:240});try{s.stations=Array.from({length:24},(_,i)=>({...s.stations[0],id:'ST-'+i,name:'station '+i,enabled:i!==23}));s.faults=[{kind:'node_outage',target:s.nodes[239].id,active:true}];await s.optical.updateSampled();const history=s.optical.historyEntries(),view=await s.network.updateSampled();assert.equal(view.status,'valid');assert.deepEqual(view.node_definitions,s.nodes);assert.deepEqual(view.stations,s.stations);assert.deepEqual(view.faults,s.faults);assert.equal(Object.keys(view.definition_hashes).length,240);assert.equal(view.network.nodes.length,263);assert.equal(s.calls.length,4);assert.deepEqual(s.optical.historyEntries(),history);assert.equal(s.network.verifySampledPresentation(view,{utc:s.utc,nodes:s.nodes}),true);const sites=s.stations;sites[23].dish_m++;s.stations=sites;assert.equal(s.network.verifySampledPresentation(view,{utc:s.utc}),false);}finally{close(s);}
+});
+
+test('sameUTC reentrant display getters cannot publish or verify a registered network proof after lease revocation',async()=>{
+ const baseline=setup(undefined,undefined,{count:1});let reads=0;try{await baseline.optical.updateSampled();const view=await baseline.network.updateSampled();baseline.hook=()=>reads++;assert.equal(baseline.network.verifySampledPresentation(view,{utc:baseline.utc}),true);}finally{close(baseline);}
+ assert.ok(reads>0);for(let position=1;position<=reads;position++){const s=setup(undefined,undefined,{count:1});try{await s.optical.updateSampled();const view=await s.network.updateSampled();let seen=0,revoked=false;s.hook=()=>{if(++seen===position){revoked=true;s.revoke();}};assert.equal(s.network.verifySampledPresentation(view,{utc:s.utc}),false,`revoke at callback ${position}`);assert.equal(revoked,true);}finally{close(s);}}
+});
+
+test('observed optical authority gap cannot resurrect the prior network approval after identical sameUTC recovery',async()=>{
+ const s=setup(undefined,undefined,{count:1});try{await s.optical.updateSampled();const old=await s.network.updateSampled();s.optical.resetHistories();assert.notEqual(s.network.sampledPresentation().status,'valid');await s.optical.updateSampled();assert.notEqual(s.network.sampledPresentation().status,'valid');assert.equal(s.network.verifySampledPresentation(old,{utc:s.utc}),false);const calls=s.calls.length,fresh=await s.network.updateSampled();assert.equal(fresh.status,'valid');assert.equal(s.calls.length,calls+1,'same content still requires a fresh full native network join after revocation');}finally{close(s);}
+});
+
+for(const method of ['verifySnapshot','presentation'])test(`sample-origin exact ${method} refuses sameUTC lease revocation from final context getters`,async()=>{
+ const baseline=setup(undefined,undefined,{count:1});let reads=0;const check=(s,raw)=>method==='verifySnapshot'?s.network.verifySnapshot(raw):s.network.presentation().verified;try{await baseline.optical.updateSampled();await baseline.network.updateSampled();const raw=baseline.network.snapshot();baseline.hook=()=>reads++;assert.equal(check(baseline,raw),true);}finally{close(baseline);}
+ for(let position=1;position<=reads;position++){const s=setup(undefined,undefined,{count:1});try{await s.optical.updateSampled();await s.network.updateSampled();const raw=s.network.snapshot();let seen=0,revoked=false;s.hook=()=>{if(++seen===position){revoked=true;s.revoke();}};assert.equal(check(s,raw),false,`sameUTC revoke at read ${position}`);assert.equal(revoked,true);}finally{close(s);}}
+});
+
+test('pending observer reentry shares the initialized sampled promise without a second calculation',async()=>{
+ let s,armed=false,reentered;try{s=setup(undefined,()=>{if(armed){armed=false;reentered=s.network.updateSampled();}}, {count:1});await s.optical.updateSampled();armed=true;const work=s.network.updateSampled();assert.equal(typeof reentered?.then,'function');assert.equal(work,reentered);assert.equal((await work).status,'valid');assert.equal(s.calls.length,4);}finally{if(s)close(s);}
+});
+for(const copy of [false,true])test(`network refuses copied optical registration before native query (frozen=${copy})`,async()=>{
+ const freeze=v=>{if(v&&typeof v==='object'){Object.values(v).forEach(freeze);Object.freeze(v);}return v;};const s=setup(undefined,undefined,{count:1,opticalFacade:owner=>({...owner,sampledPresentation:()=>{const v=structuredClone(owner.sampledPresentation());return copy?freeze(v):v;}})});try{await s.optical.updateSampled();assert.notEqual((await s.network.updateSampled()).status,'valid');assert.equal(s.calls.length,3);}finally{close(s);}
+});

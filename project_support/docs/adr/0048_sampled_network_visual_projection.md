@@ -119,3 +119,17 @@ Viewer replacement, native endpoint failure/morph/toggle/disposal, separate UI
 historical labels and no fabricated fabric quality. Run old exact regressions,
 whole suites and actual two-resolution mounted composition; actual GPU/live/remote
 acceptance remains separate. All T032 tolerances and full T075–T084 scope remain.
+
+Implementation checkpoint: root composes optical then network through the same
+timer and opaque lease. It records the verified lease at sampled dispatch because
+play at the same UTC can register without a display-context callback. Fault-input
+changes compare their complete current value before invalidating and forcing this
+same scheduler. Recursive notifications see the installed signature and do not
+start another refresh. Exact approval and histories stay with their existing owners.
+
+The diagram adds optional unverifiedAnalysis without changing default source
+outputs. Ten golden output cases are captured from Git36821fb with preserved LF
+and CRLF source fingerprints. Sampled mode removes quality, routes, custody and
+flow claims even if borrowed options supply them. Renderer final callbacks use
+bounded provider and private-owner rechecks; the terminal private verifier remains
+observational and must not mutate renderer resources.

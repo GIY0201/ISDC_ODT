@@ -7,8 +7,16 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
  const editor=createGroundStationEditorTools({model,escape}),removers=[];
  const routeChoice={source:'',target:'',objective:'balanced'};
  let passReceipt=null,passAbort=null,passGeneration=0,passBusy=false,passError='',passStation='',passPage=0;
- let selection=null,groundLinksVisible=true,coverageVisible=true;
+ let selection=null,groundLinksVisible=true,coverageVisible=true,paintGeneration=0;
+ const hasSampled=typeof network.networkSampledPresentation==='function'&&typeof network.verifySampledNetworkPresentation==='function';
  const get=id=>root?.querySelector('#ground-node-'+id);
+ function clearSampledUi(){
+  if(!hasSampled||!root)return;
+  for(const id of ['diagram','diagram-detail','results','fabric-results','fabric-custody','fabric-hops']){const item=get(id);if(item){item.textContent='';item.innerHTML='';}}
+  for(const id of ['summary','diagram-status']){const item=get(id);if(item)item.textContent='현재 UTC·입력의 검증된 노드 통신망 결과 없음';}
+  for(const id of ['prev','next','scene-links','scene-coverage','fabric-send','fabric-route']){const item=get(id);if(item)item.disabled=true;}
+  const path=get('fabric-path'),dtn=get('fabric-dtn');if(path)path.textContent='현재 통신망의 경로 결과 미확인';if(dtn)dtn.textContent='현재 통신망의 DTN 결과 미확인';
+ }
  function listen(element,event,handler){element.addEventListener(event,handler);removers.push(()=>element.removeEventListener(event,handler));}
  function attempt(action){if(dead)return;try{message='';action();}catch(error){message=String(error.message);}update();}
  function pendingEditor(){
@@ -97,6 +105,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
  function update(){
   if(dead||view!=='ground')return;
   if(!root||document.getElementById(root.id)!==root){const draft=pendingEditor();for(const remove of removers.splice(0))remove();root=null;editorId=null;mount();restoreEditor(draft);}
+  const paintRoot=root,ticket=++paintGeneration,current=()=>!dead&&view==='ground'&&root===paintRoot&&paintGeneration===ticket;
   const presets=store.availablePresets(),value=get('preset').value;
   const options=presets.map(p=>`<option value="${escape(p.key)}">${escape(p.name)} · ${escape(p.region)}</option>`).join('')+'<option value="custom">직접 입력 (위도·경도)</option>';
   if(get('preset').innerHTML!==options)get('preset').innerHTML=options;
@@ -106,21 +115,32 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   get('calculate').disabled=busy||!store.ready||externalPending;
   get('status').textContent=externalPending?'다른 창의 지상국 변경이 있습니다. 편집 내용을 보존했습니다. 확인 후 다시 불러오세요.':store.error||message||`지상국 ${store.stations.length}개 · ${store.persistence==='memory_only'?'메모리만 사용 · 영구 저장 없음':'브라우저 설정'}`;
   const snapshot=network.networkSnapshot(),valid=store.ready&&!externalPending&&snapshot?.status==='valid'&&network.verifyNetworkSnapshot(snapshot);
-  renderFabric(snapshot,valid);renderContacts();
+  if(!current())return;
+  let sampled=null;
+  if(!valid&&hasSampled&&store.ready&&!externalPending){try{const value=network.networkSampledPresentation();if(!current())return;if(value?.presentation_kind==='NETWORK_SAMPLED_UI_V1'&&value.status==='valid'&&network.verifySampledNetworkPresentation(value,{utc:value.display_utc})===true)sampled=value;}catch{/* Unavailable authority is not a current network result. */}}
+  if(!current())return;
+  const visual=valid?snapshot:sampled,visualValid=valid||sampled!==null;
+  const visualCurrent=()=>{try{return current()&&(!sampled||network.verifySampledNetworkPresentation(sampled,{utc:sampled.display_utc})===true)&&current();}catch{return false;}};
+  try{
+  if(!renderFabric(snapshot,valid,visual,visualValid,sampled!==null,visualCurrent)){if(current())clearSampledUi();return;}
+  if(!visualCurrent()){if(current())clearSampledUi();return;}renderContacts();if(!visualCurrent()){if(current())clearSampledUi();return;}
   get('results').textContent='';get('results').innerHTML='';
-  if(!valid){get('summary').textContent=snapshot?.error||'현재 UTC·입력의 검증된 노드 통신망 결과 없음';get('prev').disabled=true;get('next').disabled=true;return;}
-  const links=snapshot.network.links;page=Math.min(page,Math.max(0,Math.ceil(links.length/50)-1));
+  if(!visualValid){get('summary').textContent=snapshot?.error||'현재 UTC·입력의 검증된 노드 통신망 결과 없음';get('prev').disabled=true;get('next').disabled=true;return;}
+  const links=visual.network.links;page=Math.min(page,Math.max(0,Math.ceil(links.length/50)-1));
   const rows=links.slice(page*50,(page+1)*50);
-  get('summary').textContent=`표시 UTC ${snapshot.utc} · 노드 ${snapshot.network.nodes.length}개 · 링크 ${links.length}개 · ${page+1}/${Math.max(1,Math.ceil(links.length/50))}페이지 · GMST/UTC 근사 · 공학 가정 · 실제 RF 연결 미확인 · 모의 통신 결과는 아래에서 별도 조회`;
+  get('summary').textContent=sampled?`분석 UTC ${sampled.analysis_utc} · 표시 UTC ${sampled.display_utc} · 분석 경과 ${Number(sampled.age_seconds).toFixed(3)} s · 현재 분석 ${sampled.current_analysis?'같은 시각':'미확인'}${sampled.availability==='pending'?' · 갱신 중':''} · 노드 ${visual.network.nodes.length}개 · 링크 ${links.length}개 · ${page+1}/${Math.max(1,Math.ceil(links.length/50))}페이지 · GMST/UTC 근사 · 공학 가정 · 현재 통신 품질·실제 RF 연결 미확인`:`표시 UTC ${snapshot.utc} · 노드 ${snapshot.network.nodes.length}개 · 링크 ${links.length}개 · ${page+1}/${Math.max(1,Math.ceil(links.length/50))}페이지 · GMST/UTC 근사 · 공학 가정 · 실제 RF 연결 미확인 · 모의 통신 결과는 아래에서 별도 조회`;
   get('results').innerHTML='<table><thead><tr><th>링크</th><th>종류</th><th>모의 계산 기록</th></tr></thead><tbody>'+rows.map(link=>`<tr><td>${escape(link.id)}</td><td>${escape(link.kind)}</td><td><details><summary>단위·기하·상태 확인</summary><pre style="max-width:28rem;white-space:pre-wrap">${escape(JSON.stringify(link,null,2))}</pre></details></td></tr>`).join('')+'</tbody></table>';
   get('prev').disabled=page===0;get('next').disabled=(page+1)*50>=links.length;
+  if(!visualCurrent()&&current())clearSampledUi();
+  }catch(error){if(!sampled)throw error;if(current())clearSampledUi();}
  }
- function renderFabric(snapshot,valid){
-  const state=fabric?.snapshot(),pending=state?.pending===true,receipt=valid?state?.receipt:null;
+ function renderFabric(snapshot,valid,visual=snapshot,visualValid=valid,sampled=false,current=()=>true){
+  const state=fabric?.snapshot();if(!current())return false;
+  const pending=state?.pending===true,receipt=valid?state?.receipt:null;
   get('fabric-send').disabled=!fabric||!valid||busy||pending||state.refresh_required;
   get('fabric-send').textContent=state?.retry_available?'동일 요청 재시도':'계산된 통신망 전송';
   get('fabric-refresh').disabled=!fabric||pending||busy;
-  const nodes=valid?snapshot.network.nodes:[],options='<option value="">노드 선택</option>'+nodes.map(node=>`<option value="${escape(node.id)}">${escape(node.name||node.id)}</option>`).join('');
+  const nodes=visualValid?visual.network.nodes:[],options='<option value="">노드 선택</option>'+nodes.map(node=>`<option value="${escape(node.id)}">${escape(node.name||node.id)}</option>`).join('');
   get('fabric-route').disabled=!receipt||pending||busy||!nodes.some(node=>node.id===routeChoice.source)||!nodes.some(node=>node.id===routeChoice.target);
   for(const field of ['source','target']){const select=get('fabric-'+field);if(select.innerHTML!==options)select.innerHTML=options;select.value=nodes.some(node=>node.id===routeChoice[field])?routeChoice[field]:'';}
   get('fabric-objective').value=routeChoice.objective;
@@ -134,11 +154,12 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   const table=(heads,rows)=>'<table><thead><tr>'+heads.map(h=>'<th>'+escape(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.slice(passPage*50,(passPage+1)*50).map(row=>'<tr>'+row.map(cell=>'<td>'+escape(cell)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
   get('fabric-custody').innerHTML=receipt?table(['노드','모의 보관 상태','보관 MB','용량 MB','생성 Mbps','다음 홉'],(receipt.nodes??[]).map(node=>[name(node.id),diagram?.CUSTODY_LABELS?.[node.custody]||node.custody||'미확인',format(node.stored_mb),format(node.capacity_mb),format(node.generation_mbps),node.next_hop?name(node.next_hop):'—'])):'';
   get('fabric-hops').innerHTML=route?.status==='available'?table(['#','구간','종류','지연 ms','용량 Gbps','품질 %'],(route.hop_list??[]).map((hop,index)=>[index+1,name(hop.from)+' → '+name(hop.to),diagram?.LINK_KIND_LABELS?.[hop.kind]||hop.kind,format(hop.delay_ms),Number.isFinite(hop.capacity_mbps)?format(hop.capacity_mbps/1000):'미확인',format(hop.quality)])):'';
-  renderDiagram(snapshot,valid,receipt,route);
-  get('scene-links').disabled=!networkScene||!valid;get('scene-links').setAttribute('aria-pressed',String(groundLinksVisible));
-  get('scene-coverage').disabled=!networkScene||!valid;get('scene-coverage').setAttribute('aria-pressed',String(coverageVisible));
-  if(valid&&networkScene){networkScene.setGroundLinksVisible(groundLinksVisible);networkScene.setCoverageVisible(coverageVisible);networkScene.setSnapshot({snapshot,receipt,route,selectedLinkId:selection?.type==='link'?selection.id:null});}else networkScene?.clear();
+  if(!renderDiagram(visual,visualValid,receipt,route,sampled,current)||!current())return false;
+  get('scene-links').disabled=!networkScene||!visualValid;get('scene-links').setAttribute('aria-pressed',String(groundLinksVisible));
+  get('scene-coverage').disabled=!networkScene||!visualValid;get('scene-coverage').setAttribute('aria-pressed',String(coverageVisible));
+  if(visualValid&&networkScene){networkScene.setGroundLinksVisible(groundLinksVisible);if(!current())return false;networkScene.setCoverageVisible(coverageVisible);if(!current())return false;if(valid){networkScene.setSnapshot({snapshot,receipt,route,selectedLinkId:selection?.type==='link'?selection.id:null});if(!current())return false;}}else if(!hasSampled){networkScene?.clear();if(!current())return false;}
   get('fabric-path').textContent=route?route.status==='available'?`모의 경로 ${(route.path??[]).join(' → ')} · 지연 ${format(route.total_delay_ms)} ms · 병목 ${format(route.bottleneck_mbps)} Mbps · 신뢰도 ${format(route.reliability)}`:'현재 통신망에서 사용 가능한 모의 경로 없음':'현재 통신망의 경로 결과 미확인';
+  return current();
  }
  function cancelContacts(error=''){
   passGeneration++;passAbort?.abort();passAbort=null;passBusy=false;passReceipt=null;passError=error;
@@ -169,23 +190,27 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   get('pass-status').textContent=`모의 기하 · 승인 UTC ${passReceipt.accepted_context.utc} → ${passReceipt.conditions.end_utc} · 전체 수락 배치 ${passReceipt.node_definitions.length}기 · 선택 지상국 ${rows.length}구간 · ${passPage+1}/${Math.max(1,Math.ceil(rows.length/50))}페이지 · 원본 ${report?.geometry.coverage.resolution_seconds??'미확인'}초 탐색 · 짧은 구간 누락 가능 · 실제 RF 미확인`;
   get('pass-results').innerHTML=rows.length?'<table><thead><tr><th>위성</th><th>AOS UTC</th><th>LOS UTC</th><th>최대 고각 °</th><th>지속 s</th><th>구간 상태</th></tr></thead><tbody>'+rows.slice(passPage*50,(passPage+1)*50).map(row=>'<tr>'+[names.get(row.satellite)||row.satellite,row.start,row.end,row.max_elevation_deg,Number.isFinite(row.duration_seconds)?row.duration_seconds:(Date.parse(row.end)-Date.parse(row.start))/1000,[row.in_progress?'이미 진행 중':'',row.truncated?'조회 범위에서 잘림':''].filter(Boolean).join(' · ')||'구간 완료'].map(v=>'<td>'+escape(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table>':'<p>조회한 범위에서 마스크 위 통과 없음 · RF 연결 상태를 뜻하지 않습니다.</p>';
  }
- function renderDiagram(snapshot,valid,receipt,route){
+ function renderDiagram(snapshot,valid,receipt,route,sampled=false,current=()=>true){
+  if(!current())return false;
   get('diagram').innerHTML='';get('diagram-detail').innerHTML='';
-  get('diagram-status').textContent=!valid?'현재 UTC·입력의 연결도 미확인':!diagram?'연결도 표시 모듈 미확인':receipt?'모의 연결 구조 · 지리적 위치 아님 · 움직이는 선은 실측 패킷이 아님':'모의 노드 배치 · 통신망 미전송으로 링크 품질·보관 상태 미확인';
-  if(!valid||!diagram)return;
+  get('diagram-status').textContent=!valid?'현재 UTC·입력의 연결도 미확인':!diagram?'연결도 표시 모듈 미확인':sampled?`분석 UTC ${snapshot.analysis_utc} · 표시 UTC ${snapshot.display_utc} · 통신 품질·보관 상태·현재 경로 미확인 · 공학 가정`:receipt?'모의 연결 구조 · 지리적 위치 아님 · 움직이는 선은 실측 패킷이 아님':'모의 노드 배치 · 통신망 미전송으로 링크 품질·보관 상태 미확인';
+  if(!valid||!diagram)return current();
   const nodes=snapshot.network.nodes,ids=new Set(nodes.map(node=>node.id));
   const layout=diagram.layoutNetwork({satellites:(snapshot.node_definitions??[]).filter(node=>ids.has(node.id)).map(node=>({id:node.id,name:node.name,raan:node.orbit?.raan,meanAnomaly:node.orbit?.mean_anomaly,formation:node.formation})),stations:(snapshot.stations??[]).filter(station=>station.enabled&&ids.has(station.id))});
+  if(!current())return false;
   const reports=new Map((receipt?.links??[]).map(link=>[link.id,link]));
   // No receipt means unknown link quality, never an invented usable/unusable verdict.
-  const links=receipt?snapshot.network.links.filter(link=>reports.has(link.id)).map(link=>({...link,...reports.get(link.id)})):[];
+  const links=sampled?snapshot.network.links:receipt?snapshot.network.links.filter(link=>reports.has(link.id)).map(link=>({...link,...reports.get(link.id)})):[];
   const states=new Map((receipt?.nodes??[]).map(node=>[node.id,{tone:node.kind==='ground'?(node.serving?.length?'ok':'neutral'):node.ground_path?'ok':node.custody==='full'?'danger':node.custody?'warning':'neutral',title:diagram.CUSTODY_LABELS?.[node.custody]||node.custody||'미확인',badge:Number.isFinite(node.stored_mb)&&node.stored_mb>0?node.stored_mb+' MB':''}]));
   const routeLinkIds=new Set(route?.status==='available'?(route.hop_list??[]).map(hop=>hop.link_id):[]);
   const selected=selection&&((selection.type==='link'&&links.some(link=>link.id===selection.id))||(selection.type==='node'&&ids.has(selection.id)))?selection:null;
-  get('diagram').innerHTML=diagram.diagramMarkup(layout,links,{selected,routeLinkIds,nodeStates:states,showLabels:true,flowTimeSeconds:Number.isFinite(receipt?.elapsed_s)?receipt.elapsed_s:0});
+  const markup=diagram.diagramMarkup(layout,links,{selected,routeLinkIds,nodeStates:states,showLabels:true,flowTimeSeconds:Number.isFinite(receipt?.elapsed_s)?receipt.elapsed_s:0,...sampled?{unverifiedAnalysis:true}:{}});
+  if(!current())return false;get('diagram').innerHTML=markup;
   if(selected){
    const record=selected.type==='link'?links.find(link=>link.id===selected.id):{definition:(snapshot.node_definitions??[]).find(node=>node.id===selected.id)||(snapshot.stations??[]).find(node=>node.id===selected.id),fabric:(receipt?.nodes??[]).find(node=>node.id===selected.id)??null};
    get('diagram-detail').innerHTML='<h4>선택한 모의 '+(selected.type==='link'?'링크':'노드')+'</h4><pre style="white-space:pre-wrap;overflow-wrap:anywhere">'+escape(JSON.stringify(record,null,2))+'</pre>';
   }
+  return current();
  }
  const unsubscribe=store.subscribe(()=>{cancelContacts();network.clearNetwork();update();});
  const external=event=>{
@@ -194,6 +219,6 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   else{store.load();network.clearNetwork();update();}
  };
  host.addEventListener('storage',external);
- return Object.freeze({show(next){view=next;if(next!=='ground'){cancelContacts();networkScene?.clear();}update();},update,hasExternalChange:()=>externalPending,
-  destroy(){if(dead)return;dead=true;cancelContacts();networkScene?.clear();unsubscribe();host.removeEventListener('storage',external);for(const remove of removers.splice(0))remove();root?.remove();root=null;}});
+ return Object.freeze({show(next){paintGeneration++;view=next;if(next!=='ground'){cancelContacts();networkScene?.setActive?.(false);networkScene?.clear();clearSampledUi();}else networkScene?.setActive?.(true);update();},update,hasExternalChange:()=>externalPending,
+  destroy(){if(dead)return;paintGeneration++;clearSampledUi();dead=true;cancelContacts();networkScene?.setActive?.(false);networkScene?.clear();unsubscribe();host.removeEventListener('storage',external);for(const remove of removers.splice(0))remove();root?.remove();root=null;}});
 }

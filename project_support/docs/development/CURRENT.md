@@ -231,3 +231,21 @@ T078/N010/N011과 전체 T075–T084는 미완료 유지. 실제8891 새 factory
 최종 실화면 확인: 새8891 factory의 원본 계획 v2가 feasible3-task로 계산됐고 Chrome에서 commit 수락, 서버 held tasks3개를 확인했다. 이어 abort 수락/서버 committed 빈 명부, 검증용 배치 회수 revision4/빈 노드를 확인했다. 캡처 t078_final_live_committed.json / t078_final_live_cleanup.json / t078_source_mission_chrome.jpg. 사용자 원래 SIM missions/devices/events/run과 GP UTC는 서버 전환 캡처로 보존 대조했다. 검증용 Chrome 초안과 aborted 요청은 검증용 이름으로 남겼다.
 
 최종 fullPython824PASS8existingERFAwarnings210.27s(exit0), fullNode840PASS4873.2648ms(exit0). 실제 compute lifecycle만 이 증거로 수락하며 나머지4종 전체 live lifecycle, 전체 T075–T084/N010/N011/T078, 다중 창/성능/모듈 복원 및 실제 통신 장비 검증은 미완료다. 고정8891 서버는 계속 실행한다. 같은 브랜치의 로컬 커밋으로 남기며 remote push/merge는 수행하지 않는다.
+## 2026-10-07 지상 통신망 분석 표시 연결
+
+기존 광통신과 통신망 소유자를 같은 1초 스케줄러에 순서대로 연결했다.
+전체 노드와 지상국, native hash와 원본 계산 규칙을 유지하며 분석 시각과
+현재 표시 시각을 구분한다. 이전 기하 결과는 현재 통신 품질이나 명령
+승인이 아니다. 화면 이탈, 같은 UTC 권한 철회, 늦은 콜백과 Viewer 교체를
+실패 시험으로 재현하고 수정했다. 원본 연결도 기본 출력 10가지는 변경 전
+Git 출력 해시와 일치한다. 장애 입력 변경은 기존 스케줄러로만 갱신한다.
+
+전체 Node1426PASS0FAIL0SKIP23280.4358ms, Python965PASS1기존PillowSKIP
+8기존ERFA경고230.58s(exit0). 실제 카탈로그 소유자와 전체240노드의 두 해상도
+조립2PASS13334.9982ms. 별도 화면21/renderer25/분석소유자72시험과 독립 검토.
+Context7 공식 Cesium 이벤트·primitive 수명 규칙 대조는
+validation/sampled_optical_connection.md에 기록했다. 실제 GPU 성능이나
+운용 통신 검증으로 주장하지 않는다. N016 실제 화면/GPU, N017 읽기 전용
+조회/통과/품질 이력, N018 정확 권한의 교환, 전체 T075–T084는 계속 열려 있다.
+고정8891 서버, 사용자 실행과 초안, 원본 참조, 같은 Git 브랜치를 보존했다.
+검증 문서: project_support/specs/001-v6-function-integration/validation/sampled_network_connection.md.

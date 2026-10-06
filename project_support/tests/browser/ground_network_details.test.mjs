@@ -41,4 +41,11 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`verified ground SVG, 
  }finally{panel?.destroy();f.dispose();}
 });
 
-test('network diagram pure source matches pinned 1a1e002 bytes',()=>{assert.equal(createHash('sha256').update(readFileSync(new URL('../../../digital_twin/visualization/network_diagram.js',import.meta.url))).digest('hex'),'eab9d9183a691cd6809a96476bf67af28a0acb1fd633bd2526db7059cd67e9af');});
+test('network diagram exact default output preserves pinned source across topology and UI states',()=>{
+ const golden=JSON.parse(readFileSync(new URL('../fixtures/original_network_diagram_outputs.json',import.meta.url),'utf8'));
+ assert.equal(golden.source_commit,'1a1e00297a0301637455b0ef2cf48b2e74576b07');
+ assert.equal(golden.windows_source_sha256,'eab9d9183a691cd6809a96476bf67af28a0acb1fd633bd2526db7059cd67e9af');
+ assert.equal(golden.source_sha256,'b74f2672bedd632aaf1631c2565a3fd6e1d9b7c73ae3fc07252bff7e9c9525fe');
+ assert.equal(golden.cases.length,10);
+ for(const item of golden.cases){const options={...item.options};if(options.routeLinkIds)options.routeLinkIds=new Set(options.routeLinkIds);if(options.nodeStates)options.nodeStates=new Map(options.nodeStates);const output=diagramMarkup(layoutNetwork(item.layout),item.links,options).replace(/\r\n/g,'\n');assert.equal(createHash('sha256').update(output).digest('hex'),item.output_sha256,item.id);}
+});

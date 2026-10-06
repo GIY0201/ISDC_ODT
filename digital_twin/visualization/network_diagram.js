@@ -129,9 +129,10 @@ const shortLabel = (label, limit) => {
 };
 
 // Tag text for a ground contact: station and quality, or the reason it is not usable.
-function tagText(link, station) {
+function tagText(link, station, unverifiedAnalysis=false) {
   const name = shortLabel(station.label, 8);
   if (link.reason === 'fault' || link.faulted) return `${name} 장애`;
+  if (unverifiedAnalysis) return `${name} 미확인`;
   if (link.usable) return `${name} ${Number.isFinite(Number(link.quality)) ? `${link.quality}%` : ''}`.trim();
   return `${name} 가시`;
 }
@@ -154,10 +155,12 @@ function tagPlacement(satellite, index, tagWidth, widest) {
 // links: fabric link reports merged with the twin's link records (kind, a, b, usable, quality,
 // reason, faulted). options: { selected: { type, id }, routeLinkIds: Set, hideUnusable, showLabels }.
 export function diagramMarkup(layout, links = [], options = {}) {
+  const unverifiedAnalysis=options.unverifiedAnalysis===true;
+  if(unverifiedAnalysis)links=links.map(link=>({...link,usable:false,quality:null,reason:link.reason==='fault'?'fault':'unverified_analysis'}));
   const { positions, width, height } = layout;
   const selected = options.selected || null;
-  const routeIds = options.routeLinkIds instanceof Set ? options.routeLinkIds : new Set();
-  const nodeStates = options.nodeStates || new Map();
+  const routeIds = !unverifiedAnalysis&&options.routeLinkIds instanceof Set ? options.routeLinkIds : new Set();
+  const nodeStates = unverifiedAnalysis?new Map():options.nodeStates || new Map();
   const planeMarkup = layout.rings.map(ring => `<g class="nd-plane"><circle cx="${ring.cx}" cy="${ring.cy}" r="${ring.radius}"/><circle class="inner" cx="${ring.cx}" cy="${ring.cy}" r="${ring.radius-24}"/></g>`).join('');
   const planeLabels = layout.rings.map(ring => `<g class="nd-plane-label" transform="translate(${ring.cx},${ring.cy})"><rect x="-66" y="-37" width="132" height="74" rx="8"/><text class="kicker" y="-15" text-anchor="middle">ORBITAL PLANE</text><text class="name" y="5" text-anchor="middle">궤도면 ${String(ring.index+1).padStart(2,'0')}</text><text class="meta" y="25" text-anchor="middle">${ring.count}기 / Ω ${Math.round(ring.raan)}°</text></g>`).join('');
   const groundCount = [...positions.values()].filter(p=>p.kind === 'ground').length;
@@ -173,7 +176,7 @@ export function diagramMarkup(layout, links = [], options = {}) {
     // own connections read first. Nothing is removed; the faded links stay clickable.
     return { routed, isSelected, touchesSelected, dimmed: selected && !routed && !isSelected && !touchesSelected };
   };
-  const titleOf = (link, p, q) => `${p.label} ↔ ${q.label} · ${link.kind} · ${link.usable ? `품질 ${link.quality}%` : link.reason === 'fault' || link.faulted ? '장애' : '사용 불가'}${link.delay_ms != null ? ` · ${Number(link.delay_ms).toFixed(1)} ms` : ''}`;
+  const titleOf = (link, p, q) => `${p.label} ↔ ${q.label} · ${link.kind} · ${link.usable ? `품질 ${link.quality}%` : link.reason === 'fault' || link.faulted ? '장애' : unverifiedAnalysis?'통신 품질 미확인 · 분석 시각의 기하':'사용 불가'}${link.delay_ms != null ? ` · ${Number(link.delay_ms).toFixed(1)} ms` : ''}`;
   const isGroundContact = link => {
     const p = positions.get(String(link.a)); const q = positions.get(String(link.b));
     return link.kind === 'ground' && !!p && !!q && (p.kind === 'ground') !== (q.kind === 'ground');
@@ -190,7 +193,7 @@ export function diagramMarkup(layout, links = [], options = {}) {
   for (const link of ordered.filter(isGroundContact)) {
     const p = positions.get(String(link.a)); const q = positions.get(String(link.b));
     const satellite = p.kind === 'ground' ? q : p; const station = p.kind === 'ground' ? p : q;
-    const text = tagText(link, station);
+    const text = tagText(link, station, unverifiedAnalysis);
     const list = perSatellite.get(satellite) || [];
     list.push({ link, satellite, station, text, width: Math.round(18 + textUnits(text) * 5.4) });
     perSatellite.set(satellite, list);
