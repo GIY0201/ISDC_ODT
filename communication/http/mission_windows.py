@@ -52,8 +52,24 @@ router=APIRouter(prefix='/api/nodes',tags=['mission-windows'],route_class=NodeGe
 async def mission_windows(request:Request,command:MissionWindowRequest)->dict:
     port:MissionWindowPort|None=getattr(request.app.state,'mission_window_query',None)
     if port is None:raise HTTPException(503,'Native mission geometry unavailable')
-    try:return await port.calculate(command.nodes,[site.contract() for site in command.sites],command.start_utc,command.end_utc,command.request_id,
-        target=command.target.contract() if command.target else None,external=command.external.model_dump() if command.external else None,max_external_range_km=command.max_external_range_km)
+    accepted=None
+    expected=request.headers.get('X-ISDC-Mission-Context')
+    def current_context():
+        value=request.app.state.runtime.mission_context()
+        if value is None or value['context_hash']!=expected or value['nodes']!=command.nodes or value['utc']!=command.start_utc:
+            raise HTTPException(409,'accepted native mission context changed')
+        sites=[{'station_id':s['id'],'ground_point':{'latitude_deg':s['latitude'],'longitude_deg':s['longitude'],'ellipsoid_height_m':s.get('altitude_km',0)*1000},'minimum_elevation_deg':s.get('min_elevation_deg',0)} for s in value['stations']]
+        given=[{'station_id':s.station_id,'ground_point':{'latitude_deg':s.ground_point.latitude_deg,'longitude_deg':s.ground_point.longitude_deg,'ellipsoid_height_m':s.ground_point.ellipsoid_height_m},'minimum_elevation_deg':s.minimum_elevation_deg} for s in command.sites]
+        external=command.external.model_dump() if command.external else None
+        if given!=sites or external!=value['external']:raise HTTPException(409,'accepted mission site/external changed')
+        return value
+    if expected is not None:accepted=current_context()
+    try:
+        result=await port.calculate(command.nodes,[site.contract() for site in command.sites],command.start_utc,command.end_utc,command.request_id,
+            target=command.target.contract() if command.target else None,external=command.external.model_dump() if command.external else None,max_external_range_km=command.max_external_range_km)
+        if expected is not None:
+            current_context();result['accepted_context']=accepted
+        return result
     except CatalogGpChanged as error:raise HTTPException(409,str(error)) from error
     except (OrbitBusy,OrbitUnavailable,ImportError,OSError) as error:raise HTTPException(503,str(error)) from error
     except RuntimeError as error:raise HTTPException(502,'Invalid required native mission window result') from error

@@ -1,3 +1,9 @@
+import {createMissionServices} from './missions/mission_services.js';
+import {createSourceMissionPanel} from './tabs/source_missions.js';
+import {createMissionTypes} from '/static/model_library/mission_types.js';
+import {createMissionConstraints} from '/static/simulation/mission_constraints.js';
+import {createOrchestrationClient} from '/static/communication/orchestration.js';
+import {layoutTimeline,timelineMarkup} from '/static/visualization/mission_timeline.js';
 import {createBrowserId} from './browser_identity.js';
 import {createWorkspaceSolar} from './workspace_solar.js?v=t135-r1';
 import {createWorkspaceNodes} from './workspace_nodes.js?v=t151-r1';
@@ -102,13 +108,18 @@ const hilPanel=createHilPanel(api,hilTopology,drawSparkline);
 const simPanel=createSimPanel(api,telemetrySocket,values=>missionPanel.controller.receiveMissions(values),{frame:value=>{kpiPanel.receive(value);hilPanel.receive(value);},status:value=>{kpiPanel.connection(value);hilPanel.connection(value);}});
 const fabric=createFabricExchange({client:createDataFabricClient({fetchImpl:window.fetch.bind(window),storage:{getItem:key=>window.localStorage.getItem(key)},protocol:window.location?.protocol||'http:'}),network:nodeWorkspace,clientId:createBrowserId(window.crypto),onChange:()=>groundNetworkPanel?.update()});
 groundNetworkPanel=createGroundNetworkPanel({store:sourceGround,model:sourceStationModel,network:nodeWorkspace,fabric,document,host:window,refreshRuntime:async()=>{await simPanel.controller.load();const state=simPanel.controller.snapshot();if(!state.runtime||state.error)throw Error(state.error||'SIM 상태 미확인');}});
+const missionTypes=createMissionTypes(nodeLibrary);
+const missionModule=createOrchestrationClient({fetchImpl:window.fetch.bind(window),storage:{getItem:key=>window.localStorage.getItem(key)},protocol:window.location?.protocol||'http:'});
+let sourceMissionPanel=null;const missionClientId=createBrowserId(window.crypto);let missionCounter=0;
+const missionServices=createMissionServices({api,nodes:nodeWorkspace,ground:{get ready(){return sourceGround.ready&&!groundNetworkPanel?.hasExternalChange()&&!sourceMissionPanel?.hasExternalChange();},get enabled(){return sourceGround.enabled;}},readRuntime:()=>{const s=simPanel.controller.snapshot();if(!s.runtime||s.error)throw Error(s.error||'SIM 상태 미확인');return s.runtime;},module:{...missionModule,status:async options=>{await simPanel.controller.load();return missionModule.status(options);}},readExternal:()=>{const s=catalogTimeline.snapshot();return !s.pending&&!s.error?s.selected:null;},library:nodeLibrary,groundLinks:createGroundLinkModel({library:nodeLibrary,stationModel:sourceStationModel}),model:missionTypes,constraints:createMissionConstraints({timeOf:missionTypes.timeOf}),codec:createUtcCodec(LEAP_SHA256),storage:groundStorage,nextRequestId:()=>`${missionClientId}:${++missionCounter}`,onChange:()=>sourceMissionPanel?.update()});
+sourceMissionPanel=createSourceMissionPanel({services:missionServices,model:missionTypes,layoutTimeline,timelineMarkup,document,host:window});
 const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   displayUtc=utc;displayElevation=row?`${row.elevation_deg.toFixed(4)}°`:'자료 준비 중 / 위치 미표시';globe.update(error?{...snapshot,status:'error',error}:snapshot,row,utc);
   const clock=document.getElementById('orbit-display-utc');if(clock)clock.textContent=utc||'미선택';
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();nodeClock?.destroy();groundNetworkPanel?.destroy();fabric.destroy();sourceGround.destroy();nodeWorkspace?.destroy();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();nodeClock?.destroy();groundNetworkPanel?.destroy();fabric.destroy();sourceGround.destroy();nodeWorkspace?.destroy();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();sourceMissionPanel.destroy();missionServices.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   groundNetworkPanel?.update();
@@ -121,6 +132,7 @@ function render(){
   radioPanel.update();
   seriesPanel.update();
   missionPanel.update();
+  sourceMissionPanel?.update();
   simPanel.update();
   kpiPanel.update();
   hilPanel.update();
@@ -149,7 +161,7 @@ function render(){
   panel.querySelector('#orbit-seek').addEventListener('click',()=>{const field=panel.querySelector('#orbit-utc'),utc=field.value.trim();delete field.dataset.dirty;command(()=>client.seek(utc));});
   panel.querySelector('#orbit-epoch').addEventListener('click',()=>{delete panel.querySelector('#orbit-utc').dataset.dirty;command(()=>client.seek(record.epoch_utc));});
 }
-export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);globeViewPanel.show(view);modelPanel.show(view);nodeWorkspace?.show(view);groundNetworkPanel?.show(view);}
+export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);globeViewPanel.show(view);modelPanel.show(view);nodeWorkspace?.show(view);groundNetworkPanel?.show(view);sourceMissionPanel?.show(view);}
 client.load();
 
 export function applyWorkspaceDraft(items,remote=false){

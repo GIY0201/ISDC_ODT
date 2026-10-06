@@ -113,5 +113,5 @@ export function createMissionExecution({store,builder,client,verifyContext,hashC
    return accept(command,clone(receipt));
   }finally{active=false;}
  }
- return Object.freeze({plan,commit:(id,options)=>decide(id,'commit',options),abort:(id,options)=>decide(id,'abort',options),retry,reconcile,snapshot,destroy(){dead=true;emit();}});
+ return Object.freeze({plan,commit:(id,options)=>decide(id,'commit',options),abort:(id,options)=>decide(id,'abort',options),retry,reconcile,snapshot,inspection:id=>records.has(id)?clone(records.get(id).built):null,destroy(){dead=true;emit();}});
 }

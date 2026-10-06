@@ -25,7 +25,7 @@ from user_application.bootstrap import create_runtime
 from user_application.configs.paths import APP_NAME, APP_VERSION, WEB_DIR, VISUALIZATION_DIR, CLIENT_DIR, CATALOG_CACHE_DIR
 
 
-def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None,solar_geometry_query=None,node_geometry_query=None,data_management=None,data_management_bridge=None,data_fabric=None,mission_window_query=None) -> FastAPI:
+def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None,solar_geometry_query=None,node_geometry_query=None,data_management=None,data_management_bridge=None,data_fabric=None,mission_window_query=None,orchestration=None,mission_context_query=None) -> FastAPI:
     from communication.native.orbit_execution import BoundedOrbitExecutor
     from digital_twin.runtime.orbit import OrbitRuntime
     from digital_twin.contracts.orbit import GroundPoint
@@ -97,6 +97,16 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
     app.state.mission_window_query=mission_window_query if mission_window_query is not None else MissionWindowQuery(app.state.node_geometry_query,lambda:app.state.catalog_geometry_query)
     app.include_router(mission_windows_http.router)
     app.include_router(data_deployment_http.router)
+    from digital_twin.runtime.mission_planning.exchange import MissionPlanningExchange
+    from communication.http import orchestration as orchestration_http
+    from communication.http import mission_context as mission_context_http
+    from user_application.mission_context import MissionContextQuery
+    app.state.orchestration=orchestration if orchestration is not None else MissionPlanningExchange()
+    app.state.mission_context_query=mission_context_query
+    if app.state.mission_context_query is None:
+        app.state.mission_context_query=MissionContextQuery(state,app.state.node_geometry_query,app.state.orchestration,lambda:app.state.catalog_geometry_query)
+    app.include_router(orchestration_http.router)
+    app.include_router(mission_context_http.router)
     from digital_twin.runtime.data_fabric.exchange import DataFabricExchange
     from communication.http import data_fabric as data_fabric_http
     app.state.data_fabric = data_fabric if data_fabric is not None else DataFabricExchange()

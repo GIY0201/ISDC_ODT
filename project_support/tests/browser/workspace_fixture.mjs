@@ -47,6 +47,13 @@ import {createNetworkSnapshotModel} from '../../../digital_twin/simulation/brows
 
 // Execute the real window handlers and orbit assembly. Only DOM layout, HTTP,
 // Cesium and scheduling are adapters; expected bounds are acceptance criteria.
+import {createMissionServices} from '../../../user_application/web/scripts/missions/mission_services.js';
+import {createSourceMissionPanel} from '../../../user_application/web/scripts/tabs/source_missions.js';
+import {createMissionTypes} from '../../../digital_twin/model_library/browser/mission_types.js';
+import {createMissionConstraints} from '../../../digital_twin/simulation/browser/mission_constraints.js';
+import {layoutTimeline,timelineMarkup} from '../../../digital_twin/visualization/mission_timeline.js';
+const orchestrationSource=(await readFile(new URL('../../../communication/browser/orchestration.js',import.meta.url),'utf8')).replace('"/static/communication/data_fabric.js"',JSON.stringify(new URL('../../../communication/browser/data_fabric.js',import.meta.url).href));
+const {createOrchestrationClient}=await import(`data:text/javascript;base64,${Buffer.from(orchestrationSource).toString('base64')}`);
 const web=new URL('../../../user_application/web/scripts/',import.meta.url);
 const windowSource=(await readFile(new URL('workspace.js',web),'utf8')).replace(/^import .*;\r?\n/,'');
 const orbitSource=(await readFile(new URL('workspace_orbit.js',web),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/export function /g,'function ');
@@ -132,7 +139,7 @@ export function fixture(width=1280,height=720,options={}){
   Object.assign(context,{createWorkspaceSolar:args=>createWorkspaceSolar({...args,host:win,createDisplay:()=>({setStyle(){},clear(){},update(){},destroy(){}})}),createSatelliteHover,createSatelliteModelPanel,createSatelliteModelSelection,createModelResolver,validateSatelliteManifest,createGlobeViewPanel,createCatalogTrack,createCatalogPasses,createCatalogPassPanel,createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
   // Imported ground UI uses the same adapted document as the VM assembly.
   Object.assign(context,{createBrowserId,createWorkspaceNodes,createNodeLibrary,orbitElements,catalogElements,nodeOisl,NodeScene,createSatelliteNodePanelTools,createNodeClockControls,createUtcCodec,LEAP_SHA256});
-  Object.assign(context,{createGroundSegmentStore,createGroundNetworkPanel,createFabricExchange,createDataFabricClient,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
+  Object.assign(context,{createMissionServices,createSourceMissionPanel,createMissionTypes,createMissionConstraints,createOrchestrationClient,layoutTimeline,timelineMarkup,createGroundSegmentStore,createGroundNetworkPanel,createFabricExchange,createDataFabricClient,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
   globalThis.document=doc;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}

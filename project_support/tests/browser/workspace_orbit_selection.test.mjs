@@ -15,6 +15,12 @@ test('empty UI choice restores server selection without clearing its result or s
     .replace("'./browser_identity.js'",JSON.stringify(new URL('../../../user_application/web/scripts/browser_identity.js',import.meta.url).href))
     // Model composition has dedicated real-assembly tests; this fixture isolates
     // the unchanged stored-orbit select handler and its no-command assertion.
+    .replace(/import \{createMissionServices\} from [^;]+;/,'const createMissionServices=()=>({destroy(){}});')
+    .replace(/import \{createSourceMissionPanel\} from [^;]+;/,'const createSourceMissionPanel=()=>({show(){},update(){},destroy(){}});')
+    .replace(/import \{createMissionTypes\} from [^;]+;/,'const createMissionTypes=()=>({});')
+    .replace(/import \{createMissionConstraints\} from [^;]+;/,'const createMissionConstraints=()=>({});')
+    .replace(/import \{createOrchestrationClient\} from [^;]+;/,'const createOrchestrationClient=()=>({});')
+    .replace(/import \{layoutTimeline,timelineMarkup\} from [^;]+;/,'const layoutTimeline=()=>{},timelineMarkup=()=>{};')
     .replace(/import \{createWorkspaceSolar\} from [^;]+;/,'const createWorkspaceSolar=()=>({destroy(){}});')
     .replace(/import \{createWorkspaceNodes\} from [^;]+;/,'const createWorkspaceNodes=()=>({async start(){},show(){},refresh(){},refreshModels(){},destroy(){}});')
     .replace(/import \{createGroundSegmentStore\} from [^;]+;/,'const createGroundSegmentStore=()=>({load(){},destroy(){}});')

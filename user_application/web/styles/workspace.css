@@ -75,3 +75,41 @@
   box-shadow: 0 0 6px #fff2ad, 0 0 13px rgba(255,183,59,.72);
 }
 .space-sun[hidden] { display: none; }
+
+/* Reused source UTC timeline; isolated source mission form in the approved V6 surface. */
+.source-missions .source-mission-fields, .source-missions #ms-editor { display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-items:end; }
+.source-missions label { display:flex;flex-direction:column;gap:5px; }
+.source-missions #ms-params { grid-column:1 / -1; }
+.source-missions input,.source-missions select { width:100%;min-width:0; }
+.source-missions button { margin:6px 6px 6px 0; }
+.source-missions table { width:100%;border-collapse:collapse;font-size:12px; }
+.source-missions th,.source-missions td { padding:6px;text-align:left;border-bottom:1px solid var(--line); }
+.mt .mt-row rect { fill: transparent; }
+.mt .mt-row.odd rect { fill: color-mix(in srgb, var(--line) 22%, transparent); }
+.mt .mt-row text { fill: var(--text); font-size: 11px; font-weight: 600; }
+.mt .mt-row text.note { fill: var(--orange); font-size: 9px; font-weight: 400; }
+.mt .mt-tick line { stroke: var(--line); stroke-width: 1; }
+.mt .mt-tick.day line { stroke: var(--line-strong); stroke-width: 1.5; }
+.mt .mt-tick text { fill: var(--muted); font-size: 10px; }
+.mt .mt-gutter { stroke: var(--line-strong); stroke-width: 1; }
+.mt .mt-eclipse { fill: color-mix(in srgb, var(--text) 10%, transparent); }
+.mt .mt-contact { fill: color-mix(in srgb, #4ac4ee 32%, transparent); stroke: color-mix(in srgb, #4ac4ee 60%, transparent); stroke-width: .8; }
+.mt .mt-access { fill: color-mix(in srgb, #3ddc84 38%, transparent); stroke: color-mix(in srgb, #3ddc84 70%, transparent); stroke-width: .8; }
+.mt .mt-task { cursor: pointer; outline: none; }
+.mt .mt-task rect { fill: var(--mt-color); stroke: color-mix(in srgb, var(--mt-color) 60%, #000); stroke-width: 1; opacity: .92; }
+.mt .mt-task text { fill: #0b1620; font-size: 10px; font-weight: 700; pointer-events: none; }
+.mt .mt-task.done rect { opacity: .45; }
+.mt .mt-task.running rect { stroke: #fff; stroke-width: 1.6; filter: drop-shadow(0 0 4px var(--mt-color)); }
+.mt .mt-task.other rect { opacity: .3; }
+.mt .mt-task.other text { opacity: .5; }
+.mt .mt-task.infeasible rect { stroke: var(--red); stroke-dasharray: 4 3; }
+.mt .mt-task:hover rect, .mt .mt-task:focus-visible rect { opacity: 1; stroke-width: 2; }
+.mt .mt-task.selected rect { stroke: #fff; stroke-width: 2.4; opacity: 1; filter: drop-shadow(0 0 5px #ffffffaa); }
+.mt .mt-now line { stroke: var(--red); stroke-width: 1.5; }
+.mt .mt-now text { fill: var(--red); font-size: 9px; font-weight: 700; }
+.mt .mt-deadline line { stroke: var(--orange); stroke-width: 1; stroke-dasharray: 4 3; opacity: .55; }
+.mt .mt-deadline text { fill: var(--orange); font-size: 9px; opacity: .8; }
+.mt .mt-deadline.selected line { stroke-width: 2; opacity: 1; }
+.mt .mt-deadline.selected text { font-weight: 700; opacity: 1; }
+html[data-theme="light"] .mt .mt-task.selected rect { stroke: #10213c; filter: none; }
+html[data-theme="light"] .mt .mt-task.running rect { stroke: #10213c; }

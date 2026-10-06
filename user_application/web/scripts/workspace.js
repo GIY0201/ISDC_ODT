@@ -107,7 +107,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView} from './worksp
   function showGroup(index){const [label,views]=groups[index];document.getElementById('launcher-title').textContent=label+' 작업공간';nav.innerHTML=views.map(([id,n])=>`<button type="button" data-view="${id}">${n}</button>`).join('');launcher.hidden=false;document.querySelectorAll('#rail-groups button').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.group)===index)));nav.querySelector('button')?.focus()}
   function openView(view){if(!names[view])return;state.view=view;workWindow.hidden=false;fitWindow();shelf.hidden=true;launcher.hidden=true;render();location.hash=view;screen.focus()}
   bindWorkspaceView(openView);
-  function isDraftField(id){return !['kpi-history','kpi-filter-PASS','kpi-filter-FAIL','kpi-filter-INVALID','mw-mission','mw-task','ground-input','orbit-input','orbit-rate'].includes(id);}
+  function isDraftField(id){return !id.startsWith('ms-')&&!['kpi-history','kpi-filter-PASS','kpi-filter-FAIL','kpi-filter-INVALID','mw-mission','mw-task','ground-input','orbit-input','orbit-rate'].includes(id);}
   function draftScope(id){return id.startsWith('mw-')?{mission_id:document.getElementById('mw-mission')?.value,task_id:document.getElementById('mw-task')?.value}:{};}
   function draftValues(){return [...screen.querySelectorAll('input[id],select[id],textarea[id]')].filter(el=>isDraftField(el.id)).map(el=>({id:el.id,value:el.value,...draftScope(el.id)}));}
   function transferSnapshot(){return {type:'isdc-v6-snapshot',state:{...state},view:state.view,draft:draftValues()};}

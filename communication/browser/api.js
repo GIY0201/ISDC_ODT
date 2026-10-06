@@ -39,8 +39,8 @@ async function rfRequest(payload, { signal } = {}) {
   return data;
 }
 
-async function nodeRequest(path,payload,{signal}={}) {
-  const response=await fetch(path,{cache:'no-store',method:'POST',headers:jsonHeaders,body:JSON.stringify(payload),signal});
+async function nodeRequest(path,payload,{signal,contextHash}={}) {
+  const response=await fetch(path,{cache:'no-store',method:'POST',headers:contextHash?{...jsonHeaders,'X-ISDC-Mission-Context':contextHash}:jsonHeaders,body:JSON.stringify(payload),signal});
   const mediaType=response.headers.get('content-type')?.split(';')[0].trim().toLowerCase();
   if(mediaType!=='application/json')throw new OrbitApiError(response.status,'노드 응답 형식 오류');
   let data;
@@ -49,12 +49,13 @@ async function nodeRequest(path,payload,{signal}={}) {
   return data;
 }
 
-async function missionWindowRequest(payload,{signal}={}) {
-  try{return await nodeRequest('/api/nodes/mission-windows',payload,{signal});}
+async function missionWindowRequest(payload,{signal,contextHash}={}) {
+  try{return await nodeRequest('/api/nodes/mission-windows',payload,{signal,contextHash});}
   catch(error){if(signal?.aborted)signal.throwIfAborted();throw error;}
 }
 
 export const api = {
+  nodeMissionContext: async (payload,{signal}={})=>{try{return await nodeRequest('/api/nodes/mission-context',payload,{signal});}catch(error){if(signal?.aborted)signal.throwIfAborted();throw error;}},
   nodeMissionWindows: missionWindowRequest,
   nodeSamples: (payload,options={}) => nodeRequest('/api/nodes/samples',payload,options),
   nodeTrack: (payload,options={}) => nodeRequest('/api/nodes/track',payload,options),

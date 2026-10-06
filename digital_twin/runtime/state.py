@@ -43,10 +43,47 @@ class RuntimeState:
         self._last_snapshot_second = -1
         self.current_telemetry: dict[str, Any] = {}
         self._data_deployment = {"deployment_id": None, "revision": 0, "nodes": []}
+        self._mission_context = None
         self._deployment_ids: set[str] = set()
         self._data_scope_started_s = self.elapsed_seconds
         self._refresh_telemetry()
         self._emit("runtime.started", "info", "시뮬레이션 런타임 시작")
+
+    def resume_unconfigured_development(self, value: dict) -> None:
+        """Before-start development transition only; reject active deployment/fault owners.
+
+        Uses captured public SIM state. It does not restore hardware or accepted module work.
+        Analysis elapsed time has the existing status API's millisecond precision.
+        """
+        import json, math, re
+        candidate=deepcopy(value)
+        if self._task is not None:raise ValueError('resume requires stopped development runtime')
+        json.dumps(candidate,allow_nan=False)
+        status=candidate['runtime'];deployment=candidate['deployment']
+        if (status.get('mode')!='SIM' or status.get('active_faults')!=[] or deployment.get('nodes')!=[]
+            or deployment.get('revision')!=0 or deployment.get('deployment_id') is not None
+            or deployment.get('run_id')!=status.get('run_id') or deployment.get('scope_id')!=str(status.get('run_id'))+':unconfigured'):
+            raise ValueError('only unconfigured SIM without active faults can resume')
+        if not isinstance(status.get('run_id'),str) or not re.fullmatch(r'RUN-[A-F0-9]{12}',status['run_id']):raise ValueError('invalid captured run id')
+        if status.get('scenario_id') not in {s['id'] for s in self.scenarios}:raise ValueError('captured scenario is not registered')
+        for key in ('elapsed_seconds','speed'):
+            n=status.get(key)
+            if type(n) not in (float,int) or not math.isfinite(n) or n<0 or (key=='speed' and n==0):raise ValueError('invalid captured simulation time/speed')
+        for key in ('sequence','random_seed'):
+            if type(status.get(key)) is not int or status[key]<0:raise ValueError('invalid captured simulation counter')
+        if any(type(status.get(k)) is not bool for k in ('running','recording')):raise ValueError('invalid captured simulation flags')
+        if status.get('scenario_version')!=self.scenario_version or status.get('data_quality') not in ('GOOD','DEGRADED','INVALID'):raise ValueError('invalid captured simulation version/quality')
+        started=datetime.fromisoformat(status['started_at'])
+        if started.tzinfo is None:raise ValueError('captured start time needs timezone')
+        for key,original in [('missions',self.missions),('devices',self.devices)]:
+            items=candidate.get(key)
+            if not isinstance(items,list) or {i.get('id') for i in items}!={i['id'] for i in original} or len(items)!=len(original):raise ValueError('captured model roster changed')
+        events=candidate.get('events')
+        if not isinstance(events,list) or len(events)>200 or any(not isinstance(e,dict) or e.get('run_id')!=status['run_id'] for e in events):raise ValueError('invalid captured event log')
+        # All validation precedes the single owner replacement; no synthetic startup event.
+        for key in ('running','speed','elapsed_seconds','scenario_id','sequence','run_id','mode','scenario_version','random_seed','recording','data_quality'):setattr(self,key,status[key])
+        self.started_at=started;self.faults=[];self._missions.items=candidate['missions'];self.devices=candidate['devices'];self.events=deque(events,maxlen=200)
+        self._data_scope_started_s=self.elapsed_seconds;self._mission_context=None;self._refresh_telemetry()
 
     @property
     def missions(self) -> list[dict]:
@@ -108,6 +145,29 @@ class RuntimeState:
             self._deployment_ids.add(candidate["deployment_id"])
             self._data_scope_started_s = self.elapsed_seconds
             return self.data_deployment()
+
+    def mission_context(self) -> dict | None:
+        """Accepted static analysis inputs, not another running clock or position owner."""
+        value = self._mission_context
+        if value is None or value["deployment"] != self.data_deployment() or value["faults"] != self.status()["active_faults"]:
+            return None
+        return deepcopy(value)
+
+    async def accept_mission_context(self, value: dict) -> dict:
+        from foundation.mission_planning_errors import MissionPlanningConflict
+        async with self._lock:
+            if value["deployment"] != self.data_deployment() or value["faults"] != self.status()["active_faults"]:
+                raise MissionPlanningConflict("mission deployment or faults changed during native verification")
+            self._mission_context = deepcopy(value)
+            return deepcopy(value)
+
+    async def with_mission_context(self, expected_hash: str, consume, *, abort=False):
+        from foundation.mission_planning_errors import MissionPlanningConflict
+        async with self._lock:
+            accepted = self.mission_context()
+            if not abort and (accepted is None or accepted["context_hash"] != expected_hash):
+                raise MissionPlanningConflict("accepted native mission context changed or missing")
+            return await consume(deepcopy(accepted))
 
     async def with_data_deployment(self, consume):
         """Serialize accepted configuration, run reset and the complete ICD exchange."""

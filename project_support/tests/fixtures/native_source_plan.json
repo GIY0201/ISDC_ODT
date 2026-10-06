@@ -1,0 +1,123 @@
+{
+  "time": "2020-07-12T21:16:01.000416000Z",
+  "mission": {
+    "id": "M-native",
+    "kind": "compute",
+    "priority": 1,
+    "window_start": "2020-07-12T21:16:01.000416000Z",
+    "deadline": "2020-07-12T22:16:01.000416000Z",
+    "params": {
+      "input_mb": 10,
+      "output_ratio": 0.1
+    }
+  },
+  "satellites": [
+    {
+      "id": "N-1",
+      "name": "N-1",
+      "mode": "nominal",
+      "formation": null,
+      "capabilities": {
+        "camera": false,
+        "compute_mbps": 200,
+        "storage_gb": 64,
+        "storage_free_mb": 64000,
+        "oisl": false,
+        "rf_bands": [
+          "S"
+        ]
+      },
+      "power": {
+        "generation_w": 1200,
+        "bus_w": 120,
+        "battery_wh": 2000
+      },
+      "busy": []
+    },
+    {
+      "id": "N-2",
+      "name": "N-2",
+      "mode": "nominal",
+      "formation": null,
+      "capabilities": {
+        "camera": false,
+        "compute_mbps": 200,
+        "storage_gb": 64,
+        "storage_free_mb": 64000,
+        "oisl": false,
+        "rf_bands": [
+          "S"
+        ]
+      },
+      "power": {
+        "generation_w": 1200,
+        "bus_w": 120,
+        "battery_wh": 2000
+      },
+      "busy": []
+    }
+  ],
+  "stations": [
+    {
+      "id": "GS-DAEJEON",
+      "name": "Daejeon",
+      "bands": [
+        "S"
+      ]
+    }
+  ],
+  "windows": {
+    "contacts": [
+      {
+        "id": "GS-DAEJEON|N-1|2020-07-12T21:48:59.594Z",
+        "satellite": "N-1",
+        "station": "GS-DAEJEON",
+        "band": "S",
+        "rate_mbps": 2,
+        "uplink_mbps": 0.5,
+        "start": "2020-07-12T21:48:59.594Z",
+        "end": "2020-07-12T21:51:24.907Z",
+        "peak": "2020-07-12T21:50:12.667Z",
+        "max_elevation": 11.5,
+        "in_progress": false
+      }
+    ],
+    "target_access": [],
+    "crosslinks": [],
+    "eclipses": [
+      {
+        "id": "eclipse|N-1|2020-07-12T21:16:50.687916000Z",
+        "satellite": "N-1",
+        "start": "2020-07-12T21:16:50.687916000Z",
+        "end": "2020-07-12T21:31:14.125416000Z",
+        "in_progress": false,
+        "truncated": false
+      },
+      {
+        "id": "eclipse|N-1|2020-07-12T22:50:08.500416000Z",
+        "satellite": "N-1",
+        "start": "2020-07-12T22:50:08.500416000Z",
+        "end": "2020-07-12T23:04:01.000416000Z",
+        "in_progress": false,
+        "truncated": false
+      },
+      {
+        "id": "eclipse|N-2|2020-07-12T22:03:29.125416000Z",
+        "satellite": "N-2",
+        "start": "2020-07-12T22:03:29.125416000Z",
+        "end": "2020-07-12T22:17:37.562916000Z",
+        "in_progress": false,
+        "truncated": false
+      }
+    ]
+  },
+  "mesh": {},
+  "exclude": [],
+  "horizon": {
+    "start": "2020-07-12T21:16:01.000416000Z",
+    "end": "2020-07-12T23:16:01.000416000Z",
+    "faulted_stations": [],
+    "faulted_links": [],
+    "locked_links": 0
+  }
+}

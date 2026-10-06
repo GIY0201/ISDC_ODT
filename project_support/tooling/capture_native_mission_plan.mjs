@@ -1,0 +1,25 @@
+import {readFile} from 'node:fs/promises';
+import {createNodeSampleBuffer} from '../../user_application/web/scripts/nodes/node_timeline.js';
+import {createNodeOpticalTimeline} from '../../user_application/web/scripts/nodes/optical_timeline.js';
+import {createNodeLinkResolver} from '../../user_application/web/scripts/nodes/links.js';
+import * as oisl from '../../digital_twin/simulation/browser/oisl.js';
+import assert from 'node:assert/strict';
+import {writeFile} from 'node:fs/promises';
+import {createNodeLibrary} from '../../digital_twin/model_library/browser/satellite_nodes.js';
+import {orbitElements,catalogElements} from '../../digital_twin/simulation/browser/node_orbit_definition.js';
+import * as stationModel from '../../digital_twin/model_library/browser/ground_stations.js';
+import {createGroundLinkModel} from '../../digital_twin/simulation/browser/ground_links.js';
+import {createMissionTypes} from '../../digital_twin/model_library/browser/mission_types.js';
+import {createMissionConstraints} from '../../digital_twin/simulation/browser/mission_constraints.js';
+import {createMissionWindowRecords} from '../../user_application/web/scripts/missions/window_records.js';
+import {NODE_COMMUNICATION_METADATA as metadata} from '../../user_application/web/scripts/nodes/node_timeline.js';
+import {createUtcCodec,LEAP_SHA256} from '../../user_application/web/scripts/orbit_utc.js';
+import {createNativeMissionRequestBuilder} from '../../user_application/web/scripts/missions/mission_request.js';
+
+const library=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=> 'EQ'}),types=createMissionTypes(library),codec=createUtcCodec(LEAP_SHA256);
+const native=JSON.parse(await readFile(new URL('../tests/fixtures/native_mission_request.json',import.meta.url),'utf8'));
+const context=structuredClone(native.context),mission=structuredClone(native.mission);
+const buffers=new Map(native.optical_receipts.map(r=>[r.request.start_utc,createNodeSampleBuffer(r.request,r.reply)]));
+const optical=createNodeOpticalTimeline({resolver:createNodeLinkResolver({library,oisl}),readNodes:()=>context.nodes,readDisplay:()=>({utc:context.utc}),advanceUtc:codec.advance,requestCommunicationStates:async utc=>{const buffer=buffers.get(utc);assert.ok(buffer);return {utc,node_definitions:structuredClone(context.nodes),states:context.nodes.map(n=>[n.id,buffer.communicationStateFor(n,{utc})])};}});
+const builder=createNativeMissionRequestBuilder({missionTypes:types,constraints:createMissionConstraints({timeOf:types.timeOf}),windowRecords:createMissionWindowRecords({groundLinkModel:createGroundLinkModel({library,stationModel}),missionTypes:types}),optical,readContext:()=>context,verifyContext:c=>JSON.stringify(c)===JSON.stringify(context),advanceUtc:codec.advance,differenceUtc:codec.difference,requestWindows:async()=>structuredClone(native.bundle)});
+const built=await builder.build(mission,{requestId:native.bundle.request_id});await writeFile(process.argv[2],JSON.stringify(built,null,2));builder.destroy();optical.destroy();console.log('native source contacts',built.request.windows.contacts.length);
