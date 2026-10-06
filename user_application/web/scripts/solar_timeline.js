@@ -1,3 +1,4 @@
+import {createBrowserId} from './browser_identity.js';
 import {createUtcCodec} from './orbit_utc.js';
 const hash=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
 const quality=value=>['ut1','polar_motion'].every(key=>['final_b','observed_a','predicted_a'].includes(value?.[key]));
@@ -6,7 +7,7 @@ const copy=value=>structuredClone(value);
 // A bounded display-input cache. UTC is always supplied by the existing owner;
 // this module owns neither playback, animation callbacks nor a wall clock.
 export function createSolarTimeline(api,onDisplay=()=>{},notify=()=>{},host={}){
- const requestId=host.requestId??(()=>crypto.randomUUID());
+ const requestId=host.requestId??(()=>createBrowserId());
  let dead=false,context=null,codec=null,generation=0,flight=null,buffers=[],pinned=null,failed=null,error='',display=null,direction=1;
  const emit=value=>{display=value;if(!dead){onDisplay(value?copy(value):null);notify();}};
  function cancel(){generation++;flight?.abort.abort();flight=null;}

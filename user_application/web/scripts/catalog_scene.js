@@ -1,3 +1,4 @@
+import {createBrowserId} from './browser_identity.js';
 import {createUtcCodec,LEAP_SHA256} from './orbit_utc.js';
 const copy=v=>structuredClone(v),hash=v=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
 const same=(a,b)=>['group','query','orbit'].every(k=>a?.[k]===b?.[k]);
@@ -5,7 +6,7 @@ const quality=v=>['ut1','polar_motion'].every(k=>['final_b','observed_a','predic
 
 /** Owns presentation snapshots only. Full rows are copied on responses, never RAF. */
 export function createCatalogScene(api,onDisplay=()=>{},notify=()=>{},host={}){
- const now=host.now??(()=>performance.now()),setTimer=host.setTimer??((fn,ms)=>setTimeout(fn,ms)),clearTimer=host.clearTimer??(id=>clearTimeout(id)),requestId=host.requestId??(()=>crypto.randomUUID());
+ const now=host.now??(()=>performance.now()),setTimer=host.setTimer??((fn,ms)=>setTimeout(fn,ms)),clearTimer=host.clearTimer??(id=>clearTimeout(id)),requestId=host.requestId??(()=>createBrowserId());
  const codec=createUtcCodec(LEAP_SHA256),s={context:null,enabled:false,pending:false,result:null,desiredUtc:'',error:'',timings:null};
  const yieldTask=host.yieldTask??(()=>globalThis.scheduler?.yield?globalThis.scheduler.yield():new Promise(resolve=>setTimeout(resolve,0)));
  let dead=false,generation=0,abort=null,timer=null,lastStarted=-Infinity,full=null,byId=new Map();

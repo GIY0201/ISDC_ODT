@@ -1,10 +1,11 @@
+import {createBrowserId} from '../browser_identity.js';
 import {createUtcCodec} from '../orbit_utc.js';
 const escape=value=>String(value??'미확인').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pointEqual=(a,b)=>a&&b&&['latitude_deg','longitude_deg','ellipsoid_height_m','virtual','ellipsoid'].every(key=>a[key]===b[key]);
 const context=state=>JSON.stringify(state&&[state.revision,state.input_id,state.input_hash,state.eop_sha256,state.leap_sha256,state.frame,state.profile,state.ground_point,state.minimum_elevation_deg]);
 
 // Independent query result copy; selection and time remain owned by the server.
-export function createGroundVisibility(client,api,notify,requestId=()=>crypto.randomUUID()){
+export function createGroundVisibility(client,api,notify,requestId=()=>createBrowserId()){
   let result=null,status='idle',error='',generation=0,abort=null,key=context(client.snapshot().state);
   const snapshot=()=>structuredClone({result,status,error});
   function cancel(){generation++;abort?.abort();abort=null;result=null;status='idle';error='';}

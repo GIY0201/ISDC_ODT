@@ -1,10 +1,11 @@
+import {createBrowserId} from '../browser_identity.js';
 import {createUtcCodec} from '../orbit_utc.js';
 import {validateRadioResponse} from './orbit_radio.js?v=t048-r3';
 import {createRfReceiveProfile,profileMarkup} from './rf_receive_profile.js?v=t039-r1';
 import {seriesMarkup} from '/static/visualization/orbit_radio_series.js?v=t053-r2';
 const context=s=>JSON.stringify(s&&[s.revision,s.input_id,s.input_hash,s.ground_point,s.minimum_elevation_deg,s.eop_sha256,s.leap_sha256,s.frame,s.profile]);
 const escape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export function createRadioSeries(client,api,notify=()=>{},requestId=()=>crypto.randomUUID()){
+export function createRadioSeries(client,api,notify=()=>{},requestId=()=>createBrowserId()){
  let interval=null,frequency='',result=null,status='idle',error='',generation=0,abort=null,destroyed=false,key=context(client.snapshot().state);
  const snapshot=()=>structuredClone({interval,frequency,result,status,error});
  function cancel(){generation++;abort?.abort();abort=null;result=null;status='idle';error='';}

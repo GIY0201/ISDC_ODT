@@ -1,3 +1,4 @@
+import {createBrowserId} from './browser_identity.js';
 import {createUtcCodec} from './orbit_utc.js';
 import {createSampleBuffer} from './orbit_playback.js';
 const copy=v=>structuredClone(v);
@@ -5,7 +6,7 @@ const samePoint=(a,b)=>['latitude_deg','longitude_deg','ellipsoid_height_m','vir
 const quality=v=>['ut1','polar_motion'].every(k=>['final_b','observed_a','predicted_a'].includes(v?.[k]));
 
 export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}){
- const now=host.now??(()=>performance.now()),requestFrame=host.requestFrame??(fn=>requestAnimationFrame(fn)),cancelFrame=host.cancelFrame??(id=>cancelAnimationFrame(id)),requestId=host.requestId??(()=>crypto.randomUUID());
+ const now=host.now??(()=>performance.now()),requestFrame=host.requestFrame??(fn=>requestAnimationFrame(fn)),cancelFrame=host.cancelFrame??(id=>cancelAnimationFrame(id)),requestId=host.requestId??(()=>createBrowserId());
  const s={selected:null,observer:null,minimumElevation:5,utc:'',playing:false,rate:1,pending:false,buffer:null,display:null,error:''};
  let dead=false,generation=0,abort=null,frame=null,codec=null,sampleBuffer=null,anchorUtc=null,anchorMs=0,lastNotify=-Infinity;
  const emit=()=>{if(!dead)notify();};

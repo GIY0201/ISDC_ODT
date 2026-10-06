@@ -10,6 +10,12 @@ function storage(){const values=new Map();return {getItem:key=>values.get(key)??
 function store(options={}){const lib=library();return createConstellationStore({library:lib,now:()=>epoch,storage:storage(),...options});}
 function view(s){return {drafts:s.drafts,deployed:s.deployed,deployedAt:s.deployedAt,selectedId:s.selectedId,dirty:s.isDirty()};}
 
+test('restore readiness stays false on damaged storage and becomes true only after successful load',()=>{
+ const memory=storage();memory.setItem(DRAFT_KEY,'broken');const s=store({storage:memory});
+ assert.equal(s.loaded,false);assert.throws(()=>s.load(),/손상/);assert.equal(s.loaded,false);assert.equal(memory.getItem(DRAFT_KEY),'broken');
+ memory.setItem(DRAFT_KEY,JSON.stringify({schema:1,nodes:[],sequence:0,selectedId:null,revision:0}));s.load();assert.equal(s.loaded,true);
+});
+
 test('original source store transitions are preserved with verified-receipt injection',async()=>{
  const fixture=JSON.parse(await readFile(new URL('../fixtures/original_constellation.json',import.meta.url),'utf8'));
  const s=store({verifyAcceptance:()=>true});

@@ -1,3 +1,4 @@
+import {createBrowserId} from './browser_identity.js';
 import {createWorkspaceSolar} from './workspace_solar.js?v=t135-r1';
 import {createWorkspaceNodes} from './workspace_nodes.js?v=t151-r1';
 import {createNodeClockControls} from './nodes/clock_controls.js';
@@ -79,7 +80,7 @@ catalogScenePanel=createCatalogScenePanel(catalogScene,()=>catalogTimeline.snaps
 catalogPanel=createCatalogPanel(api,catalogGeometry,{applied:p=>catalogScene.configure(p)});
 modelSelection=createSatelliteModelSelection({api,globe,timeline:catalogTimeline,validateManifest:validateSatelliteManifest,createResolver:createModelResolver});
 const removeModelSelection=catalogPanel.controller.observeSelection(syncModel);
-const nodeLibrary=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>crypto.randomUUID()});
+const nodeLibrary=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>createBrowserId(window.crypto)});
 nodeClock=createNodeClockControls({readContext:()=>nodeWorkspace?.snapshot().display,stored:client,catalog:catalogTimeline,advanceUtc:createUtcCodec(LEAP_SHA256).advance,now:()=>Date.now(),runStored:command});
 nodeWorkspace=createWorkspaceNodes({api,globe,solar,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window),readClock:context=>nodeClock.read(context),clockActions:nodeClock.actions});
 void nodeWorkspace.start().then(()=>nodeWorkspace.show(view));

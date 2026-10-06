@@ -172,7 +172,7 @@ export function createConstellationStore({library,storage=null,now,verifyAccepta
     select(id){const selectedId=state.drafts.some(n=>n.id===id)?id:null;commit({...state,selectedId},'select');return selectedId;},
     get drafts(){return copy(state.drafts);},get deployed(){return copy(state.deployed);},get deployedAt(){return state.deployedAt;},
     get selectedId(){return state.selectedId;},get selected(){return find(state.selectedId);},get revision(){return state.revision;},
-    get deploymentConfirmed(){return confirmed;},get persistence(){return snapshot().persistence;},get error(){return copy(lastError);},snapshot,
+    get loaded(){return loaded;},get deploymentConfirmed(){return confirmed;},get persistence(){return snapshot().persistence;},get error(){return copy(lastError);},snapshot,
     draftItems:()=>copy(state.drafts.map(library.nodeCatalogItem)),deployedItems:()=>copy(state.deployed.map(library.nodeCatalogItem)),
     subscribe(listener){if(typeof listener!=='function')throw new TypeError('listener required');listeners.add(listener);return ()=>listeners.delete(listener);}
   });

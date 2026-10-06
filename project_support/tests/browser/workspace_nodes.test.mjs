@@ -8,9 +8,10 @@ import {NODE_COMMUNICATION_METADATA} from '../../../user_application/web/scripts
 import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
 import {fixture as actualWorkspaceFixture} from './workspace_fixture.mjs';
 
-function fixture({native=false,solar=null,view=null}={}){
+function fixture({native=false,solar=null,view=null,storage=null,storageGetter=null,fetchOverride=null}={}){
  let id=0,context=null,displayListener,rendererFactory,panelOptions,interaction,renderer,removeCount=0;const calls=[],sections=new Map();
- const host={innerWidth:1280,innerHeight:720,localStorage:null,crypto:{randomUUID:()=>`test-${++id}`},setTimeout,clearTimeout,addEventListener(){},removeEventListener(){},confirm:()=>true};
+ const host={innerWidth:1280,innerHeight:720,localStorage:storage,crypto:{randomUUID:()=>`test-${++id}`},setTimeout,clearTimeout,addEventListener(){},removeEventListener(){},confirm:()=>true};
+ if(storageGetter)Object.defineProperty(host,'localStorage',{get:storageGetter});
  const buttons=new Map(['nodes-deploy','nodes-recall','deploy-state'].map(key=>[key,{disabled:false,textContent:'',addEventListener(k,fn){this.fn=fn;},removeEventListener(){}}]));
  const document={getElementById:id=>id==='screen'?{prepend:root=>sections.set(root.id,root)}:sections.get(id)??null,createElement:()=>({querySelector:selector=>buttons.get(selector.slice(1))??null,remove(){sections.delete(this.id);}})};
  const globe={observeDisplayContext(fn){displayListener=fn;fn(context);return()=>removeCount++;},bindNodeRenderer(fn){rendererFactory=fn;return()=>removeCount++;},nodeRendererState:()=>({phase:'ready'}),observeNodeRenderer:()=>()=>removeCount++,setSatelliteModel:(...v)=>calls.push(['model',...v]),clearSatelliteModel:()=>calls.push(['clear']),focusSatelliteModel:()=>{calls.push(['focus']);return true;},releaseSatelliteModel:()=>calls.push(['release'])};
@@ -18,13 +19,34 @@ function fixture({native=false,solar=null,view=null}={}){
  const Scene=class{constructor(options){this.options=options;this.points=new Map();this.labels=new Map();this.models=new Map();}async setNodes(entries){calls.push(['nodes',entries]);this.points=new Map(entries.map(entry=>[entry.id,{show:true}]));}setTheme(value){calls.push(['theme',value]);}setHovered(id){calls.push(['hover',id]);}select(id){calls.push(['select',id]);}setLinks(){}update(){}destroy(){calls.push(['destroy']);}syncFrame(){}setLinksVisible(){}setModelsVisible(){}};
  const library=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>`EQ-${++id}`});
  const tools={workPanelMarkup:()=>'<panel>',createNodeWorkPanel(options){panelOptions=options;return{refresh(){},destroy(){calls.push(['panel-destroy']);}};}};
- const fetchImpl=async(url,options)=>{calls.push(['http',url,options.method]);return{ok:true,json:async()=>({revision:0,run_id:'run',scope_id:'run:unconfigured',deployment_id:null,nodes:[]})};};
+ const fetchImpl=async(url,options)=>{calls.push(['http',url,options.method]);if(fetchOverride)return fetchOverride(url,options);return{ok:true,json:async()=>({revision:0,run_id:'run',scope_id:'run:unconfigured',deployment_id:null,nodes:[]})};};
  const codec=createUtcCodec(LEAP_SHA256),row=utc=>({utc,status:'valid',error_code:null,position_m:[7000000,2,3],inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550});
  const api={nodeSamples:async p=>{calls.push(['samples']);if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>row(codec.advance(p.start_utc,i)))}))};},nodeTrack:async p=>{if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>{const period=orbitElements(node.orbit).period/60;return{node_id:node.id,definition_hash:'a'.repeat(64),period_minutes:period,path_visible:true,rows:Array.from({length:121},(_,i)=>row(codec.advance(new Date(Math.trunc(Date.parse(p.center_utc)+(i-60)*period*60000/120)).toISOString(),0)))};})};}};
  if(view)Object.assign(globe,view);
  const workspace=createWorkspaceNodes({api,globe,solar,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now:()=>1791151272000,resolveModel:()=>({key:'flat',url:'/flat.glb'}),models:()=>[],fetchImpl});
- return{workspace,globe,calls,buttons,sections,context(value){context=value;displayListener(value);},get options(){return panelOptions;},get interaction(){return interaction;},get renderer(){return renderer;},attach(){return renderer=rendererFactory({},{});},get removeCount(){return removeCount;}};
+ return{workspace,host,globe,calls,buttons,sections,context(value){context=value;displayListener(value);},get options(){return panelOptions;},get interaction(){return interaction;},get renderer(){return renderer;},attach(){return renderer=rendererFactory({},{});},get removeCount(){return removeCount;}};
 }
+
+test('damaged draft restore mounts an error without replacing bytes and explicit retry recovers read-only',async()=>{
+ let raw='broken',writes=0;const f=fixture({storage:{getItem:key=>key==='spacetwin-nodes-draft-v1'?raw:null,setItem(){writes++;}}});
+ await assert.doesNotReject(f.workspace.start());f.workspace.show('satellite');assert.ok(f.sections.get('satellite-nodes'));assert.match(f.workspace.snapshot().error,/손상/);assert.equal(f.options.store.loaded,false);assert.equal(raw,'broken');assert.equal(writes,0);
+ assert.equal(f.buttons.get('nodes-deploy').disabled,true);raw=JSON.stringify({schema:1,nodes:[],sequence:0,selectedId:null,revision:0});
+ await f.workspace.retryRestore();assert.equal(f.options.store.loaded,true);assert.equal(f.workspace.snapshot().error,'');assert.equal(writes,0);assert.equal(f.calls.filter(c=>c[0]==='http').every(c=>c[2]==='GET'),true);
+ f.workspace.destroy();await f.workspace.retryRestore();assert.equal(writes,0);
+});
+
+test('denied storage property mounts safely and retry recovers after access returns',async()=>{
+ let denied=true,writes=0;const f=fixture({storageGetter:()=>{if(denied)throw Error('denied');return{getItem:()=>null,setItem(){writes++;}};}});
+ await f.workspace.start();f.workspace.show('satellite');assert.match(f.workspace.snapshot().error,/읽을 수/);assert.equal(f.options.store.loaded,false);assert.equal(f.calls.some(c=>c[0]==='http'),false);
+ denied=false;await f.workspace.retryRestore();assert.equal(f.options.store.loaded,true);assert.equal(f.workspace.snapshot().error,'');assert.equal(writes,0);f.workspace.destroy();
+});
+
+test('server retry is single-flight and GET-only while retaining restored edited drafts',async()=>{
+ let fail=true,finish;const f=fixture({fetchOverride:async()=>{if(fail)throw Error('offline');return new Promise(resolve=>{finish=()=>resolve({ok:true,json:async()=>({revision:0,run_id:'run',scope_id:'run:unconfigured',deployment_id:null,nodes:[]})});});}});
+ await f.workspace.start();f.workspace.show('satellite');const node=f.options.store.add({name:'keep'});assert.match(f.workspace.snapshot().error,/offline/);fail=false;
+ const first=f.workspace.retryRestore(),second=f.workspace.retryRestore();assert.equal(first,second);for(let i=0;i<10&&!finish;i++)await Promise.resolve();finish();await first;
+ assert.equal(f.options.store.selected.name,node.name);assert.equal(f.workspace.snapshot().error,'');assert.equal(f.calls.filter(c=>c[0]==='http').length,2);assert.equal(f.calls.filter(c=>c[0]==='http').every(c=>c[2]==='GET'),true);f.workspace.destroy();
+});
 
 test('source node lighting reads shared preference and delegates without another state owner',async()=>{
  let enabled=false,observer,removed=0,writes=0;const solar={state:()=>({enabled}),observe(fn){observer=fn;fn({enabled});return()=>removed++;},setEnabled(value){enabled=value;writes++;observer({enabled});return true;}};
@@ -103,5 +125,20 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 node lighti
   f.get('globe-mode').value='2d';await f.get('globe-mode').dispatch('change');assert.equal(f.viewers[0].scene.mode,2);assert.equal(f.evaluate('globe.viewState().mode.phase'),'ready');assert.equal(f.counts().commands,before.commands);
   f.get('globe-mode').value='3d';await f.get('globe-mode').dispatch('change');assert.equal(f.viewers.length,1);assert.equal(f.viewers[0].scene.mode,3);
   await f.win.dispatch('pagehide',{persisted:false});assert.equal(f.get('node-lighting').listeners.get('click').size,0);
+ }finally{f.dispose();}
+});
+
+for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 damaged restore retry keeps bytes and cryptographic IDs work without randomUUID ${width}x${height}`,async()=>{
+ let raw='broken',writes=0,reads=0,sequence=0;
+ const storage={getItem:key=>key==='spacetwin-nodes-draft-v1'?raw:null,setItem(key,value){writes++;if(key==='spacetwin-nodes-draft-v1')raw=value;}};
+ const f=actualWorkspaceFixture(width,height,{hash:'#satellite',storage,crypto:{getRandomValues(bytes){bytes.fill(0);bytes[15]=++sequence;return bytes;}},fetch:async()=>{reads++;return{ok:true,json:async()=>({revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]})};}});
+ try{
+  await new Promise(resolve=>setTimeout(resolve,10));assert.match(f.get('deploy-state').textContent,/손상/);assert.equal(raw,'broken');assert.equal(writes,0);assert.equal(reads,0);
+  const retry=f.get('nodes-restore');assert.equal(retry.disabled,false);raw=JSON.stringify({schema:1,nodes:[],sequence:0,selectedId:null,revision:0});await retry.dispatch('click');
+  for(let i=0;i<30&&f.evaluate('nodeWorkspace.snapshot().error');i++)await Promise.resolve();
+  assert.equal(f.evaluate('nodeWorkspace.snapshot().error'),'');assert.equal(writes,0);assert.equal(reads,1);assert.equal(f.get('nodes-restore'),retry);
+  await f.get('node-add').dispatch('click');assert.equal(f.get('node-count').textContent,'1');assert.ok(sequence>0);assert.equal(f.get('node-editor').hidden,false);
+  const drafts=JSON.parse(raw);for(const equipment of drafts.nodes[0].equipment)assert.match(equipment.id,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+  await f.win.dispatch('pagehide',{persisted:false});assert.equal(retry.listeners.get('click').size,0);
  }finally{f.dispose();}
 });

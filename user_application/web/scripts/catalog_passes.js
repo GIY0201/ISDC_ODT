@@ -1,3 +1,4 @@
+import {createBrowserId} from './browser_identity.js';
 import {createUtcCodec} from './orbit_utc.js';
 const copy=v=>structuredClone(v);
 const key=t=>JSON.stringify(t&&[t.selected?.group,t.selected?.catalog_number,t.selected?.normalized_gp_sha256,t.selected?.epoch_utc,t.selected?.eop_sha256,t.selected?.leap_sha256,t.selected?.profile,t.utc,t.observer,t.minimumElevation]);
@@ -23,7 +24,7 @@ export function createCatalogPasses(api,notify=()=>{},onSeek=()=>{},host={}){
    if(dead)return;cancel();const ticket=generation;
    try{
     if(!context?.selected||!context.observer)throw Error('카탈로그 위성과 관측 지상국을 먼저 선택하세요.');
-    const codec=createUtcCodec(context.selected.leap_sha256),start=codec.advance(context.utc,0),p={group:context.selected.group,catalog_number:context.selected.catalog_number,normalized_gp_sha256:context.selected.normalized_gp_sha256,client_request_id:host.requestId?.()??crypto.randomUUID(),query_start_utc:start,query_end_utc:codec.advance(start,86400),ground_point:copy(context.observer),minimum_elevation_deg:context.minimumElevation};
+    const codec=createUtcCodec(context.selected.leap_sha256),start=codec.advance(context.utc,0),p={group:context.selected.group,catalog_number:context.selected.catalog_number,normalized_gp_sha256:context.selected.normalized_gp_sha256,client_request_id:host.requestId?.()??createBrowserId(),query_start_utc:start,query_end_utc:codec.advance(start,86400),ground_point:copy(context.observer),minimum_elevation_deg:context.minimumElevation};
     abort=new AbortController();s.pending=true;emit();const v=await api.catalogVisibility(p,{signal:abort.signal});
     if(dead||ticket!==generation)return;validate(v,p,codec);s.result=copy(v);
    }catch(e){if(dead||ticket!==generation)return;s.error=String(e.message||e);s.result=null;if(e.status===409)host.onConflict?.();}

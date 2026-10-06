@@ -1,5 +1,6 @@
+import {createBrowserId} from './browser_identity.js';
 // Server snapshots only: never advance UTC or calculate positions in this client.
-export function createOrbitSelection(api, notify, requestId=()=>crypto.randomUUID(),now=()=>performance.now()) {
+export function createOrbitSelection(api, notify, requestId=()=>createBrowserId(),now=()=>performance.now()) {
   let inputs=[], state=null, result=null, status='loading', error='',disposed=false;
   let generation=0, chain=Promise.resolve(), queryAbort=null,queryGeneration=0,fetching=false,receivedAtMs=0;
   const snapshot=()=>structuredClone({inputs,state,result,status,error,fetching,receivedAtMs});

@@ -1,3 +1,4 @@
+import {createBrowserId} from './browser_identity.js';
 import {createUtcCodec} from './orbit_utc.js';
 const copy=v=>structuredClone(v);
 const quality=v=>['ut1','polar_motion'].every(k=>['final_b','observed_a','predicted_a'].includes(v?.[k]));
@@ -5,7 +6,7 @@ const identity=v=>JSON.stringify([v?.group,v?.catalog_number,v?.normalized_gp_sh
 
 // Presentation-owned readonly query. Positions always come from the native/EOP API.
 export function createCatalogTrack(api,onDisplay=()=>{},notify=()=>{},host={}){
- const requestId=host.requestId??(()=>crypto.randomUUID());
+ const requestId=host.requestId??(()=>createBrowserId());
  const s={selected:null,enabled:true,pending:false,result:null,error:''};
  let codec=null,dead=false,generation=0,abort=null,latest=null;
  const emit=()=>{if(!dead)notify();};

@@ -1,8 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
-const source=await readFile(new URL('../../../user_application/web/scripts/orbit_selection.js',import.meta.url),'utf8');
-const {createOrbitSelection}=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+import {createOrbitSelection} from '../../../user_application/web/scripts/orbit_selection.js';
 const state={revision:0,input_id:null,ground_point:{latitude_deg:33.5,longitude_deg:126.5,ellipsoid_height_m:0},minimum_elevation_deg:10,play_rate:1};
 const input={input_id:'tle',raw_sha256:'hash',epoch_utc:'2020-07-12T21:16:01Z'};
 function fixture(overrides={}){let revision=0;return {orbitInputs:async()=>({inputs:[input]}),orbitState:async()=>state,selectOrbit:async p=>({...state,...p,revision:++revision,input_hash:'hash',current_utc:p.anchor_utc}),orbitSamples:async p=>({...p,revision:p.selection_revision,input_hash:'hash',stale:false,rows:[],status:'complete'}),...overrides};}

@@ -1,3 +1,4 @@
+import {createBrowserId} from '../browser_identity.js';
 import {createUtcCodec} from '../orbit_utc.js';
 import {createRfReceiveProfile,profileMarkup} from './rf_receive_profile.js?v=t039-r1';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -14,7 +15,7 @@ export function validateRadioResponse(r,p,s){
   }
   if(r.error_code!==null||metrics.some(k=>typeof r[k]!=='number'||!Number.isFinite(r[k]))||[r.position_m,r.velocity_m_s].some(v=>!Array.isArray(v)||v.length!==3||v.some(x=>typeof x!=='number'||!Number.isFinite(x)))||r.range_m<=0||Math.abs(r.elevation_deg)>90||Math.abs(r.range_rate_m_s)>=c||!close(r.doppler_hz,-p.frequency_hz*r.range_rate_m_s/c)||!close(r.received_frequency_hz,p.frequency_hz+r.doppler_hz))throw Error('거리·도플러 단위 또는 계산 관계가 일치하지 않습니다.');
 }
-export function createOrbitRadio(client,api,notify=()=>{},requestId=()=>crypto.randomUUID()){
+export function createOrbitRadio(client,api,notify=()=>{},requestId=()=>createBrowserId()){
   let draft={utc:'',frequency_mhz:''},result=null,status='idle',error='',generation=0,abort=null,destroyed=false,context='';
   const snapshot=()=>structuredClone({draft,result,status,error});
   function cancel(){generation++;abort?.abort();abort=null;result=null;status='idle';error='';}
