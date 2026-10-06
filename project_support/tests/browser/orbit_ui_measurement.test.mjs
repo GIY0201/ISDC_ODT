@@ -33,3 +33,17 @@ test('input presentation groups related entries by interaction and excludes poin
   const report=summarizeMeasurements({eventTiming:[{visible:'visible',interactionId:0,duration:200},{visible:'visible',interactionId:4,duration:16},{visible:'visible',interactionId:4,duration:24},{visible:'hidden',interactionId:5,duration:200}]});
   assert.equal(report.eventTiming.count,1);assert.equal(report.eventTiming.max,24);assert.equal(report.gates.eventTiming,true);
 });
+
+test('explicit raw download preserves outliers, incomplete trials and context without changing measurements',()=>{
+  const f=fixture(),created=f.host.document.createElement;let blob,download,clicked=false,removed=false,revoked=false,deferred;
+  f.host.Blob=class{constructor(parts,options){blob={parts,options};}};
+  f.host.URL={createObjectURL:()=> 'blob:validation',revokeObjectURL:url=>{assert.equal(url,'blob:validation');revoked=true;}};
+  f.host.setTimeout=callback=>{deferred=callback;};
+  f.host.document.createElement=tag=>tag==='a'?(download={click(){clicked=true;},remove(){removed=true;}}):created(tag);
+  f.listeners['#measure-start']();f.advance(1);f.advance(4001);
+  const before=structuredClone(f.recorder.raw);f.listeners['#measure-download']();
+  const record=JSON.parse(blob.parts[0]);assert.deepEqual(record.raw,before);assert.equal(record.summary.frames.max,4000);
+  assert.equal(record.context.viewport[0],1280);assert.equal(record.raw.events.some(e=>e.id==='frame-trial-complete'),false);
+  assert.deepEqual(f.recorder.raw,before);assert.equal(download.download,'isdc_browser_measurements.json');assert.equal(clicked,true);assert.equal(removed,true);
+  assert.equal(revoked,false);deferred();assert.equal(revoked,true);
+});

@@ -133,23 +133,23 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 source node
  }finally{f.dispose();}
 });
 
-function fixture({native=false,solar=null,view=null,storage=null,storageGetter=null,fetchOverride=null,onHover=()=>{},networkInputs=null,readClock=()=>({})}={}){
+function fixture({native=false,solar=null,view=null,storage=null,storageGetter=null,fetchOverride=null,onHover=()=>{},networkInputs=null,readClock=()=>({}),networkSceneClass=null,panelRefresh=null,onSampleRequest=null,sceneUpdate=null,sceneLinks=null}={}){
  let id=0,context=null,displayListener,rendererFactory,panelOptions,interaction,renderer,removeCount=0;const calls=[],sections=new Map();
  const host={innerWidth:1280,innerHeight:720,localStorage:storage,crypto:{randomUUID:()=>`test-${++id}`},setTimeout,clearTimeout,addEventListener(){},removeEventListener(){},confirm:()=>true};
  if(storageGetter)Object.defineProperty(host,'localStorage',{get:storageGetter});
- const buttons=new Map(['nodes-deploy','nodes-recall','nodes-reapply','nodes-recall-reviewed','deploy-state','node-server-configuration'].map(key=>[key,{disabled:false,textContent:'',addEventListener(k,fn){this.fn=fn;},removeEventListener(){}}]));
+ const buttons=new Map(['nodes-deploy','nodes-recall','nodes-reapply','nodes-recall-reviewed','deploy-state','node-server-configuration','node-scene-summary'].map(key=>[key,{disabled:false,textContent:'',addEventListener(k,fn){this.fn=fn;},removeEventListener(){}}]));
  const document={getElementById:id=>id==='screen'?{prepend:root=>sections.set(root.id,root)}:sections.get(id)??null,createElement:()=>({querySelector:selector=>buttons.get(selector.slice(1))??null,remove(){sections.delete(this.id);}})};
  const globe={observeDisplayContext(fn){displayListener=fn;fn(context);return()=>removeCount++;},bindNodeRenderer(fn){rendererFactory=fn;return()=>removeCount++;},nodeRendererState:()=>({phase:'ready'}),observeNodeRenderer:()=>()=>removeCount++,setSatelliteModel:(...v)=>calls.push(['model',...v]),clearSatelliteModel:()=>calls.push(['clear']),focusSatelliteModel:()=>{calls.push(['focus']);return true;},releaseSatelliteModel:()=>calls.push(['release'])};
  globe.bindNodeInteraction=value=>{interaction=value;return()=>removeCount++;};
- const Scene=class{constructor(options){this.options=options;this.points=new Map();this.labels=new Map();this.models=new Map();}async setNodes(entries){calls.push(['nodes',entries]);this.points=new Map(entries.map(entry=>[entry.id,{show:true}]));}setTheme(value){calls.push(['theme',value]);}setHovered(id){calls.push(['hover',id]);}select(id){calls.push(['select',id]);}setLinks(){}update(){}destroy(){calls.push(['destroy']);}syncFrame(){}setLinksVisible(){}setModelsVisible(){}};
+ const Scene=class{constructor(options){this.options=options;this.points=new Map();this.labels=new Map();this.models=new Map();}async setNodes(entries){calls.push(['nodes',entries]);this.points=new Map(entries.map(entry=>[entry.id,{show:true}]));}setTheme(value){calls.push(['theme',value]);}setHovered(id){calls.push(['hover',id]);}select(id){calls.push(['select',id]);}setLinks(value){sceneLinks?.(value);}update(){sceneUpdate?.();}destroy(){calls.push(['destroy']);}syncFrame(){}setLinksVisible(){}setModelsVisible(){}};
  const library=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>`EQ-${++id}`});
- const tools={workPanelMarkup:()=>'<panel>',createNodeWorkPanel(options){panelOptions=options;return{refresh(){},destroy(){calls.push(['panel-destroy']);}};}};
+ const tools={workPanelMarkup:()=>'<panel>',createNodeWorkPanel(options){panelOptions=options;return{refresh(){panelRefresh?.(options);},destroy(){calls.push(['panel-destroy']);}};}};
  const fetchImpl=async(url,options)=>{calls.push(['http',url,options.method]);if(fetchOverride)return fetchOverride(url,options);return{ok:true,json:async()=>({revision:0,run_id:'run',scope_id:'run:unconfigured',deployment_id:null,nodes:[]})};};
  const codec=createUtcCodec(LEAP_SHA256),row=utc=>({utc,status:'valid',error_code:null,position_m:[7000000,2,3],inertial_position_km:[7000,0,0],lvlh_basis:{x:[1,0,0],y:[0,1,0],z:[0,0,1]},inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550});
- const api={nodeSamples:async p=>{calls.push(['samples']);if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>row(codec.advance(p.start_utc,i)))}))};},nodeTrack:async p=>{if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>{const period=Math.round(orbitElements(node.orbit).period/60*1000)/1000;return{node_id:node.id,definition_hash:'a'.repeat(64),period_minutes:period,path_visible:true,rows:Array.from({length:121},(_,i)=>row(codec.advance(new Date(Math.trunc(Date.parse(p.center_utc)+(i-60)*period*60000/120)).toISOString(),0)))};})};}};
+ const api={nodeSamples:async p=>{calls.push(['samples']);await onSampleRequest?.(p);if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>row(codec.advance(p.start_utc,i)))}))};},nodeTrack:async p=>{if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>{const period=Math.round(orbitElements(node.orbit).period/60*1000)/1000;return{node_id:node.id,definition_hash:'a'.repeat(64),period_minutes:period,path_visible:true,rows:Array.from({length:121},(_,i)=>row(codec.advance(new Date(Math.trunc(Date.parse(p.center_utc)+(i-60)*period*60000/120)).toISOString(),0)))};})};}};
  if(view)Object.assign(globe,view);
  const network=networkInputs?{...networkInputs,model:createNetworkSnapshotModel({library,oisl,groundLinks:createGroundLinkModel({library,stationModel})}),validateStation:stationModel.validateStation}:null;
- const workspace=createWorkspaceNodes({api,globe,solar,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now:()=>1791151272000,resolveModel:()=>({key:'flat',url:'/flat.glb'}),models:()=>[],fetchImpl,onHover,networkInputs:network,readClock});
+ const workspace=createWorkspaceNodes({api,globe,solar,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now:()=>1791151272000,resolveModel:()=>({key:'flat',url:'/flat.glb'}),models:()=>[],fetchImpl,onHover,networkInputs:network,readClock,...(networkSceneClass?{NetworkScene:networkSceneClass}:{})});
  return{workspace,host,globe,calls,buttons,sections,context(value){context=value;displayListener(value);},get options(){return panelOptions;},get interaction(){return interaction;},get renderer(){return renderer;},attach(){return renderer=rendererFactory({},{});},get removeCount(){return removeCount;}};
 }
 
@@ -359,3 +359,60 @@ test('actual node owner exposes only accepted paused mission inputs and existing
 });
 
 test('projected running SIM preserves pose buffers without optical query floods or manual network approval',async()=>{const codec=createUtcCodec(LEAP_SHA256),start=codec.advance('2026-10-04T22:01:12Z',0),f=fixture({native:true,networkInputs:{readStations:()=>[],readFaults:()=>[]}});try{await f.workspace.start();f.workspace.show('satellite');f.attach();f.options.store.add({name:'source'});f.context({utc:start,source:'sim',key:'sim:R'});for(let i=0;i<100&&f.workspace.sceneSnapshot().calculation.pending;i++)await new Promise(resolve=>setTimeout(resolve,2));const before=f.calls.filter(c=>c[0]==='samples').length;for(let i=1;i<=60;i++)f.context({utc:codec.advance(start,i/60),source:'sim',key:'sim:R',projected:true});await new Promise(resolve=>setTimeout(resolve,30));assert.equal(f.calls.filter(c=>c[0]==='samples').length,before,'same accepted native buffer services all projected frames');assert.ok(f.renderer.options.geometryFor(f.options.store.drafts[0],{utc:codec.advance(start,1)}));const answer=await f.workspace.updateNetwork();assert.equal(answer.status,'error');assert.match(answer.error,/보간 SIM/);assert.equal(f.workspace.verifyNetworkSnapshot(answer),false);}finally{f.workspace.destroy();}});
+
+test('node frame guards prefer the authoritative transition query and retain legacy view fallback',async()=>{
+ let phase='ready',reads=0;const f=fixture({view:{viewState:()=>({choice:{theme:'dark'},mode:{phase}}),isTransitioning:()=>{reads++;return phase!=='ready';}}});
+ try{await f.workspace.start();f.attach();f.globe.viewState=()=>{throw Error('frame guard must not clone full view');};
+  for(const value of ['ready','pending','error','ready']){phase=value;assert.equal(f.renderer.options.isTransitioning(),value!=='ready');}
+  assert.equal(reads,4);f.globe.isTransitioning=()=>{throw Error('owner query failure');};assert.throws(()=>f.renderer.options.isTransitioning(),/owner query failure/);
+ }finally{f.workspace.destroy();}
+ const legacy=fixture({view:{viewState:()=>({choice:{theme:'dark'},mode:{phase}})}});try{await legacy.workspace.start();legacy.attach();phase='pending';assert.equal(legacy.renderer.options.isTransitioning(),true);phase='ready';assert.equal(legacy.renderer.options.isTransitioning(),false);}finally{legacy.workspace.destroy();}
+});
+
+test('ground network frame guards use the same authoritative transition query',async()=>{
+ let captured,phase='ready';const NetworkScene=class{constructor(options){captured=options;}setGroundLinksVisible(){}setCoverageVisible(){}destroy(){}syncFrame(){}};
+ const f=fixture({networkInputs:{readStations:()=>[],readFaults:()=>[]},networkSceneClass:NetworkScene,view:{viewState:()=>({choice:{theme:'dark'},mode:{phase}}),isTransitioning:()=>phase!=='ready'}});
+ try{await f.workspace.start();f.attach();assert.ok(captured);f.globe.viewState=()=>{throw Error('network guard must not copy view state');};for(const value of ['pending','error','ready']){phase=value;assert.equal(captured.isTransitioning(),value!=='ready');}}finally{f.workspace.destroy();}
+});
+
+test('workspace metadata refresh bounds repeated panel errors and keeps the latest error',async()=>{
+ let refreshes=0,fail=false;const f=fixture({readClock:()=>{if(fail)throw Error('clock input unavailable');return{};},panelRefresh:options=>{refreshes++;if(!fail)return;try{options.readDisplay();}catch(error){options.onError(error);}options.onError('latest panel error');}});
+ try{await f.workspace.start();f.workspace.show('satellite');const before=refreshes;fail=true;f.workspace.refresh();assert.equal(refreshes-before,1,'a reported error must not recursively refresh the whole panel');assert.equal(f.workspace.snapshot().error,'latest panel error');
+  const again=refreshes;f.workspace.refresh();assert.equal(refreshes-again,1);assert.equal(f.workspace.snapshot().error,'latest panel error');
+ }finally{f.workspace.destroy();}
+});
+
+test('workspace refresh stops metadata rendering after disposal inside a panel callback',async()=>{
+ let dispose=false,f;f=fixture({panelRefresh:()=>{if(dispose)f.workspace.destroy();}});await f.workspace.start();f.workspace.show('satellite');dispose=true;assert.doesNotThrow(()=>f.workspace.refresh());assert.equal(f.workspace.sceneSnapshot(),null);assert.equal(f.sections.size,0);assert.equal(f.calls.filter(c=>c[0]==='panel-destroy').length,1);assert.doesNotThrow(()=>f.workspace.refresh());
+});
+
+test('workspace refresh releases its guard after exceptions and reads post-callback definitions',async()=>{
+ let throwNext=false,addNext=false;const f=fixture({panelRefresh:options=>{if(throwNext){throwNext=false;throw Error('panel failure');}if(addNext){addNext=false;options.store.add({name:'added during panel refresh'});}}});
+ try{await f.workspace.start();f.workspace.show('satellite');throwNext=true;assert.throws(()=>f.workspace.refresh(),/panel failure/);addNext=true;assert.doesNotThrow(()=>f.workspace.refresh());assert.match(f.buttons.get('node-scene-summary').textContent,/초안 1개/);assert.equal(f.options.store.drafts.length,1);
+  f.options.store.add({name:'next operation'});f.workspace.refresh();assert.match(f.buttons.get('node-scene-summary').textContent,/초안 2개/);
+ }finally{f.workspace.destroy();}
+});
+
+test('communication pending notifications leave fleet and scene intact while actual UTC and optical results refresh them',async()=>{
+ const codec=createUtcCodec(LEAP_SHA256);let panels=0,updates=0,gate=null;const f=fixture({native:true,panelRefresh:()=>panels++,sceneUpdate:()=>updates++,onSampleRequest:p=>p.count===1?new Promise(resolve=>{gate=resolve;}):undefined});
+ const wait=async predicate=>{for(let i=0;i<150&&!predicate();i++)await new Promise(resolve=>setTimeout(resolve,2));assert.ok(predicate());};
+ try{await f.workspace.start();f.workspace.show('satellite');f.attach();f.options.store.add({name:'notification scope'});const utc=codec.advance('2026-10-04T22:01:12Z',0);f.context({utc,source:'sim',key:'sim:fixture',projected:true});await wait(()=>!f.workspace.snapshot().timeline.pending);
+  gate=null;const beforeDisplay=panels;f.context({utc,source:'catalog',key:'catalog:fixture'});assert.ok(panels>beforeDisplay,'actual display change retains full panel refresh');const baseline={panels,updates};await wait(()=>gate);
+  assert.equal(panels,baseline.panels+1,'only the independent display-observe completion may rebuild fleet/status; communication start must not');assert.equal(updates,baseline.updates+1,'only the independent display-observe completion may update pose/scene; communication start must not');assert.equal(f.workspace.snapshot().timeline.communicationPending,1);
+  // A later display/error boundary is still a complete refresh, even while the
+  // exact communication request is waiting in the unchanged native queue.
+  const beforeNext=panels;f.context(null);assert.ok(panels>beforeNext);assert.equal(f.workspace.snapshot().display,null);
+  const release=gate;gate=null;release();await wait(()=>f.workspace.snapshot().timeline.communicationPending===0);assert.equal(f.workspace.snapshot().display,null);
+ }finally{gate?.();f.workspace.destroy();}
+});
+
+test('accepted optical result still updates the scene and full panel after communication bookkeeping',async()=>{
+ const codec=createUtcCodec(LEAP_SHA256);let panels=0,linkValues=[];const f=fixture({native:true,panelRefresh:()=>panels++,sceneLinks:value=>linkValues.push(value)});
+ try{await f.workspace.start();f.workspace.show('satellite');f.attach();f.options.store.add({name:'optical notifications'});const utc=codec.advance('2026-10-04T22:01:12Z',0);f.context({utc,source:'sim',key:'sim:fixture',projected:true});for(let i=0;i<150&&f.workspace.snapshot().timeline.pending;i++)await new Promise(resolve=>setTimeout(resolve,2));
+  const before=panels;f.context({utc,source:'catalog',key:'catalog:fixture'});const value=await f.workspace.updateMissionLinks();assert.equal(value.status,'valid');assert.equal(value.utc,utc);assert.ok(linkValues.some(v=>v.status==='valid'&&v.utc===utc));assert.ok(panels>before);assert.equal(f.workspace.verifyMissionLinks(value,{nodes:f.options.store.drafts,utc}),true);
+ }finally{f.workspace.destroy();}
+});
+
+test('workspace optical cache keeps same-definition selection valid and revokes edited definitions at the same UTC',async()=>{
+ const codec=createUtcCodec(LEAP_SHA256),f=fixture({native:true});try{await f.workspace.start();f.workspace.show('satellite');f.attach();f.options.store.add({name:'scope owner'});const utc=codec.advance('2026-10-04T22:01:12Z',0);f.context({utc,source:'catalog',key:'catalog:fixture'});const value=await f.workspace.updateMissionLinks();assert.equal(value.status,'valid');const nodes=f.options.store.drafts;f.options.store.select(nodes[0].id);assert.equal(f.workspace.verifyMissionLinks(value,{nodes:f.options.store.drafts,utc}),true,'selection rotates cache token without changing the actual receipt scope');f.options.store.update(nodes[0].id,{...nodes[0],name:'edited scope'});assert.equal(f.workspace.verifyMissionLinks(value,{nodes:f.options.store.drafts,utc}),false);f.workspace.destroy();assert.equal(f.workspace.verifyMissionLinks(value,{nodes,utc}),false);}finally{f.workspace.destroy();}
+});

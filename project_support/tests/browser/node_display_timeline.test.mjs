@@ -104,3 +104,24 @@ test('shared display exposes stable track revisions without queries and invalida
  for(let i=0;i<20;i++){assert.equal(s.timeline.pathRevisionFor(node),token);await s.timeline.observe(start);}assert.equal(s.calls.length,2);
  await s.timeline.observe(codec.advance(start,30));assert.notEqual(s.timeline.pathRevisionFor(node),token);s.timeline.clear();assert.equal(s.timeline.pathRevisionFor(node),null);s.timeline.destroy();assert.equal(s.timeline.pathRevisionFor(node),null);
 });
+
+test('exact communication bookkeeping emissions carry an explicit reason without changing snapshots',async()=>{
+ const events=[];const timeline=createNodeDisplayTimeline({api:{nodeSamples:async p=>{const v=receipt(p,'samples');for(const n of v.nodes)for(const row of n.rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}return v;},nodeTrack:async p=>receipt(p,'track')},periodFor:()=>period,requestId:()=> 'reason',yieldControl:async()=>{},onChange:(snapshot,reason)=>events.push({snapshot,reason})});
+ try{timeline.setDefinitions(defs());await timeline.observe(start);events.length=0;const value=await timeline.requestCommunicationStates(codec.advance(start,-1));assert.equal(value.states.length,1);
+  const communication=events.filter(e=>e.reason?.kind==='communication');assert.equal(communication.length,2);assert.equal(communication[0].snapshot.activeKind,'communication');assert.equal(communication[1].snapshot.activeKind,null);assert.equal(communication[0].snapshot.communicationPending,1);assert.equal(communication[1].snapshot.communicationPending,0);assert.equal(communication.every(e=>e.snapshot.utc===start),true);
+  events.length=0;await timeline.observe(codec.advance(start,300));assert.ok(events.length);assert.equal(events.some(e=>e.reason?.kind==='communication'),false);
+ }finally{timeline.destroy();}
+});
+
+test('failed and disposed communication work preserves explicit reason and existing failure settlement',async()=>{
+ const events=[];let finish;const timeline=createNodeDisplayTimeline({api:{nodeSamples:async p=>{if(p.count===1)return new Promise((resolve,reject)=>{finish=()=>reject(Error('exact native unavailable'));});return receipt(p,'samples');},nodeTrack:async p=>receipt(p,'track')},periodFor:()=>period,requestId:()=> 'reason-failure',yieldControl:async()=>{},onChange:(snapshot,reason)=>events.push({snapshot,reason})});
+ timeline.setDefinitions(defs());await timeline.observe(start);events.length=0;const pending=timeline.requestCommunicationStates(codec.advance(start,-1));const rejected=assert.rejects(pending,/exact native unavailable/);await until(()=>finish);finish();await rejected;await until(()=>timeline.snapshot().communicationPending===0);assert.equal(events.filter(e=>e.reason?.kind==='communication').length,2);
+ events.length=0;finish=null;const late=timeline.requestCommunicationStates(codec.advance(start,-2));const invalidated=assert.rejects(late,/invalidated/);await until(()=>finish);timeline.destroy();const count=events.length;finish();await invalidated;await new Promise(resolve=>setImmediate(resolve));assert.equal(events.length,count,'disposed owner cannot publish late bookkeeping');
+});
+
+test('exact communication batch joins all240 accepted nodes in request order without new HTTP and preserves independent copies',async()=>{
+ const s=setup((p,kind)=>{const value=receipt(p,kind);for(const node of value.nodes)for(const row of node.rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}return value;});
+ const nodes=Array.from({length:240},(_,i)=>({...defs()[0],id:'N-'+i,catalog_number:900001+i}));try{s.timeline.setDefinitions(nodes);await s.timeline.observe(start);const count=s.calls.length,states=await s.timeline.requestCommunicationStates(start);assert.equal(s.calls.length,count);assert.equal(states.states.length,240);assert.deepEqual(states.states.map(([id])=>id),nodes.map(n=>n.id));
+  for(const index of [0,82,83,165,166,239])assert.deepEqual(states.states[index][1],s.timeline.communicationStateFor(nodes[index],{utc:start}));states.states[239][1].inertial.r[0]=0;states.node_definitions[239].name='mutated';const again=await s.timeline.requestCommunicationStates(start);assert.equal(again.states[239][1].inertial.r[0],7000);assert.equal(again.node_definitions[239].name,'node');assert.equal(s.calls.length,count);
+ }finally{s.timeline.destroy();}
+});

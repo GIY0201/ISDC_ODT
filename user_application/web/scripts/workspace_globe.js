@@ -220,6 +220,8 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     releaseSatelliteModel(options){if(disposed)return;globe?.releaseSatelliteModel(options);notifyModel();},
     retrySatelliteModel(){if(disposed)return Promise.resolve(null);return Promise.resolve(globe?.retrySatelliteModel()).finally(notifyModel);},
     viewState,
+    // Read the same authoritative phase as viewState without copying UI state.
+    isTransitioning:()=>mode.phase!=='ready',
     observeView(fn){if(disposed)return()=>{};viewObservers.add(fn);fn(viewState());return()=>viewObservers.delete(fn);},
     changeView(patch){
       if(disposed||!patch||typeof patch!=='object'||Array.isArray(patch)||Object.keys(patch).some(key=>!['mode','imagery','theme','emphasis'].includes(key)))return false;

@@ -1109,3 +1109,43 @@ Next source renderer optimization is approved as optional readonly display-owner
 Optional registered immutable displayGeometry owner port completed: private views/packets, accepted-buffer cohort revision, callback fences and bounded two-UTC cache. Focused155PASS; independent readonly review found no concrete blockers, with advancing UTC copy/freeze cost retained as an explicit performance limitation. FullNode1154PASS/0FAIL/0SKIP6837.7841ms in full_migration_node_0621.log validates this and held-summary correction. Latest Python965PASS remains prior checkpoint; fresh Python will follow live measurement to avoid CPU contention. No FPS acceptance claim.
 
 Actual Aside151 receipt proves finished current-input review accepted, original module sequence15/two committed inventory and original form exactly preserved, runtime/verdict exact and5/10/7 unchanged. No runtime/setup commands, old-plan reuse or playback authorization. New labelled five-kind validation requests now proceed in live UI; full lifecycle still pending. Receipt copied to t081_live_finished_0430/aside_artifacts. FullT075-T084 remains active.
+
+### 06:26 advancing display diagnostic and preserved runtime
+
+Checkpoint e3f955f committed on existing branch; subsequent advancing-UTC RED tests remain uncommitted and outside the1154PASS checkpoint. Actual first240pausedtrial1504RAF p9536.4/p9954.8/max127.6; settledsecond1634p9519.4/p9919.6/max19.8 includesprofiler and doesnotprovegame-frameacceptance. IndependentcatalogPlay exposed severe responsiveness; measureclick andtwoPauseclicks timedout. Same validationtabreload recovered240drafts. Directbootstrap verifies originalRUN-904CE008D00B/SIM/paused884.681/speed5/noactivefaults unchanged. Targeted owner-private projection construction/parity repair now proceeds withoutframe-fence weakening. FullPython89532 confirmedlive52percent; no terminalsuccessclaim.
+
+Actual observation validation MSN-0007 legitimately infeasible0tasks withinsix-minutewindow, explicitreasonnoobservationpass; noCommit/Abort/heldtasks. Separate labelledcompute MSN-0008 freshfeasibletwo-taskplancommitted; ownAbort/cleanup andremainingthree kinds stillinprogressunderAside53586. NevermodifyoriginalMSN0004/0005. Fullscope remainsopen.
+
+## 2026-10-07 06:29 latest regression checkpoint
+
+FullPython89532 terminalexit0:965PASS/1PillowSKIP/8existingwarnings223.97s in full_migration_python_0626.log. FullNode1161PASS/0FAIL/0SKIP6414.7817ms in full_migration_node_0628.log validates subsequent pure native row projection, cheap authoritative globe transition getter and explicit validation-only raw JSON download. Independent sampler review112focusedPASS found no semanticblocker; remaining frozen-graph traversal noted as a cost, not removed or anFPSclaim. Pythonbackend unchanged during JS patches. Freshactual240continuousmeasurement follows afterfullCPUtests finished; no conflictingperformanceclaim. Goalactive.
+
+### 06:30 next actual advancing bottleneck
+
+Latest1161-testedJSstillfailsactual240advancingresponsiveness. Direct17.668868sCPUprofile locates repeated constellation.get drafts184 wholecohortclone stacks, plusserveCommunication391. Sametemporarytab recoveredwithreloadaftertwofailedPauseattempts; noserver/SIMcommands. Agentinspects synchronousowner cohortreads before nextboundedpatch. Rawmeasurebutton implemented butnoactualfileyet; donotclaim fullperformance. Originalsource functionality, all50GPU, remainingmodule/multiwindow/review gates stayopen.
+
+### 06:38 raw performance file and actual mission lifecycle
+
+Raw240pausedrecorder downloaded51295bytes and independentlyverifiedSHA96b0090924e5a420245c35ac7aad391273c57876e75d4d33936e22656750c707; copiedto t076_240_paused_raw_0636.json. Foreground1513RAF p9536.3 fails16.7, notGPU/sustainedacceptance. FullNode1164PASS6620.8565ms validates boundednonreentrantpanel/countreuse; subsequentdifferentialcommunicationrefresh stillinprogress.
+
+Actual Aside158 computeMSN0008 and162relayMSN0009 eachfreshfeasible2taskplan/commit/abort,0validationheldafterabort andmodulebacktooriginaltwoheld. Observation154 validinfeasible0tasks. Pickup164 correctlyrefusedmissingexplicitexternalGP/EOP/leapidentity;166restoredsameTERRA25994 GPepoch07:11 andhashes withoutchangingstoredISS/UTC, replanpending. Ownvalidationrequestsandoriginalrun preserved. SourceT079 actiongate/3spoll/progress patch26focusedPASS; rootreviewfoundpendingcommandformrace, capturedinputsrepairpending. Nofullcompletionclaim.
+
+## 2026-10-07 06:50 advancing failure and data input race checkpoint
+
+Latest actual240 advancing trial30.3008s102foregroundRAF p95401.7/p99474.1/max695ms FAILS original16.7target. Zoom inspection, twoPauseattempts and rawdownload failed before click; originalraw remainsCUAmemoryonly. Same temporarytab reload recovered; no server/runtime/SIMcommand. Fresh21.28122sCPU locates communicationStateFor→geometryFor/serveCommunication plus repeated satellite_nodes.context/wholecohortcopies from BOTH globe display andcatalognotification. Diagnosticprofile stopped/disabled; not acceptance evidence. Targetedownerbatch and duplicate refresh investigation continue without loweringcriteria.
+
+SourceT079 gates/3spoll/progress and before-first-await commandfields snapshot now independentlyreviewed with30focusedPASS. Four deferreddeployment REDcases prove the prior mixed-input race; captured intent remains separate from edits for nextcommand. FullNode1182PASS/0FAIL/0SKIP7057.915ms in full_migration_node_0650.log validates latest stableJS before upcoming performancechanges. Pythonbackend unchanged, prior fullPython965PASS/1PillowSKIP223.97s remains applicable. Actual operational/two-resolution data matrix remainsopen.
+
+Aside same livehandle53586 confirms computeMSN0008,relayMSN0009,fleet_updateMSN0011 each Plan/Commit/Abort; all6ownheldtasks removed and original2commitments/run/5-10-7verdict preserved. ObserveMSN0007 validinfeasible0tasks; pickupMSN0010 refuses stale externalGP identity after explicitselection, noPlan/Commit/heldtasks. Neither outcome closes fullfivekindfeasibility/lifecycle. Receipts151-178 copied into existing t081 evidence directory. All50appearance matrix resumed, T079queued afterstablepatch. FullT075-T084 staysactive; no umbrellacheckboxclosure/newbranch/historyrewrite.
+
+### 2026-10-07 06:55 combined display checkpoint (log label0700)
+
+Data fix committed13e2981. Exact communication batch175focusedPASS and independent61focusedreview preserve public single-state parity, exact UTC/definition/hash/payload verification, all240 order, copies and mid-query revocation. Catalog duplicate-node refresh RED→79focusedPASS plus independentreview retains all native paints and same-UTC control/error changes; shared-context notifications remain unchanged. Combined fullNode1187PASS/0FAIL/0SKIP8112.5299ms in full_migration_node_0700.log. StableJS checkpoint, not actual frame acceptance; no backend change after fullPython965PASS.
+
+Same performance tab reloaded latest stable code, retained240localdrafts/0accepted. CurrentTERRA25994 GPepoch14:00:37.897344 selected, unchanged explicitanalysisUTC07:11:41.280576 and DAEJEON applied. Native preparation precedes new advancing trial. Originalserver40/runtime remainspreserved. Supported stalepickup recovery auditedreadonly and queued boundedfreshreselection+oneplanretry aftercurrentall-modelmatrix; nohashbypass/storedISS/UTC/runtimechanges.
+
+### 2026-10-07 06:59 trusted scope and focus checkpoint
+
+Latest combined fullNode1193PASS/0FAIL/0SKIP8015.7176ms in full_migration_node_0702.log. Focus-only geometry query89focusedPASS and independent no-blocker review; fullstatus still reads link context, actualfocusguards unchanged. Trusted optical cohort cache158focusedPASS/final64PASS and independent64PASS review; opaque token rotates first on every actualstore event inclsame-numberload, complete canonical frozen scope and exactUTC/currentreceipt guards retained. Generic no-token callers unchanged. This checkpoint is after the309.3ms failed advancing trial; new live performance measurement remainspending. No source physics/HTTP/backend changes after965PASS Pythoncheckpoint.
+
+Combined advancing trial rawfile51318bytes SHA b91b7e4938c05abf16df0210175523d0ee90cbf1a097570fbe17f90090b15133 retained at data/workspace/validation/t076_240_advancing_raw_0655.json. Samebutton keyboardEnter recoveredpause aftertwo mouse Input dispatchtimeouts, then savedraw through explicitdownload. Originalserver/runtime/SIM not restarted or changed. Isolatedall-modelGPU matrix now has actualAqua body screenshot184; remainingassets stillinprogress, not closed. Shared-context copies remain a known next cost to investigate, no loweredframecriteria.

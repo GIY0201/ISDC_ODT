@@ -12,15 +12,33 @@ function signature(value){
   };
   return JSON.stringify(ordered(value));
 }
-export function createNodeOpticalTimeline({resolver,requestCommunicationStates,readNodes,readDisplay,advanceUtc,onChange=()=>{}}={}){
+export function createNodeOpticalTimeline({resolver,requestCommunicationStates,readNodes,nodeScopeRevision=null,readDisplay,advanceUtc,onChange=()=>{}}={}){
   if(!resolver||['resolveLinks','terminalKey'].some(key=>typeof resolver[key]!=='function')||[requestCommunicationStates,readNodes,readDisplay,advanceUtc,onChange].some(value=>typeof value!=='function'))throw new TypeError('optical timeline dependencies required');
+  if(nodeScopeRevision!==null&&typeof nodeScopeRevision!=='function')throw new TypeError('trusted node scope revision callback required');
+  let scopeCache=null;
+  const freezeScope=value=>{if(value&&typeof value==='object'){for(const child of Object.values(value))freezeScope(child);Object.freeze(value);}return value;};
   let disposed=false,generation=0,active=null,last=null,failure=null,histories=new Map(),owners=new Map(),knownDefinitions=new Map(),knownHashes=new Map(),observerError='';
   function context(){
-    const utc=readDisplay()?.utc,nodes=structuredClone(readNodes());
+    const revision=nodeScopeRevision?.(),utc=readDisplay()?.utc;
+    if(nodeScopeRevision&&(revision==null||nodeScopeRevision()!==revision))throw new Error('optical node scope changed during read');
+    let nodes,scope;
+    if(nodeScopeRevision&&scopeCache?.revision===revision){({nodes,scope}=scopeCache);}
+    else{
+      nodes=structuredClone(readNodes());
+      if(!Array.isArray(nodes)||nodes.length>240||new Set(nodes.map(n=>n?.id)).size!==nodes.length)throw new Error('invalid optical node scope');
+      scope=signature(nodes);
+      if(nodeScopeRevision){
+        if(nodeScopeRevision()!==revision)throw new Error('optical node scope changed during read');
+        freezeScope(nodes);scopeCache={revision,nodes,scope};
+      }
+    }
     if(typeof utc!=='string'||advanceUtc(utc,0)!==utc||/:60(?:\.|Z)/.test(utc)||!Number.isFinite(Date.parse(utc)))throw new Error('unsupported optical analysis UTC');
-    if(!Array.isArray(nodes)||nodes.length>240||new Set(nodes.map(n=>n?.id)).size!==nodes.length)throw new Error('invalid optical node scope');
-    return {utc,nodes,scope:signature(nodes),key:signature([utc,nodes])};
+    if(nodeScopeRevision&&(nodeScopeRevision()!==revision||readDisplay()?.utc!==utc||nodeScopeRevision()!==revision))throw new Error('optical context changed during read');
+    // Identical canonical scope + exact UTC remains the receipt authority;
+    // owner tokens only permit reuse of a completely validated frozen scope.
+    return {utc,nodes,scope,key:nodeScopeRevision?`[${JSON.stringify(utc)},${scope}]`:signature([utc,nodes])};
   }
+
   const empty=(c,status,error=null)=>({...NODE_COMMUNICATION_METADATA,schema_version:1,status,error,utc:c?.utc??null,node_definitions:structuredClone(c?.nodes??[]),definition_hashes:{},terminals:[],pairs:[]});
   function snapshot(){
     if(disposed)return empty(null,'unavailable','disposed');
@@ -78,6 +96,6 @@ export function createNodeOpticalTimeline({resolver,requestCommunicationStates,r
   }
   function resetHistories(){if(disposed)return;cancel();histories=new Map();owners=new Map();knownDefinitions=new Map();knownHashes=new Map();last=null;failure=null;notify();}
   function pruneHistories(keep){if(disposed)return;const ids=keep instanceof Set?keep:new Set(keep??[]);cancel();for(const key of [...histories.keys()])if(!ids.has(owners.get(key))){histories.delete(key);owners.delete(key);}last=null;failure=null;notify();}
-  function destroy(){if(disposed)return;disposed=true;cancel();histories=new Map();owners=new Map();knownDefinitions=new Map();knownHashes=new Map();last=null;failure=null;}
+  function destroy(){if(disposed)return;disposed=true;scopeCache=null;cancel();histories=new Map();owners=new Map();knownDefinitions=new Map();knownHashes=new Map();last=null;failure=null;}
   return Object.freeze({update,snapshot,verifyLinkSnapshot,resetHistories,pruneHistories,destroy,historyEntries:()=>structuredClone([...histories]),get observerError(){return observerError;}});
 }

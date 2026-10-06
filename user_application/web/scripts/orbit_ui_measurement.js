@@ -19,7 +19,7 @@ export function summarizeMeasurements(raw){
 export function installOrbitUiMeasurement(host=window){
   const doc=host.document,raw={frames:[],hiddenFrames:[],feedback:[],utcResult:[],dayResult:[],events:[],eventTiming:[]};
   const box=doc.createElement('aside');box.id='orbit-ui-measurement';box.style.cssText='position:fixed;top:0;right:0;z-index:10000;background:#fff;color:#111;max-width:420px;max-height:200px;overflow:auto;font:12px monospace;padding:5px';
-  box.innerHTML='<button id="measure-start">30초 프레임 측정</button><button id="measure-report">결과 기록</button><pre id="measure-output"></pre>';doc.body.append(box);
+  box.innerHTML='<button id="measure-start">30초 프레임 측정</button><button id="measure-report">결과 기록</button><button id="measure-download">원본 기록 내려받기</button><pre id="measure-output"></pre>';doc.body.append(box);
   let frame=null,last=null,until=0,query=null,utcQuery=null,disposed=false,trial=0,eventObserver=null,eventTimingStatus='unsupported';
   const captureTiming=entries=>{for(const entry of entries){const id=entry.target?.closest?.('[id]')?.id;
     if(!id||id.startsWith('measure-'))continue;
@@ -33,7 +33,8 @@ export function installOrbitUiMeasurement(host=window){
     if(eventObserver)captureTiming(eventObserver.takeRecords());
     const canvas=doc.querySelector('#stored-orbit-globe canvas');let renderer='unavailable';try{const gl=canvas?.getContext('webgl2')||canvas?.getContext('webgl');const debug=gl?.getExtension('WEBGL_debug_renderer_info');if(debug)renderer=gl.getParameter(debug.UNMASKED_RENDERER_WEBGL);}catch{}
     const context={renderer,eventTiming:{status:eventTimingStatus,durationThresholdMs:16,roundingMs:8,method:'Event Timing next-paint duration; sub-threshold entries censored, missing observations never pass'},feedbackMethod:'two requestAnimationFrame callbacks: conservative presentation proxy, not Event Timing',frameMethod:'foreground RAF scheduling; GPU rendered frames not inferred',userAgent:host.navigator.userAgent,viewport:[host.innerWidth,host.innerHeight],devicePixelRatio:host.devicePixelRatio,visibility:doc.visibilityState,focused:doc.hasFocus(),date:new Date().toISOString(),hardwareConcurrency:host.navigator.hardwareConcurrency};
-    box.querySelector('#measure-output').textContent=JSON.stringify({context,summary:summarizeMeasurements(raw),raw});
+    const record=JSON.stringify({context,summary:summarizeMeasurements(raw),raw});
+    box.querySelector('#measure-output').textContent=record;return record;
   }
   function tick(now){
     if(disposed)return;
@@ -43,6 +44,11 @@ export function installOrbitUiMeasurement(host=window){
   }
   box.querySelector('#measure-start').addEventListener('click',()=>{if(frame!==null)return;trial++;box.querySelector('#measure-start').disabled=true;host.performance.mark?.(`orbit-frame-trial-${trial}-start`);raw.events.push({id:'frame-trial',trial,start:host.performance.now(),viewport:[host.innerWidth,host.innerHeight],visible:doc.visibilityState,focused:doc.hasFocus()});last=null;until=host.performance.now()+30000;frame=host.requestAnimationFrame(tick);});
   box.querySelector('#measure-report').addEventListener('click',output);
+  box.querySelector('#measure-download').addEventListener('click',()=>{
+    const record=output(),url=host.URL.createObjectURL(new host.Blob([record],{type:'application/json'}));
+    const link=doc.createElement('a');link.href=url;link.download='isdc_browser_measurements.json';doc.body.append(link);
+    try{link.click();}finally{link.remove();host.setTimeout(()=>host.URL.revokeObjectURL(url),1000);}
+  });
   const click=event=>{
     const id=event.target.closest('[id]')?.id;if(!id||id.startsWith('measure-'))return;
     const start=host.performance.now();

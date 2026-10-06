@@ -8,7 +8,7 @@
 
 ## 실행
 
-2026-10-07 현재 V6에 원본 노드 편집·배치, 통신망·경로, 다섯 임무 계획, 데이터·보안 모의 모듈, 설정과 PoC 재생기를 연결했습니다. 카탈로그 계산과 원본 노드의 시간·좌표계·상태 소유권을 구분합니다. 최신 회귀 검증은 Python 960개 및 브라우저 JavaScript 1,081개 통과이며, 실제 화면의 전체 복구·파일 저장·GPU·성능·다중창 수용 검증은 진행 중입니다. 요구별 남은 범위는 [현재 이식 감사](project_support/specs/001-v6-function-integration/validation/t075_t083_current_requirement_audit.md)와 [실제 실행 기록](project_support/specs/001-v6-function-integration/validation/t081_live_continuation_20261007.md)에 기록합니다. 선배 원본에도 없는 Terra 텍스처 두 개와 실제 수신 장비 조건은 미확인 상태로 보존합니다.
+2026-10-07 현재 V6에 원본 노드 편집·배치, 통신망·경로, 다섯 임무 계획, 데이터·보안 모의 모듈, 설정과 PoC 재생기를 연결했습니다. 카탈로그 계산과 원본 노드의 시간·좌표계·상태 소유권을 구분합니다. 06:59 안정 체크포인트의 회귀 검증은 Python 965개 통과(이미지 의존 시험 1개 건너뜀, 별도 환경에서 통과) 및 브라우저 JavaScript 1,193개 통과이며, 실제 화면의 전체 복구·파일 저장·GPU·성능·다중창 수용 검증은 진행 중입니다. 요구별 남은 범위는 [현재 이식 감사](project_support/specs/001-v6-function-integration/validation/t075_t083_current_requirement_audit.md)와 [실제 실행 기록](project_support/specs/001-v6-function-integration/validation/t081_live_continuation_20261007.md)에 기록합니다. Terra와 Jason은 원본 파일을 보존하고 공식 과거 자산에서 입증한 UV·재질 수정본을 사용합니다. 전체 모델의 실제 렌더링 검증과 게임 기준 성능은 아직 미완료이며 실제 수신 장비 조건도 미확인입니다.
 
 ```powershell
 python -m venv project_support/.venv

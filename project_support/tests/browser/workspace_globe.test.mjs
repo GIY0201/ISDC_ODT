@@ -53,3 +53,19 @@ test('missing Cesium reports unavailable without a synthetic marker',async()=>{
   const ui=createWorkspaceGlobe(container,status,button,host);load();
   assert.match(status.textContent,/사용할 수 없습니다/);assert.equal(container.dataset.orbitVisible,'false');assert.equal(button.disabled,true);ui.destroy();
 });
+
+test('authoritative transition query follows mode phase without cloning view state',async()=>{
+ let settle,reject;globalThis.TransitionQueryGlobe=class{constructor(){this.viewer={scene:{renderError:{addEventListener:()=>()=>{}}}};}update(){return false;}setGroundPoint(){}setViewStyle(){}setViewImagery(){}setViewMode(){return new Promise((a,b)=>{settle=a;reject=b;});}destroy(){}};
+ const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href)).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.TransitionQueryGlobe;');
+ const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+ const host={Cesium:{},setTimeout:()=>1,clearTimeout(){},addEventListener(){},removeEventListener(){}},ui=createWorkspaceGlobe({dataset:{}},{},{addEventListener(){},removeEventListener(){}},host);
+ try{
+  assert.equal(typeof ui.isTransitioning,'function');
+  const query=expected=>{const clone=globalThis.structuredClone;globalThis.structuredClone=()=>{throw Error('transition guard must not clone view state');};try{for(let i=0;i<100;i++)assert.equal(ui.isTransitioning(),expected);}finally{globalThis.structuredClone=clone;}assert.equal(ui.isTransitioning(),ui.viewState().mode.phase!=='ready');};
+  query(false);const copied=ui.viewState();copied.mode.phase='pending';copied.choice.mode='2d';query(false);
+  ui.changeView({mode:'2d'});query(true);settle(true);await Promise.resolve();query(false);
+  ui.changeView({mode:'3d'});query(true);settle(false);await Promise.resolve();query(true);
+  ui.changeView({mode:'2d'});reject(Error('morph failed'));await Promise.resolve();await Promise.resolve();query(true);
+  ui.changeView({mode:'3d'});query(true);ui.destroy();query(true);settle(true);await Promise.resolve();query(true);
+ }finally{ui.destroy();delete globalThis.TransitionQueryGlobe;}
+});

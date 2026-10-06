@@ -16,7 +16,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  let tracks=true,links=true,modelsVisible=true;const readiness=new Map(),removers=[];
  let restorePromise=null,scenarioReceipt=null;
  let applyingSelectedPose=false;
- let reviewedRevision=null;
+ let reviewedRevision=null,refreshingPanel=false;
  const id=()=>createBrowserId(host.crypto);
  const report=value=>{if(dead)return;error=String(value?.message??value);refreshPanel();};
  const projectedSim=value=>value?.source==='sim'&&value.projected===true;
@@ -25,8 +25,9 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  try{if(host.localStorage)storage=storagePort;}catch{storage=storagePort;}
  const store=createConstellationStore({library,storage,now,verifyAcceptance:(...args)=>deployment?.verifyAcceptance(...args)===true});
  // HTTP source track grids use the source three-decimal-minute n0 period.
- const timeline=createNodeDisplayTimeline({api,periodFor:node=>Math.round(orbitElements(node.orbit)?.period/60*1000)/1000,requestId:id,yieldControl:()=>new Promise(resolve=>host.setTimeout(resolve,0)),onChange:()=>{if(dead)return;refreshPose();scene?.update(display?.utc??null);refreshPanel();},onError:report});
- const optical=createNodeOpticalTimeline({resolver:createNodeLinkResolver({library,oisl}),requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>store.drafts,readDisplay,advanceUtc,onChange:value=>{if(dead)return;scene?.setLinks(value);refreshPanel();}});
+ const timeline=createNodeDisplayTimeline({api,periodFor:node=>Math.round(orbitElements(node.orbit)?.period/60*1000)/1000,requestId:id,yieldControl:()=>new Promise(resolve=>host.setTimeout(resolve,0)),onChange:(_snapshot,reason)=>{if(dead)return;if(reason?.kind==='communication'){refreshPanel({metadataOnly:true});return;}refreshPose();scene?.update(display?.utc??null);refreshPanel();},onError:report});
+ let opticalScopeRevision=Object.freeze({});
+ const optical=createNodeOpticalTimeline({resolver:createNodeLinkResolver({library,oisl}),requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>store.drafts,nodeScopeRevision:()=>dead?null:opticalScopeRevision,readDisplay,advanceUtc,onChange:value=>{if(dead)return;scene?.setLinks(value);refreshPanel();}});
  // Communication consumers use these existing owners; no mutable owner escapes this port.
  const network=networkInputs===null?null:createNodeNetworkTimeline({model:networkInputs.model,optical,
   requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>{
@@ -70,22 +71,30 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   if(scene)void scene.setNodes(store.drafts.map(node=>({id:node.id,definition:node,model:modelFor(node),orbit_regime:library.nodeCatalogItem(node).ORBIT_REGIME}))).catch(report);
   refreshPose();refreshPanel();
  }
- function refreshPanel(){
-  if(dead)return;panel?.refresh();if(!root)return;
+ function refreshPanel(options){
+  const metadataOnly=options?.metadataOnly===true;
+  if(dead||refreshingPanel)return;
+  refreshingPanel=true;
+  try{
+  if(!metadataOnly)panel?.refresh();if(dead||!root)return;
+  // A panel callback can report errors or change definitions synchronously.
+  // Read one fresh cohort afterwards; never retain these copies across refreshes.
+  const drafts=store.drafts,deployed=store.deployed;
   const state=deployment.state,ready=store.loaded&&state.server!==null&&!state.syncRequired&&!state.busy;
   const deploy=root.querySelector('#nodes-deploy'),recall=root.querySelector('#nodes-recall'),label=root.querySelector('#deploy-state');
-  if(deploy)deploy.disabled=!ready||store.drafts.length===0;
-  const reapply=root.querySelector('#nodes-reapply');if(reapply){reapply.hidden=!state.syncRequired;reapply.disabled=!store.loaded||state.server===null||state.busy||!state.syncRequired||store.drafts.length===0;}
+  if(deploy)deploy.disabled=!ready||drafts.length===0;
+  const reapply=root.querySelector('#nodes-reapply');if(reapply){reapply.hidden=!state.syncRequired;reapply.disabled=!store.loaded||state.server===null||state.busy||!state.syncRequired||drafts.length===0;}
   const reviewedRecall=root.querySelector('#nodes-recall-reviewed');if(reviewedRecall){reviewedRecall.hidden=!state.syncRequired;reviewedRecall.disabled=!store.loaded||state.server===null||state.busy||!state.syncRequired||state.server.nodes.length===0;}
   const serverReview=root.querySelector('#node-server-configuration');if(serverReview){serverReview.hidden=!state.syncRequired;serverReview.textContent=state.syncRequired&&state.server?JSON.stringify(state.server,null,2):'';}
   if(recall)recall.disabled=!ready||state.server.nodes.length===0;
   if(label)label.textContent=error||store.error?.message||state.error||(state.busy?'서버 배치 처리 중':state.server?`서버 배치 revision ${state.server.revision} · ${store.isDirty()?'편집 변경 있음':'확인됨'}`:'서버 배치 미확인');
   const native=root.querySelector('#node-native-state'),retry=root.querySelector('#nodes-retry'),calculation=timeline.snapshot();
-  if(native)native.textContent=calculation.error||(!display?.utc?'공용 표시 UTC를 먼저 선택하세요.':calculation.pending?'Rust 노드 계산 중':store.drafts.length?'Kepler+J2 모의 계산 · 실제 통신 미확인':'작업 세트에 노드가 없습니다.');
-  if(retry)retry.disabled=!display?.utc||store.drafts.length===0||calculation.pending;
+  if(native)native.textContent=calculation.error||(!display?.utc?'공용 표시 UTC를 먼저 선택하세요.':calculation.pending?'Rust 노드 계산 중':drafts.length?'Kepler+J2 모의 계산 · 실제 통신 미확인':'작업 세트에 노드가 없습니다.');
+  if(retry)retry.disabled=!display?.utc||drafts.length===0||calculation.pending;
   const restore=root.querySelector('#nodes-restore');if(restore)restore.disabled=!!restorePromise||(store.loaded&&state.server!==null&&!state.syncRequired&&!state.error);
-  const summary=root.querySelector('#node-scene-summary');if(summary)summary.textContent=`공유 작업 세트 · 초안 ${store.drafts.length}개 · 수락 배치 ${store.deployed.length}개 · ${store.deploymentConfirmed?'서버 수락 확인':'배치 수락 미확인'} · 표시 UTC ${display?.utc??'미제공'} · 실제 통신 미확인`;
-  const definitions=root.querySelector('#node-scene-definitions');if(definitions&&reviewedRevision!==store.revision){reviewedRevision=store.revision;definitions.textContent=JSON.stringify({drafts:store.drafts,deployed:store.deployed,selected_id:store.selectedId},null,2);}
+  const summary=root.querySelector('#node-scene-summary');if(summary)summary.textContent=`공유 작업 세트 · 초안 ${drafts.length}개 · 수락 배치 ${deployed.length}개 · ${store.deploymentConfirmed?'서버 수락 확인':'배치 수락 미확인'} · 표시 UTC ${display?.utc??'미제공'} · 실제 통신 미확인`;
+  const definitions=root.querySelector('#node-scene-definitions');if(definitions&&reviewedRevision!==store.revision){reviewedRevision=store.revision;definitions.textContent=JSON.stringify({drafts,deployed,selected_id:store.selectedId},null,2);}
+  }finally{refreshingPanel=false;}
  }
  function sceneSnapshot(){
   if(dead)return null;
@@ -93,7 +102,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  }
  const editorTools=createNodeEditorTools({library,catalogElements,now});
  deployment=createDataDeployment({constellation:store,fetchImpl,createId:id,setTimer:host.setTimeout.bind(host),clearTimer:host.clearTimeout.bind(host),onChange:refreshPanel});
- const removeStore=store.subscribe(()=>syncDefinitions());
+ const removeStore=store.subscribe(()=>{opticalScopeRevision=Object.freeze({});syncDefinitions();});
  const removeDisplay=globe.observeDisplayContext(value=>{
   if(dead)return;const previousUtc=display?.utc??null,wasProjected=projectedSim(display);display=value?structuredClone(value):null;
   if(previousUtc!==(display?.utc??null))network?.clear();
@@ -101,10 +110,10 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   refreshPose();refreshPanel();
  });
  const removeRenderer=globe.bindNodeRenderer((cesium,viewer)=>{
-  scene=new Scene({cesium,viewer,timeSource:()=>display?.utc??null,advanceUtc,geometryFor,displayGeometry:timeline.displayGeometry,pathFor:timeline.pathFor,pathRevisionFor:timeline.pathRevisionFor,tracksVisible:()=>tracks,palette:theme=>globe.palette?.(theme)??{},isTransitioning:()=>globe.viewState?.().mode.phase!=='ready',verifyLinkSnapshot:optical.verifyLinkSnapshot,onStatus:value=>{if(dead)return;readiness.set(value.node_id,structuredClone(value));refreshPanel();}});
+  scene=new Scene({cesium,viewer,timeSource:()=>display?.utc??null,advanceUtc,geometryFor,displayGeometry:timeline.displayGeometry,pathFor:timeline.pathFor,pathRevisionFor:timeline.pathRevisionFor,tracksVisible:()=>tracks,palette:theme=>globe.palette?.(theme)??{},isTransitioning:()=>typeof globe.isTransitioning==='function'?globe.isTransitioning():globe.viewState?.().mode.phase!=='ready',verifyLinkSnapshot:optical.verifyLinkSnapshot,onStatus:value=>{if(dead)return;readiness.set(value.node_id,structuredClone(value));refreshPanel();}});
   scene.setTheme(globe.viewState?.().choice.theme??'dark');refreshModels();
   if(!NetworkScene||!network)return scene;
-  const nodeRenderer=scene,groundRenderer=networkScene=new NetworkScene({cesium,viewer,timeSource:()=>display?.utc??null,geometryFor,verifyNetworkSnapshot:value=>!dead&&network.verifySnapshot(value),readFabricState:()=>networkInputs.readFabricState?.(),coverageRadiusKm:station=>networkInputs.coverageRadiusKm?.(station,networkSceneInput?.snapshot?.node_definitions??[])??0,isTransitioning:()=>globe.viewState?.().mode.phase!=='ready'});
+  const nodeRenderer=scene,groundRenderer=networkScene=new NetworkScene({cesium,viewer,timeSource:()=>display?.utc??null,geometryFor,verifyNetworkSnapshot:value=>!dead&&network.verifySnapshot(value),readFabricState:()=>networkInputs.readFabricState?.(),coverageRadiusKm:station=>networkInputs.coverageRadiusKm?.(station,networkSceneInput?.snapshot?.node_definitions??[])??0,isTransitioning:()=>typeof globe.isTransitioning==='function'?globe.isTransitioning():globe.viewState?.().mode.phase!=='ready'});
   groundRenderer.setGroundLinksVisible(groundLinksVisible);groundRenderer.setCoverageVisible(coverageVisible);if(networkSceneInput)groundRenderer.setSnapshot(networkSceneInput);
   return {syncFrame(...args){nodeRenderer.syncFrame(...args);groundRenderer.syncFrame(...args);},destroy(){try{groundRenderer.destroy();}finally{nodeRenderer.destroy();if(networkScene===groundRenderer)networkScene=null;}}};
  });

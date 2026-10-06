@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {createSampleBuffer} from '../../../user_application/web/scripts/orbit_playback.js';
-import {createNodeSampleBuffer} from '../../../user_application/web/scripts/nodes/node_timeline.js';
+import {createNodeSampleBuffer,createNodeTimeline} from '../../../user_application/web/scripts/nodes/node_timeline.js';
 import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
 const codec=createUtcCodec(LEAP_SHA256),start=codec.advance('2026-10-04T22:01:12Z',0),H='a'.repeat(64);
 const definition=id=>({schema:1,id,catalog_number:900001+Number(id.slice(2)),name:id,orbit:{epoch:1791151272000,altitude_km:550,eccentricity:0,inclination:53,raan:1,argp:2,mean_anomaly:3}});
@@ -120,4 +120,61 @@ test('native display projections are privately registered deeply readonly exact 
  assert.equal(port.sampleAt(view,codec.advance(start,-1)),null);assert.equal(port.sampleAt(view,'2026-10-04T22:01:12Z'),null);
  const middle=port.sampleAt(view,codec.advance(start,1)),last=port.sampleAt(view,codec.advance(start,2));assert.ok(middle);assert.ok(last);assert.notEqual(port.sampleAt(view,start),first,'third exact UTC evicts the earliest strong cached packet');assert.equal(port.verifySample(view,first,start),true,'held immutable genuine packets retain their provenance after eviction');
  const copy=buffer.geometryFor(node,{utc:start});copy.row.position_m[0]=0;assert.equal(port.sampleAt(view,start).row.position_m[0],7000000);
+});
+
+test('advancing readonly projections reuse the owner proof without repeating native definition or row clones',()=>{
+ const f=fixture({count:5});f.response.nodes[0].rows.forEach(row=>row.power={samples:[1,2],basis:{x:[1,0,0]}});
+ const buffer=createNodeSampleBuffer(f.request,f.response),node=f.request.nodes[0],port=buffer.displayGeometry,view=port.viewFor(node);
+ const clone=globalThis.structuredClone;let calls=0;globalThis.structuredClone=value=>{calls++;return clone(value);};
+ try{for(const elapsed of [.125,.625,1.125,1.625,2.125,2.625])assert.ok(port.sampleAt(view,codec.advance(start,elapsed)));}finally{globalThis.structuredClone=clone;}
+ assert.equal(calls,0,'registered native projections must not clone accepted definitions or pure interpolation inputs on advancing UTC');
+ for(const elapsed of [0,.125,.625,1,1.125,2.625,4]){const utc=codec.advance(start,elapsed);assert.deepEqual(port.sampleAt(view,utc),buffer.geometryFor(node,{utc}));}
+ const exact=port.sampleAt(view,start);assert.equal(Object.isFrozen(exact.row.power.samples),true);assert.throws(()=>{exact.row.power.samples[0]=999;},TypeError);
+ f.response.nodes[0].rows[0].power.samples[0]=999;assert.equal(buffer.geometryFor(node,{utc:start}).row.power.samples[0],1);
+});
+
+test('advancing registered packets preserve gap leap overflow and canonical UTC rejection',()=>{
+ for(const startUtc of [start,codec.advance('2016-12-31T23:59:59Z',0)]){
+  const f=fixture({startUtc}),row=f.response.nodes[0].rows[1];for(const key of Object.keys(row))if(!['utc','status','error_code'].includes(key))row[key]=null;row.status='error';row.error_code='unsupported_node_time';f.response.status='partial';
+  const b=createNodeSampleBuffer(f.request,f.response),p=b.displayGeometry,v=p.viewFor(f.request.nodes[0]);
+  for(const elapsed of [-.001,0,.5,1,1.5,2,2.001]){const utc=codec.advance(startUtc,elapsed);assert.deepEqual(p.sampleAt(v,utc),b.geometryFor(f.request.nodes[0],{utc}));}
+  assert.equal(p.sampleAt(v,'invalid'),null);assert.equal(p.sampleAt(v,'2026-10-04T22:01:12Z'),null);
+ }
+ const f=fixture();f.response.nodes[0].rows[0].position_m[0]=Number.MAX_VALUE;f.response.nodes[0].rows[1].position_m[0]=-Number.MAX_VALUE;
+ const b=createNodeSampleBuffer(f.request,f.response),p=b.displayGeometry,v=p.viewFor(f.request.nodes[0]);assert.equal(p.sampleAt(v,codec.advance(start,.5)),null);
+});
+
+test('private native projection matches the unchanged generic interpolation at every fractional tick',()=>{
+ const f=fixture({count:5}),rows=f.response.nodes[0].rows;
+ rows.forEach((row,i)=>{row.raan_deg=[359,1,179,181,359][i];row.longitude_deg=[179,-179,-1,1,179][i];row.native_extra={power:[i,i+1]};});
+ const turn=(a,b,f,o=0)=>{const delta=((b-a+180)%360+360)%360-180;return ((a+delta*f-o)%360+360)%360+o;};
+ const legacy=createSampleBuffer(rows,codec.difference,{isValid:r=>r.status==='valid',interpolateFields:(a,b,f)=>({inertial_velocity_km_s:a.inertial_velocity_km_s.map((v,i)=>v+(b.inertial_velocity_km_s[i]-v)*f),raan_deg:turn(a.raan_deg,b.raan_deg,f),argp_deg:turn(a.argp_deg,b.argp_deg,f),mean_anomaly_deg:turn(a.mean_anomaly_deg,b.mean_anomaly_deg,f),longitude_deg:turn(a.longitude_deg,b.longitude_deg,f,-180),latitude_deg:a.latitude_deg+(b.latitude_deg-a.latitude_deg)*f,height_km:a.height_km+(b.height_km-a.height_km)*f,sunlit:a.sunlit})});
+ const b=createNodeSampleBuffer(f.request,f.response),p=b.displayGeometry,v=p.viewFor(f.request.nodes[0]);
+ for(let tick=0;tick<=32;tick++){const utc=codec.advance(start,tick/8);assert.deepEqual(p.sampleAt(v,utc).row,legacy.sampleAt(utc),utc);}
+});
+
+test('owner exact communication batch preserves full public state parity with one boundary clone',()=>{
+ const f=fixture({ids:['N-0','N-1','N-2']});for(const entry of f.response.nodes)for(const row of entry.rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}
+ const b=createNodeSampleBuffer(f.request,f.response);assert.equal(typeof b.communicationStatesFor,'function');const expected=f.request.nodes.map(node=>[node.id,b.communicationStateFor(node,{utc:start})]);
+ const clone=globalThis.structuredClone;let calls=0;globalThis.structuredClone=value=>{calls++;return clone(value);};let result;try{result=b.communicationStatesFor(f.request.nodes,{utc:start});}finally{globalThis.structuredClone=clone;}
+ assert.deepEqual(result,expected);assert.equal(calls,1,'complete exact cohort crosses the copy boundary once');result[0][1].basis.x[0]=999;result[0][1].node_definition.orbit.altitude_km=999;result[0][1].inertial.r[0]=999;assert.deepEqual(b.communicationStatesFor(f.request.nodes,{utc:start}),expected);
+ assert.equal(b.communicationStatesFor(f.request.nodes,{utc:codec.advance(start,.5)}),null);assert.equal(b.communicationStatesFor([{...f.request.nodes[0],name:'dirty'}],{utc:start}),null);assert.equal(b.communicationStatesFor([f.request.nodes[0],f.request.nodes[0]],{utc:start}),null);
+ f.response.nodes[0].rows[0].lvlh_basis.x[0]=999;assert.deepEqual(b.communicationStatesFor(f.request.nodes,{utc:start}),expected);
+});
+
+test('exact communication batch rejects native errors malformed payloads noncanonical UTC and foreign scope',()=>{
+ for(const change of [row=>row.inertial_position_km=[0,0,0],row=>row.inertial_position_km=[Infinity,0,0],row=>row.lvlh_basis.x=[1,1,0],row=>row.lvlh_basis.y=[0,1,0],row=>row.lvlh_basis.z=[0,0,-1],row=>delete row.lvlh_basis]){
+  const f=fixture();for(const row of f.response.nodes[0].rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}change(f.response.nodes[0].rows[0]);const b=createNodeSampleBuffer(f.request,f.response);assert.equal(b.communicationStateFor(f.request.nodes[0],{utc:start}),null);assert.equal(b.communicationStatesFor(f.request.nodes,{utc:start}),null);
+ }
+ const f=fixture();for(const row of f.response.nodes[0].rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}const b=createNodeSampleBuffer(f.request,f.response);
+ for(const utc of ['invalid','2026-10-04T22:01:12Z',codec.advance(start,-1),codec.advance(start,3)])assert.equal(b.communicationStatesFor(f.request.nodes,{utc}),null);
+ assert.equal(b.communicationStatesFor([],{utc:start}),null);assert.equal(b.communicationStatesFor([definition('N-99')],{utc:start}),null);assert.equal(b.communicationStatesFor([{...f.request.nodes[0],name:Infinity}],{utc:start}),null);
+ const error=fixture();for(const row of error.response.nodes[0].rows){for(const key of Object.keys(row))if(!['utc','status','error_code'].includes(key))row[key]=null;row.status='error';row.error_code='unsupported_node_time';}error.response.status='error';assert.equal(createNodeSampleBuffer(error.request,error.response).communicationStatesFor(error.request.nodes,{utc:start}),null);
+});
+
+test('accepted communication cohort revocation during boundary copying fails closed and retry restores exact states',async()=>{
+ let timeline;const make=p=>{const f=fixture({count:p.count,startUtc:p.start_utc,ids:p.nodes.map(n=>n.id)});f.request=p;f.response.request_id=p.request_id;for(const n of f.response.nodes)for(const row of n.rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}return f.response;};
+ timeline=createNodeTimeline({api:{nodeSamples:async p=>make(p)},requestId:()=> 'cohort',yieldControl:async()=>{}});const nodes=[definition('N-0')];timeline.setDefinitions(nodes);await timeline.calculate(start);assert.ok(timeline.communicationStatesFor(nodes,{utc:start}));
+ const clone=globalThis.structuredClone;let revoked=false;globalThis.structuredClone=value=>{if(!revoked){revoked=true;timeline.cancel();}return clone(value);};try{assert.equal(timeline.communicationStatesFor(nodes,{utc:start}),null);}finally{globalThis.structuredClone=clone;}
+ assert.equal(timeline.communicationStatesFor(nodes,{utc:start}),null);await timeline.calculate(start);assert.ok(timeline.communicationStatesFor(nodes,{utc:start}));timeline.destroy();assert.equal(timeline.communicationStatesFor(nodes,{utc:start}),null);
 });

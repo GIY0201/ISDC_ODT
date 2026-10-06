@@ -1,5 +1,4 @@
 import {createUtcCodec,LEAP_SHA256} from '../orbit_utc.js';
-import {createSampleBuffer} from '../orbit_playback.js';
 
 // Readonly projection of source-native node receipts. No clock, HTTP or orbital propagation.
 const metadata=Object.freeze({model_profile:'SOURCE_KEPLER_J2_V1',frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',source_commit:'1a1e00297a0301637455b0ef2cf48b2e74576b07',quality:'engineering_assumption'});
@@ -53,13 +52,16 @@ export const NODE_COMMUNICATION_METADATA=metadata;
 export function isNodeCommunicationState(value,{node,utc}={}){
   try{
     if(!value||Object.entries(metadata).some(([key,expected])=>value[key]!==expected)||value.node_id!==node.id||identity(value.node_definition)!==identity(node)||value.utc!==utc||codec.advance(utc,0)!==utc||value.interpolated!==false||!(/^[a-f0-9]{64}$/.test(value.definition_hash)))return false;
+    return validCommunicationPayload(value);
+  }catch{return false;}
+}
+function validCommunicationPayload(value){
     const r=value.inertial?.r,v=value.inertial?.v,basis=value.basis;
     if(!vector(r)||!vector(v)||!(Math.hypot(...r)>0)||!(Math.hypot(...v)>0)||!basis||!['x','y','z'].every(axis=>vector(basis[axis])&&Math.abs(Math.hypot(...basis[axis])-1)<=1e-7))return false;
     const dot=(a,b)=>a.reduce((sum,item,i)=>sum+item*b[i],0);
     if(Math.abs(dot(basis.x,basis.y))>1e-7||Math.abs(dot(basis.x,basis.z))>1e-7||Math.abs(dot(basis.y,basis.z))>1e-7)return false;
     const cross=[basis.x[1]*basis.y[2]-basis.x[2]*basis.y[1],basis.x[2]*basis.y[0]-basis.x[0]*basis.y[2],basis.x[0]*basis.y[1]-basis.x[1]*basis.y[0]];
     return cross.every((item,i)=>Math.abs(item-basis.z[i])<=1e-7)&&typeof value.sunlit==='boolean'&&['longitude','latitude','altitude','velocity'].every(key=>Number.isFinite(value.geodetic?.[key]))&&value.geodetic.velocity===Math.hypot(...v);
-  }catch{return false;}
 }
 const interpolate=(a,b,fraction)=>{
   const linear=(left,right)=>left+(right-left)*fraction;
@@ -72,7 +74,7 @@ function* prepareNodeSampleBuffer(request,response,{expectedHashes={}}={}){
   const start=codec.advance(request.start_utc,0),times=Array.from({length:request.count},(_,i)=>codec.advance(start,i));
   if(!response||response.schema_version!==1||response.request_id!==request.request_id||!['valid','partial','error'].includes(response.status)||Object.entries(metadata).some(([key,value])=>response[key]!==value)||!Array.isArray(response.nodes)||response.nodes.length!==request.nodes.length)throw new Error('node sample metadata mismatch');
   const responseStatus=response.status,entries=new Map(),catalogs=new Set();let errors=0;
-  // createSampleBuffer deep-copies and freezes every custom-predicate row.
+  // Capture and freeze complete native rows before private projection reads.
   // Keep the full validation result only for those immutable row/vector objects
   // inside this prepared native buffer. A replacement buffer gets a new memo;
   // mutable/interpolated public results still undergo the complete check below.
@@ -96,20 +98,41 @@ function* prepareNodeSampleBuffer(request,response,{expectedHashes={}}={}){
       }else if(!valid(row))throw new Error('malformed native node success row');
     }
     catalogs.add(node.catalog_number);
-    const buffer=createSampleBuffer(result.rows,codec.difference,{isValid:immutableRowValid,interpolateFields:interpolate});
+    const captured=freezeProjection(structuredClone(result.rows));
+    const offsets=captured.map(row=>codec.difference(row.utc,start));
+    // The receipt already proves the canonical one-second grid. This private
+    // sampler has no caller-provided callbacks or mutable inputs to isolate.
+    // Retain the generic sampler's exact binary search/interpolation semantics.
+    const buffer={sampleAt(utc){
+      const target=codec.difference(utc,start);
+      if(!Number.isFinite(target)||target<offsets[0]||target>offsets.at(-1))return null;
+      let left=0,right=offsets.length-1;
+      while(left<right){const mid=(left+right)>>1;if(offsets[mid]<target)left=mid+1;else right=mid;}
+      if(offsets[left]===target)return immutableRowValid(captured[left])?captured[left]:null;
+      const a=captured[left-1],b=captured[left],span=offsets[left]-offsets[left-1];
+      if(!immutableRowValid(a)||!immutableRowValid(b)||span>1.000000001)return null;
+      const fraction=(target-offsets[left-1])/span;
+      return {...interpolate(a,b,fraction),utc,status:'valid',error_code:null,position_m:a.position_m.map((v,i)=>v+(b.position_m[i]-v)*fraction)};
+    }};
     entries.set(node.id,{definition:structuredClone(node),key,hash:result.definition_hash,buffer,failureRows});
     yield;
   }
   const total=request.nodes.length*request.count;
   if(responseStatus!==(errors===total?'error':errors?'partial':'valid'))throw new Error('node sample aggregate status mismatch');
+  function projectEntry(entry,utc){
+    const row=entry.failureRows.get(utc)??entry.buffer.sampleAt(utc);if(!row)return null;
+    // Immutable captured rows reuse their prior full proof; every new fractional
+    // result receives the complete finite/type check before packet registration.
+    if(row.status==='valid'&&!immutableRowValid(row))return null;
+    const elapsed=codec.difference(utc,start),observed=codec.advance(start,Math.floor(elapsed));
+    return {...metadata,node_id:entry.definition.id,node_definition:entry.definition,definition_hash:entry.hash,row,observation_utc:observed,interpolated:utc!==observed};
+  }
   function geometryFor(node,display){
     const entry=entries.get(node?.id);if(!entry)return null;
     try{
       if(identity(node)!==entry.key||typeof display?.utc!=='string'||codec.advance(display.utc,0)!==display.utc)return null;
-      const row=entry.failureRows.get(display.utc)??entry.buffer.sampleAt(display.utc);if(!row)return null;
-      if(row.status==='valid'&&!valid(row))return null;
-      const elapsed=codec.difference(display.utc,start),observed=codec.advance(start,Math.floor(elapsed));
-      return {...metadata,node_id:node.id,node_definition:structuredClone(entry.definition),definition_hash:entry.hash,row:structuredClone(row),observation_utc:observed,interpolated:display.utc!==observed};
+      const value=projectEntry(entry,display.utc);if(!value)return null;
+      return {...value,node_definition:structuredClone(entry.definition),row:structuredClone(value.row)};
     }catch{return null;}
   }
   function communicationStateFor(node,display){
@@ -121,6 +144,26 @@ function* prepareNodeSampleBuffer(request,response,{expectedHashes={}}={}){
       utc:display.utc,interpolated:false,inertial:{r:[...row.inertial_position_km],v:[...row.inertial_velocity_km_s]},basis:structuredClone(basis),
       geodetic:{longitude:row.longitude_deg,latitude:row.latitude_deg,altitude:row.height_km,velocity:Math.hypot(...row.inertial_velocity_km_s)},sunlit:row.sunlit};
     return isNodeCommunicationState(result,{node,utc:display.utc})?result:null;
+  }
+  // Internal exact-point cohort extraction. Full definition matching happens
+  // at this boundary; private immutable rows do not pass through the copied
+  // geometry API. The complete public communication payload is still checked.
+  function communicationStatesFor(nodes,display){
+    try{
+      if(!Array.isArray(nodes)||!nodes.length||nodes.length>240||typeof display?.utc!=='string'||codec.advance(display.utc,0)!==display.utc)return null;
+      const ids=new Set(),states=[];
+      for(const node of nodes){
+        const entry=entries.get(node?.id);if(!entry||ids.has(entry.definition.id)||identity(node)!==entry.key)return null;
+        ids.add(entry.definition.id);
+        const value=projectEntry(entry,display.utc);if(!value||value.interpolated||!immutableRowValid(value.row))return null;
+        const row=value.row,result={...metadata,node_id:entry.definition.id,node_definition:entry.definition,definition_hash:entry.hash,
+          utc:display.utc,interpolated:false,inertial:{r:row.inertial_position_km,v:row.inertial_velocity_km_s},basis:row.lvlh_basis,
+          geodetic:{longitude:row.longitude_deg,latitude:row.latitude_deg,altitude:row.height_km,velocity:Math.hypot(...row.inertial_velocity_km_s)},sunlit:row.sunlit};
+        if(!validCommunicationPayload(result))return null;
+        states.push([entry.definition.id,result]);
+      }
+      return structuredClone(states);
+    }catch{return null;}
   }
   // These registered display packets are derived immutable projections, never
   // mutable runtime state. The public geometryFor above retains fresh copies.
@@ -136,14 +179,19 @@ function* prepareNodeSampleBuffer(request,response,{expectedHashes={}}={}){
     sampleAt(view,utc){
       const own=registeredViews.get(view);if(!own||typeof utc!=='string')return null;
       if(own.cache.has(utc)){const value=own.cache.get(utc);own.cache.delete(utc);own.cache.set(utc,value);return value;}
-      const copy=geometryFor(own.entry.definition,{utc});
-      const value=copy?freezeProjection({...copy,node_definition:view.node_definition}):null;
+      let value=null;
+      try{
+        if(codec.advance(utc,0)===utc){
+          const projection=projectEntry(own.entry,utc);
+          if(projection)value=freezeProjection({...projection,node_definition:view.node_definition});
+        }
+      }catch{/* Invalid UTC or nonfinite interpolation cannot become a packet. */}
       if(value)registeredPackets.set(value,{view,utc});
       own.cache.set(utc,value);if(own.cache.size>2)own.cache.delete(own.cache.keys().next().value);return value;
     },
     verifySample(view,value,utc){const own=registeredPackets.get(value);return registeredViews.has(view)&&!!own&&own.view===view&&own.utc===utc&&value.row?.utc===utc;},
   });
-  return Object.freeze({geometryFor,communicationStateFor,displayGeometry,nodeIds:()=>[...entries.keys()],definitionHashes:()=>Object.fromEntries([...entries].map(([id,entry])=>[id,entry.hash]))});
+  return Object.freeze({geometryFor,communicationStateFor,communicationStatesFor,displayGeometry,nodeIds:()=>[...entries.keys()],definitionHashes:()=>Object.fromEntries([...entries].map(([id,entry])=>[id,entry.hash]))});
 }
 
 export function createNodeSampleBuffer(request,response,options){
@@ -308,13 +356,23 @@ export function createNodeTimeline({api,requestId,yieldControl,onChange=()=>{},o
   }
   function geometryFor(node,display){if(disposed)return null;return buffers.get(node?.id)?.geometryFor(node,display)??null;}
   function communicationStateFor(node,display){if(disposed)return null;return buffers.get(node?.id)?.communicationStateFor(node,display)??null;}
+  function communicationStatesFor(nodes,display){
+    if(disposed||!Array.isArray(nodes)||!nodes.length||nodes.length>240)return null;
+    const accepted=buffers,groups=new Map(),ids=new Set();
+    try{
+      for(const node of nodes){const buffer=accepted.get(node?.id);if(!buffer||ids.has(node.id))return null;ids.add(node.id);if(!groups.has(buffer))groups.set(buffer,[]);groups.get(buffer).push(node);}
+      const states=new Map();
+      for(const [buffer,scope] of groups){const values=buffer.communicationStatesFor(scope,display);if(!values||disposed||buffers!==accepted)return null;for(const [id,state]of values)states.set(id,state);}
+      return nodes.map(node=>[node.id,states.get(node.id)]);
+    }catch{return null;}
+  }
   function cancel(){requireOpen();invalidate(true);emit();}
   function destroy(){if(disposed)return;invalidate(true);disposed=true;definitions=[];hashes={};}
   const cohortRevisions=new WeakMap();
   const displayGeometry=bindDisplayGeometryOwner({revision:()=>{
     if(disposed||!buffers.size)return null;let token=cohortRevisions.get(buffers);if(!token){token=Object.freeze({});cohortRevisions.set(buffers,token);}return token;
   },bufferForNode:id=>disposed?null:buffers.get(id)});
-  return Object.freeze({setDefinitions,calculate,geometryFor,communicationStateFor,displayGeometry,snapshot,cancel,destroy});
+  return Object.freeze({setDefinitions,calculate,geometryFor,communicationStateFor,communicationStatesFor,displayGeometry,snapshot,cancel,destroy});
 }
 
 // One application queue for source-native display work. No clock or animation scheduler.
@@ -330,7 +388,7 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
   const communicationPoints=new Map(),communicationPointLimit=8;
   const requireOpen=()=>{if(disposed)throw new Error('node display timeline disposed');};
   const snapshot=()=>{const sample=samples.snapshot(),track=tracks.snapshot();return {utc,direction,pending:runner!==null,activeKind,error:inputError||sample.error||track.error,samples:sample,tracks:track,communicationPending:communicationJobs.length+(activeCommunication?1:0)};};
-  const emit=()=>{if(disposed)return;try{onChange(snapshot());}catch(e){try{onError(e instanceof Error?e.message:String(e));}catch{/* Display observers do not own calculations. */}}};
+  const emit=(reason={kind:'display'})=>{if(disposed)return;try{onChange(snapshot(),reason);}catch(e){try{onError(e instanceof Error?e.message:String(e));}catch{/* Display observers do not own calculations. */}}};
   // Called only after a display HTTP receipt has returned. Its uncommitted
   // validation can yield to exact-point work without overlapping native HTTP.
   async function cooperate({signal}={}){
@@ -365,7 +423,7 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
   }
   async function serveCommunication(job){
     if(job.settled)return;
-    activeCommunication=job;activeKind='communication';emit();
+    activeCommunication=job;activeKind='communication';emit({kind:'communication'});
     const current=()=>!disposed&&!job.controller.signal.aborted&&job.generation===communicationGeneration&&job.scope===identity(definitions);
     try{
       if(!current())throw new Error('native communication request invalidated');
@@ -376,8 +434,8 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
         communicationPoints.delete(job.utc);communicationPoints.set(job.utc,cached);
         settleCommunication(job,structuredClone(cached.result));return;
       }
-      let states=job.nodes.map(node=>[node.id,samples.communicationStateFor(node,{utc:job.utc})]);
-      if(states.some(([,state])=>!state)){
+      let states=samples.communicationStatesFor(job.nodes,{utc:job.utc});
+      if(!states){
         const base=requestId();if(typeof base!=='string'||!base.trim())throw new Error('node request identity required');
         const request={request_id:`${base}-communication-${job.generation}-${++communicationSequence}`,nodes:structuredClone(job.nodes),start_utc:job.utc,count:1,step_seconds:1};
         if(request.request_id.length>128)throw new Error('node request identity exceeds128');
@@ -385,16 +443,16 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
         if(!current())throw new Error('native communication request invalidated');
         const buffer=await createNodeSampleBufferAsync(request,response,{expectedHashes:known,yieldControl,signal:job.controller.signal});
         if(!current())throw new Error('native communication request invalidated');
-        states=job.nodes.map(node=>[node.id,buffer.communicationStateFor(node,{utc:job.utc})]);
+        states=buffer.communicationStatesFor(job.nodes,{utc:job.utc});
       }
-      if(states.some(([,state])=>!state))throw new Error('native communication states unavailable');
+      if(!states||states.some(([,state])=>!state))throw new Error('native communication states unavailable');
       if(!current())throw new Error('native communication request invalidated');
       const result={utc:job.utc,node_definitions:structuredClone(job.nodes),states:structuredClone(states)};
       communicationPoints.set(job.utc,{generation:job.generation,scope:job.scope,result:structuredClone(result)});
       if(communicationPoints.size>communicationPointLimit)communicationPoints.delete(communicationPoints.keys().next().value);
       settleCommunication(job,result);
     }catch(error){settleCommunication(job,null,error instanceof Error?error:new Error(String(error)));}
-    finally{activeCommunication=null;activeKind=null;emit();}
+    finally{activeCommunication=null;activeKind=null;emit({kind:'communication'});}
   }
   function requestCommunicationStates(value,{signal}={}){
     requireOpen();let canonical;

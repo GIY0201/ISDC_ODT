@@ -14,7 +14,7 @@ const codec=createUtcCodec(LEAP_SHA256),fixture=JSON.parse(gunzipSync(await read
 const scenario=fixture.cases.find(c=>c.id==='dense-two-plane:0'),meta={model_profile:'SOURCE_KEPLER_J2_V1',frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',source_commit:fixture.source_commit,quality:'engineering_assumption'};
 const canonical=date=>codec.advance(new Date(date).toISOString(),0),json=value=>JSON.parse(JSON.stringify(value));
 const until=async predicate=>{for(let i=0;i<100&&!predicate();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(predicate());};
-function setup(action){
+function setup(action,nodeScopeRevision=null){
  let nodes=structuredClone(scenario.rows[0].input.nodes),utc=canonical(fixture.epoch);const calls=[],events=[];
  const library=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>{throw Error('no equipment creation');}}),resolver=createNodeLinkResolver({library,oisl});
  const request=async(stamp,options)=>{
@@ -23,7 +23,7 @@ function setup(action){
   const value={utc:stamp,node_definitions:structuredClone(nodes),states:nodes.map(node=>[node.id,{...meta,...structuredClone(source.get(node.id)),node_id:node.id,node_definition:structuredClone(node),definition_hash:'a'.repeat(64),utc:stamp,interpolated:false}])};
   return action?action(value,options,calls):value;
  };
- const optical=createNodeOpticalTimeline({resolver,requestCommunicationStates:request,readNodes:()=>nodes,readDisplay:()=>({utc}),advanceUtc:codec.advance,onChange:value=>events.push(value)});
+ const optical=createNodeOpticalTimeline({resolver,requestCommunicationStates:request,readNodes:()=>nodes,nodeScopeRevision,readDisplay:()=>({utc}),advanceUtc:codec.advance,onChange:value=>events.push(value)});
  return {optical,calls,events,library,get nodes(){return structuredClone(nodes);},set nodes(value){nodes=structuredClone(value);},get utc(){return utc;},set utc(value){utc=value;}};
 }
 
@@ -140,4 +140,27 @@ test('empty input, unavailable UTC and absent dependencies cannot start native w
  const s=setup();s.nodes=[];assert.equal((await s.optical.update()).status,'valid');assert.equal(s.calls.length,0);
  s.utc=codec.advance('2016-12-31T23:59:60Z',0);assert.equal((await s.optical.update()).status,'error');assert.equal(s.calls.length,0);s.optical.destroy();
  assert.throws(()=>createNodeOpticalTimeline(),TypeError);
+});
+
+test('trusted optical scope token reuses complete immutable scope while same-number store reload invalidates it',async()=>{
+ const {createConstellationStore,DRAFT_KEY}=await import('../../../user_application/web/scripts/nodes/constellation.js');
+ const s=setup();let raw=JSON.stringify({schema:1,nodes:s.nodes,sequence:10000,revision:0,selectedId:null}),token=Object.freeze({}),reads=0;
+ const store=createConstellationStore({library:s.library,now:()=>fixture.epoch,storage:{getItem:key=>key===DRAFT_KEY?raw:null,setItem:(key,value)=>{if(key===DRAFT_KEY)raw=value;}}});store.subscribe(()=>{token=Object.freeze({});});store.load();
+ const resolver=createNodeLinkResolver({library:s.library,oisl}),optical=createNodeOpticalTimeline({resolver,nodeScopeRevision:()=>token,readNodes:()=>{reads++;return store.drafts;},readDisplay:()=>({utc:s.utc}),advanceUtc:codec.advance,requestCommunicationStates:async stamp=>{const source=new Map(scenario.rows.find(row=>row.input.date===Date.parse(stamp))?.input.states??scenario.rows.at(-1).input.states),nodes=store.drafts;return {utc:stamp,node_definitions:nodes,states:nodes.map(node=>[node.id,{...meta,...structuredClone(source.get(node.id)),node_id:node.id,node_definition:structuredClone(node),definition_hash:'a'.repeat(64),utc:stamp,interpolated:false}])};}});
+ try{const value=await optical.update();assert.equal(value.status,'valid');const after=reads;for(let i=0;i<10;i++){assert.equal(optical.snapshot().status,'valid');assert.equal(optical.verifyLinkSnapshot(value,{nodes:store.drafts,utc:s.utc}),true);}assert.equal(reads,after,'unchanged authoritative cohort must not copy or serialize all node definitions again');
+  const changed=JSON.parse(raw);changed.nodes[0].name='Reloaded different node';raw=JSON.stringify(changed);const previousRevision=store.revision;store.load({discardLocal:true});assert.equal(store.revision,previousRevision);assert.equal(optical.verifyLinkSnapshot(value,{nodes:store.drafts,utc:s.utc}),false);assert.equal(optical.snapshot().status,'unavailable');assert.ok(reads>after);const current=await optical.update();assert.equal(current.status,'valid');assert.equal(current.node_definitions[0].name,changed.nodes[0].name);
+ }finally{optical.destroy();s.optical.destroy();}
+});
+
+test('trusted optical scope rejects token drift during reads and UTC callbacks while generic callers remain fresh',()=>{
+ for(const point of ['nodes','advance','display']){
+  let token=Object.freeze({}),enabled=false,reads=0,utc=canonical(fixture.epoch);const nodes=structuredClone(scenario.rows[0].input.nodes);
+  const optical=createNodeOpticalTimeline({resolver:{resolveLinks(){throw Error('not queried');},terminalKey(){return'';}},requestCommunicationStates:async()=>{throw Error('not queried');},nodeScopeRevision:()=>token,readNodes:()=>{reads++;if(enabled&&point==='nodes')token=Object.freeze({});return nodes;},readDisplay:()=>{const value={utc};if(enabled&&point==='display')utc=canonical(Date.parse(utc)+1000);return value;},advanceUtc:(stamp,delta)=>{if(enabled&&point==='advance')token=Object.freeze({});return codec.advance(stamp,delta);}});
+  enabled=true;assert.equal(optical.snapshot().status,'error',point);enabled=false;assert.equal(optical.snapshot().status,'unavailable');const before=reads;optical.snapshot();assert.equal(reads,before);optical.destroy();assert.equal(optical.snapshot().error,'disposed');
+ }
+ let reads=0;const s=setup(),optical=createNodeOpticalTimeline({resolver:{resolveLinks(){},terminalKey(){}},requestCommunicationStates:async()=>null,readNodes:()=>{reads++;return s.nodes;},readDisplay:()=>({utc:s.utc}),advanceUtc:codec.advance});optical.snapshot();optical.snapshot();assert.equal(reads,2,'generic callers without the trusted token always re-read full definitions');optical.destroy();s.optical.destroy();
+});
+
+test('trusted optical scope preserves complete source results histories requests and mutable snapshot boundaries',async()=>{
+ const token=Object.freeze({}),legacy=setup(),trusted=setup(undefined,()=>token);try{const expected=await legacy.optical.update(),value=await trusted.optical.update();assert.deepEqual(value,expected);assert.deepEqual(trusted.optical.historyEntries(),legacy.optical.historyEntries());assert.deepEqual(trusted.calls.map(c=>c.utc),legacy.calls.map(c=>c.utc));const altered=trusted.optical.snapshot();altered.node_definitions[0].orbit.altitude_km=0;altered.terminals[0].state.phase='foreign';assert.deepEqual(trusted.optical.snapshot(),expected);assert.equal(trusted.optical.verifyLinkSnapshot(altered,{nodes:trusted.nodes,utc:trusted.utc}),false);}finally{trusted.optical.destroy();legacy.optical.destroy();}
 });

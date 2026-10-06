@@ -180,11 +180,15 @@ function createNodeStatusPanel({host,store,readDisplay,geometryFor=()=>null,link
   const requireOpen=()=>{if(destroyed)throw new Error('node_status_disposed');};
   const report=error=>{const message=error instanceof Error?error.message:String(error);if(message!==lastError){lastError=message;onError(message);}};
   function unbind(){generation++;for(const remove of owned.splice(0))remove();}
-  function context(node){
-    let display=null,geometry=null,links=null;
+  function geometryContext(node){
+    let display=null,geometry=null;
     try{display=readDisplay();if(display?.utc)geometry=geometryFor(structuredClone(node),structuredClone(display));}catch(error){report(error);}
-    try{if(display?.utc)links=linksFor({nodes:store.drafts,utc:display.utc});}catch(error){report(error);}
-    return {utc:display?.utc,geometry,links,nodes:store.drafts,verifyLinkSnapshot,oislPresentation};
+    return {utc:display?.utc,geometry};
+  }
+  function context(node){
+    const input=geometryContext(node);let links=null;
+    try{if(input.utc)links=linksFor({nodes:store.drafts,utc:input.utc});}catch(error){report(error);}
+    return {...input,links,nodes:store.drafts,verifyLinkSnapshot,oislPresentation};
   }
   function bind(selector,node,action){
     const element=host.querySelector(selector);if(!element)return;
@@ -205,7 +209,7 @@ function createNodeStatusPanel({host,store,readDisplay,geometryFor=()=>null,link
     bind('#node-duplicate',node,next=>store.duplicate(next.id));
     bind('#node-remove',node,next=>store.remove(next.id));
     bind('#node-locate',node,next=>{
-      const input=context(next);if(!validGeometry(next,input.geometry,input.utc)||typeof onFocus!=='function')return;
+      const input=geometryContext(next);if(!validGeometry(next,input.geometry,input.utc)||typeof onFocus!=='function')return;
       return onFocus(next,structuredClone(input.geometry),{userInitiated:true,focus:true});
     });
   }
@@ -227,10 +231,10 @@ function createNodeStatusPanel({host,store,readDisplay,geometryFor=()=>null,link
     return structuredClone(value);
   }
   function destroy(){if(destroyed)return;unbind();destroyed=true;}
-  function canFocus(){if(destroyed||editor?.isOpen()||typeof onFocus!=='function')return false;const node=store.selected;if(!node)return false;const input=context(node);return validGeometry(node,input.geometry,input.utc);}
+  function canFocus(){if(destroyed||editor?.isOpen()||typeof onFocus!=='function')return false;const node=store.selected;if(!node)return false;const input=geometryContext(node);return validGeometry(node,input.geometry,input.utc);}
   async function focusSelected(){
     if(destroyed||editor?.isOpen()||typeof onFocus!=='function')return false;
-    const node=store.selected;if(!node)return false;const input=context(node);if(!validGeometry(node,input.geometry,input.utc))return false;
+    const node=store.selected;if(!node)return false;const input=geometryContext(node);if(!validGeometry(node,input.geometry,input.utc))return false;
     try{await onFocus(structuredClone(node),structuredClone(input.geometry),{userInitiated:true,focus:true});return true;}catch(error){report(error);return false;}
   }
   return Object.freeze({refresh,destroy,canFocus,focusSelected});

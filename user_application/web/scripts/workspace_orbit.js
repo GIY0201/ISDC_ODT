@@ -111,8 +111,11 @@ const radioPanel=createOrbitRadioPanel(client,api);
 const missionPanel=createMissionPanel(api);
 const kpiPanel=createKpiPanel(api,drawMultiLine);
 let catalogPanel,catalogTimePanel,catalogScene,catalogScenePanel,catalogTrack,catalogPasses,catalogPassPanel,modelSelection;
+// UTC/position changes already refresh source nodes through the globe display observer.
+// Keep every other catalog state change (including controls, selection and errors).
+let catalogNodeControlKey=null;
 function syncModel(selection){if(!modelSelection||!catalogPanel)return;const selected=selection??catalogPanel.controller.snapshot();modelSelection.select(selected.selectedItem,selected.profile,catalogTimeline.snapshot().selected);}
-const catalogTimeline=createCatalogTimeline(api,value=>globe.catalog(value),()=>{catalogTimePanel?.update();catalogPanel?.update();stationPanel.update();nodeWorkspace?.refresh();const t=catalogTimeline.snapshot();catalogTrack?.select(t.selected);if(t.utc)catalogTrack?.observe(t.utc);catalogPasses?.update(t);catalogPassPanel?.update();notifyWorkspaceContext();if(catalogScenePanel?.followsTimeline()&&t.selected?.group===catalogScene?.snapshot().context?.group&&t.utc)catalogScene.observe(t.utc);});
+const catalogTimeline=createCatalogTimeline(api,value=>globe.catalog(value),()=>{catalogTimePanel?.update();catalogPanel?.update();stationPanel.update();const t=catalogTimeline.snapshot();const controlKey=JSON.stringify(Object.fromEntries(Object.entries(t).filter(([key])=>!['utc','display'].includes(key))));if(controlKey!==catalogNodeControlKey){catalogNodeControlKey=controlKey;nodeWorkspace?.refresh();}catalogTrack?.select(t.selected);if(t.utc)catalogTrack?.observe(t.utc);catalogPasses?.update(t);catalogPassPanel?.update();notifyWorkspaceContext();if(catalogScenePanel?.followsTimeline()&&t.selected?.group===catalogScene?.snapshot().context?.group&&t.utc)catalogScene.observe(t.utc);});
 catalogTrack=createCatalogTrack(api,value=>globe.catalogTrack(value),()=>catalogPassPanel?.update(),{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
 catalogPasses=createCatalogPasses(api,()=>{catalogPassPanel?.update();stationPanel.update();},async utc=>{catalogTimeline.seek(utc);await catalogTimeline.calculate();},{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
 catalogPassPanel=createCatalogPassPanel(catalogTrack,catalogPasses,()=>catalogTimeline.snapshot());
