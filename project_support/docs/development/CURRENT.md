@@ -63,3 +63,7 @@
 ## 2026-09-07: Git 저장소 초기 등록
 
 사용자의 별도 요청으로 Git을 초기화하고 origin을 https://github.com/HyeonJun9138/ISDC-ODT.git 으로 지정했다. 원격 저장소가 비어 있음을 확인했다. 실행 코드와 자산, 개발 문서 및 테스트 97개 파일을 등록 대상으로 삼고 로컬 도구 설정, 실행 데이터, 기획 자료와 원본 백업은 제외했다. 등록 대상 스냅샷을 임시 폴더에 복원하여 Python 35개 및 JavaScript 4개 시험을 통과했다. 주요 비밀키 패턴 검사에서 발견 항목이 없었다. 원격 반영 여부는 `git status -sb`와 `git ls-remote origin refs/heads/main`으로 확인한다.
+
+
+## 2026-10-06 T077 original optical equations component
+Original pure oisl.js text ported unchanged (only line endings), no clock/timed JS propagation/network/state owner. Hash-pinned source offline capture twice565246bytes/SHA c63dc5daeb8852034594c2d5796a8837535de0e4268a38e9dbba660af59ceaf3, elevenepochstates/1071exactserializedgeometry-selection-pair-history-label cases. Original9testbodies preserved with captured state inputs; missingmoduleRED and JSONnegativezero10PASS1FAIL corrected solely by matching capture serialization. FullPython645PASS8existingERFAwarnings166.50s(session73019exit0)/Node570PASS2985.9988ms; focused11PASS95.562ms; syntax and fullsource-text/original9test-body equality. Evidence validation/t077_oisl_equations.md. Original nodes/links.js resolver/scoped histories/commonexactUTC/verifiedsnapshot; T148/T151-153; fullT075-84/Terra/all50/T032/equipment/HIL/download/review. Source100kmatmospheremargin/ratedrangequality/acquisition remain engineering assumptions, no actual optical/RF success. Actual8891/native0.2.0/userbrowser/remotePR/merge unchanged; fullgoalactive.
