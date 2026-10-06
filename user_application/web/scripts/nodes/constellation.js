@@ -27,6 +27,7 @@ export function createConstellationStore({library,storage=null,now,verifyAccepta
   if(typeof now!=='function')throw new TypeError('명시적인 시각 공급자가 필요합니다.');
   let state={drafts:[],deployed:[],deployedAt:null,sequence:0,selectedId:null,revision:0,deployedRevision:0,receipt:null};
   let draftToken=null,deployedToken=null,loaded=false,confirmed=false,lastError=null;
+  let presentationState=null,presentationDraftsEqual=false,deployedIdentity=null,deployedCanonical=null;
   const listeners=new Set();
   const fail=(code,message)=>{lastError={code,message};return new ConstellationError(code,message);};
   const time=()=>{const value=now();if(!['number','string'].includes(typeof value)||!Number.isFinite(new Date(value).getTime()))throw fail('invalid_time','유효한 명시 시각이 필요합니다.');return value;};
@@ -178,7 +179,20 @@ export function createConstellationStore({library,storage=null,now,verifyAccepta
     try{record(raw,'draft',time());}catch{return false;}
     fail('storage_conflict','다른 창의 변경과 충돌했습니다. 초안을 확인하고 다시 불러오세요.');notify('conflict');return false;
   }
-  return Object.freeze({load,add,addMany,duplicate,update,remove,removeFormation,replaceFormation,deploy,recall,isDirty,find,nextIds,idFactory,receiveExternalDraft,
+  // Private presentation join: no full current arrays escape and no approval
+  // is inferred from revision. Exact ordered JSON includes updated_at.
+  function contextPresentation(serverIds){
+    if(presentationState!==state){presentationState=state;presentationDraftsEqual=canonical(state.drafts)===canonical(state.deployed);}
+    const selected=state.drafts.find(n=>n.id===state.selectedId);
+    return {loaded,deployment_confirmed:confirmed,error:lastError?.message??'',drafts_equal_deployed:presentationDraftsEqual,server_ids_match:Array.isArray(serverIds)&&state.deployed.length===serverIds.length&&state.deployed.every((node,i)=>node.id===serverIds[i]),deployed_count:state.deployed.length,selected_node:selected?{id:selected.id,name:selected.name}:null};
+  }
+  function matchesDeployed(value){
+    if(!Array.isArray(value))return false;
+    if(deployedIdentity!==state.deployed){deployedIdentity=state.deployed;deployedCanonical=canonical(state.deployed);}
+    return canonical(value)===deployedCanonical;
+  }
+  function nodeForPresentation(id){const node=state.drafts.find(n=>n.id===id);return node?{id:node.id,name:node.name}:null;}
+  return Object.freeze({load,add,addMany,duplicate,update,remove,removeFormation,replaceFormation,deploy,recall,isDirty,find,nextIds,idFactory,receiveExternalDraft,contextPresentation,matchesDeployed,nodeForPresentation,
     clear(){commit({...state,drafts:[],selectedId:null},'remove');},
     select(id){const selectedId=state.drafts.some(n=>n.id===id)?id:null;commit({...state,selectedId},'select');return selectedId;},
     get drafts(){return copy(state.drafts);},get deployed(){return copy(state.deployed);},get deployedAt(){return state.deployedAt;},

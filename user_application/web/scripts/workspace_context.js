@@ -8,8 +8,9 @@ const ids=nodes=>Array.isArray(nodes)?nodes.map(n=>n.id):null;
 export function projectWorkspaceContext({display=null,catalog=null,stored=null,nodes=null,sim=null,mission=null,fabric=null,data=null,selection=null,network=null}={}){
  const runtime=!sim?.error&&sim?.runtime?.mode==='SIM'&&text(sim.runtime.run_id)&&Number.isFinite(sim.runtime.elapsed_seconds)&&sim.runtime.elapsed_seconds>=0&&typeof sim.runtime.running==='boolean'?sim.runtime:null;
  const run={status:runtime?'source_sim':'unavailable',id:runtime?.run_id??null,scenario_id:runtime?.scenario_id??null,elapsed_seconds:runtime?.elapsed_seconds??null,running:runtime?.running??null};
- const accepted=runtime&&nodes?.loaded===true&&nodes.deployment_confirmed===true&&!nodes.error&&nodes.server?.run_id===runtime.run_id&&Number.isSafeInteger(nodes.server.revision)&&same(ids(nodes.deployed),ids(nodes.server.nodes))&&same(nodes.drafts,nodes.deployed);
- const deployment={status:accepted?'accepted':'unavailable',count:accepted?nodes.deployed.length:0,run_id:accepted?nodes.server.run_id:null,revision:accepted?nodes.server.revision:null,scope_id:accepted?nodes.server.scope_id:null};
+ const compact=nodes?.contract==='node-workspace-presentation-v1'&&['matchesDeployed','matchesServer','matchesServerNodes','nodeForSelection'].every(key=>typeof nodes[key]==='function');
+ const accepted=runtime&&nodes?.loaded===true&&nodes.deployment_confirmed===true&&!nodes.error&&nodes.server?.run_id===runtime.run_id&&Number.isSafeInteger(nodes.server.revision)&&(compact?nodes.server_ids_match===true&&nodes.drafts_equal_deployed===true:same(ids(nodes.deployed),ids(nodes.server.nodes))&&same(nodes.drafts,nodes.deployed));
+ const deployment={status:accepted?'accepted':'unavailable',count:accepted?(compact?nodes.deployed_count:nodes.deployed.length):0,run_id:accepted?nodes.server.run_id:null,revision:accepted?nodes.server.revision:null,scope_id:accepted?nodes.server.scope_id:null};
  let identity={domain:'unavailable',id:null,name:null,status:'unavailable',source:null},time=null;
  const displayUtc=utc(display?.utc),key=text(display?.key);
  if(displayUtc&&key){
@@ -21,11 +22,11 @@ export function projectWorkspaceContext({display=null,catalog=null,stored=null,n
   if(key.startsWith('scene:')&&hash(key.slice(6))){identity={domain:'catalog_scene',id:key.slice(6),name:null,status:'native_analysis',source:'카탈로그 전체 장면'};time=displayUtc;}
  }
  if(selection?.domain==='source_node'){
-  const node=nodes?.drafts?.find(n=>n.id===selection.id);
+  const node=compact?nodes.nodeForSelection(selection.id):nodes?.drafts?.find(n=>n.id===selection.id);
   if(node){identity={domain:'source_node',id:node.id,name:node.name,status:accepted&&time?'accepted_analysis':'draft',source:'선배 노드 모델'};if(identity.status==='draft')time=null;}
  }
  const chosen=mission?.ready?mission.selected:null,plan=chosen&&mission?.module?.accepted_plans?.[chosen.id],context=mission?.context,inspection=mission?.inspection;
- const planCurrent=chosen&&accepted&&time&&context?.utc===time&&same(context.deployment,nodes.server)&&same(context.nodes,nodes.deployed)&&same(physical(context),physical(inspection?.context))&&mission.module?.reachable===true&&mission.module.exchange_contract==='guarded-v1'&&plan?.instance_id===mission.module.instance_id&&plan.mission_id===chosen.id&&plan.mission_version===chosen.version&&hash(plan.context_hash)&&plan.context_hash===inspection?.evidence?.accepted_context?.context_hash;
+ const planCurrent=chosen&&accepted&&time&&context?.utc===time&&(compact?nodes.matchesServer(context.deployment)&&nodes.matchesDeployed(context.nodes):same(context.deployment,nodes.server)&&same(context.nodes,nodes.deployed))&&same(physical(context),physical(inspection?.context))&&mission.module?.reachable===true&&mission.module.exchange_contract==='guarded-v1'&&plan?.instance_id===mission.module.instance_id&&plan.mission_id===chosen.id&&plan.mission_version===chosen.version&&hash(plan.context_hash)&&plan.context_hash===inspection?.evidence?.accepted_context?.context_hash;
  const missionView={id:chosen?.id??null,status:planCurrent?(mission.module.committed?.[chosen.id]?'module_committed':'module_accepted_plan'):chosen?'draft_or_previous_plan':'unavailable',feasible:planCurrent?plan.feasible:null};
  // The fabric owner reconciles receipt scope; the native network verifier also
  // proves it still belongs to this displayed UTC/input, not another SIM run.
@@ -35,7 +36,7 @@ export function projectWorkspaceContext({display=null,catalog=null,stored=null,n
  const receipt=networkCurrent&&!fabric?.error&&!fabric?.pending&&!fabric?.refresh_required&&['accepted','routed'].includes(fabric?.status)&&hash(fabric?.receipt?.network_hash)?fabric.receipt:null;
  const communication={status:receipt?'last_verified_query':'unavailable',utc:receipt?proof.utc:null,module_utc:receipt?.time??null,module_instance:receipt?.instance_id??null,sequence:receipt?.sequence??null,actual_rf:'unknown'};
  const report=!data?.error&&!data?.busy?data?.report:null;
- const dataCurrent=accepted&&report?.runtime?.run_id===runtime.run_id&&report.deployment?.run_id===runtime.run_id&&report.deployment?.scope_id===nodes.server.scope_id&&report.deployment?.revision===nodes.server.revision&&same(report.deployment.nodes,nodes.server.nodes)&&report.module?.reachable===true&&report.module.scope_contract==='isolated-v1'&&report.module.scope_id===nodes.server.scope_id;
+ const dataCurrent=accepted&&report?.runtime?.run_id===runtime.run_id&&report.deployment?.run_id===runtime.run_id&&report.deployment?.scope_id===nodes.server.scope_id&&report.deployment?.revision===nodes.server.revision&&(compact?nodes.matchesServerNodes(report.deployment.nodes):same(report.deployment.nodes,nodes.server.nodes))&&report.module?.reachable===true&&report.module.scope_contract==='isolated-v1'&&report.module.scope_id===nodes.server.scope_id;
  const dataView={status:dataCurrent?'last_verified_query':'unavailable',scope_id:dataCurrent?report.deployment.scope_id:null,elapsed_seconds:dataCurrent?report.runtime.elapsed_seconds:null,objects:dataCurrent?report.module.objects:null,implementation:dataCurrent?report.module.implementation:null,selected_id:dataCurrent?data.selected_id??null:null};
  const domainLabel={source_sim:'SIM',source_node:'SIM 노드',catalog_gp:'GP 위성',catalog_scene:'GP 장면',stored_orbit:'보존 궤도',unavailable:'현재 대상 미확인'}[identity.domain];
  const handoff=`${domainLabel} ${identity.name??identity.id??'미선택'} → 임무 ${missionView.id??'미선택'} (${missionView.status}) → 통신 ${communication.status} → 데이터 ${dataView.status} · 실제 RF·수신·장비 보안·시설 상태 미확인`;

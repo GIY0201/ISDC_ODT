@@ -32,7 +32,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  const network=networkInputs===null?null:createNodeNetworkTimeline({model:networkInputs.model,optical,
   requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>{
    if(!started||!store.loaded)throw Error('노드 설정 불러오기 미완료');return store.drafts;
-  },readDisplay,readStations:networkInputs.readStations,readFaults:networkInputs.readFaults,
+  },nodeScopeRevision:()=>dead?null:opticalScopeRevision,readDisplay,readStations:networkInputs.readStations,readFaults:networkInputs.readFaults,
   validateNode:library.validateNode,validateStation:networkInputs.validateStation,advanceUtc,
   onChange:value=>{if(!dead)networkInputs.onChange?.(value);}});
  const geometryFor=(node,at)=>timeline.geometryFor(node,at);
@@ -99,6 +99,11 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  function sceneSnapshot(){
   if(dead)return null;
   return structuredClone({drafts:store.drafts,deployed:store.deployed,selected_id:store.selectedId,revision:store.revision,loaded:store.loaded,deployment_confirmed:store.deploymentConfirmed,persistence:store.persistence,display,server:deployment.state.server,calculation:timeline.snapshot(),model_status:[...readiness.values()],error:error||store.error?.message||deployment.state.error||''});
+ }
+ function contextPresentation(){
+  if(dead)return null;
+  const accepted=deployment.contextPresentation(),local=store.contextPresentation(accepted.server_node_ids);
+  return {...local,contract:'node-workspace-presentation-v1',server:accepted.server,error:error||local.error||accepted.error||'',nodeForSelection:store.nodeForPresentation,matchesDeployed:store.matchesDeployed,matchesServer:deployment.matchesServer,matchesServerNodes:deployment.matchesServerNodes};
  }
  const editorTools=createNodeEditorTools({library,catalogElements,now});
  deployment=createDataDeployment({constellation:store,fetchImpl,createId:id,setTimer:host.setTimeout.bind(host),clearTimer:host.clearTimeout.bind(host),onChange:refreshPanel});
@@ -211,7 +216,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  return Object.freeze({
   async start(){if(dead||started)return;started=true;return retryRestore();},retryRestore,
   scenarioPorts:()=>scenarioPorts,
-  show,refresh:refreshPanel,refreshModels,sceneSnapshot,selection,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
+  show,refresh:refreshPanel,refreshModels,sceneSnapshot,contextPresentation,selection,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
   missionInputs(){
    const state=deployment.state;
    if(dead||!started||!store.loaded||!store.deploymentConfirmed||store.deployed.length===0||store.error||state.server===null||state.syncRequired||state.busy||store.isDirty())throw Error('위성 설정을 불러오고 현재 초안을 서버에 배치하세요.');
@@ -226,6 +231,12 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   setCoverageVisible:value=>{if(dead)return;coverageVisible=Boolean(value);networkScene?.setCoverageVisible(coverageVisible);},
   clearNetworkScene:()=>{networkSceneInput=null;networkScene?.clear();},
   updateNetwork:()=>dead?Promise.resolve(null):network?.update()??Promise.resolve(null),
+  // UI status/time only; full receipts remain on the original action/render ports.
+  networkPresentation:()=>{
+   if(dead||!network)return {proof:null,verified:false};
+   if(typeof network.presentation==='function')return network.presentation();
+   const proof=network.snapshot();return {proof,verified:proof?network.verifySnapshot(proof)===true:false};
+  },
   networkSnapshot:()=>dead?null:network?.snapshot()??null,
   verifyNetworkSnapshot:value=>!dead&&network?.verifySnapshot(value)===true,
   clearNetwork:()=>{if(!dead)network?.clear();},

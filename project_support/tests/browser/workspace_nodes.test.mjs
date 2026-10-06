@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {projectWorkspaceContext} from '../../../user_application/web/scripts/workspace_context.js';
 import assert from 'node:assert/strict';
 import {createWorkspaceNodes} from '../../../user_application/web/scripts/workspace_nodes.js';
 import {createNodeLibrary} from '../../../digital_twin/model_library/browser/satellite_nodes.js';
@@ -415,4 +416,32 @@ test('accepted optical result still updates the scene and full panel after commu
 
 test('workspace optical cache keeps same-definition selection valid and revokes edited definitions at the same UTC',async()=>{
  const codec=createUtcCodec(LEAP_SHA256),f=fixture({native:true});try{await f.workspace.start();f.workspace.show('satellite');f.attach();f.options.store.add({name:'scope owner'});const utc=codec.advance('2026-10-04T22:01:12Z',0);f.context({utc,source:'catalog',key:'catalog:fixture'});const value=await f.workspace.updateMissionLinks();assert.equal(value.status,'valid');const nodes=f.options.store.drafts;f.options.store.select(nodes[0].id);assert.equal(f.workspace.verifyMissionLinks(value,{nodes:f.options.store.drafts,utc}),true,'selection rotates cache token without changing the actual receipt scope');f.options.store.update(nodes[0].id,{...nodes[0],name:'edited scope'});assert.equal(f.workspace.verifyMissionLinks(value,{nodes:f.options.store.drafts,utc}),false);f.workspace.destroy();assert.equal(f.workspace.verifyMissionLinks(value,{nodes,utc}),false);}finally{f.workspace.destroy();}
+});
+
+
+test('mounted private network summary preserves complete context output across current, changed, missing and disposed inputs',async()=>{
+ const codec=createUtcCodec(LEAP_SHA256),utc=codec.advance('2026-10-04T22:01:12Z',0);let faults=[],stations=stationModel.DEFAULT_STATION_KEYS.map(preset=>stationModel.createStation({preset})),fail=false;
+ const f=fixture({networkInputs:{readStations:()=>{if(fail)throw Error('station unavailable');return stations;},readFaults:()=>faults}});
+ const input={display:{key:'sim:R',utc},sim:{runtime:{mode:'SIM',run_id:'R',elapsed_seconds:0,running:false}},fabric:{status:'accepted',receipt:{network_hash:'a'.repeat(64),time:utc,instance_id:'fabric',sequence:1}}};
+ const check=()=>{const proof=f.workspace.networkSnapshot(),summary=f.workspace.networkPresentation(),before=JSON.stringify(proof);assert.deepEqual(projectWorkspaceContext({...input,network:summary}),projectWorkspaceContext({...input,network:{proof,verified:proof?f.workspace.verifyNetworkSnapshot(proof):false}}));assert.equal(JSON.stringify(proof),before);if(summary?.proof){assert.equal(summary.proof.node_definitions,undefined);assert.equal(summary.proof.stations,undefined);assert.equal(summary.proof.network?.links,undefined);assert.equal(f.workspace.verifyNetworkSnapshot(summary.proof),false);}return summary;};
+ try{
+  await f.workspace.start();check();f.context({utc});check();await f.workspace.updateNetwork();assert.equal(check().verified,true);
+  input.fabric.receipt.time=null;assert.equal(projectWorkspaceContext({...input,network:check()}).communication.status,'unavailable');input.fabric.receipt.time=utc;
+  input.fabric.pending=true;assert.equal(projectWorkspaceContext({...input,network:check()}).communication.status,'unavailable');input.fabric.pending=false;input.fabric.error='failed';assert.equal(projectWorkspaceContext({...input,network:check()}).communication.status,'unavailable');input.fabric.error='';
+  stations[0].dish_m+=1;assert.equal(check().verified,false);await f.workspace.updateNetwork();assert.equal(check().verified,true);
+  faults=[{kind:'station_down',target:stations[0].id}];assert.equal(check().verified,false);await f.workspace.updateNetwork();check();
+  f.context({utc:codec.advance(utc,1)});assert.equal(check().verified,false);await f.workspace.updateNetwork();check();
+  fail=true;assert.equal(check().verified,false);await f.workspace.updateNetwork();check();fail=false;
+  f.context({});assert.equal(check().verified,false);f.context(null);assert.equal(check().verified,false);
+  f.context({utc});await f.workspace.updateNetwork();f.workspace.clearNetwork();assert.equal(check().verified,false);
+  f.workspace.destroy();assert.equal(check().verified,false);
+ }finally{f.workspace.destroy();}
+});
+
+test('mounted private network summary does not promote pending or failed native requests',async()=>{
+ let finish,queries=0;const codec=createUtcCodec(LEAP_SHA256),utc=codec.advance('2026-10-04T22:01:12Z',0),f=fixture({networkInputs:{readStations:()=>[],readFaults:()=>[]},onSampleRequest:()=>++queries===1?new Promise(resolve=>{finish=resolve;}):undefined});
+ try{await f.workspace.start();f.workspace.show('satellite');f.options.store.add({name:'source'});f.context({utc});const pending=f.workspace.updateNetwork();for(let i=0;i<40&&!finish;i++)await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(f.workspace.networkSnapshot().status,'pending');assert.equal(f.workspace.networkPresentation().proof.status,'pending');assert.equal(f.workspace.networkPresentation().verified,false);finish?.();await pending;
+  assert.equal(f.workspace.networkSnapshot().status,'error');assert.equal(f.workspace.networkPresentation().proof.status,'error');assert.equal(f.workspace.networkPresentation().verified,false);
+ }finally{finish?.();f.workspace.destroy();}
 });

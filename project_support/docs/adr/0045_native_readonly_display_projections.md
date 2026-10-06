@@ -219,3 +219,37 @@ selection), an existing exact-UTC receipt remains valid; if definitions differ,
 it is revoked by the original scope key. Tests cover actual store reload at the
 same persisted revision, scope read-count reduction, token drift during node/UTC
 callbacks, generic fallback, selection parity, same-UTC edits and disposal.
+
+## Network node scope and UI status proof
+
+The subsequent Chrome CPU profile identified network context and full envelope
+copies on workspace presentation reads. Network timeline now accepts the same
+optional trusted nodeScopeRevision contract as optical. It caches only a fully
+validated, deeply frozen node roster, canonical scope and private node ID set.
+Every station, runtime-derived fault and exact UTC is still read, copied and
+validated freshly on every context call, including station/node ID collisions.
+The canonical context key is byte-identical to the prior full JSON key. Generic
+callers without this port execute the original fresh-context path unchanged.
+
+A UI-only presentation() returns {proof:{status,utc,error,network:{time}|null},
+verified}. It uses the existing private accepted envelope, current context and
+optical proof, then re-reads the complete current context and owner identities
+before returning verified=true. It never exposes definition/station/fault/link
+arrays or substitutes for full verifySnapshot/action receipts. Public snapshot,
+verifySnapshot and mission/fabric paths remain unchanged. Pending, failure,
+clear and disposal fields match the existing public UI projection; mutation or
+owner disposal during verification fails closed. Fresh station/fault/runtime
+failures revoke this proof even when the trusted node token stays unchanged.
+
+RED established repeated node reads and the absent summary. Tests compare full
+source envelopes and summary fields with the original public APIs, verify node
+read reduction, actual same-number store reload, node/validator/station/fault/UTC
+callback token drift, fresh station collisions/runtime errors, pending/failure/
+clear/disposal, mutation inside optical verification and mutable summary/copy
+independence. UI summaries are explicitly rejected as full action receipts.
+
+## Private definition scope reuse, 2026-10-07
+
+The display query owner alone assigns its cloned definitions at accepted setDefinitions and clears them at destroy. Outgoing jobs/native requests/receipts cross existing copy boundaries. The complete canonical definition scope is now captured from the owned clone once at actual definition change and reused by queued job capture and every final current check. Existing full sample/track input validation, communication generation, abort, UTC/hash/native response and queue serialization checks remain. No revision-only or identity-only approval replaces full canonical equality. Canonically equivalent input cannot alter private data; reorder or any full-field difference still invalidates active/queued work. Clear/retry/seek generation invalidation remains unchanged.
+
+Meaningful RED six cached240-node queries repeated18 full-cohort serializations; GREEN removes those18 while returning all240 exact states and independent copies. Active/queued changed definitions, caller mutation, clear and destroy remain covered. Focused71PASS; independent readonly review found no actionable issue. Combined fullsuite and actual performance after this additional patch remain pending, separate from the committed1193-test/164.6ms trial.

@@ -15,6 +15,28 @@ function setup(action=(p,kind)=>receipt(p,kind)){
  timeline.setDefinitions(defs());return {timeline,calls,get max(){return max;}};
 }
 const until=async predicate=>{for(let i=0;i<100&&!predicate();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(predicate());};
+test('cached exact communication reads preserve all240 copies without reserializing the private cohort',async()=>{
+ const s=setup((p,kind)=>{const value=receipt(p,kind);for(const node of value.nodes)for(const row of node.rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}return value;}),nodes=Array.from({length:240},(_,i)=>({...defs()[0],id:'N-'+i,catalog_number:900001+i}));
+ try{s.timeline.setDefinitions(nodes);await s.timeline.observe(start);await s.timeline.requestCommunicationStates(start);const calls=s.calls.length,stringify=JSON.stringify;let cohortSerializations=0;
+  JSON.stringify=function(value,...args){if(Array.isArray(value)&&value.length===240&&value.every(node=>node?.schema===1&&typeof node.id==='string'))cohortSerializations++;return stringify.call(this,value,...args);};
+  try{for(let i=0;i<6;i++){const result=await s.timeline.requestCommunicationStates(start);assert.equal(result.states.length,240);assert.deepEqual(result.node_definitions,nodes);result.node_definitions[239].name='foreign';result.states[239][1].inertial.r[0]=0;}}finally{JSON.stringify=stringify;}
+  assert.equal(s.calls.length,calls);assert.equal(cohortSerializations,0,'accepted private scope is unchanged; cached reads must not walk all definitions again');assert.equal((await s.timeline.requestCommunicationStates(start)).states[239][1].inertial.r[0],7000);
+ }finally{s.timeline.destroy();}
+});
+test('communication private scope keeps canonical equivalents but revokes active and queued work on every actual scope change',async()=>{
+ for(const change of ['equivalent','reordered','foreign-field','clear','destroy']){
+  let finish;const s=setup((p,kind,_,calls)=>{const value=receipt(p,kind);for(const node of value.nodes)for(const row of node.rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}return calls.length===1?new Promise(resolve=>{finish=()=>resolve(value);}):value;});
+  const nodes=[...defs(),{...defs()[0],id:'N-2',catalog_number:900002}];s.timeline.setDefinitions(nodes);const first=s.timeline.requestCommunicationStates(start),second=s.timeline.requestCommunicationStates(codec.advance(start,1));
+  const results=Promise.allSettled([first,second]);await until(()=>finish);nodes[0].name='caller mutation';
+  if(change==='equivalent'){const equivalent=[...defs(),{...defs()[0],catalog_number:900002,id:'N-2'}];assert.equal(s.timeline.setDefinitions(equivalent),false);}
+  else if(change==='reordered')s.timeline.setDefinitions([...s.calls[0].p.nodes].reverse());
+  else if(change==='foreign-field')s.timeline.setDefinitions(s.calls[0].p.nodes.map(node=>({...node,notes:'changed complete definition'})));
+  else s.timeline[change]();
+  finish();const settled=await results;if(change==='equivalent'){assert.equal(settled.every(value=>value.status==='fulfilled'),true);assert.equal(settled[0].value.node_definitions[0].name,'node');assert.deepEqual(settled[0].value.states.map(([id])=>id),['N-1','N-2']);}
+  else{assert.equal(settled.every(value=>value.status==='rejected'&&/invalidated/.test(value.reason.message)),true);assert.equal(s.calls[0].signal.aborted,true);assert.equal(s.calls.length,1);}
+  assert.equal(s.max,1);s.timeline.destroy();
+ }
+});
 test('communication state follows the same readonly buffers and exact UTC through the shared owner',async()=>{
  const s=setup((p,kind)=>{
   const value=receipt(p,kind);

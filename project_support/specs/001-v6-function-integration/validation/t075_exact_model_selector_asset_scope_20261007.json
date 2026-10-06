@@ -1,0 +1,1154 @@
+{
+  "schema": 1,
+  "scope": "Static selector/asset coverage only; neither prior load-ready status nor this matrix proves GPU rendering.",
+  "pinned_source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "inputs": [
+    {
+      "path": "digital_twin/model_library/packages/satellite_display/v1/manifest.json",
+      "sha256": "f2c3f2e55a35cb8c6fefee877381c93867698c7002331224f58b0e01f40f3db5"
+    },
+    {
+      "path": "D:/projects/ISDC/isdc_odt_upstream_reference/user_application/web/assets/models/manifest.json",
+      "sha256": "7a88f531a8a138c0d7f8eaa4e3c88a891ab17920d809389f62feb9b5d621f9fe"
+    },
+    {
+      "path": "data/workspace/validation/t081_live_finished_0430/aside_artifacts/178-isolated-matrix-baseline-and-options.json",
+      "sha256": "aa91f8204f5d91a6bc056ebc2ebb9c83ef10adb5b59b7fd7b35048fabc828eb7"
+    }
+  ],
+  "option_count": 56,
+  "unique_current_asset_url_count": 50,
+  "no_3d_options": [],
+  "unique_assets": [
+    {
+      "url": "/static/satellite_display/iss.glb",
+      "representative_option_id": "iss",
+      "option_ids": [
+        "iss"
+      ],
+      "sha256": "2ba4427413b0dd89a33d2acaf962dea8a96a3b1d8dceda05cc7aad547ffd3d16",
+      "bytes": 476992
+    },
+    {
+      "url": "/static/satellite_display/hubble.glb",
+      "representative_option_id": "hubble",
+      "option_ids": [
+        "hubble"
+      ],
+      "sha256": "e5ba4de15c7d359ac8fa1ab7e286aff42dec09c0fadae3db99252587f39fa384",
+      "bytes": 1694988
+    },
+    {
+      "url": "/static/satellite_display/landsat_7.glb",
+      "representative_option_id": "landsat_7",
+      "option_ids": [
+        "landsat_7"
+      ],
+      "sha256": "0ecb0a11a405d6f21a9cca60a65fdbaaaf1d00e026de50ad55e9074279829687",
+      "bytes": 160156
+    },
+    {
+      "url": "/static/satellite_display/landsat_8.glb",
+      "representative_option_id": "landsat_8",
+      "option_ids": [
+        "landsat_8"
+      ],
+      "sha256": "8b599e867be20589cd35e55ed1d46da104299b430b1827b548a25d3fad0a314d",
+      "bytes": 780280
+    },
+    {
+      "url": "/static/satellite_display/terra_repaired.glb",
+      "representative_option_id": "terra",
+      "option_ids": [
+        "terra"
+      ],
+      "sha256": "85e3a8e05c694463e3e664a3fd702484a0fc0e5eb042fbb3acdfb2dc924dd779",
+      "bytes": 2165908
+    },
+    {
+      "url": "/static/satellite_display/aqua.glb",
+      "representative_option_id": "aqua",
+      "option_ids": [
+        "aqua"
+      ],
+      "sha256": "f0761181a1d378b6b3e270e8eee8bf20c241b7d577933630369b0cffd4b521e1",
+      "bytes": 1104016
+    },
+    {
+      "url": "/static/satellite_display/aura.glb",
+      "representative_option_id": "aura",
+      "option_ids": [
+        "aura"
+      ],
+      "sha256": "99d46cd9af551c7511befe47d3f24b9b957da6a9dc35a0e29fc784db9f55b381",
+      "bytes": 476264
+    },
+    {
+      "url": "/static/satellite_display/suomi_npp.glb",
+      "representative_option_id": "suomi_npp",
+      "option_ids": [
+        "suomi_npp"
+      ],
+      "sha256": "885278277ed8fa864368803b7da2046292754bff01033055d56fe86e8b951ee4",
+      "bytes": 2283576
+    },
+    {
+      "url": "/static/satellite_display/goes.glb",
+      "representative_option_id": "goes",
+      "option_ids": [
+        "goes"
+      ],
+      "sha256": "e2f690d3d59e101d6a75a8b0bdcbe1cf9f58a058d01eaceede8557460a6e9101",
+      "bytes": 335620
+    },
+    {
+      "url": "/static/satellite_display/tdrs.glb",
+      "representative_option_id": "tdrs",
+      "option_ids": [
+        "tdrs"
+      ],
+      "sha256": "4508756798d827722608aa9001925f01ce6409b9e0fd910eacfde9c061139b9e",
+      "bytes": 216892
+    },
+    {
+      "url": "/static/satellite_display/oco_2.glb",
+      "representative_option_id": "oco_2",
+      "option_ids": [
+        "oco_2"
+      ],
+      "sha256": "5aba302aaf91fe1a915f1121683aca6ef7ad65d7a82dad65f363361e5009b1ef",
+      "bytes": 280060
+    },
+    {
+      "url": "/static/satellite_display/sdo.glb",
+      "representative_option_id": "sdo",
+      "option_ids": [
+        "sdo"
+      ],
+      "sha256": "8ce4607bd65f098eee22f02717a182d6721610c940a961511dfbca832a3eda95",
+      "bytes": 497844
+    },
+    {
+      "url": "/static/satellite_display/swift.glb",
+      "representative_option_id": "swift",
+      "option_ids": [
+        "swift"
+      ],
+      "sha256": "e7074fe1590550747fbcd6803b0c6086b4f57cafd8e3d93789f0b0b7e59b0372",
+      "bytes": 211404
+    },
+    {
+      "url": "/static/satellite_display/tess.glb",
+      "representative_option_id": "tess",
+      "option_ids": [
+        "tess"
+      ],
+      "sha256": "2b82a0191af6f06081368bb59d6cbb63b13ad8f019cd7ad08229e911e5b9ee6a",
+      "bytes": 206576
+    },
+    {
+      "url": "/static/satellite_display/icesat_2.glb",
+      "representative_option_id": "icesat_2",
+      "option_ids": [
+        "icesat_2"
+      ],
+      "sha256": "e7d260d69852fcd3367c8e7a3c236f8c0551c591abc5a8e8f42c0356a2eebf38",
+      "bytes": 1499504
+    },
+    {
+      "url": "/static/satellite_display/grace.glb",
+      "representative_option_id": "grace",
+      "option_ids": [
+        "grace"
+      ],
+      "sha256": "b376141db89a708acac65484b69ffafe36bbed00709f73c1c9d48cc3d5e3e499",
+      "bytes": 22620
+    },
+    {
+      "url": "/static/satellite_display/jason_repaired.glb",
+      "representative_option_id": "jason",
+      "option_ids": [
+        "jason"
+      ],
+      "sha256": "f9b01e1684fd83fa1242bdce55793128796b3ff6164272b5fae2e656dd2821fb",
+      "bytes": 592788
+    },
+    {
+      "url": "/static/satellite_display/sentinel_6.glb",
+      "representative_option_id": "sentinel_6",
+      "option_ids": [
+        "sentinel_6"
+      ],
+      "sha256": "cd257b8d63deef018d0227fa6c4bcb29974f257073c4d4f92abd557098b3d580",
+      "bytes": 2108496
+    },
+    {
+      "url": "/static/satellite_display/chandra.glb",
+      "representative_option_id": "chandra",
+      "option_ids": [
+        "chandra"
+      ],
+      "sha256": "9383f44fc4c6eba73c40b0c2cfe33c08c90f1fb5230274bfdaa98e0c9f116a34",
+      "bytes": 998500
+    },
+    {
+      "url": "/static/satellite_display/van_allen.glb",
+      "representative_option_id": "van_allen",
+      "option_ids": [
+        "van_allen"
+      ],
+      "sha256": "be9ed53e1452c615750e8d2f977a168eb95216cb82fb698c16d5e08cb4b891f0",
+      "bytes": 933260
+    },
+    {
+      "url": "/static/satellite_display/poes.glb",
+      "representative_option_id": "poes",
+      "option_ids": [
+        "poes"
+      ],
+      "sha256": "30a8bfdb6585bb87e27d8a847046a55f8c299456e3752d1b00786942c59035aa",
+      "bytes": 1158944
+    },
+    {
+      "url": "/static/satellite_display/eo_1.glb",
+      "representative_option_id": "eo_1",
+      "option_ids": [
+        "eo_1"
+      ],
+      "sha256": "2d26422a45147e86c93c535979b1d9ae16d34fc0171f661dec051bca61c14a74",
+      "bytes": 224580
+    },
+    {
+      "url": "/static/satellite_display/sac_c.glb",
+      "representative_option_id": "sac_c",
+      "option_ids": [
+        "sac_c"
+      ],
+      "sha256": "cf1e9ad3923ded6f6157ec06b545de50840b5b7c9526d0a9bda8be1f021ca745",
+      "bytes": 73608
+    },
+    {
+      "url": "/static/satellite_display/radarsat_1.glb",
+      "representative_option_id": "radarsat_1",
+      "option_ids": [
+        "radarsat_1"
+      ],
+      "sha256": "db609daaf38354f67d73f412e44d78642383de157f0e2d1de85c3614562cb86f",
+      "bytes": 68148
+    },
+    {
+      "url": "/static/satellite_display/cubesat_1u.glb",
+      "representative_option_id": "cubesat_1u",
+      "option_ids": [
+        "cubesat_1u"
+      ],
+      "sha256": "bae308ea2e33778c93675909f7dc2e0d5d6916cd685668a463566c61224b1e85",
+      "bytes": 149424
+    },
+    {
+      "url": "/static/satellite_display/ssl_1300.glb",
+      "representative_option_id": "ssl_1300",
+      "option_ids": [
+        "ssl_1300"
+      ],
+      "sha256": "63cd644d67ee49ab79e313bb6cb0495e9f6072d421a84e116c2c3f9c40bf9c0c",
+      "bytes": 510324
+    },
+    {
+      "url": "/static/satellite_display/mms.glb",
+      "representative_option_id": "mms",
+      "option_ids": [
+        "mms"
+      ],
+      "sha256": "e3688a8db82f1918c3b4525f4ceed08b614a3a2c5be09ade5711baba30262eef",
+      "bytes": 335808
+    },
+    {
+      "url": "/static/satellite_display/cygnss.glb",
+      "representative_option_id": "cygnss",
+      "option_ids": [
+        "cygnss"
+      ],
+      "sha256": "830321f2d30099b4355f835d7ae5a2ab1f9f91c292dd01dfc008b8d4bf64c962",
+      "bytes": 1622924
+    },
+    {
+      "url": "/static/satellite_display/gpm.glb",
+      "representative_option_id": "gpm",
+      "option_ids": [
+        "gpm"
+      ],
+      "sha256": "7068c880770bb2ac936e804a1af48e564c90b829ff884c405a4759e8da9e693e",
+      "bytes": 2257008
+    },
+    {
+      "url": "/static/satellite_display/hinode.glb",
+      "representative_option_id": "hinode",
+      "option_ids": [
+        "hinode"
+      ],
+      "sha256": "104f23212d379541990c28b26999db3bcfb2ef0731285f2366219e5438e125e6",
+      "bytes": 276248
+    },
+    {
+      "url": "/static/satellite_display/calipso.glb",
+      "representative_option_id": "calipso",
+      "option_ids": [
+        "calipso"
+      ],
+      "sha256": "4abd7708d0f2629baf3e58e9d5df634c34692365791e58a7795742854e53de1d",
+      "bytes": 536084
+    },
+    {
+      "url": "/static/satellite_display/cloudsat.glb",
+      "representative_option_id": "cloudsat",
+      "option_ids": [
+        "cloudsat"
+      ],
+      "sha256": "293aab60f12decc020fe7e19ddd0837b0643067425a4ad09f01ffd8a380e7423",
+      "bytes": 267656
+    },
+    {
+      "url": "/static/satellite_display/topex.glb",
+      "representative_option_id": "topex",
+      "option_ids": [
+        "topex"
+      ],
+      "sha256": "e5ff3cae87bbdc59c07a626bea1907aa24678038e1431ff703e85fe9d5c88c0c",
+      "bytes": 214264
+    },
+    {
+      "url": "/static/satellite_display/ibex.glb",
+      "representative_option_id": "ibex",
+      "option_ids": [
+        "ibex"
+      ],
+      "sha256": "6ce15c60467673f599c7085ed5152a07d0335628109741848ce64835e3786406",
+      "bytes": 1306616
+    },
+    {
+      "url": "/static/satellite_display/fermi.glb",
+      "representative_option_id": "fermi",
+      "option_ids": [
+        "fermi"
+      ],
+      "sha256": "d345f3b0595f7792f699acf33b28d7401cb53cc2a20b735bca00e95644e3813c",
+      "bytes": 1379016
+    },
+    {
+      "url": "/static/satellite_display/aquarius.glb",
+      "representative_option_id": "aquarius",
+      "option_ids": [
+        "aquarius"
+      ],
+      "sha256": "dc81055c83e5da56d3ae57f4c967010be64ad5d01cee4cdb0a88c85c2b628116",
+      "bytes": 1137428
+    },
+    {
+      "url": "/static/satellite_display/geotail.glb",
+      "representative_option_id": "geotail",
+      "option_ids": [
+        "geotail"
+      ],
+      "sha256": "3b39a3fc157731421869dab707dd5c4d3d829ab0b727b2a6cc8bc211fd96a8ad",
+      "bytes": 91504
+    },
+    {
+      "url": "/static/satellite_display/themis.glb",
+      "representative_option_id": "themis",
+      "option_ids": [
+        "themis"
+      ],
+      "sha256": "2dfe2a2e07de211f6686adbb612c09c5dfac62a397cb88343f119c2124d818e3",
+      "bytes": 682092
+    },
+    {
+      "url": "/static/satellite_display/sorce.glb",
+      "representative_option_id": "sorce",
+      "option_ids": [
+        "sorce"
+      ],
+      "sha256": "8ec505080199227d25897f5157f4cd87e60092d69b16079deb3ca32caa2ce10d",
+      "bytes": 366492
+    },
+    {
+      "url": "/static/satellite_display/toms.glb",
+      "representative_option_id": "toms",
+      "option_ids": [
+        "toms"
+      ],
+      "sha256": "36578255a65849073c12d596d255a2fc2042730576bfb433bb9073eb66d287d2",
+      "bytes": 98620
+    },
+    {
+      "url": "/static/satellite_display/polar.glb",
+      "representative_option_id": "polar",
+      "option_ids": [
+        "polar"
+      ],
+      "sha256": "0ffe9e41f6686db7dcaf3144f967f0f419e72b6a90218d955b1654cf0478801d",
+      "bytes": 98592
+    },
+    {
+      "url": "/static/satellite_display/swas.glb",
+      "representative_option_id": "swas",
+      "option_ids": [
+        "swas"
+      ],
+      "sha256": "c1d58e66cb2f1185fc98b5941cbfeb3dbdb453b817a87f95e6bf8d176630f5a1",
+      "bytes": 150296
+    },
+    {
+      "url": "/static/satellite_display/fuse.glb",
+      "representative_option_id": "fuse",
+      "option_ids": [
+        "fuse"
+      ],
+      "sha256": "056c26e4f48bc362790ebc42c7c85101037c92b4f50a313bbe2783fc7004cdf8",
+      "bytes": 236704
+    },
+    {
+      "url": "/static/satellite_display/wire.glb",
+      "representative_option_id": "wire",
+      "option_ids": [
+        "wire"
+      ],
+      "sha256": "adffb87ebd6d884f47b8d82b0aa8c37f72dc1c72bf532ba4117a94c392f6b2d0",
+      "bytes": 375404
+    },
+    {
+      "url": "/static/satellite_display/hete_2.glb",
+      "representative_option_id": "hete_2",
+      "option_ids": [
+        "hete_2"
+      ],
+      "sha256": "f514f7cff65c0d4d565408b3f6ba113c4a3b97321a3fe770c89f67820e83922c",
+      "bytes": 61836
+    },
+    {
+      "url": "/static/satellite_display/goes_r.glb",
+      "representative_option_id": "goes_r",
+      "option_ids": [
+        "goes_r"
+      ],
+      "sha256": "26f2f289ec9fc78612de27548247c8caf754a6f0efe182290bbf81dc9cbf41e6",
+      "bytes": 6409168
+    },
+    {
+      "url": "/static/satellite_display/starlink_flat.glb",
+      "representative_option_id": "starlink_flat",
+      "option_ids": [
+        "starlink_flat"
+      ],
+      "sha256": "1f2bd994bca491b82ddaafaae70805b9cab8e8ac42bb1444463e566e44bf29ec",
+      "bytes": 14096
+    },
+    {
+      "url": "/static/satellite_display/gnss_bus.glb",
+      "representative_option_id": "gnss_bus",
+      "option_ids": [
+        "gnss_bus"
+      ],
+      "sha256": "caa606c93deae3608a8a7ddb2a66c88d266f9bf11b838e56df47a7f6130e5c7e",
+      "bytes": 43068
+    },
+    {
+      "url": "/static/satellite_display/leo_comms_bus.glb",
+      "representative_option_id": "oneweb",
+      "option_ids": [
+        "oneweb",
+        "kuiper",
+        "iridium",
+        "globalstar",
+        "orbcomm",
+        "o3b",
+        "china_leo_comms"
+      ],
+      "sha256": "aba350d67d392924b68b2f8abf9712e55200ad4a88d2340e44c3f5220b84ff09",
+      "bytes": 15896
+    },
+    {
+      "url": "/static/satellite_display/cubesat_3u.glb",
+      "representative_option_id": "cubesat_3u",
+      "option_ids": [
+        "cubesat_3u"
+      ],
+      "sha256": "8657ecec5c182900985c92b85281f49ca4c7859e1ff40b704aef7a54359d073f",
+      "bytes": 10608
+    }
+  ],
+  "options": [
+    {
+      "option_id": "iss",
+      "actual_option_label": "국제우주정거장 ISS · 109.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/iss.glb",
+      "sha256": "2ba4427413b0dd89a33d2acaf962dea8a96a3b1d8dceda05cc7aad547ffd3d16",
+      "bytes": 476992,
+      "size_m": 109,
+      "scale": 2.393270930147821,
+      "source_file": "iss.glb",
+      "derived": false
+    },
+    {
+      "option_id": "hubble",
+      "actual_option_label": "허블 우주망원경 · 13.2 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/hubble.glb",
+      "sha256": "e5ba4de15c7d359ac8fa1ab7e286aff42dec09c0fadae3db99252587f39fa384",
+      "bytes": 1694988,
+      "size_m": 13.2,
+      "scale": 0.02511947789454451,
+      "source_file": "hubble.glb",
+      "derived": false
+    },
+    {
+      "option_id": "landsat_7",
+      "actual_option_label": "Landsat 7 · 9.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/landsat_7.glb",
+      "sha256": "0ecb0a11a405d6f21a9cca60a65fdbaaaf1d00e026de50ad55e9074279829687",
+      "bytes": 160156,
+      "size_m": 9,
+      "scale": 7.168070546557415,
+      "source_file": "landsat_7.glb",
+      "derived": false
+    },
+    {
+      "option_id": "landsat_8",
+      "actual_option_label": "Landsat 8 · 11.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/landsat_8.glb",
+      "sha256": "8b599e867be20589cd35e55ed1d46da104299b430b1827b548a25d3fad0a314d",
+      "bytes": 780280,
+      "size_m": 11,
+      "scale": 0.8972652497162602,
+      "source_file": "landsat_8.glb",
+      "derived": false
+    },
+    {
+      "option_id": "terra",
+      "actual_option_label": "Terra (EOS AM-1) · 15.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/terra_repaired.glb",
+      "sha256": "85e3a8e05c694463e3e664a3fd702484a0fc0e5eb042fbb3acdfb2dc924dd779",
+      "bytes": 2165908,
+      "size_m": 15,
+      "scale": 0.0005757311001930177,
+      "source_file": "terra.glb",
+      "derived": true
+    },
+    {
+      "option_id": "aqua",
+      "actual_option_label": "Aqua (EOS PM-1) · 16.7 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/aqua.glb",
+      "sha256": "f0761181a1d378b6b3e270e8eee8bf20c241b7d577933630369b0cffd4b521e1",
+      "bytes": 1104016,
+      "size_m": 16.7,
+      "scale": 0.9393896779637182,
+      "source_file": "aqua.glb",
+      "derived": false
+    },
+    {
+      "option_id": "aura",
+      "actual_option_label": "Aura (EOS CH-1) · 17.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/aura.glb",
+      "sha256": "99d46cd9af551c7511befe47d3f24b9b957da6a9dc35a0e29fc784db9f55b381",
+      "bytes": 476264,
+      "size_m": 17,
+      "scale": 0.3345000498306692,
+      "source_file": "aura.glb",
+      "derived": false
+    },
+    {
+      "option_id": "suomi_npp",
+      "actual_option_label": "Suomi NPP / JPSS 계열 · 9.5 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/suomi_npp.glb",
+      "sha256": "885278277ed8fa864368803b7da2046292754bff01033055d56fe86e8b951ee4",
+      "bytes": 2283576,
+      "size_m": 9.5,
+      "scale": 1.0604054968295549,
+      "source_file": "suomi_npp.glb",
+      "derived": false
+    },
+    {
+      "option_id": "goes",
+      "actual_option_label": "GOES 계열 · 7.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/goes.glb",
+      "sha256": "e2f690d3d59e101d6a75a8b0bdcbe1cf9f58a058d01eaceede8557460a6e9101",
+      "bytes": 335620,
+      "size_m": 7,
+      "scale": 52.0666750965093,
+      "source_file": "goes.glb",
+      "derived": false
+    },
+    {
+      "option_id": "tdrs",
+      "actual_option_label": "TDRS 데이터 중계위성 · 17.3 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/tdrs.glb",
+      "sha256": "4508756798d827722608aa9001925f01ce6409b9e0fd910eacfde9c061139b9e",
+      "bytes": 216892,
+      "size_m": 17.3,
+      "scale": 0.18318520744507039,
+      "source_file": "tdrs.glb",
+      "derived": false
+    },
+    {
+      "option_id": "oco_2",
+      "actual_option_label": "OCO-2 · 4.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/oco_2.glb",
+      "sha256": "5aba302aaf91fe1a915f1121683aca6ef7ad65d7a82dad65f363361e5009b1ef",
+      "bytes": 280060,
+      "size_m": 4,
+      "scale": 0.10033789035421507,
+      "source_file": "oco_2.glb",
+      "derived": false
+    },
+    {
+      "option_id": "sdo",
+      "actual_option_label": "Solar Dynamics Observatory · 6.3 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/sdo.glb",
+      "sha256": "8ce4607bd65f098eee22f02717a182d6721610c940a961511dfbca832a3eda95",
+      "bytes": 497844,
+      "size_m": 6.25,
+      "scale": 0.1687616740888051,
+      "source_file": "sdo.glb",
+      "derived": false
+    },
+    {
+      "option_id": "swift",
+      "actual_option_label": "Swift 감마선 관측위성 · 5.6 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/swift.glb",
+      "sha256": "e7074fe1590550747fbcd6803b0c6086b4f57cafd8e3d93789f0b0b7e59b0372",
+      "bytes": 211404,
+      "size_m": 5.6,
+      "scale": 0.14029669594516744,
+      "source_file": "swift.glb",
+      "derived": false
+    },
+    {
+      "option_id": "tess",
+      "actual_option_label": "TESS · 3.7 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/tess.glb",
+      "sha256": "2b82a0191af6f06081368bb59d6cbb63b13ad8f019cd7ad08229e911e5b9ee6a",
+      "bytes": 206576,
+      "size_m": 3.7,
+      "scale": 0.09973046359732958,
+      "source_file": "tess.glb",
+      "derived": false
+    },
+    {
+      "option_id": "icesat_2",
+      "actual_option_label": "ICESat-2 · 7.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/icesat_2.glb",
+      "sha256": "e7d260d69852fcd3367c8e7a3c236f8c0551c591abc5a8e8f42c0356a2eebf38",
+      "bytes": 1499504,
+      "size_m": 7,
+      "scale": 0.9257744466943703,
+      "source_file": "icesat_2.glb",
+      "derived": false
+    },
+    {
+      "option_id": "grace",
+      "actual_option_label": "GRACE / GRACE-FO 계열 · 3.1 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/grace.glb",
+      "sha256": "b376141db89a708acac65484b69ffafe36bbed00709f73c1c9d48cc3d5e3e499",
+      "bytes": 22620,
+      "size_m": 3.1,
+      "scale": 0.9425815789153623,
+      "source_file": "grace.glb",
+      "derived": false
+    },
+    {
+      "option_id": "jason",
+      "actual_option_label": "Jason 계열 해양고도계 위성 · 9.5 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/jason_repaired.glb",
+      "sha256": "f9b01e1684fd83fa1242bdce55793128796b3ff6164272b5fae2e656dd2821fb",
+      "bytes": 592788,
+      "size_m": 9.5,
+      "scale": 0.014981596937494126,
+      "source_file": "jason.glb",
+      "derived": true
+    },
+    {
+      "option_id": "sentinel_6",
+      "actual_option_label": "Sentinel-6 Michael Freilich · 5.1 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/sentinel_6.glb",
+      "sha256": "cd257b8d63deef018d0227fa6c4bcb29974f257073c4d4f92abd557098b3d580",
+      "bytes": 2108496,
+      "size_m": 5.13,
+      "scale": 0.999498691981585,
+      "source_file": "sentinel_6.glb",
+      "derived": false
+    },
+    {
+      "option_id": "chandra",
+      "actual_option_label": "찬드라 X선 관측위성 · 19.5 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/chandra.glb",
+      "sha256": "9383f44fc4c6eba73c40b0c2cfe33c08c90f1fb5230274bfdaa98e0c9f116a34",
+      "bytes": 998500,
+      "size_m": 19.5,
+      "scale": 0.9996413081931577,
+      "source_file": "chandra.glb",
+      "derived": false
+    },
+    {
+      "option_id": "van_allen",
+      "actual_option_label": "Van Allen Probes (RBSP) · 100.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/van_allen.glb",
+      "sha256": "be9ed53e1452c615750e8d2f977a168eb95216cb82fb698c16d5e08cb4b891f0",
+      "bytes": 933260,
+      "size_m": 100,
+      "scale": 0.07827130545795549,
+      "source_file": "van_allen.glb",
+      "derived": false
+    },
+    {
+      "option_id": "poes",
+      "actual_option_label": "NOAA POES 계열 · 8.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/poes.glb",
+      "sha256": "30a8bfdb6585bb87e27d8a847046a55f8c299456e3752d1b00786942c59035aa",
+      "bytes": 1158944,
+      "size_m": 8,
+      "scale": 0.019594212097039394,
+      "source_file": "poes.glb",
+      "derived": false
+    },
+    {
+      "option_id": "eo_1",
+      "actual_option_label": "Earth Observing-1 · 7.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/eo_1.glb",
+      "sha256": "2d26422a45147e86c93c535979b1d9ae16d34fc0171f661dec051bca61c14a74",
+      "bytes": 224580,
+      "size_m": 7,
+      "scale": 0.05428479334973437,
+      "source_file": "eo_1.glb",
+      "derived": false
+    },
+    {
+      "option_id": "sac_c",
+      "actual_option_label": "SAC-C · 6.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/sac_c.glb",
+      "sha256": "cf1e9ad3923ded6f6157ec06b545de50840b5b7c9526d0a9bda8be1f021ca745",
+      "bytes": 73608,
+      "size_m": 6,
+      "scale": 0.09960798613005277,
+      "source_file": "sac_c.glb",
+      "derived": false
+    },
+    {
+      "option_id": "radarsat_1",
+      "actual_option_label": "RADARSAT-1 · 15.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/radarsat_1.glb",
+      "sha256": "db609daaf38354f67d73f412e44d78642383de157f0e2d1de85c3614562cb86f",
+      "bytes": 68148,
+      "size_m": 15,
+      "scale": 0.09361935302261502,
+      "source_file": "radarsat_1.glb",
+      "derived": false
+    },
+    {
+      "option_id": "cubesat_1u",
+      "actual_option_label": "1U 큐브샛 (일반형) · 0.3 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/cubesat_1u.glb",
+      "sha256": "bae308ea2e33778c93675909f7dc2e0d5d6916cd685668a463566c61224b1e85",
+      "bytes": 149424,
+      "size_m": 0.25,
+      "scale": 0.048143805933473734,
+      "source_file": "cubesat_1u.glb",
+      "derived": false
+    },
+    {
+      "option_id": "ssl_1300",
+      "actual_option_label": "SSL-1300 정지궤도 통신위성 버스 · 26.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/ssl_1300.glb",
+      "sha256": "63cd644d67ee49ab79e313bb6cb0495e9f6072d421a84e116c2c3f9c40bf9c0c",
+      "bytes": 510324,
+      "size_m": 26,
+      "scale": 0.09689543125184369,
+      "source_file": "ssl_1300.glb",
+      "derived": false
+    },
+    {
+      "option_id": "mms",
+      "actual_option_label": "MMS 자기권 관측위성 · 3.5 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/mms.glb",
+      "sha256": "e3688a8db82f1918c3b4525f4ceed08b614a3a2c5be09ade5711baba30262eef",
+      "bytes": 335808,
+      "size_m": 3.5,
+      "scale": 0.4104599743474244,
+      "source_file": "mms.glb",
+      "derived": false
+    },
+    {
+      "option_id": "cygnss",
+      "actual_option_label": "CYGNSS · 1.7 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/cygnss.glb",
+      "sha256": "830321f2d30099b4355f835d7ae5a2ab1f9f91c292dd01dfc008b8d4bf64c962",
+      "bytes": 1622924,
+      "size_m": 1.65,
+      "scale": 1.0374200557817619,
+      "source_file": "cygnss.glb",
+      "derived": false
+    },
+    {
+      "option_id": "gpm",
+      "actual_option_label": "GPM Core Observatory · 13.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/gpm.glb",
+      "sha256": "7068c880770bb2ac936e804a1af48e564c90b829ff884c405a4759e8da9e693e",
+      "bytes": 2257008,
+      "size_m": 13,
+      "scale": 0.030099834598861973,
+      "source_file": "gpm.glb",
+      "derived": false
+    },
+    {
+      "option_id": "hinode",
+      "actual_option_label": "Hinode (Solar-B) · 10.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/hinode.glb",
+      "sha256": "104f23212d379541990c28b26999db3bcfb2ef0731285f2366219e5438e125e6",
+      "bytes": 276248,
+      "size_m": 10,
+      "scale": 0.04355022363780192,
+      "source_file": "hinode.glb",
+      "derived": false
+    },
+    {
+      "option_id": "calipso",
+      "actual_option_label": "CALIPSO · 4.7 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/calipso.glb",
+      "sha256": "4abd7708d0f2629baf3e58e9d5df634c34692365791e58a7795742854e53de1d",
+      "bytes": 536084,
+      "size_m": 4.7,
+      "scale": 0.020651490278985423,
+      "source_file": "calipso.glb",
+      "derived": false
+    },
+    {
+      "option_id": "cloudsat",
+      "actual_option_label": "CloudSat · 4.6 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/cloudsat.glb",
+      "sha256": "293aab60f12decc020fe7e19ddd0837b0643067425a4ad09f01ffd8a380e7423",
+      "bytes": 267656,
+      "size_m": 4.6,
+      "scale": 0.026722386638160695,
+      "source_file": "cloudsat.glb",
+      "derived": false
+    },
+    {
+      "option_id": "topex",
+      "actual_option_label": "TOPEX/Poseidon · 11.5 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/topex.glb",
+      "sha256": "e5ff3cae87bbdc59c07a626bea1907aa24678038e1431ff703e85fe9d5c88c0c",
+      "bytes": 214264,
+      "size_m": 11.5,
+      "scale": 0.03081697973136158,
+      "source_file": "topex.glb",
+      "derived": false
+    },
+    {
+      "option_id": "ibex",
+      "actual_option_label": "IBEX · 1.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/ibex.glb",
+      "sha256": "6ce15c60467673f599c7085ed5152a07d0335628109741848ce64835e3786406",
+      "bytes": 1306616,
+      "size_m": 1,
+      "scale": 0.6548964314038557,
+      "source_file": "ibex.glb",
+      "derived": false
+    },
+    {
+      "option_id": "fermi",
+      "actual_option_label": "Fermi (GLAST) · 15.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/fermi.glb",
+      "sha256": "d345f3b0595f7792f699acf33b28d7401cb53cc2a20b735bca00e95644e3813c",
+      "bytes": 1379016,
+      "size_m": 15,
+      "scale": 0.2407406028350127,
+      "source_file": "fermi.glb",
+      "derived": false
+    },
+    {
+      "option_id": "aquarius",
+      "actual_option_label": "SAC-D / Aquarius · 7.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/aquarius.glb",
+      "sha256": "dc81055c83e5da56d3ae57f4c967010be64ad5d01cee4cdb0a88c85c2b628116",
+      "bytes": 1137428,
+      "size_m": 7,
+      "scale": 0.6564392186047628,
+      "source_file": "aquarius.glb",
+      "derived": false
+    },
+    {
+      "option_id": "geotail",
+      "actual_option_label": "Geotail · 100.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/geotail.glb",
+      "sha256": "3b39a3fc157731421869dab707dd5c4d3d829ab0b727b2a6cc8bc211fd96a8ad",
+      "bytes": 91504,
+      "size_m": 100,
+      "scale": 0.00951411392680041,
+      "source_file": "geotail.glb",
+      "derived": false
+    },
+    {
+      "option_id": "themis",
+      "actual_option_label": "THEMIS · 2.5 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/themis.glb",
+      "sha256": "2dfe2a2e07de211f6686adbb612c09c5dfac62a397cb88343f119c2124d818e3",
+      "bytes": 682092,
+      "size_m": 2.5,
+      "scale": 0.3469001832188008,
+      "source_file": "themis.glb",
+      "derived": false
+    },
+    {
+      "option_id": "sorce",
+      "actual_option_label": "SORCE · 3.4 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/sorce.glb",
+      "sha256": "8ec505080199227d25897f5157f4cd87e60092d69b16079deb3ca32caa2ce10d",
+      "bytes": 366492,
+      "size_m": 3.4,
+      "scale": 0.013989682954448555,
+      "source_file": "sorce.glb",
+      "derived": false
+    },
+    {
+      "option_id": "toms",
+      "actual_option_label": "TOMS-EP · 1.6 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/toms.glb",
+      "sha256": "36578255a65849073c12d596d255a2fc2042730576bfb433bb9073eb66d287d2",
+      "bytes": 98620,
+      "size_m": 1.6,
+      "scale": 0.04111200997952931,
+      "source_file": "toms.glb",
+      "derived": false
+    },
+    {
+      "option_id": "polar",
+      "actual_option_label": "Polar · 6.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/polar.glb",
+      "sha256": "0ffe9e41f6686db7dcaf3144f967f0f419e72b6a90218d955b1654cf0478801d",
+      "bytes": 98592,
+      "size_m": 6,
+      "scale": 0.2227875828449551,
+      "source_file": "polar.glb",
+      "derived": false
+    },
+    {
+      "option_id": "swas",
+      "actual_option_label": "SWAS · 1.6 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/swas.glb",
+      "sha256": "c1d58e66cb2f1185fc98b5941cbfeb3dbdb453b817a87f95e6bf8d176630f5a1",
+      "bytes": 150296,
+      "size_m": 1.6,
+      "scale": 0.019449837756139322,
+      "source_file": "swas.glb",
+      "derived": false
+    },
+    {
+      "option_id": "fuse",
+      "actual_option_label": "FUSE · 5.6 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/fuse.glb",
+      "sha256": "056c26e4f48bc362790ebc42c7c85101037c92b4f50a313bbe2783fc7004cdf8",
+      "bytes": 236704,
+      "size_m": 5.6,
+      "scale": 4.7034515775460575,
+      "source_file": "fuse.glb",
+      "derived": false
+    },
+    {
+      "option_id": "wire",
+      "actual_option_label": "WIRE · 1.8 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/wire.glb",
+      "sha256": "adffb87ebd6d884f47b8d82b0aa8c37f72dc1c72bf532ba4117a94c392f6b2d0",
+      "bytes": 375404,
+      "size_m": 1.8,
+      "scale": 0.05244921364496597,
+      "source_file": "wire.glb",
+      "derived": false
+    },
+    {
+      "option_id": "hete_2",
+      "actual_option_label": "HETE-2 · 1.0 m",
+      "provider": "nasa",
+      "url": "/static/satellite_display/hete_2.glb",
+      "sha256": "f514f7cff65c0d4d565408b3f6ba113c4a3b97321a3fe770c89f67820e83922c",
+      "bytes": 61836,
+      "size_m": 1,
+      "scale": 0.6426714567112574,
+      "source_file": "hete_2.glb",
+      "derived": false
+    },
+    {
+      "option_id": "goes_r",
+      "actual_option_label": "GOES-R 계열 (GOES 16~19) · 8.5 m",
+      "provider": "noaa_goesr",
+      "url": "/static/satellite_display/goes_r.glb",
+      "sha256": "26f2f289ec9fc78612de27548247c8caf754a6f0efe182290bbf81dc9cbf41e6",
+      "bytes": 6409168,
+      "size_m": 8.5,
+      "scale": 8.500017000034,
+      "source_file": "goes_r.glb",
+      "derived": false
+    },
+    {
+      "option_id": "starlink_flat",
+      "actual_option_label": "Starlink형 평판 위성 · 29.0 m",
+      "provider": "spacetwin",
+      "url": "/static/satellite_display/starlink_flat.glb",
+      "sha256": "1f2bd994bca491b82ddaafaae70805b9cab8e8ac42bb1444463e566e44bf29ec",
+      "bytes": 14096,
+      "size_m": 29,
+      "scale": 1.0034602076124568,
+      "source_file": "starlink_flat.glb",
+      "derived": false
+    },
+    {
+      "option_id": "gnss_bus",
+      "actual_option_label": "GNSS 항법위성 · 14.0 m",
+      "provider": "spacetwin",
+      "url": "/static/satellite_display/gnss_bus.glb",
+      "sha256": "caa606c93deae3608a8a7ddb2a66c88d266f9bf11b838e56df47a7f6130e5c7e",
+      "bytes": 43068,
+      "size_m": 14,
+      "scale": 1,
+      "source_file": "gnss_bus.glb",
+      "derived": false
+    },
+    {
+      "option_id": "oneweb",
+      "actual_option_label": "OneWeb형 통신위성 · 6.3 m",
+      "provider": "spacetwin",
+      "url": "/static/satellite_display/leo_comms_bus.glb",
+      "sha256": "aba350d67d392924b68b2f8abf9712e55200ad4a88d2340e44c3f5220b84ff09",
+      "bytes": 15896,
+      "size_m": 6.3,
+      "scale": 1,
+      "source_file": "leo_comms_bus.glb",
+      "derived": false
+    },
+    {
+      "option_id": "kuiper",
+      "actual_option_label": "Kuiper형 통신위성 · 12.0 m",
+      "provider": "spacetwin",
+      "url": "/static/satellite_display/leo_comms_bus.glb",
+      "sha256": "aba350d67d392924b68b2f8abf9712e55200ad4a88d2340e44c3f5220b84ff09",
+      "bytes": 15896,
+      "size_m": 12,
+      "scale": 1.9047619047619049,
+      "source_file": "leo_comms_bus.glb",
+      "derived": false
+    },
+    {
+      "option_id": "iridium",
+      "actual_option_label": "Iridium형 통신위성 · 9.4 m",
+      "provider": "spacetwin",
+      "url": "/static/satellite_display/leo_comms_bus.glb",
+      "sha256": "aba350d67d392924b68b2f8abf9712e55200ad4a88d2340e44c3f5220b84ff09",
+      "bytes": 15896,
+      "size_m": 9.4,
+      "scale": 1.492063492063492,
+      "source_file": "leo_comms_bus.glb",
+      "derived": false
+    },
+    {
+      "option_id": "globalstar",
+      "actual_option_label": "Globalstar형 통신위성 · 10.0 m",
+      "provider": "spacetwin",
+      "url": "/static/satellite_display/leo_comms_bus.glb",
+      "sha256": "aba350d67d392924b68b2f8abf9712e55200ad4a88d2340e44c3f5220b84ff09",
+      "bytes": 15896,
+      "size_m": 10,
+      "scale": 1.5873015873015874,
+      "source_file": "leo_comms_bus.glb",
+      "derived": false
+    },
+    {
+      "option_id": "orbcomm",
+      "actual_option_label": "Orbcomm형 통신위성 · 6.0 m",
+      "provider": "spacetwin",
+      "url": "/static/satellite_display/leo_comms_bus.glb",
+      "sha256": "aba350d67d392924b68b2f8abf9712e55200ad4a88d2340e44c3f5220b84ff09",
+      "bytes": 15896,
+      "size_m": 6,
+      "scale": 0.9523809523809524,
+      "source_file": "leo_comms_bus.glb",
+      "derived": false
+    },
+    {
+      "option_id": "o3b",
+      "actual_option_label": "O3b형 통신위성 · 12.0 m",
+      "provider": "spacetwin",
+      "url": "/static/satellite_display/leo_comms_bus.glb",
+      "sha256": "aba350d67d392924b68b2f8abf9712e55200ad4a88d2340e44c3f5220b84ff09",
+      "bytes": 15896,
+      "size_m": 12,
+      "scale": 1.9047619047619049,
+      "source_file": "leo_comms_bus.glb",
+      "derived": false
+    },
+    {
+      "option_id": "china_leo_comms",
+      "actual_option_label": "저궤도 통신망 위성 · 12.0 m",
+      "provider": "spacetwin",
+      "url": "/static/satellite_display/leo_comms_bus.glb",
+      "sha256": "aba350d67d392924b68b2f8abf9712e55200ad4a88d2340e44c3f5220b84ff09",
+      "bytes": 15896,
+      "size_m": 12,
+      "scale": 1.9047619047619049,
+      "source_file": "leo_comms_bus.glb",
+      "derived": false
+    },
+    {
+      "option_id": "cubesat_3u",
+      "actual_option_label": "3U 큐브샛 · 0.7 m",
+      "provider": "spacetwin",
+      "url": "/static/satellite_display/cubesat_3u.glb",
+      "sha256": "8657ecec5c182900985c92b85281f49ca4c7859e1ff40b704aef7a54359d073f",
+      "bytes": 10608,
+      "size_m": 0.7,
+      "scale": 1,
+      "source_file": "cubesat_3u.glb",
+      "derived": false
+    }
+  ]
+}

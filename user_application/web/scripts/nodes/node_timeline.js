@@ -380,7 +380,8 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
   if(typeof yieldControl!=='function')throw new TypeError('node display cooperative executor required');
   const samples=createNodeTimeline({api,requestId,yieldControl:cooperate}),tracks=createNodeTrackTimeline({api,periodFor,requestId,yieldControl:cooperate});
   let disposed=false,utc=null,direction=1,nodeCount=0,runner=null,activeKind=null,inputError='';
-  let definitions=[],communicationGeneration=0,communicationSequence=0,activeCommunication=null;
+  // Private definitions only change at setDefinitions; every outgoing value is a copy.
+  let definitions=[],definitionScope='[]',communicationGeneration=0,communicationSequence=0,activeCommunication=null;
   const communicationJobs=[];
   let validationWaiter=null;
   // Immutable native point receipts in this existing query owner, never current
@@ -424,7 +425,7 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
   async function serveCommunication(job){
     if(job.settled)return;
     activeCommunication=job;activeKind='communication';emit({kind:'communication'});
-    const current=()=>!disposed&&!job.controller.signal.aborted&&job.generation===communicationGeneration&&job.scope===identity(definitions);
+    const current=()=>!disposed&&!job.controller.signal.aborted&&job.generation===communicationGeneration&&job.scope===definitionScope;
     try{
       if(!current())throw new Error('native communication request invalidated');
       const cached=communicationPoints.get(job.utc),known=samples.snapshot().definitionHashes;
@@ -460,7 +461,7 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
     catch(error){return Promise.reject(error);}
     if(!definitions.length)return Promise.resolve({utc:canonical,node_definitions:[],states:[]});
     return new Promise((resolve,reject)=>{
-      const job={utc:canonical,nodes:structuredClone(definitions),scope:identity(definitions),generation:communicationGeneration,controller:new AbortController(),signal,resolve,reject,settled:false};
+      const job={utc:canonical,nodes:structuredClone(definitions),scope:definitionScope,generation:communicationGeneration,controller:new AbortController(),signal,resolve,reject,settled:false};
       job.abort=()=>{job.controller.abort();settleCommunication(job,null,signal.reason??new Error('native communication request aborted'));};
       signal?.addEventListener('abort',job.abort,{once:true});communicationJobs.push(job);validationWaiter?.resolve?.();void schedule();
     });
@@ -496,7 +497,7 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
   }
   function setDefinitions(nodes){
     requireOpen();const changed=samples.setDefinitions(nodes);tracks.setDefinitions(nodes);nodeCount=nodes.length;
-    if(changed){invalidateCommunication();definitions=structuredClone(nodes);inputError='';emit();void schedule();}return changed;
+    if(changed){invalidateCommunication();definitions=structuredClone(nodes);definitionScope=identity(definitions);inputError='';emit();void schedule();}return changed;
   }
   function observe(value,{seek=false}={}){
     requireOpen();let canonical;
@@ -508,7 +509,7 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
   }
   function retry(){requireOpen();samples.cancel();tracks.cancel();invalidateCommunication();inputError='';return schedule();}
   function clear(){requireOpen();utc=null;direction=1;inputError='';samples.cancel();tracks.cancel();invalidateCommunication();emit();}
-  function destroy(){if(disposed)return;disposed=true;utc=null;invalidateCommunication();definitions=[];samples.destroy();tracks.destroy();}
+  function destroy(){if(disposed)return;disposed=true;utc=null;invalidateCommunication();definitions=[];definitionScope='[]';samples.destroy();tracks.destroy();}
   const displayGeometry=guardDisplayGeometry(samples.displayGeometry,()=>!disposed&&!inputError);
   return Object.freeze({setDefinitions,observe,retry,clear,snapshot,requestCommunicationStates,displayGeometry,geometryFor:(node,display={utc})=>disposed||inputError?null:samples.geometryFor(node,display),communicationStateFor:(node,display={utc})=>disposed||inputError?null:samples.communicationStateFor(node,display),pathFor:node=>disposed||inputError?null:tracks.pathFor(node),pathRevisionFor:node=>disposed||inputError?null:tracks.pathRevisionFor(node),destroy});
 }

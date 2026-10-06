@@ -195,6 +195,11 @@ export function createDataDeployment({
 
   return {
     get state() { return state(); },
+    // Internal readonly presentation predicates use this accepted owner directly.
+    // Public state/receipt/command copies and validation remain unchanged.
+    contextPresentation(){return {server:server?{run_id:server.run_id,revision:server.revision,scope_id:server.scope_id}:null,server_node_ids:server?.nodes.map(node=>node.id)??null,error};},
+    matchesServer(value){return !disposed&&server!==null&&value!==null&&value!==undefined&&canonical(value)===canonical(server);},
+    matchesServerNodes(value){return !disposed&&server!==null&&Array.isArray(value)&&canonical(value)===canonical(server.nodes);},
     verifyAcceptance(nodes, receipt, kind) {
       return !disposed && authorization !== null && kind === authorization.kind
         && JSON.stringify(nodes) === JSON.stringify(authorization.nodes)

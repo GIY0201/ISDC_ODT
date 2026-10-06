@@ -11,10 +11,13 @@ function signature(value){
  };
  return JSON.stringify(ordered(value));
 }
-export function createNodeNetworkTimeline({model,optical,requestCommunicationStates,readNodes,readDisplay,readStations,readFaults,validateNode,validateStation,advanceUtc,onChange=()=>{}}={}){
+export function createNodeNetworkTimeline({model,optical,requestCommunicationStates,readNodes,nodeScopeRevision=null,readDisplay,readStations,readFaults,validateNode,validateStation,advanceUtc,onChange=()=>{}}={}){
  if(typeof model?.buildNetworkSnapshot!=='function'||!optical||['update','verifyLinkSnapshot'].some(key=>typeof optical[key]!=='function')||[requestCommunicationStates,readNodes,readDisplay,readStations,readFaults,validateNode,validateStation,advanceUtc,onChange].some(value=>typeof value!=='function'))throw new TypeError('network timeline dependencies required');
+ if(nodeScopeRevision!==null&&typeof nodeScopeRevision!=='function')throw new TypeError('trusted network node revision callback required');
+ let nodeScopeCache=null;
+ const freezeScope=value=>{if(value&&typeof value==='object'){for(const child of Object.values(value))freezeScope(child);Object.freeze(value);}return value;};
  let disposed=false,generation=0,active=null,last=null,failure=null,observerError='';
- function context(){
+ function freshContext(){
   const utc=readDisplay()?.utc,nodes=structuredClone(readNodes()),stations=structuredClone(readStations()),faults=structuredClone(readFaults());
   if(typeof utc!=='string'||advanceUtc(utc,0)!==utc||/:60(?:\.|Z)/.test(utc)||!Number.isFinite(Date.parse(utc)))throw new Error('unsupported network UTC');
   if(!Array.isArray(nodes)||nodes.length>240||!Array.isArray(stations)||stations.length>24||!Array.isArray(faults))throw new Error('invalid network scope');
@@ -30,12 +33,58 @@ export function createNodeNetworkTimeline({model,optical,requestCommunicationSta
   for(const fault of faults)if(!fault||typeof fault!=='object'||Array.isArray(fault)||typeof fault.kind!=='string'||typeof fault.target!=='string')throw new Error('invalid network fault');
   return {utc,nodes,stations,faults,key,scope:signature(nodes)};
  }
+ function context(){
+  if(!nodeScopeRevision)return freshContext();
+  const revision=nodeScopeRevision?.(),utc=readDisplay()?.utc;
+  if(nodeScopeRevision&&(revision==null||nodeScopeRevision()!==revision))throw new Error('network node scope changed during read');
+  let nodes,scope,nodeIds;
+  if(nodeScopeRevision&&nodeScopeCache?.revision===revision){({nodes,scope,nodeIds}=nodeScopeCache);}
+  else{
+   nodes=structuredClone(readNodes());
+   if(!Array.isArray(nodes)||nodes.length>240)throw new Error('invalid network scope');
+   scope=signature(nodes);nodeIds=new Set();const catalogs=new Set();
+   for(const node of nodes){
+    if(validateNode(node).length||nodeIds.has(node.id)||catalogs.has(node.catalog_number))throw new Error('invalid network node definitions');
+    nodeIds.add(node.id);catalogs.add(node.catalog_number);
+   }
+   if(nodeScopeRevision){if(nodeScopeRevision()!==revision)throw new Error('network node scope changed during read');freezeScope(nodes);nodeScopeCache={revision,nodes,scope,nodeIds};}
+  }
+  // Stations and runtime-derived faults never share the node-cohort cache.
+  const stations=structuredClone(readStations()),faults=structuredClone(readFaults());
+  if(typeof utc!=='string'||advanceUtc(utc,0)!==utc||/:60(?:\.|Z)/.test(utc)||!Number.isFinite(Date.parse(utc)))throw new Error('unsupported network UTC');
+  if(!Array.isArray(stations)||stations.length>24||!Array.isArray(faults))throw new Error('invalid network scope');
+  const ids=new Set(nodeIds);
+  for(const station of stations){
+   if(validateStation(station).length||station.schema!==1||typeof station.name!=='string'||['latitude','longitude','altitude_km','dish_m','min_elevation_deg'].some(key=>!Number.isFinite(station[key]))||typeof station.id!=='string'||!station.id.trim()||station.id.length>80||ids.has(station.id)||typeof station.enabled!=='boolean')throw new Error('invalid network station definitions');
+   ids.add(station.id);
+  }
+  for(const fault of faults)if(!fault||typeof fault!=='object'||Array.isArray(fault)||typeof fault.kind!=='string'||typeof fault.target!=='string')throw new Error('invalid network fault');
+  if(nodeScopeRevision&&(nodeScopeRevision()!==revision||readDisplay()?.utc!==utc||nodeScopeRevision()!==revision))throw new Error('network context changed during read');
+  const key=nodeScopeRevision?`{"faults":${signature(faults)},"nodes":${scope},"stations":${signature(stations)},"utc":${JSON.stringify(utc)}}`:signature({utc,nodes,stations,faults});
+  return {utc,nodes,stations,faults,key,scope};
+ }
+
  const empty=(c,status,error=null)=>({...NODE_COMMUNICATION_METADATA,schema_version:1,status,error,utc:c?.utc??null,node_definitions:structuredClone(c?.nodes??[]),stations:structuredClone(c?.stations??[]),faults:structuredClone(c?.faults??[]),definition_hashes:{},network:null});
  function validLast(c){return last?.key===c.key&&optical.verifyLinkSnapshot(last.optical,{nodes:c.nodes,utc:c.utc})===true;}
  function snapshot(){
   if(disposed)return empty(null,'unavailable','disposed');
   try{const c=context();if(validLast(c))return structuredClone(last.value);if(failure?.key===c.key)return empty(c,'error',failure.error);if(active?.key===c.key)return empty(c,'pending');return empty(c,'unavailable');}
   catch(error){return empty(null,'error',String(error?.message??error));}
+ }
+ // UI-only status/time proof. This is never a mission/fabric action receipt.
+ function presentation(){
+  const summary=(status,utc,error=null,network=null,verified=false)=>({proof:{status,utc,error,network},verified});
+  if(disposed)return summary('unavailable',null,'disposed');
+  try{
+   const c=context(),accepted=last,failed=failure,pending=active,ticket=generation,valid=validLast(c);
+   if(disposed)return summary('unavailable',null,'disposed');
+   const after=context();
+   if(disposed||last!==accepted||failure!==failed||active!==pending||generation!==ticket||after.key!==c.key)return summary('unavailable',after.utc);
+   if(valid)return summary('valid',c.utc,null,accepted.value.network?{time:accepted.value.network.time}:null,true);
+   if(failed?.key===c.key)return summary('error',c.utc,failed.error);
+   if(pending?.key===c.key)return summary('pending',c.utc);
+   return summary('unavailable',c.utc);
+  }catch(error){return disposed?summary('unavailable',null,'disposed'):summary('error',null,String(error?.message??error));}
  }
  function notify(){try{onChange(snapshot());}catch(error){observerError=String(error?.message??error);}}
  function cancel(){generation++;active?.controller.abort();active=null;}
@@ -77,6 +126,6 @@ export function createNodeNetworkTimeline({model,optical,requestCommunicationSta
   task.promise=Promise.resolve().then(run);notify();return task.promise;
  }
  function clear(){if(disposed)return;cancel();last=null;failure=null;notify();}
- function destroy(){if(disposed)return;disposed=true;cancel();last=null;failure=null;}
- return Object.freeze({update,snapshot,verifySnapshot,clear,destroy,get observerError(){return observerError;}});
+ function destroy(){if(disposed)return;disposed=true;nodeScopeCache=null;cancel();last=null;failure=null;}
+ return Object.freeze({update,snapshot,presentation,verifySnapshot,clear,destroy,get observerError(){return observerError;}});
 }
