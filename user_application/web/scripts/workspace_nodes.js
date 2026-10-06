@@ -84,7 +84,7 @@ export function createWorkspaceNodes({api,globe,library,orbitElements,catalogEle
  }
  return Object.freeze({
   async start(){if(dead||started)return;store.load();started=true;syncDefinitions();try{await deployment.initialize();}catch(value){report(value);}return deployment.state;},
-  show,refreshModels,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
+  show,refresh:refreshPanel,refreshModels,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
   destroy(){if(dead)return;dead=true;for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
  });
 }

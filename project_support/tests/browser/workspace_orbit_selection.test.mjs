@@ -15,7 +15,9 @@ test('empty UI choice restores server selection without clearing its result or s
     // Model composition has dedicated real-assembly tests; this fixture isolates
     // the unchanged stored-orbit select handler and its no-command assertion.
     .replace(/import \{createWorkspaceSolar\} from [^;]+;/,'const createWorkspaceSolar=()=>({destroy(){}});')
-    .replace(/import \{createWorkspaceNodes\} from [^;]+;/,'const createWorkspaceNodes=()=>({async start(){},show(){},refreshModels(){},destroy(){}});')
+    .replace(/import \{createWorkspaceNodes\} from [^;]+;/,'const createWorkspaceNodes=()=>({async start(){},show(){},refresh(){},refreshModels(){},destroy(){}});')
+    .replace(/import \{createNodeClockControls\} from [^;]+;/,'const createNodeClockControls=()=>({read(){return{}},actions:{},destroy(){}});')
+    .replace(/import \{createUtcCodec,LEAP_SHA256\} from [^;]+;/,'const createUtcCodec=()=>({}),LEAP_SHA256="test";')
     .replace(/import \{createNodeLibrary\} from [^;]+;/,'const createNodeLibrary=()=>({});')
     .replace(/import \{orbitElements,catalogElements\} from [^;]+;/,'const orbitElements=()=>null,catalogElements=()=>null;')
     .replace(/import \* as nodeOisl from [^;]+;/,'const nodeOisl={};')

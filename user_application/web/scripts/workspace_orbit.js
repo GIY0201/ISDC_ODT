@@ -1,5 +1,7 @@
 import {createWorkspaceSolar} from './workspace_solar.js?v=t135-r1';
 import {createWorkspaceNodes} from './workspace_nodes.js?v=t151-r1';
+import {createNodeClockControls} from './nodes/clock_controls.js';
+import {createUtcCodec,LEAP_SHA256} from './orbit_utc.js';
 import {createNodeLibrary} from '/static/model_library/satellite_nodes.js';
 import {orbitElements,catalogElements} from '/static/simulation/node_orbit_definition.js';
 import * as nodeOisl from '/static/simulation/oisl.js';
@@ -48,6 +50,7 @@ const globeViewPanel=createGlobeViewPanel(globe,solar);
 const modelPanel=createSatelliteModelPanel(globe);
 let satelliteHover=null;
 let nodeWorkspace=null;
+let nodeClock=null;
 const removeSatelliteHover=globe.observeSatelliteHover((payload,C)=>{
   if(!satelliteHover&&payload&&C)satelliteHover=createSatelliteHover(document.getElementById('stored-orbit-globe'),C);
   if(payload)satelliteHover?.show(payload);else satelliteHover?.clear();
@@ -65,7 +68,7 @@ const missionPanel=createMissionPanel(api);
 const kpiPanel=createKpiPanel(api,drawMultiLine);
 let catalogPanel,catalogTimePanel,catalogScene,catalogScenePanel,catalogTrack,catalogPasses,catalogPassPanel,modelSelection;
 function syncModel(selection){if(!modelSelection||!catalogPanel)return;const selected=selection??catalogPanel.controller.snapshot();modelSelection.select(selected.selectedItem,selected.profile,catalogTimeline.snapshot().selected);}
-const catalogTimeline=createCatalogTimeline(api,value=>globe.catalog(value),()=>{catalogTimePanel?.update();const t=catalogTimeline.snapshot();catalogTrack?.select(t.selected);if(t.utc)catalogTrack?.observe(t.utc);catalogPasses?.update(t);catalogPassPanel?.update();if(catalogScenePanel?.followsTimeline()&&t.selected?.group===catalogScene?.snapshot().context?.group&&t.utc)catalogScene.observe(t.utc);});
+const catalogTimeline=createCatalogTimeline(api,value=>globe.catalog(value),()=>{catalogTimePanel?.update();nodeWorkspace?.refresh();const t=catalogTimeline.snapshot();catalogTrack?.select(t.selected);if(t.utc)catalogTrack?.observe(t.utc);catalogPasses?.update(t);catalogPassPanel?.update();if(catalogScenePanel?.followsTimeline()&&t.selected?.group===catalogScene?.snapshot().context?.group&&t.utc)catalogScene.observe(t.utc);});
 catalogTrack=createCatalogTrack(api,value=>globe.catalogTrack(value),()=>catalogPassPanel?.update(),{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
 catalogPasses=createCatalogPasses(api,()=>catalogPassPanel?.update(),async utc=>{catalogTimeline.seek(utc);await catalogTimeline.calculate();},{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
 catalogPassPanel=createCatalogPassPanel(catalogTrack,catalogPasses,()=>catalogTimeline.snapshot());
@@ -77,7 +80,8 @@ catalogPanel=createCatalogPanel(api,catalogGeometry,{applied:p=>catalogScene.con
 modelSelection=createSatelliteModelSelection({api,globe,timeline:catalogTimeline,validateManifest:validateSatelliteManifest,createResolver:createModelResolver});
 const removeModelSelection=catalogPanel.controller.observeSelection(syncModel);
 const nodeLibrary=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>crypto.randomUUID()});
-nodeWorkspace=createWorkspaceNodes({api,globe,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window)});
+nodeClock=createNodeClockControls({readContext:()=>nodeWorkspace?.snapshot().display,stored:client,catalog:catalogTimeline,advanceUtc:createUtcCodec(LEAP_SHA256).advance,now:()=>Date.now(),runStored:command});
+nodeWorkspace=createWorkspaceNodes({api,globe,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window),readClock:context=>nodeClock.read(context),clockActions:nodeClock.actions});
 void nodeWorkspace.start().then(()=>nodeWorkspace.show(view));
 void modelSelection.load().then(()=>nodeWorkspace.refreshModels());
 const hilPanel=createHilPanel(api,hilTopology,drawSparkline);
@@ -88,9 +92,10 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();nodeWorkspace?.destroy();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();nodeClock?.destroy();nodeWorkspace?.destroy();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
+  nodeWorkspace?.refresh();
   revisionSync.observe(client.snapshot());
   playback.update(client.snapshot());
   groundPanel.update();

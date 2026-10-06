@@ -50,6 +50,7 @@ test('real V6 assembly mounts the original work panel, binds add editor and rema
  await new Promise(resolve=>setTimeout(resolve,10));
  assert.ok(f.doc.getElementById('satellite-nodes'));assert.match(f.get('satellite-nodes').innerHTML,/Walker Δ/);
  assert.equal(f.get('node-count').textContent,'0');assert.deepEqual(requests,[['/api/data-management/deployment','GET']]);
+ assert.equal(f.evaluate('nodeClock.read(nodeWorkspace.snapshot().display).mode'),'저장 궤도');
  await f.get('node-add').dispatch('click');assert.equal(f.get('node-count').textContent,'1');assert.equal(f.get('node-editor').hidden,false);
  assert.equal(requests.length,1);await f.win.dispatch('pagehide',{persisted:false});assert.equal(f.get('satellite-nodes').isConnected,false);f.dispose();
 });
