@@ -56,6 +56,7 @@ export function createDataDeployment({
   const requests = new Set();
   const ensureActive = () => { if (disposed) throw new Error('배치 클라이언트가 종료되었습니다.'); };
   let server = null, error = null, syncRequired = false;
+  let reviewServer=null,reviewJson='';
   let queue = Promise.resolve(), queued = 0, initialized = false, initializing = null;
   let pending = null;
   const listeners = new Set();
@@ -197,7 +198,13 @@ export function createDataDeployment({
     get state() { return state(); },
     // Internal readonly presentation predicates use this accepted owner directly.
     // Public state/receipt/command copies and validation remain unchanged.
-    contextPresentation(){return {server:server?{run_id:server.run_id,revision:server.revision,scope_id:server.scope_id}:null,server_node_ids:server?.nodes.map(node=>node.id)??null,error};},
+    contextPresentation(){return {server:server?{run_id:server.run_id,revision:server.revision,scope_id:server.scope_id}:null,server_node_ids:server?.nodes.map(node=>node.id)??null,server_count:server?.nodes.length??0,busy:queued>0,syncRequired,error};},
+    // Immutable UI review text, bounded to one actual accepted server object.
+    reviewConfigurationJson(){
+      if(disposed||!syncRequired||server===null){reviewServer=null;reviewJson='';return '';}
+      if(reviewServer!==server){reviewJson=JSON.stringify(server,null,2);reviewServer=server;}
+      return reviewJson;
+    },
     matchesServer(value){return !disposed&&server!==null&&value!==null&&value!==undefined&&canonical(value)===canonical(server);},
     matchesServerNodes(value){return !disposed&&server!==null&&Array.isArray(value)&&canonical(value)===canonical(server.nodes);},
     verifyAcceptance(nodes, receipt, kind) {
@@ -207,7 +214,7 @@ export function createDataDeployment({
     },
     destroy() {
       if (disposed) return;
-      disposed = true; authorization = null; listeners.clear();
+      disposed = true; authorization = null; reviewServer=null;reviewJson='';listeners.clear();
       for (const {controller, timer} of requests) { controller.abort(); clearTimer(timer); }
       requests.clear();
     },

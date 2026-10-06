@@ -130,3 +130,22 @@ test('a valid40-codepoint name remains duplicable repeatedly until the existing2
  for(let i=1;i<240;i++){current=s.duplicate(current.id);assert.equal([...current.name].length<=40,true);assert.equal(current.name.endsWith(' 사본'),true);assert.equal(current.formation,null);}
  assert.deepEqual(s.find(source.id),original);assert.equal(new Set(s.drafts.map(n=>n.id)).size,240);assert.equal(new Set(s.drafts.map(n=>n.catalog_number)).size,240);const before=view(s);assert.throws(()=>s.duplicate(current.id),/240/);assert.deepEqual(view(s),before);
 });
+
+
+test('private full rendering roster is immutable and stable while all original action queries remain fresh copies',()=>{
+ const backing=storage();let now=epoch;const s=store({storage:backing,now:()=>now,verifyAcceptance:()=>true});s.load();const a=s.add({name:'first'}),b=s.add({name:'second'});s.deploy(s.drafts,{proof:'source'});
+ const first=s.presentationRoster();assert.deepEqual(first.drafts,s.drafts);assert.deepEqual(first.deployed,s.deployed);assert.deepEqual(first.selected,s.selected);assert.equal(first.drafts.length,2);assert.equal(Object.isFrozen(first.drafts[0].equipment[0]),true);assert.throws(()=>{first.drafts[0].name='changed';},TypeError);assert.equal(s.presentationRoster().drafts,first.drafts);
+ const publicDraft=s.drafts;publicDraft[0].name='outside';const selected=s.selected;selected.name='outside';assert.notEqual(s.find(a.id).name,'outside');assert.notEqual(s.selected.name,'outside');assert.notEqual(publicDraft,s.drafts);
+ s.select(b.id);const selection=s.presentationRoster();assert.equal(selection.selected.id,b.id);assert.notEqual(selection.drafts,first.drafts);assert.deepEqual(selection.drafts,s.drafts);
+ now+=1000;s.update(b.id,s.find(b.id));assert.equal(s.presentationMetadata().dirty,false,'original dirty ignores timestamp only');assert.notEqual(s.presentationRoster().drafts,selection.drafts);assert.notEqual(s.presentationRoster().selected.updated_at,selection.selected.updated_at);
+ const edited=s.find(b.id);edited.equipment[0].enabled=!edited.equipment[0].enabled;s.update(b.id,edited);assert.equal(s.presentationMetadata().dirty,true);assert.deepEqual(s.presentationRoster().selected,s.find(b.id));
+ const persisted=backing.getItem(DRAFT_KEY),beforeReload=s.presentationRoster();s.load({discardLocal:true});assert.notEqual(s.presentationRoster().drafts,beforeReload.drafts,'same persisted revision reload is a new owner scope');assert.equal(s.presentationRoster().deployment_confirmed,false);assert.equal(backing.getItem(DRAFT_KEY),persisted);
+ assert.equal(s.receiveExternalDraft(JSON.stringify({...JSON.parse(persisted),revision:999})),false);assert.match(s.presentationMetadata().error,/충돌/);assert.match(s.presentationRoster().error,/충돌/);assert.equal(s.presentationMetadata().revision,s.revision);
+});
+
+test('240-node private metadata and repeated rendering roster reads do not serialize unchanged full definitions',()=>{
+ const s=store({verifyAcceptance:()=>true});s.load();const lib=library();s.addMany(Array.from({length:240},(_,i)=>lib.createNode({}, {epoch,id:'N-'+i,catalogNumber:900001+i})));s.deploy(s.drafts,{proof:'source'});
+ const roster=s.presentationRoster(),stringify=JSON.stringify;let serializations=0;JSON.stringify=function(value,...args){if(Array.isArray(value)&&value.length===240&&value.every(n=>n?.schema===1))serializations++;return stringify.call(this,value,...args);};
+ try{for(let i=0;i<20;i++){const next=s.presentationRoster(),meta=s.presentationMetadata();assert.equal(next.drafts,roster.drafts);assert.equal(meta.draft_count,240);assert.equal(meta.deployed_count,240);assert.equal(meta.dirty,false);assert.equal(meta.drafts,undefined);assert.equal(meta.deployed,undefined);}}finally{JSON.stringify=stringify;}
+ assert.equal(serializations,0);assert.deepEqual(s.presentationRoster().drafts,s.drafts);
+});

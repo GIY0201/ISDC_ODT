@@ -142,9 +142,20 @@ function validLinks(links,nodes,utc,verifyLinkSnapshot){
   if(!links||links.status!=='valid'||links.utc!==utc||links.source_commit!==sourceCommit||links.quality!=='engineering_assumption'||!Array.isArray(links.terminals)||!Array.isArray(links.pairs)||!sameDefinition(links.node_definitions,nodes)||typeof verifyLinkSnapshot!=='function')return false;
   try{return verifyLinkSnapshot(structuredClone(links),{nodes:structuredClone(nodes),utc})===true;}catch{return false;}
 }
-function statusPresentation(node,{utc,geometry=null,links=null,nodes=[node],verifyLinkSnapshot,oislPresentation=null}={}){
+const readonlyDefinitionKeys=new WeakMap();
+function presentationDefinitionKey(nodes){
+  if(!Array.isArray(nodes))return null;
+  if(readonlyDefinitionKeys.has(nodes))return readonlyDefinitionKeys.get(nodes);
+  const readonly=value=>!value||typeof value!=='object'||Object.isFrozen(value)&&Object.values(value).every(readonly);
+  const key=JSON.stringify(nodes);if(readonly(nodes))readonlyDefinitionKeys.set(nodes,key);return key;
+}
+function validLinkPresentation(links,nodes,utc,verify){
+  if(!links||links.presentation_kind!=='OPTICAL_UI_V1'||links.status!=='valid'||links.utc!==utc||links.source_commit!==sourceCommit||links.quality!=='engineering_assumption'||!Array.isArray(links.terminals)||!Array.isArray(links.pairs)||!Array.isArray(links.node_definitions)||!Array.isArray(nodes)||typeof verify!=='function')return false;
+  try{return presentationDefinitionKey(links.node_definitions)===presentationDefinitionKey(nodes)&&verify(links,{utc})===true;}catch{return false;}
+}
+function statusPresentation(node,{utc,geometry=null,links=null,nodes=[node],verifyLinkSnapshot,verifyLinkPresentation,oislPresentation=null}={}){
   const hasGeometry=validGeometry(node,geometry,utc),row=hasGeometry?geometry.row:null;
-  let hasLinks=validLinks(links,nodes,utc,verifyLinkSnapshot);
+  let hasLinks=typeof verifyLinkPresentation==='function'?validLinkPresentation(links,nodes,utc,verifyLinkPresentation):validLinks(links,nodes,utc,verifyLinkSnapshot);
   let terminals=hasLinks?links.terminals.filter(terminal=>terminal.nodeId===node.id):[];
   if(terminals.length&&['acquisitionProgress','blockedLabel','phaseLabel'].some(key=>typeof oislPresentation?.[key]!=='function')){hasLinks=false;terminals=[];}
   const activeTerminals=new Set(terminals.filter(terminal=>terminal.targetId).map(terminal=>terminal.equipmentId));
@@ -174,8 +185,10 @@ function statusPresentation(node,{utc,geometry=null,links=null,nodes=[node],veri
   return {texts,equipmentMarkup,terminalMarkup,powerAssumption,canLocate:hasGeometry,geometryStatus:hasGeometry?'valid':geometry?.row?.status==='error'?'error':geometry?'unavailable':'unknown',linksStatus:hasLinks?'valid':links?.status==='error'?'error':'unknown',
     sunClass:row?(row.sunlit?'sunlit':'eclipse'):'',marginClass:marginKnown?(power.margin_w>=0?'ok':'bad'):'unknown',powerBar:{width,className:marginKnown?(power.margin_w>=0?'':'bad'):'unknown'}};
 }
-function createNodeStatusPanel({host,store,readDisplay,geometryFor=()=>null,linksFor=()=>null,verifyLinkSnapshot,oislPresentation,modelFor=()=>null,modelReadinessFor=()=>null,editor,onEdit,onFocus,onError=()=>{}}={}){
+function createNodeStatusPanel({host,store,readPresentation=null,readDisplay,geometryFor=()=>null,linksFor=()=>null,linksPresentationFor=null,verifyLinkSnapshot,verifyLinkPresentation,oislPresentation,modelFor=()=>null,modelReadinessFor=()=>null,editor,onEdit,onFocus,onError=()=>{}}={}){
   if(!host||!store||typeof readDisplay!=='function')throw new TypeError('node_status_dependencies_required');
+  if(readPresentation!==null&&typeof readPresentation!=='function')throw new TypeError('node_status_presentation_reader_required');
+  if(linksPresentationFor!==null&&typeof linksPresentationFor!=='function')throw new TypeError('node_status_link_presentation_reader_required');
   let destroyed=false,key=null,generation=0,lastError=null;const owned=[];
   const requireOpen=()=>{if(destroyed)throw new Error('node_status_disposed');};
   const report=error=>{const message=error instanceof Error?error.message:String(error);if(message!==lastError){lastError=message;onError(message);}};
@@ -185,10 +198,10 @@ function createNodeStatusPanel({host,store,readDisplay,geometryFor=()=>null,link
     try{display=readDisplay();if(display?.utc)geometry=geometryFor(structuredClone(node),structuredClone(display));}catch(error){report(error);}
     return {utc:display?.utc,geometry};
   }
-  function context(node){
-    const input=geometryContext(node);let links=null;
-    try{if(input.utc)links=linksFor({nodes:store.drafts,utc:input.utc});}catch(error){report(error);}
-    return {...input,links,nodes:store.drafts,verifyLinkSnapshot,oislPresentation};
+  function context(node,presentation){
+    const input=geometryContext(node),nodes=readPresentation?presentation?.drafts??[]:null;let links=null;
+    try{if(input.utc)links=linksPresentationFor?linksPresentationFor({utc:input.utc}):linksFor({nodes:readPresentation?structuredClone(nodes):store.drafts,utc:input.utc});}catch(error){report(error);}
+    return {...input,links,nodes:readPresentation?nodes:store.drafts,verifyLinkSnapshot:linksPresentationFor?undefined:verifyLinkSnapshot,verifyLinkPresentation:linksPresentationFor?verifyLinkPresentation:undefined,oislPresentation};
   }
   function bind(selector,node,action){
     const element=host.querySelector(selector);if(!element)return;
@@ -215,11 +228,11 @@ function createNodeStatusPanel({host,store,readDisplay,geometryFor=()=>null,link
   }
   function refresh(){
     requireOpen();if(editor?.isOpen()){host.hidden=true;unbind();key=null;return;}
-    host.hidden=false;const node=store.selected;
+    host.hidden=false;const presentation=readPresentation?.(),node=readPresentation?presentation?.selected??null:store.selected;
     if(!node){if(key!=='empty'){unbind();host.innerHTML='<div class="ns-empty tall">위성을 선택하면 궤도, 전력, 장비와 OISL 단말 상태를 표시합니다.</div>';key='empty';}return;}
     let match=null,readiness=null;try{match=modelFor(structuredClone(node));readiness=modelReadinessFor(structuredClone(node));}catch(error){report(error);}
     const nextKey=JSON.stringify([node,match,readiness]);if(nextKey!==key){key=nextKey;renderFrame(node,match,readiness);}
-    const input=context(node),value=statusPresentation(node,input);
+    const input=context(node,presentation),value=statusPresentation(node,input);
     for(const [name,text]of Object.entries(value.texts)){const el=host.querySelector(`[data-live="${name}"]`);if(el)el.textContent=text;}
     const update=(name,action)=>{const el=host.querySelector(`[data-live="${name}"]`);if(el)action(el);};
     update('power-assumption',el=>el.hidden=!value.powerAssumption);
@@ -299,13 +312,15 @@ function linkStateOf(nodeId,links) {
   return "danger";
 }
 
-function createNodeFleetPanel({host,count=null,store,readDisplay,linksFor=()=>null,verifyLinkSnapshot,onSelected=()=>{},onError=()=>{}}={}){
+function createNodeFleetPanel({host,count=null,store,readPresentation=null,readDisplay,linksFor=()=>null,linksPresentationFor=null,verifyLinkSnapshot,verifyLinkPresentation,onSelected=()=>{},onError=()=>{}}={}){
   if(!host||!store||typeof readDisplay!=='function')throw new TypeError('node_fleet_dependencies_required');
+  if(readPresentation!==null&&typeof readPresentation!=='function')throw new TypeError('node_fleet_presentation_reader_required');
+  if(linksPresentationFor!==null&&typeof linksPresentationFor!=='function')throw new TypeError('node_fleet_link_presentation_reader_required');
   let destroyed=false,key=null,generation=0;const owned=[];
   const requireOpen=()=>{if(destroyed)throw new Error('node_fleet_disposed');};
   function unbind(){generation++;for(const remove of owned.splice(0))remove();}
   function refresh(){
-    requireOpen();const nodes=store.drafts,nextKey=JSON.stringify(nodes.map(node=>[node.id,node.updated_at,node.name,node.mode,node.orbit,node.formation]));
+    requireOpen();const presentation=readPresentation?.(),nodes=readPresentation?presentation?.drafts??[]:store.drafts,nextKey=JSON.stringify(nodes.map(node=>[node.id,node.updated_at,node.name,node.mode,node.orbit,node.formation]));
     if(count)count.textContent=String(nodes.length);
     if(nextKey!==key){
       key=nextKey;unbind();host.innerHTML=fleetMarkup(nodes);const version=generation;
@@ -318,10 +333,10 @@ function createNodeFleetPanel({host,count=null,store,readDisplay,linksFor=()=>nu
         row.addEventListener('click',handler);owned.push(()=>row.removeEventListener('click',handler));
       });
     }
-    let links=null,utc=null;try{utc=readDisplay()?.utc;if(utc)links=linksFor({nodes:structuredClone(nodes),utc});}catch(error){onError(error instanceof Error?error.message:String(error));}
-    const verified=validLinks(links,nodes,utc,verifyLinkSnapshot);
+    let links=null,utc=null;try{utc=readDisplay()?.utc;if(utc)links=linksPresentationFor?linksPresentationFor({utc}):linksFor({nodes:structuredClone(nodes),utc});}catch(error){onError(error instanceof Error?error.message:String(error));}
+    const verified=linksPresentationFor?validLinkPresentation(links,nodes,utc,verifyLinkPresentation):validLinks(links,nodes,utc,verifyLinkSnapshot);
     host.querySelectorAll('[data-node-id]').forEach(row=>{
-      row.setAttribute('aria-selected',String(row.dataset.nodeId===store.selectedId));const dot=row.querySelector('.status-dot');
+      row.setAttribute('aria-selected',String(row.dataset.nodeId===(readPresentation?presentation?.selected_id:store.selectedId)));const dot=row.querySelector('.status-dot');
       if(dot){dot.className=`status-dot ${verified?linkStateOf(row.dataset.nodeId,links):'neutral'}`;dot.title=verified?'원본 기하 모델의 통신 상태':'통신 결과 미확인';}
     });
   }
@@ -485,8 +500,8 @@ function createNodeSceneControls({root,readScene=()=>null,readDisplay,actions={}
   refresh();return Object.freeze({refresh,destroy(){if(disposed)return;disposed=true;for(const remove of owned.splice(0))remove();}});
 }
 
-function createNodeWorkPanel({root,store,editorTools,now,timers,createFormationId,readDisplay,viewport,scrollTarget,
-  geometryFor,linksFor,verifyLinkSnapshot,oislPresentation,modelFor,modelReadinessFor,models,onModelChange,
+function createNodeWorkPanel({root,store,readPresentation=null,editorTools,now,timers,createFormationId,readDisplay,viewport,scrollTarget,
+  geometryFor,linksFor,linksPresentationFor,verifyLinkSnapshot,verifyLinkPresentation,oislPresentation,modelFor,modelReadinessFor,models,onModelChange,
   confirmClear,onDefinitionsChanged,onResetTerminals,onSelected=()=>{},onFocus,readScene,actions,onError=()=>{},initialParams=FORMATION_DEFAULTS}={}){
   if(!root||!store||typeof readDisplay!=='function'||typeof viewport!=='function')throw new TypeError('node_work_panel_dependencies_required');
   const host=root.querySelector('#node-fleet'),statusHost=root.querySelector('#node-status'),tip=root.querySelector('#node-tip');
@@ -496,8 +511,8 @@ function createNodeWorkPanel({root,store,editorTools,now,timers,createFormationI
   function destroy(){if(disposed)return;disposed=true;for(const remove of owned.splice(0))remove();removeTooltips?.();controls?.destroy();fleet?.destroy();status?.destroy();draft?.destroy();}
   try{
     draft=createNodeDraftPanel({root,store,editorTools,now,timers,createFormationId,models,onModelChange,confirmClear,onDefinitionsChanged,onResetTerminals,onError,initialParams,onRefresh:refresh,onSelected});
-    status=createNodeStatusPanel({host:statusHost,store,readDisplay,geometryFor,linksFor,verifyLinkSnapshot,oislPresentation,modelFor,modelReadinessFor,onFocus,onError,editor:draft.editor,onEdit:node=>draft.openEditor(node.id)});
-    fleet=createNodeFleetPanel({host,count:root.querySelector('#node-count'),store,readDisplay,linksFor,verifyLinkSnapshot,onError,onSelected:node=>{draft.editor.close();refresh();return onSelected(structuredClone(node),{userInitiated:true,focus:false});}});
+    status=createNodeStatusPanel({host:statusHost,store,readPresentation,readDisplay,geometryFor,linksFor,linksPresentationFor,verifyLinkSnapshot,verifyLinkPresentation,oislPresentation,modelFor,modelReadinessFor,onFocus,onError,editor:draft.editor,onEdit:node=>draft.openEditor(node.id)});
+    fleet=createNodeFleetPanel({host,count:root.querySelector('#node-count'),store,readPresentation,readDisplay,linksFor,linksPresentationFor,verifyLinkSnapshot,verifyLinkPresentation,onError,onSelected:node=>{draft.editor.close();refresh();return onSelected(structuredClone(node),{userInitiated:true,focus:false});}});
     controls=createNodeSceneControls({root,readScene,readDisplay,actions,onError,canFocus:()=>status.canFocus(),onFocus:()=>status.focusSelected()});
     const focus=async event=>{if(disposed)return;const row=event.target?.closest?.('[data-node-id]');if(!row||!Array.from(host.querySelectorAll('[data-node-id]')).includes(row)||store.selectedId!==row.dataset.nodeId)return;await status.focusSelected();if(!disposed)refresh();};
     host.addEventListener('dblclick',focus);owned.push(()=>host.removeEventListener('dblclick',focus));

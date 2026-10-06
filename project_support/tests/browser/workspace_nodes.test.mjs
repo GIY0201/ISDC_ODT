@@ -445,3 +445,34 @@ test('mounted private network summary does not promote pending or failed native 
   assert.equal(f.workspace.networkSnapshot().status,'error');assert.equal(f.workspace.networkPresentation().proof.status,'error');assert.equal(f.workspace.networkPresentation().verified,false);
  }finally{finish?.();f.workspace.destroy();}
 });
+
+
+test('mounted presentation port is readonly full roster and metadata refresh avoids unchanged240 full clones',async()=>{
+ const f=fixture();let equipment=0;const lib=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>`EQ-${++equipment}`});try{await f.workspace.start();f.workspace.show('satellite');f.options.store.addMany(Array.from({length:240},(_,i)=>lib.createNode({}, {epoch:1791151272000,id:'N-'+i,catalogNumber:900001+i})));
+  assert.equal(typeof f.options.readPresentation,'function');const before=f.options.readPresentation();assert.equal(before.drafts.length,240);assert.equal(Object.isFrozen(before.drafts[0]),true);
+  const stringify=JSON.stringify;let serializations=0;JSON.stringify=function(value,...args){if(Array.isArray(value)&&value.length===240&&value.every(n=>n?.schema===1))serializations++;return stringify.call(this,value,...args);};
+  const deployment=f.workspace.scenarioPorts().deployment,descriptor=Object.getOwnPropertyDescriptor(deployment,'state');Object.defineProperty(deployment,'state',{get(){throw Error('metadata refresh must not clone full deployment state');},configurable:true});
+  try{for(let i=0;i<10;i++)f.workspace.refresh();}finally{JSON.stringify=stringify;Object.defineProperty(deployment,'state',descriptor);}
+  assert.equal(serializations,0,'metadata refresh uses counts and flags, not full public roster copies');assert.equal(f.options.readPresentation().drafts,before.drafts);assert.match(f.buttons.get('node-scene-summary').textContent,/초안 240개/);
+  f.options.store.select('N-239');assert.equal(f.options.readPresentation().selected.id,'N-239');f.workspace.destroy();assert.equal(f.options.readPresentation(),null);
+ }finally{f.workspace.destroy();}
+});
+
+
+test('review-required metadata refresh retains exact full server review without cloning public state each frame',async()=>{
+ const receipt={deployment_id:'foreign',revision:4,run_id:'run',scope_id:'run:deployment:foreign',nodes:Array.from({length:40},(_,i)=>({id:'S-'+i,name:'source '+i,mode:'nominal',equipment:[]}))};const f=fixture({fetchOverride:async()=>({ok:true,json:async()=>structuredClone(receipt)})});
+ try{await f.workspace.start();f.workspace.show('satellite');const expected=JSON.stringify(receipt,null,2),deployment=f.workspace.scenarioPorts().deployment,descriptor=Object.getOwnPropertyDescriptor(deployment,'state');assert.equal(f.buttons.get('node-server-configuration').textContent,expected);
+  Object.defineProperty(deployment,'state',{get(){throw Error('review refresh must not clone full server');},configurable:true});
+  try{for(let i=0;i<10;i++)f.workspace.refresh();}finally{Object.defineProperty(deployment,'state',descriptor);}
+  assert.equal(f.buttons.get('node-server-configuration').textContent,expected);assert.equal(f.buttons.get('node-server-configuration').hidden,false);
+ }finally{f.workspace.destroy();}
+});
+
+
+test('mounted readonly optical UI proof is current registered owner output and cannot replace action receipts',async()=>{
+ const f=fixture(),codec=createUtcCodec(LEAP_SHA256),utc=codec.advance('2026-10-04T22:01:12Z',0);
+ try{await f.workspace.start();f.workspace.show('satellite');assert.equal(typeof f.options.linksPresentationFor,'function');assert.equal(typeof f.options.verifyLinkPresentation,'function');f.context({utc});await new Promise(resolve=>setImmediate(resolve));
+  const view=f.options.linksPresentationFor();assert.equal(view.presentation_kind,'OPTICAL_UI_V1');assert.equal(Object.isFrozen(view),true);assert.equal(f.options.verifyLinkPresentation(view,{utc}),true);assert.equal(f.options.verifyLinkSnapshot(view,{nodes:f.options.store.drafts,utc}),false);assert.equal(f.options.verifyLinkPresentation(structuredClone(view),{utc}),false);
+  f.context(null);assert.equal(f.options.verifyLinkPresentation(view,{utc}),false);f.workspace.destroy();assert.equal(f.options.linksPresentationFor(),null);assert.equal(f.options.verifyLinkPresentation(view,{utc}),false);
+ }finally{f.workspace.destroy();}
+});

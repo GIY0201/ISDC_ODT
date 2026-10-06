@@ -33,5 +33,25 @@ function format(tai){
 }
 export function createUtcCodec(hash){
   if(hash!==LEAP_SHA256)throw new Error('UTC leap hash mismatch');
-  return {advance(utc,seconds){if(!Number.isFinite(seconds))throw new Error('finite elapsed seconds required');return format(parse(utc)+BigInt(Math.round(seconds*1e9)));},difference:(a,b)=>Number(parse(a)-parse(b))/1e9};
+  // Exact immutable strings/BigInts only, bounded within this provenance-bound codec.
+  // Invalid inputs never enter the cache; no rounded UTC or mutable caller object
+  // can stand in for a validated instant.
+  const instants=new Map(),limit=128;
+  function remember(utc,tai,canonical){
+    const value={tai,canonical};instants.set(utc,value);
+    if(instants.size>limit)instants.delete(instants.keys().next().value);
+    return value;
+  }
+  function instant(utc){
+    if(typeof utc==='string'&&instants.has(utc))return instants.get(utc);
+    const tai=parse(utc);return remember(utc,tai,format(tai));
+  }
+  return {advance(utc,seconds){
+    if(!Number.isFinite(seconds))throw new Error('finite elapsed seconds required');
+    const value=instant(utc),delta=BigInt(Math.round(seconds*1e9));
+    if(delta===0n)return value.canonical;
+    // Formatting may cross the supported four-digit input-year boundary.
+    // Only parse-validated inputs can enter the cache, including our own output.
+    return format(value.tai+delta);
+  },difference:(a,b)=>Number(instant(a).tai-instant(b).tai)/1e9};
 }

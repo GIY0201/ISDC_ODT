@@ -170,3 +170,24 @@ test('original client wire and valid state transitions remain identical',async()
   const expected=JSON.parse(await readFile(new URL('../fixtures/original_data_client.json',import.meta.url),'utf8'));
   assert.deepEqual(await trace(createDataDeployment),{requests:expected.requests,events:expected.events,rows:expected.rows});
 });
+
+
+test('private deployment metadata mirrors current owner busy error counts without exposing full server nodes',async()=>{
+ let finish;const f=fixture(async(_,options)=>options.method==='GET'?ok(empty()):new Promise(resolve=>{finish=()=>resolve(ok(reply(JSON.parse(options.body))));}));
+ const check=()=>{const full=f.client.state,p=f.client.contextPresentation();assert.equal(p.busy,full.busy);assert.equal(p.syncRequired,full.syncRequired);assert.equal(p.server_count,full.server?.nodes.length??0);assert.equal(p.error,full.error);assert.deepEqual(p.server,full.server?{run_id:full.server.run_id,revision:full.server.revision,scope_id:full.server.scope_id}:null);assert.equal(p.server?.nodes,undefined);};
+ try{check();await f.client.initialize();check();f.constellation.add({name:'source'});const pending=f.client.deploy();await tick();assert.equal(f.client.state.busy,true);check();finish();await pending;check();assert.equal(f.client.contextPresentation().server_count,1);
+  const summary=f.client.contextPresentation();summary.server.revision=999;assert.notEqual(f.client.contextPresentation().server.revision,999);
+ }finally{finish?.();f.client.destroy();}
+});
+
+
+test('private review JSON memo serializes once per actual server object and invalidates same-revision different contents',async()=>{
+ let current={deployment_id:'foreign',revision:4,run_id:'RUN-1',scope_id:'RUN-1:deployment:foreign',nodes:Array.from({length:40},(_,i)=>({id:'S-'+i,name:'source '+i,mode:'nominal',equipment:[]}))};const f=fixture(async()=>ok(current));
+ try{assert.equal(f.client.reviewConfigurationJson(),'');await f.client.initialize();assert.equal(f.client.state.syncRequired,true);
+  const expected=JSON.stringify(f.client.state.server,null,2),stringify=JSON.stringify;let serializations=0;JSON.stringify=function(value,...args){if(value?.run_id==='RUN-1'&&value?.nodes?.length===40)serializations++;return stringify.call(this,value,...args);};
+  try{for(let i=0;i<10;i++)assert.equal(f.client.reviewConfigurationJson(),expected);}finally{JSON.stringify=stringify;}
+  assert.equal(serializations,1);f.client.state.server.nodes[0].name='outside';assert.equal(f.client.reviewConfigurationJson(),expected);
+  current=structuredClone(current);current.nodes[0].name='same revision new source';await f.client.refresh();assert.equal(f.client.state.server.revision,4);assert.equal(f.client.reviewConfigurationJson(),JSON.stringify(f.client.state.server,null,2));assert.notEqual(f.client.reviewConfigurationJson(),expected);
+  f.client.destroy();assert.equal(f.client.reviewConfigurationJson(),'');
+ }finally{f.client.destroy();}
+});

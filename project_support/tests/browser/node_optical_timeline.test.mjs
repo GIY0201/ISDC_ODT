@@ -164,3 +164,57 @@ test('trusted optical scope rejects token drift during reads and UTC callbacks w
 test('trusted optical scope preserves complete source results histories requests and mutable snapshot boundaries',async()=>{
  const token=Object.freeze({}),legacy=setup(),trusted=setup(undefined,()=>token);try{const expected=await legacy.optical.update(),value=await trusted.optical.update();assert.deepEqual(value,expected);assert.deepEqual(trusted.optical.historyEntries(),legacy.optical.historyEntries());assert.deepEqual(trusted.calls.map(c=>c.utc),legacy.calls.map(c=>c.utc));const altered=trusted.optical.snapshot();altered.node_definitions[0].orbit.altitude_km=0;altered.terminals[0].state.phase='foreign';assert.deepEqual(trusted.optical.snapshot(),expected);assert.equal(trusted.optical.verifyLinkSnapshot(altered,{nodes:trusted.nodes,utc:trusted.utc}),false);}finally{trusted.optical.destroy();legacy.optical.destroy();}
 });
+
+test('registered optical UI projection preserves full receipt and immutable ownership without public action authority',async()=>{
+ let token=Object.freeze({});const s=setup(undefined,()=>token);
+ try{
+  const unavailable=s.optical.presentation();assert.equal(unavailable.status,'unavailable');assert.deepEqual(unavailable.node_definitions,s.nodes);assert.ok(Object.isFrozen(unavailable.node_definitions[0].orbit));
+  const receipt=await s.optical.update(),view=s.optical.presentation();
+  assert.deepEqual({...view,presentation_kind:undefined},{...receipt,presentation_kind:undefined});
+  assert.ok(Object.isFrozen(view.terminals[0].state));assert.ok(Object.isFrozen(view.pairs));
+  assert.equal(s.optical.verifyPresentation(view,{utc:s.utc}),true);
+  assert.equal(s.optical.verifyPresentation(structuredClone(view),{utc:s.utc}),false);
+  assert.equal(s.optical.verifyLinkSnapshot(view,{nodes:s.nodes,utc:s.utc}),false);
+  assert.equal(s.optical.presentation(),view,'same accepted receipt borrows one immutable UI projection');
+  token=Object.freeze({});assert.equal(s.optical.verifyPresentation(view,{utc:s.utc}),true,'same complete canonical definitions remain accepted');
+  const changed=s.nodes;changed[0].notes='changed exact scope';s.nodes=changed;token=Object.freeze({});
+  assert.equal(s.optical.verifyPresentation(view,{utc:s.utc}),false);assert.equal(s.optical.presentation().status,'unavailable');
+  await s.optical.update();const recovered=s.optical.presentation();assert.equal(recovered.node_definitions[0].notes,'changed exact scope');assert.equal(s.optical.verifyPresentation(recovered,{utc:s.utc}),true);
+  s.optical.resetHistories();assert.equal(s.optical.verifyPresentation(recovered,{utc:s.utc}),false);assert.equal(s.optical.presentation().status,'unavailable');
+  s.optical.destroy();assert.equal(s.optical.presentation().error,'disposed');assert.equal(s.optical.verifyPresentation(recovered,{utc:s.utc}),false);
+ }finally{s.optical.destroy();}
+});
+
+test('240-node pending UI reads reuse complete frozen cohort while public snapshots keep independent copies',async()=>{
+ const nodes=Array.from({length:240},(_,i)=>({...structuredClone(scenario.rows[0].input.nodes[0]),id:`COPY-${i}`}));
+ let token=Object.freeze({}),utc=canonical(fixture.epoch),finish,reads=0,copies=0;const originalClone=globalThis.structuredClone;
+ const optical=createNodeOpticalTimeline({resolver:{resolveLinks(){throw Error('unused');},terminalKey(){return'';}},requestCommunicationStates:()=>new Promise(resolve=>{finish=()=>resolve(null);}),readNodes:()=>{reads++;return nodes;},nodeScopeRevision:()=>token,readDisplay:()=>({utc}),advanceUtc:codec.advance});
+ try{
+  optical.presentation();const work=optical.update();await until(()=>finish);
+  globalThis.structuredClone=value=>{if(Array.isArray(value)&&value.length===240&&value[0]?.id==='COPY-0')copies++;return originalClone(value);};
+  const pending=optical.presentation();for(let i=0;i<20;i++){assert.equal(optical.presentation(),pending);assert.equal(pending.node_definitions.length,240);assert.equal(pending.status,'pending');}
+  assert.equal(copies,0,'UI reads do not clone the complete 240-node cohort');assert.equal(reads,1);
+  const a=optical.snapshot(),b=optical.snapshot();assert.equal(copies,2);a.node_definitions[0].name='external mutation';assert.notEqual(b.node_definitions[0].name,a.node_definitions[0].name);
+  finish();await work;const error=optical.presentation();assert.equal(error.status,'error');assert.deepEqual(error.error,optical.snapshot().error);assert.equal(optical.verifyPresentation(error,{utc}),false);
+  utc=canonical(fixture.epoch+1000);assert.equal(optical.presentation().status,'unavailable');assert.equal(optical.verifyPresentation(pending,{utc}),false);
+ }finally{globalThis.structuredClone=originalClone;optical.destroy();}
+});
+
+test('optical UI proof fails closed on owner mutation during final callback fence',async()=>{
+ const s=setup();await s.optical.update();let enabled=false,utc=s.utc;
+ const optical=createNodeOpticalTimeline({resolver:createNodeLinkResolver({library:s.library,oisl}),requestCommunicationStates:async stamp=>{const source=new Map(scenario.rows.at(-1).input.states),nodes=s.nodes;return{utc:stamp,node_definitions:nodes,states:nodes.map(node=>[node.id,{...meta,...structuredClone(source.get(node.id)),node_id:node.id,node_definition:node,definition_hash:'a'.repeat(64),utc:stamp,interpolated:false}])};},readNodes:()=>s.nodes,readDisplay:()=>({utc}),advanceUtc:(stamp,delta)=>{if(enabled)utc=canonical(Date.parse(utc)+1000);return codec.advance(stamp,delta);}});
+ try{await optical.update();const view=optical.presentation();assert.equal(optical.verifyPresentation(view,{utc}),true);enabled=true;assert.equal(optical.verifyPresentation(view,{utc}),false);assert.notEqual(optical.presentation().status,'valid');}finally{optical.destroy();s.optical.destroy();}
+});
+
+test('trusted 240-node canonical history keys are proved once per cohort across exact UTC requests',async()=>{
+ const sentinel=123456789.125,nodes=Array.from({length:240},(_,i)=>({...structuredClone(scenario.rows[0].input.nodes[0]),id:`KEY-${i}`,proof_sentinel:sentinel}));
+ let token=Object.freeze({}),utc=canonical(fixture.epoch),serialVisits=0,requests=0;const finite=Number.isFinite;
+ const optical=createNodeOpticalTimeline({resolver:{resolveLinks(){throw Error('unused');},terminalKey(){return'';}},requestCommunicationStates:async()=>{requests++;return null;},readNodes:()=>nodes,nodeScopeRevision:()=>token,readDisplay:()=>({utc}),advanceUtc:codec.advance});
+ try{
+  optical.presentation();
+  Number.isFinite=value=>{if(value===sentinel)serialVisits++;return finite(value);};
+  for(let i=1;i<=3;i++){utc=canonical(fixture.epoch+i*1000);assert.equal((await optical.update()).status,'error');}
+  assert.equal(requests,3);assert.equal(serialVisits,0,'fully canonical unchanged cohort and per-node history keys are reused, without rewalking 240 full definitions');
+  token=Object.freeze({});nodes[0].notes='new full definition';optical.presentation();assert.ok(serialVisits>=240,'new authoritative token revalidates every full definition');
+ }finally{Number.isFinite=finite;optical.destroy();}
+});

@@ -28,6 +28,7 @@ export function createConstellationStore({library,storage=null,now,verifyAccepta
   let state={drafts:[],deployed:[],deployedAt:null,sequence:0,selectedId:null,revision:0,deployedRevision:0,receipt:null};
   let draftToken=null,deployedToken=null,loaded=false,confirmed=false,lastError=null;
   let presentationState=null,presentationDraftsEqual=false,deployedIdentity=null,deployedCanonical=null;
+  let metadataState=null,metadataDirty=false,rosterState=null,rosterDrafts=null,rosterDeployed=null;
   const listeners=new Set();
   const fail=(code,message)=>{lastError={code,message};return new ConstellationError(code,message);};
   const time=()=>{const value=now();if(!['number','string'].includes(typeof value)||!Number.isFinite(new Date(value).getTime()))throw fail('invalid_time','유효한 명시 시각이 필요합니다.');return value;};
@@ -192,7 +193,20 @@ export function createConstellationStore({library,storage=null,now,verifyAccepta
     return canonical(value)===deployedCanonical;
   }
   function nodeForPresentation(id){const node=state.drafts.find(n=>n.id===id);return node?{id:node.id,name:node.name}:null;}
-  return Object.freeze({load,add,addMany,duplicate,update,remove,removeFormation,replaceFormation,deploy,recall,isDirty,find,nextIds,idFactory,receiveExternalDraft,contextPresentation,matchesDeployed,nodeForPresentation,
+  // Private readonly rendering query. Public/action getters below always copy.
+  function presentationMetadata(){
+    if(metadataState!==state){metadataState=state;metadataDirty=isDirty();}
+    return {draft_count:state.drafts.length,deployed_count:state.deployed.length,selected_id:state.selectedId,revision:state.revision,loaded,deployment_confirmed:confirmed,persistence:storage===null?'memory_only':loaded?'stored':'not_loaded',dirty:metadataDirty,error:lastError?.message??''};
+  }
+  function presentationRoster(){
+    if(rosterState!==state){
+      const freeze=value=>{if(value&&typeof value==='object'){for(const child of Object.values(value))freeze(child);Object.freeze(value);}return value;};
+      rosterDrafts=freeze(copy(state.drafts));rosterDeployed=freeze(copy(state.deployed));rosterState=state;
+    }
+    return Object.freeze({...presentationMetadata(),contract:'node-render-presentation-v1',drafts:rosterDrafts,deployed:rosterDeployed,selected:rosterDrafts.find(node=>node.id===state.selectedId)??null});
+  }
+
+  return Object.freeze({load,add,addMany,duplicate,update,remove,removeFormation,replaceFormation,deploy,recall,isDirty,find,nextIds,idFactory,receiveExternalDraft,contextPresentation,matchesDeployed,nodeForPresentation,presentationMetadata,presentationRoster,
     clear(){commit({...state,drafts:[],selectedId:null},'remove');},
     select(id){const selectedId=state.drafts.some(n=>n.id===id)?id:null;commit({...state,selectedId},'select');return selectedId;},
     get drafts(){return copy(state.drafts);},get deployed(){return copy(state.deployed);},get deployedAt(){return state.deployedAt;},
