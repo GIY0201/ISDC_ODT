@@ -1,0 +1,46 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+import path from 'node:path';
+import {createNodeLibrary} from '../../digital_twin/model_library/browser/satellite_nodes.js';
+import {orbitElements,catalogElements} from '../../digital_twin/simulation/browser/node_orbit_definition.js';
+import * as stationModel from '../../digital_twin/model_library/browser/ground_stations.js';
+import {createGroundLinkModel} from '../../digital_twin/simulation/browser/ground_links.js';
+import {createMissionTypes} from '../../digital_twin/model_library/browser/mission_types.js';
+import {createMissionWindowRecords} from '../../user_application/web/scripts/missions/window_records.js';
+// Offline capture only; pass readonly source-browser directory, native receipt, and destination.
+const [rootArg,inputPath,outputPath]=process.argv.slice(2);
+if(!rootArg||!inputPath||!outputPath)throw Error('source browser directory, native receipt and fixture destination required');
+const root=rootArg.replace(/[\\/]?$/,'/');
+const read=name=>fs.readFileSync(root+name,'utf8').replace(/\r\n/g,'\n');
+const url=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
+const dynamics=read('satellite_dynamics.js'),dynamicsUrl=url(dynamics);
+const {predictPasses}=await import(url(read('orbit.js').replace("'./satellite_dynamics.js'",JSON.stringify(dynamicsUrl))));
+const {nodePositionAt}=await import(dynamicsUrl);
+const library=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>{throw Error('no equipment mutation');}});
+const ground=createGroundLinkModel({library,stationModel}),types=createMissionTypes(library);
+const source=read('mission_windows.js');
+const contactBody=source.slice(source.indexOf('export function contactWindows'),source.indexOf('// Passes of one satellite'));
+const accessBody=source.slice(source.indexOf('export function targetAccessWindows'),source.indexOf('export function eclipseIntervals'));
+const offBody=source.slice(source.indexOf('export function elevationForOffNadir'),source.indexOf('// Planning horizon:'));
+const input=JSON.parse(fs.readFileSync(inputPath,'utf8'));
+const revision=spawnSync('git',['-c','safe.directory='+path.resolve(rootArg,'../../..').replaceAll('\\','/'),'-C',rootArg,'rev-parse','HEAD'],{encoding:'utf8'});
+assert.equal(revision.status,0,revision.stderr);assert.equal(revision.stdout.trim(),input.passes.source_commit);
+const node=input.nodes[0],station={id:'GS-DAEJEON',latitude:input.site.latitude,longitude:input.site.longitude,altitude_km:input.site.altitudeKm,altitudeKm:input.site.altitudeKm,min_elevation_deg:10,bands:['S','Ka']};
+const start=new Date(input.start_utc).getTime(),hours=(new Date(input.end_utc)-start)/3600000;
+const nativeModel=createMissionWindowRecords({groundLinkModel:ground,missionTypes:types});
+const sourceFactory=new Function('chooseBand','radioLinksOf','UPLINK_RATE_MBPS','predictPasses','nodePositionAt','EARTH_A_KM','RADIANS','DEGREES',offBody.replaceAll('export ','')+source.slice(source.indexOf('function passWindows'),source.indexOf('// Ground contacts'))+contactBody.replaceAll('export ','')+accessBody.replaceAll('export ','')+';return {contactWindows,targetAccessWindows};');
+const sourceModel=sourceFactory(ground.chooseBand,ground.radioLinksOf,types.UPLINK_RATE_MBPS,predictPasses,nodePositionAt,6378.137,Math.PI/180,180/Math.PI);
+const expectedContacts=sourceModel.contactWindows(node,station,start,hours,{maxPasses:100});
+const expectedAccess=sourceModel.targetAccessWindows(node,station,start,hours,45,{maxPasses:100});
+const args={node,geometry:input.passes,definitionHash:input.passes.definition_hashes[node.id]};
+const gotContacts=nativeModel.contacts({...args,station}),gotAccess=nativeModel.access({...args,geometry:input.access,target:station,offNadirDegrees:45});
+let maximumMs=0;
+for(const [got,want] of [[gotContacts,expectedContacts],[gotAccess,expectedAccess]]){
+ assert.equal(got.length,want.length);
+ got.forEach((record,i)=>{for(const key of Object.keys(want[i])){if(['start','end','peak'].includes(key)){const delta=Math.abs(new Date(record[key])-new Date(want[i][key]));assert.ok(delta<=1000);maximumMs=Math.max(delta,maximumMs);}else assert.deepEqual(record[key],want[i][key]);}});
+}
+const fixture={source_commit:input.passes.source_commit,source_function_hashes:Object.fromEntries([['contactWindows',contactBody],['targetAccessWindows',accessBody]].map(([name,body])=>[name,crypto.createHash('sha256').update(body.trim()).digest('hex')])),node,station,geometry:input.passes,access_geometry:input.access,expected_contacts:expectedContacts,expected_access:expectedAccess};
+fs.writeFileSync(outputPath,JSON.stringify(fixture,null,2));
+console.log(JSON.stringify({contacts:gotContacts.length,access:gotAccess.length,maximum_boundary_delta_ms:maximumMs}));

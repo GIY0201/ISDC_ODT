@@ -1,0 +1,202 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_function_hashes": {
+    "contactWindows": "38b7e4ccb5e8b5fdee503c9722d58303092f1c1f5eefb7b0e952e985a799c959",
+    "targetAccessWindows": "c2102c6867cc888d6f7e3c2bf61c9d139f794d5379177ff2605eed6899427208"
+  },
+  "node": {
+    "schema": 1,
+    "id": "N-1",
+    "catalog_number": 900001,
+    "orbit": {
+      "altitude_km": 550,
+      "eccentricity": 0,
+      "inclination": 53,
+      "raan": 20,
+      "argp": 30,
+      "mean_anomaly": 40,
+      "epoch": 1791151272000
+    },
+    "mode": "normal",
+    "equipment": [
+      {
+        "id": "RF-S",
+        "catalog": "s_band_ttc",
+        "enabled": true
+      },
+      {
+        "id": "RF-K",
+        "catalog": "ka_user_link",
+        "enabled": true
+      }
+    ]
+  },
+  "station": {
+    "id": "GS-DAEJEON",
+    "latitude": 36.3504,
+    "longitude": 127.3845,
+    "altitude_km": 0.07,
+    "altitudeKm": 0.07,
+    "min_elevation_deg": 10,
+    "bands": [
+      "S",
+      "Ka"
+    ]
+  },
+  "geometry": {
+    "schema_version": 1,
+    "status": "sampled",
+    "model_profile": "SOURCE_KEPLER_J2_V1",
+    "frame": "EARTH_FIXED_GMST_UTC_APPROX",
+    "inertial_frame": "SOURCE_MEAN_EQUATOR_EQUINOX_APPROX",
+    "time_model": "unix_ms_utc_approx",
+    "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+    "quality": "engineering_assumption",
+    "definition_hashes": {
+      "N-1": "fa5e6c9dd2de703c663dce1a989a751f15e7dac43dcfa34517688be511033bd0"
+    },
+    "passes": [
+      {
+        "id": "pass|N-1|2026-10-04T23:45:46.219000000Z",
+        "satellite": "N-1",
+        "start": "2026-10-04T23:45:46.219000000Z",
+        "end": "2026-10-04T23:50:51.844000000Z",
+        "peak": "2026-10-04T23:48:19.420000000Z",
+        "max_elevation_deg": 15.446038591249764,
+        "duration_seconds": 306,
+        "in_progress": false,
+        "truncated": false
+      },
+      {
+        "id": "pass|N-1|2026-10-05T01:24:19.969000000Z",
+        "satellite": "N-1",
+        "start": "2026-10-05T01:24:19.969000000Z",
+        "end": "2026-10-05T01:32:39.657000000Z",
+        "peak": "2026-10-05T01:28:31.158000000Z",
+        "max_elevation_deg": 73.02397830407128,
+        "duration_seconds": 500,
+        "in_progress": false,
+        "truncated": false
+      },
+      {
+        "id": "pass|N-1|2026-10-05T03:05:44.344000000Z",
+        "satellite": "N-1",
+        "start": "2026-10-05T03:05:44.344000000Z",
+        "end": "2026-10-05T03:09:26.531000000Z",
+        "peak": "2026-10-05T03:07:35.362000000Z",
+        "max_elevation_deg": 12.698210842121632,
+        "duration_seconds": 222,
+        "in_progress": false,
+        "truncated": false
+      }
+    ],
+    "site": {
+      "latitude_deg": 36.3504,
+      "longitude_deg": 127.3845,
+      "ellipsoid_height_m": 70
+    },
+    "minimum_elevation_deg": 10,
+    "coverage": {
+      "start_utc": "2026-10-04T22:01:12.000000000Z",
+      "end_utc": "2026-10-05T10:01:12.000000000Z",
+      "resolution_seconds": 30,
+      "peak_bracket_seconds": 0.1,
+      "boundary_bracket_seconds": 1,
+      "short_intervals_may_be_missed": true
+    }
+  },
+  "access_geometry": {
+    "schema_version": 1,
+    "status": "sampled",
+    "model_profile": "SOURCE_KEPLER_J2_V1",
+    "frame": "EARTH_FIXED_GMST_UTC_APPROX",
+    "inertial_frame": "SOURCE_MEAN_EQUATOR_EQUINOX_APPROX",
+    "time_model": "unix_ms_utc_approx",
+    "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+    "quality": "engineering_assumption",
+    "definition_hashes": {
+      "N-1": "fa5e6c9dd2de703c663dce1a989a751f15e7dac43dcfa34517688be511033bd0"
+    },
+    "passes": [
+      {
+        "id": "access|N-1|2026-10-05T01:27:06.844000000Z",
+        "satellite": "N-1",
+        "start": "2026-10-05T01:27:06.844000000Z",
+        "end": "2026-10-05T01:29:54.657000000Z",
+        "peak": "2026-10-05T01:28:31.158000000Z",
+        "max_elevation_deg": 73.02397830407128,
+        "duration_seconds": 168,
+        "in_progress": false,
+        "truncated": false,
+        "minimum_elevation_deg": 39.81802879335896
+      }
+    ],
+    "site": {
+      "latitude_deg": 36.3504,
+      "longitude_deg": 127.3845,
+      "ellipsoid_height_m": 70
+    },
+    "minimum_elevation_deg": null,
+    "coverage": {
+      "start_utc": "2026-10-04T22:01:12.000000000Z",
+      "end_utc": "2026-10-05T10:01:12.000000000Z",
+      "resolution_seconds": 30,
+      "peak_bracket_seconds": 0.1,
+      "boundary_bracket_seconds": 1,
+      "short_intervals_may_be_missed": true
+    },
+    "off_nadir_degrees": 45
+  },
+  "expected_contacts": [
+    {
+      "id": "GS-DAEJEON|N-1|2026-10-04T23:45:46.219Z",
+      "satellite": "N-1",
+      "station": "GS-DAEJEON",
+      "band": "Ka",
+      "rate_mbps": 500,
+      "uplink_mbps": 100,
+      "start": "2026-10-04T23:45:46.219Z",
+      "end": "2026-10-04T23:50:51.844Z",
+      "peak": "2026-10-04T23:48:19.420Z",
+      "max_elevation": 15.4,
+      "in_progress": false
+    },
+    {
+      "id": "GS-DAEJEON|N-1|2026-10-05T01:24:19.969Z",
+      "satellite": "N-1",
+      "station": "GS-DAEJEON",
+      "band": "Ka",
+      "rate_mbps": 500,
+      "uplink_mbps": 100,
+      "start": "2026-10-05T01:24:19.969Z",
+      "end": "2026-10-05T01:32:39.657Z",
+      "peak": "2026-10-05T01:28:31.158Z",
+      "max_elevation": 73,
+      "in_progress": false
+    },
+    {
+      "id": "GS-DAEJEON|N-1|2026-10-05T03:05:44.344Z",
+      "satellite": "N-1",
+      "station": "GS-DAEJEON",
+      "band": "Ka",
+      "rate_mbps": 500,
+      "uplink_mbps": 100,
+      "start": "2026-10-05T03:05:44.344Z",
+      "end": "2026-10-05T03:09:26.532Z",
+      "peak": "2026-10-05T03:07:35.362Z",
+      "max_elevation": 12.7,
+      "in_progress": false
+    }
+  ],
+  "expected_access": [
+    {
+      "id": "access|N-1|2026-10-05T01:27:06.844Z",
+      "satellite": "N-1",
+      "start": "2026-10-05T01:27:06.844Z",
+      "end": "2026-10-05T01:29:54.657Z",
+      "peak": "2026-10-05T01:28:31.158Z",
+      "max_elevation": 73,
+      "min_elevation": 39.8
+    }
+  ]
+}
