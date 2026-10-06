@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-06 T079 수락장비별 모의 제품 계산 부분 이식
+- 변경: 원본storage/eo_camera/mode/fault→storage roster/profile/availability 및 deterministic slot/size/ref 계산재사용. 모든노드·hour분할로400cap이후제품누락방지 보존. unused fixedground snapshot제외. 별도finite/no-progress 시간guard추가; 실제수락상태/clock/HTTP생성없음.
+- 검증: source20cases×6intervals 및1/240node4h 원본일치, 두179848bytes/SHAa71dd733… 동일. 153600제품/unique153600/full digest/slotset 검증. missingmodule RED→24PASS3FAILnonfinite 보완→target34PASS0.84s; 원본4h시험·AST대조·실제scopedmodule7제품dedupe 포함. 전체Node540PASS3052.611ms/Python596PASS8기존warnings156.19s(session85737exit0)/계층/syntax/diffcheck. validation/t079_data_production.md.
+- 남음: T079unchecked acceptedRuntime/cursor/strictICD/remoteadapter/activation T149/client T150/actualT151–153/dataUI/download. 계산증거는실측storage/bytes/network/FPS아님. T148/T077/N003/전체T075–84/Terra/all50/N001/T137인증/T032/장비·RF·HIL/AeroDT 유지. 8891/native/화면/원격PR·병합 변경없음.
+
+
 ## 2026-10-06 T079 원본 범위 분리 데이터 모듈 부분 이식
 - 변경: 원본policy/catalog/placement/stand_in/scopes 재사용을 기존model_library/simulation/runtime 안에배치. 원본isolated-v1·RLock·빈초기scope/SIM입력시간 보존. reason입력/조회와nested event3곳 deepcopy로statealias차단; 계산·정책은원본AST일치. 운영서버조립/실파일기능아님.
 - 검증: 원본19command 전체result/5report와7scopecommand 두311087bytes/SHAe0d0c233… 동일. missingmodule RED→10PASS1FAILalias수정. 원본4component시험포함target16PASS0.13s. AST문서줄바꿈1FAIL수정. 전체Node540PASS3060.8802ms/Python562PASS8기존warnings154.81s(session50186exit0)/계층/syntax/diffcheck. validation/t079_data_management_module.md.

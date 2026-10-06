@@ -1,0 +1,7272 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_hashes": {
+    "digital_twin/model_library/data_deployment.py": "5c20fa9dab7f0604a298970b004a196d4067077eff478c09f49d76395a6881b0",
+    "digital_twin/simulation/data_deployment.py": "f77e7426ef1f4cb5f285a7975b8a64d329cc02221ebbfa80efdf1b934d5d57df",
+    "digital_twin/simulation/data_products.py": "34abc837401a826810d8c23e007a1f6e933f129f8728c121388634d2f2d6e42a"
+  },
+  "semantic_hashes": {
+    "profile": "fe61d43d861b5ef66dd660e153c95d90031293e58e30eaf915b6b6f242ea1742",
+    "deployment_inputs": "cff1dca811c73089673b84f695dedd0a99470a87aa6724a0acdec07769b499c1",
+    "deployment_products": "5c8553adc93c8b53a27414277743faafe222408d8424ad395d5ec62f44786982",
+    "_fraction": "a7caac242c7da9bc1efdc03480a036cbd18d702ff84374aeb3814dd0e32270f7",
+    "products_between": "b96b38329b91e405aaba341657e73c20af3340637cf7b57fffe8f2e1dd5f7816"
+  },
+  "harness": "Original pure source execution; representative SIM equipment/products, not bytes or actual hardware",
+  "cases": [
+    {
+      "name": "empty",
+      "deployment": {
+        "nodes": []
+      },
+      "faults": [],
+      "inputs": {
+        "nodes": [],
+        "production": {},
+        "available": {}
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": []
+        }
+      ]
+    },
+    {
+      "name": "camera-only",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 0,
+            "available": false,
+            "reason": "저장소 미설정"
+          }
+        ],
+        "production": {},
+        "available": {
+          "A": false
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": []
+        }
+      ]
+    },
+    {
+      "name": "storage",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "safe",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "safe",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 0,
+            "available": false,
+            "reason": "저장소 미설정"
+          }
+        ],
+        "production": {},
+        "available": {
+          "A": false
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": []
+        }
+      ]
+    },
+    {
+      "name": "disabled",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": false
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 0,
+            "available": false,
+            "reason": "저장소 미설정"
+          }
+        ],
+        "production": {},
+        "available": {
+          "A": false
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": []
+        }
+      ]
+    },
+    {
+      "name": "multiple-store",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "store1",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 4000.0,
+            "available": true,
+            "reason": null
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            },
+            {
+              "ref": "A:imagery:2",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 987.479,
+              "priority": 1,
+              "label": "A imagery #2",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "nominal",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            },
+            {
+              "ref": "A:imagery:2",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 987.479,
+              "priority": 1,
+              "label": "A imagery #2",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "power_drop-high-True",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "power_drop",
+          "severity": "high",
+          "active": true
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": false,
+            "reason": "power_drop (high)"
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": false
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": []
+        }
+      ]
+    },
+    {
+      "name": "power_drop-medium-True",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "power_drop",
+          "severity": "medium",
+          "active": true
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            },
+            {
+              "ref": "A:imagery:2",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 987.479,
+              "priority": 1,
+              "label": "A imagery #2",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "power_drop-high-False",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "power_drop",
+          "severity": "high",
+          "active": false
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            },
+            {
+              "ref": "A:imagery:2",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 987.479,
+              "priority": 1,
+              "label": "A imagery #2",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "storage_pressure-high-True",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "storage_pressure",
+          "severity": "high",
+          "active": true
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": false,
+            "reason": "storage_pressure (high)"
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": false
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": []
+        }
+      ]
+    },
+    {
+      "name": "storage_pressure-medium-True",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "storage_pressure",
+          "severity": "medium",
+          "active": true
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            },
+            {
+              "ref": "A:imagery:2",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 987.479,
+              "priority": 1,
+              "label": "A imagery #2",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "storage_pressure-high-False",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "storage_pressure",
+          "severity": "high",
+          "active": false
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            },
+            {
+              "ref": "A:imagery:2",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 987.479,
+              "priority": 1,
+              "label": "A imagery #2",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "thermal_spike-high-True",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "thermal_spike",
+          "severity": "high",
+          "active": true
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": false,
+            "reason": "thermal_spike (high)"
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": false
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": []
+        }
+      ]
+    },
+    {
+      "name": "thermal_spike-medium-True",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "thermal_spike",
+          "severity": "medium",
+          "active": true
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            },
+            {
+              "ref": "A:imagery:2",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 987.479,
+              "priority": 1,
+              "label": "A imagery #2",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "thermal_spike-high-False",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "thermal_spike",
+          "severity": "high",
+          "active": false
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            },
+            {
+              "ref": "A:imagery:2",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 987.479,
+              "priority": 1,
+              "label": "A imagery #2",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "link_loss-high-True",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "link_loss",
+          "severity": "high",
+          "active": true
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": false,
+            "reason": "link_loss (high)"
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": false
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": []
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": []
+        }
+      ]
+    },
+    {
+      "name": "link_loss-medium-True",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "link_loss",
+          "severity": "medium",
+          "active": true
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            },
+            {
+              "ref": "A:imagery:2",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 987.479,
+              "priority": 1,
+              "label": "A imagery #2",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "link_loss-high-False",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [
+        {
+          "target": "A",
+          "kind": "link_loss",
+          "severity": "high",
+          "active": false
+        }
+      ],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            },
+            {
+              "ref": "A:imagery:2",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 987.479,
+              "priority": 1,
+              "label": "A imagery #2",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mixed",
+      "deployment": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "B",
+            "name": "  node B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "C",
+            "name": "  node C  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "faults": [],
+      "inputs": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  node A  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          },
+          {
+            "id": "B",
+            "name": "  node B  ",
+            "kind": "onboard",
+            "capacity_gb": 2000.0,
+            "available": true,
+            "reason": null
+          },
+          {
+            "id": "C",
+            "name": "  node C  ",
+            "kind": "onboard",
+            "capacity_gb": 0,
+            "available": false,
+            "reason": "저장소 미설정"
+          }
+        ],
+        "production": {
+          "A": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            },
+            {
+              "class": "imagery",
+              "interval_s": 90,
+              "size_mb": [
+                400,
+                1200
+              ]
+            }
+          ],
+          "B": [
+            {
+              "class": "telemetry",
+              "interval_s": 30,
+              "size_mb": [
+                8,
+                24
+              ]
+            }
+          ]
+        },
+        "available": {
+          "A": true,
+          "B": true,
+          "C": false
+        }
+      },
+      "queries": [
+        {
+          "from_s": 0,
+          "to_s": 100,
+          "products": [
+            {
+              "ref": "A:telemetry:1",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 20.836,
+              "priority": 1,
+              "label": "A telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "A:telemetry:2",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 23.605,
+              "priority": 1,
+              "label": "A telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            },
+            {
+              "ref": "B:telemetry:1",
+              "class": "telemetry",
+              "source": "B",
+              "size_mb": 19.559,
+              "priority": 1,
+              "label": "B telemetry #1",
+              "created_s": 30.0
+            },
+            {
+              "ref": "B:telemetry:2",
+              "class": "telemetry",
+              "source": "B",
+              "size_mb": 12.388,
+              "priority": 1,
+              "label": "B telemetry #2",
+              "created_s": 60.0
+            },
+            {
+              "ref": "B:telemetry:3",
+              "class": "telemetry",
+              "source": "B",
+              "size_mb": 16.324,
+              "priority": 1,
+              "label": "B telemetry #3",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 60,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            },
+            {
+              "ref": "B:telemetry:3",
+              "class": "telemetry",
+              "source": "B",
+              "size_mb": 16.324,
+              "priority": 1,
+              "label": "B telemetry #3",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 100,
+          "to_s": 100,
+          "products": []
+        },
+        {
+          "from_s": 100,
+          "to_s": 60,
+          "products": []
+        },
+        {
+          "from_s": 89.5,
+          "to_s": 90,
+          "products": [
+            {
+              "ref": "A:telemetry:3",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.375,
+              "priority": 1,
+              "label": "A telemetry #3",
+              "created_s": 90.0
+            },
+            {
+              "ref": "A:imagery:1",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 423.632,
+              "priority": 1,
+              "label": "A imagery #1",
+              "created_s": 90.0
+            },
+            {
+              "ref": "B:telemetry:3",
+              "class": "telemetry",
+              "source": "B",
+              "size_mb": 16.324,
+              "priority": 1,
+              "label": "B telemetry #3",
+              "created_s": 90.0
+            }
+          ]
+        },
+        {
+          "from_s": 123.5,
+          "to_s": 200,
+          "products": [
+            {
+              "ref": "A:telemetry:5",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.653,
+              "priority": 1,
+              "label": "A telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "A:telemetry:6",
+              "class": "telemetry",
+              "source": "A",
+              "size_mb": 10.596,
+              "priority": 1,
+              "label": "A telemetry #6",
+              "created_s": 180.0
+            },
+            {
+              "ref": "A:imagery:2",
+              "class": "imagery",
+              "source": "A",
+              "size_mb": 987.479,
+              "priority": 1,
+              "label": "A imagery #2",
+              "created_s": 180.0
+            },
+            {
+              "ref": "B:telemetry:5",
+              "class": "telemetry",
+              "source": "B",
+              "size_mb": 9.56,
+              "priority": 1,
+              "label": "B telemetry #5",
+              "created_s": 150.0
+            },
+            {
+              "ref": "B:telemetry:6",
+              "class": "telemetry",
+              "source": "B",
+              "size_mb": 9.515,
+              "priority": 1,
+              "label": "B telemetry #6",
+              "created_s": 180.0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "long": [
+    {
+      "count": 1,
+      "from_s": 0,
+      "to_s": 14400,
+      "deployment": {
+        "nodes": [
+          {
+            "id": "0",
+            "name": "  node 0  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "digest": "ed4d3eb7c0b1cde628c82d253f1f2fcb2be67fa8c8de9fbe487511fa7a0776bb",
+      "products": 640,
+      "unique_refs": 640,
+      "classes": {
+        "telemetry": 480,
+        "imagery": 160
+      },
+      "max_created_s": 14400.0
+    },
+    {
+      "count": 240,
+      "from_s": 0,
+      "to_s": 14400,
+      "deployment": {
+        "nodes": [
+          {
+            "id": "0",
+            "name": "  node 0  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "1",
+            "name": "  node 1  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "2",
+            "name": "  node 2  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "3",
+            "name": "  node 3  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "4",
+            "name": "  node 4  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "5",
+            "name": "  node 5  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "6",
+            "name": "  node 6  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "7",
+            "name": "  node 7  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "8",
+            "name": "  node 8  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "9",
+            "name": "  node 9  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "10",
+            "name": "  node 10  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "11",
+            "name": "  node 11  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "12",
+            "name": "  node 12  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "13",
+            "name": "  node 13  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "14",
+            "name": "  node 14  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "15",
+            "name": "  node 15  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "16",
+            "name": "  node 16  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "17",
+            "name": "  node 17  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "18",
+            "name": "  node 18  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "19",
+            "name": "  node 19  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "20",
+            "name": "  node 20  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "21",
+            "name": "  node 21  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "22",
+            "name": "  node 22  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "23",
+            "name": "  node 23  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "24",
+            "name": "  node 24  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "25",
+            "name": "  node 25  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "26",
+            "name": "  node 26  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "27",
+            "name": "  node 27  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "28",
+            "name": "  node 28  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "29",
+            "name": "  node 29  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "30",
+            "name": "  node 30  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "31",
+            "name": "  node 31  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "32",
+            "name": "  node 32  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "33",
+            "name": "  node 33  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "34",
+            "name": "  node 34  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "35",
+            "name": "  node 35  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "36",
+            "name": "  node 36  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "37",
+            "name": "  node 37  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "38",
+            "name": "  node 38  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "39",
+            "name": "  node 39  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "40",
+            "name": "  node 40  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "41",
+            "name": "  node 41  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "42",
+            "name": "  node 42  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "43",
+            "name": "  node 43  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "44",
+            "name": "  node 44  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "45",
+            "name": "  node 45  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "46",
+            "name": "  node 46  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "47",
+            "name": "  node 47  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "48",
+            "name": "  node 48  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "49",
+            "name": "  node 49  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "50",
+            "name": "  node 50  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "51",
+            "name": "  node 51  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "52",
+            "name": "  node 52  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "53",
+            "name": "  node 53  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "54",
+            "name": "  node 54  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "55",
+            "name": "  node 55  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "56",
+            "name": "  node 56  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "57",
+            "name": "  node 57  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "58",
+            "name": "  node 58  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "59",
+            "name": "  node 59  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "60",
+            "name": "  node 60  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "61",
+            "name": "  node 61  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "62",
+            "name": "  node 62  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "63",
+            "name": "  node 63  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "64",
+            "name": "  node 64  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "65",
+            "name": "  node 65  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "66",
+            "name": "  node 66  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "67",
+            "name": "  node 67  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "68",
+            "name": "  node 68  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "69",
+            "name": "  node 69  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "70",
+            "name": "  node 70  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "71",
+            "name": "  node 71  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "72",
+            "name": "  node 72  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "73",
+            "name": "  node 73  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "74",
+            "name": "  node 74  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "75",
+            "name": "  node 75  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "76",
+            "name": "  node 76  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "77",
+            "name": "  node 77  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "78",
+            "name": "  node 78  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "79",
+            "name": "  node 79  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "80",
+            "name": "  node 80  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "81",
+            "name": "  node 81  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "82",
+            "name": "  node 82  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "83",
+            "name": "  node 83  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "84",
+            "name": "  node 84  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "85",
+            "name": "  node 85  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "86",
+            "name": "  node 86  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "87",
+            "name": "  node 87  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "88",
+            "name": "  node 88  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "89",
+            "name": "  node 89  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "90",
+            "name": "  node 90  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "91",
+            "name": "  node 91  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "92",
+            "name": "  node 92  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "93",
+            "name": "  node 93  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "94",
+            "name": "  node 94  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "95",
+            "name": "  node 95  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "96",
+            "name": "  node 96  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "97",
+            "name": "  node 97  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "98",
+            "name": "  node 98  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "99",
+            "name": "  node 99  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "100",
+            "name": "  node 100  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "101",
+            "name": "  node 101  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "102",
+            "name": "  node 102  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "103",
+            "name": "  node 103  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "104",
+            "name": "  node 104  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "105",
+            "name": "  node 105  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "106",
+            "name": "  node 106  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "107",
+            "name": "  node 107  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "108",
+            "name": "  node 108  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "109",
+            "name": "  node 109  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "110",
+            "name": "  node 110  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "111",
+            "name": "  node 111  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "112",
+            "name": "  node 112  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "113",
+            "name": "  node 113  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "114",
+            "name": "  node 114  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "115",
+            "name": "  node 115  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "116",
+            "name": "  node 116  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "117",
+            "name": "  node 117  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "118",
+            "name": "  node 118  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "119",
+            "name": "  node 119  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "120",
+            "name": "  node 120  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "121",
+            "name": "  node 121  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "122",
+            "name": "  node 122  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "123",
+            "name": "  node 123  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "124",
+            "name": "  node 124  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "125",
+            "name": "  node 125  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "126",
+            "name": "  node 126  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "127",
+            "name": "  node 127  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "128",
+            "name": "  node 128  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "129",
+            "name": "  node 129  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "130",
+            "name": "  node 130  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "131",
+            "name": "  node 131  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "132",
+            "name": "  node 132  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "133",
+            "name": "  node 133  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "134",
+            "name": "  node 134  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "135",
+            "name": "  node 135  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "136",
+            "name": "  node 136  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "137",
+            "name": "  node 137  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "138",
+            "name": "  node 138  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "139",
+            "name": "  node 139  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "140",
+            "name": "  node 140  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "141",
+            "name": "  node 141  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "142",
+            "name": "  node 142  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "143",
+            "name": "  node 143  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "144",
+            "name": "  node 144  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "145",
+            "name": "  node 145  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "146",
+            "name": "  node 146  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "147",
+            "name": "  node 147  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "148",
+            "name": "  node 148  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "149",
+            "name": "  node 149  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "150",
+            "name": "  node 150  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "151",
+            "name": "  node 151  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "152",
+            "name": "  node 152  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "153",
+            "name": "  node 153  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "154",
+            "name": "  node 154  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "155",
+            "name": "  node 155  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "156",
+            "name": "  node 156  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "157",
+            "name": "  node 157  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "158",
+            "name": "  node 158  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "159",
+            "name": "  node 159  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "160",
+            "name": "  node 160  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "161",
+            "name": "  node 161  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "162",
+            "name": "  node 162  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "163",
+            "name": "  node 163  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "164",
+            "name": "  node 164  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "165",
+            "name": "  node 165  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "166",
+            "name": "  node 166  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "167",
+            "name": "  node 167  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "168",
+            "name": "  node 168  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "169",
+            "name": "  node 169  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "170",
+            "name": "  node 170  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "171",
+            "name": "  node 171  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "172",
+            "name": "  node 172  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "173",
+            "name": "  node 173  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "174",
+            "name": "  node 174  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "175",
+            "name": "  node 175  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "176",
+            "name": "  node 176  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "177",
+            "name": "  node 177  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "178",
+            "name": "  node 178  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "179",
+            "name": "  node 179  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "180",
+            "name": "  node 180  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "181",
+            "name": "  node 181  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "182",
+            "name": "  node 182  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "183",
+            "name": "  node 183  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "184",
+            "name": "  node 184  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "185",
+            "name": "  node 185  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "186",
+            "name": "  node 186  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "187",
+            "name": "  node 187  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "188",
+            "name": "  node 188  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "189",
+            "name": "  node 189  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "190",
+            "name": "  node 190  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "191",
+            "name": "  node 191  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "192",
+            "name": "  node 192  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "193",
+            "name": "  node 193  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "194",
+            "name": "  node 194  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "195",
+            "name": "  node 195  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "196",
+            "name": "  node 196  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "197",
+            "name": "  node 197  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "198",
+            "name": "  node 198  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "199",
+            "name": "  node 199  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "200",
+            "name": "  node 200  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "201",
+            "name": "  node 201  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "202",
+            "name": "  node 202  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "203",
+            "name": "  node 203  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "204",
+            "name": "  node 204  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "205",
+            "name": "  node 205  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "206",
+            "name": "  node 206  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "207",
+            "name": "  node 207  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "208",
+            "name": "  node 208  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "209",
+            "name": "  node 209  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "210",
+            "name": "  node 210  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "211",
+            "name": "  node 211  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "212",
+            "name": "  node 212  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "213",
+            "name": "  node 213  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "214",
+            "name": "  node 214  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "215",
+            "name": "  node 215  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "216",
+            "name": "  node 216  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "217",
+            "name": "  node 217  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "218",
+            "name": "  node 218  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "219",
+            "name": "  node 219  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "220",
+            "name": "  node 220  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "221",
+            "name": "  node 221  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "222",
+            "name": "  node 222  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "223",
+            "name": "  node 223  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "224",
+            "name": "  node 224  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "225",
+            "name": "  node 225  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "226",
+            "name": "  node 226  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "227",
+            "name": "  node 227  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "228",
+            "name": "  node 228  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "229",
+            "name": "  node 229  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "230",
+            "name": "  node 230  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "231",
+            "name": "  node 231  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "232",
+            "name": "  node 232  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "233",
+            "name": "  node 233  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "234",
+            "name": "  node 234  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "235",
+            "name": "  node 235  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "236",
+            "name": "  node 236  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "237",
+            "name": "  node 237  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "238",
+            "name": "  node 238  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": "239",
+            "name": "  node 239  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store0",
+                "catalog": "dtn_store",
+                "enabled": true
+              },
+              {
+                "id": "camera",
+                "catalog": "eo_camera",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "digest": "cadf6ddcb2626b719045ed2fdaffe28d10792c79c634812e086eba7e4ffd0962",
+      "products": 153600,
+      "unique_refs": 153600,
+      "classes": {
+        "telemetry": 115200,
+        "imagery": 38400
+      },
+      "max_created_s": 14400.0
+    }
+  ]
+}
