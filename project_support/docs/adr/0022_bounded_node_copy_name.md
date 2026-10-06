@@ -1,0 +1,2 @@
+# ADR0022 복제 이름의 기존 상한 유지
+2026-10-06. 기존 모델 이름 검증의40codepoint 상한을 readonly MAX_NODE_NAME_LENGTH로 모델 라이브러리/factory에 추가 공개한다. ConstellationStore duplicate는 기존cloneNode를 재사용하되 그 상한에서 사본 접미사 codepoint길이를 뺀 원본명 prefix와 접미사를 name 인자로 전달한다. 짧은 이름/원본golden/장비 복제/epoch/ID/formation 분리/물리 계산은 그대로이며 기존 원본 노드를 바꾸지 않는다. 긴 이름에도 유효한 복제본을 생성하고 기존240cap이 유일한 수량상한으로 작동하게 한다. 원본 cloneNode의 자동 이름 동작을 직접 바꾸거나 명명 제약을 완화하지 않는다. evidence validation/t152_presets_capacity.md, original golden + Unicode/repeated239copy/cap rollback regression passed.

@@ -124,3 +124,9 @@ test('prospective formation IDs do not consume state on rejected generation',()=
  const s=store();s.load();const ids=s.idFactory();const first=ids();ids();assert.equal(s.drafts.length,0);
  const node=library().createNode({}, {epoch,...first});node.orbit.altitude_km=100;assert.throws(()=>s.addMany([node]));assert.equal(s.add({}).id,first.id);
 });
+
+test('a valid40-codepoint name remains duplicable repeatedly until the existing240 cap',()=>{
+ const s=store();s.load();const source=s.add({name:'🛰'.repeat(40)}),original=s.find(source.id);let current=source;
+ for(let i=1;i<240;i++){current=s.duplicate(current.id);assert.equal([...current.name].length<=40,true);assert.equal(current.name.endsWith(' 사본'),true);assert.equal(current.formation,null);}
+ assert.deepEqual(s.find(source.id),original);assert.equal(new Set(s.drafts.map(n=>n.id)).size,240);assert.equal(new Set(s.drafts.map(n=>n.catalog_number)).size,240);const before=view(s);assert.throws(()=>s.duplicate(current.id),/240/);assert.deepEqual(view(s),before);
+});

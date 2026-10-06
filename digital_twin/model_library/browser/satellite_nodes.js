@@ -2,6 +2,7 @@
 // Representative sandbox values, not manufacturer specifications. No storage, HTTP or propagation.
 // WGS84 source radius is used only in the static formation chord summary.
 const EARTH_A_KM=6378.137;
+export const MAX_NODE_NAME_LENGTH=40;
 
 function freezeDefinition(value) {
   if (value && typeof value === 'object') { for (const nested of Object.values(value)) freezeDefinition(nested); Object.freeze(value); }
@@ -212,7 +213,7 @@ function validateNode(node) {
   const errors = [];
   if (!node || typeof node !== 'object') return ['노드 정의가 없습니다.'];
   const name = typeof node.name === 'string' ? node.name.trim() : '';
-  if (!name || [...name].length > 40) errors.push('위성 이름은 1~40자여야 합니다.');
+  if (!name || [...name].length > MAX_NODE_NAME_LENGTH) errors.push('위성 이름은 1~40자여야 합니다.');
   for (const key of ['created_at', 'updated_at']) {
     try { if (typeof node[key] !== 'string') throw new RangeError(key); requireEpoch(node[key]); }
     catch { errors.push(`노드 ${key}는 유효한 UTC 시각이어야 합니다.`); }
@@ -371,5 +372,5 @@ function generateFormation(params, { epoch, idFactory, formationId, base = null 
   return nodes;
 }
 
-return Object.freeze({NODE_SCHEMA,NODE_CATALOG_BASE,EQUIPMENT_KINDS,OISL_ROLES,EQUIPMENT_CATALOG,BUS_PRESETS,NODE_MODES,FORMATION_PRESETS,LINK_POLICIES,FORMATION_CONTROLS,FORMATION_DEFAULTS,equipmentSpec,createEquipment,defaultOrbit,createNode,cloneNode,normalizeNode,validateNode,equipmentOf,equipmentActive,activeOislTerminals,powerBudget,nodeMass,nodeCatalogItem,normalizeFormationParams,formationSummary,generateFormation});
+return Object.freeze({NODE_SCHEMA,NODE_CATALOG_BASE,MAX_NODE_NAME_LENGTH,EQUIPMENT_KINDS,OISL_ROLES,EQUIPMENT_CATALOG,BUS_PRESETS,NODE_MODES,FORMATION_PRESETS,LINK_POLICIES,FORMATION_CONTROLS,FORMATION_DEFAULTS,equipmentSpec,createEquipment,defaultOrbit,createNode,cloneNode,normalizeNode,validateNode,equipmentOf,equipmentActive,activeOislTerminals,powerBudget,nodeMass,nodeCatalogItem,normalizeFormationParams,formationSummary,generateFormation});
 }

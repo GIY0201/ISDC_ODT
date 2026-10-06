@@ -125,7 +125,8 @@ export function createConstellationStore({library,storage=null,now,verifyAccepta
     ready();const source=find(id);if(!source)return null;
     if(state.drafts.length>=MAX_NODES)throw fail('invalid_nodes','노드는 최대 240개까지 둘 수 있습니다.');
     const sequence=state.sequence+1,copyId=`NODE-${String(sequence).padStart(4,'0')}`;
-    const node=library.cloneNode(source,{epoch:time(),id:copyId,catalogNumber:BASE+sequence});
+    const suffix=' 사본',name=[...source.name].slice(0,library.MAX_NODE_NAME_LENGTH-[...suffix].length).join('')+suffix;
+    const node=library.cloneNode(source,{epoch:time(),id:copyId,catalogNumber:BASE+sequence,name});
     commit({...state,drafts:[...state.drafts,node],sequence,selectedId:node.id},'add');return copy(node);
   }
   function update(id,next){
