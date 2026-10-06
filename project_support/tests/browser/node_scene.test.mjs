@@ -27,8 +27,11 @@ function fixture({load,geometry,path,palette,verifyLinkSnapshot,pathRevisionFor,
  return {scene,loads,statuses,viewer,set display(v){display=v;},set morph(v){morph=v;},set tracks(v){tracks=v;}};
 }
 const entries=(count=2)=>Array.from({length:count},(_,i)=>({id:String(i+1),definition:definition(String(i+1)),model:description(String(i+1)),orbit_regime:'LEO'}));
+test('fleet model picking adds explicit node identity while retaining original satellite identity',async()=>{
+ const f=fixture();await f.scene.setNodes(entries(1));assert.equal(f.loads[0].id.nodeId,'1');assert.equal(f.loads[0].id.satelliteId,'1');f.scene.destroy();
+});
 test('source model options, native forward-difference display orientation and selected suppression match original',async()=>{
- const f=fixture();await f.scene.setNodes(entries());assert.deepEqual(LINK_COLORS,golden.colors);assert.deepEqual(plain(f.loads),golden.loads);
+ const f=fixture();await f.scene.setNodes(entries());assert.deepEqual(LINK_COLORS,golden.colors);const sourceLoads=plain(f.loads);for(const load of sourceLoads)delete load.id.nodeId;assert.deepEqual(sourceLoads,golden.loads);
  assert.deepEqual(plain(f.scene.models.get('1').model.modelMatrix),golden.models['1']);assert.equal(f.scene.models.get('1').model.show,true);
  f.scene.select('1');assert.equal(f.scene.models.get('1').model.show,golden.selected.model);f.scene.setModelsVisible(false);assert.equal(f.scene.models.get('2').model.show,false);f.scene.destroy();
 });

@@ -7,6 +7,13 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   const viewObservers=new Set();
   const displayObservers=new Set();let displayKey=null,solarFactory=null,solarRenderer=null;
   let nodeBinding=null;const nodeObservers=new Set();
+  let nodeInteractionBinding=null;
+  function attachNodeInteraction(){
+    const binding=nodeInteractionBinding,owner=globe;if(!owner||disposed)return;
+    if(!binding){owner.setNodeInteraction?.(null);return;}
+    const current=()=>!disposed&&!failed&&nodeInteractionBinding===binding&&globe===owner;
+    owner.setNodeInteraction({owns:(...args)=>current()&&binding.interaction.owns(...args)===true,onSelect:id=>{if(current())binding.interaction.onSelect?.(id);},onHover:id=>{if(current())binding.interaction.onHover?.(id);}});
+  }
   const nodeRendererState=()=>({phase:disposed?'unavailable':nodeBinding?.phase??'unavailable',error:nodeBinding?.error??null});
   function notifyNodes(){for(const fn of nodeObservers){try{fn(structuredClone(nodeRendererState()));}catch{/* A display observer cannot own renderer resources. */}}}
   function detachNodes(binding=nodeBinding){
@@ -131,6 +138,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       applyModel();
       attachSolar();
       attachNodes();
+      attachNodeInteraction();
     }catch{fail();}
   }
   const timer=host.setTimeout(boot,12000);
@@ -144,6 +152,14 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       if(disposed)return()=>{};
       const previous=nodeBinding,binding={factory,renderer:null,removeFrame:null,phase:'pending',error:null};nodeBinding=binding;detachNodes(previous);attachNodes();notifyNodes();
       return()=>{if(nodeBinding!==binding)return;nodeBinding=null;detachNodes(binding);notifyNodes();};
+    },
+    bindNodeInteraction(interaction){
+      if(typeof interaction?.owns!=='function')throw new TypeError('node primitive ownership verifier required');
+      if(disposed)return()=>{};
+      const previous=nodeInteractionBinding,binding={interaction:{...interaction}};nodeInteractionBinding=binding;
+      try{previous?.interaction.onHover?.(null);}catch{/* Scoped cleanup. */}
+      if(nodeInteractionBinding===binding)attachNodeInteraction();
+      return()=>{if(nodeInteractionBinding!==binding)return;nodeInteractionBinding=null;try{binding.interaction.onHover?.(null);}catch{/* Scoped cleanup. */}if(nodeInteractionBinding===null)attachNodeInteraction();};
     },
     observeDisplayContext(fn){if(disposed)return()=>{};displayObservers.add(fn);fn(displayContext());return()=>displayObservers.delete(fn);},
     bindSolarRenderer(factory){if(disposed)return()=>{};solarFactory=factory;attachSolar();return()=>{if(solarFactory!==factory)return;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;};},
@@ -194,6 +210,6 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       paint();
       if(!catalog&&!latest&&!sceneMetadata&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
     },
-    destroy(){if(disposed)return;disposed=true;nodeObservers.clear();detachNodes();nodeBinding=null;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;displayObservers.clear();hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
+    destroy(){if(disposed)return;disposed=true;nodeInteractionBinding=null;nodeObservers.clear();detachNodes();nodeBinding=null;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;displayObservers.clear();hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
   };
 }

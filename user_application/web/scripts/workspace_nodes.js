@@ -68,6 +68,19 @@ export function createWorkspaceNodes({api,globe,library,orbitElements,catalogEle
   refreshModels();return scene;
  });
  const removeStatus=globe.observeNodeRenderer(refreshPanel);
+ function pickGeometry(id){
+  if(dead||!started||!display?.utc||globe.nodeRendererState().phase!=='ready')return null;
+  const node=store.find(id),geometry=node&&geometryFor(node,{utc:display.utc});return geometry?.row?.status==='valid'&&geometry.row.error_code===null?geometry:null;
+ }
+ const removeInteraction=globe.bindNodeInteraction({
+  owns:(id,primitive,selectedModel=false)=>{
+   if(!pickGeometry(id)||!scene||scene.disposed)return false;
+   if(selectedModel)return activeSelection&&store.selectedId===id&&selectedSignature!==null;
+   return primitive?.show===true&&[scene.points?.get(id),scene.labels?.get(id),scene.models?.get(id)?.model].some(value=>value!==undefined&&value===primitive);
+  },
+  onSelect:id=>{if(!pickGeometry(id))return;try{store.select(id);select();}catch(value){report(value);}},
+  onHover:id=>{if(!dead)scene?.setHovered(id&&pickGeometry(id)?id:null);},
+ });
  const external=event=>{if(!dead&&event.key===DRAFT_KEY)store.receiveExternalDraft(event.newValue);};host.addEventListener('storage',external);
  function show(view){
   if(dead||!started)return;
@@ -85,6 +98,6 @@ export function createWorkspaceNodes({api,globe,library,orbitElements,catalogEle
  return Object.freeze({
   async start(){if(dead||started)return;store.load();started=true;syncDefinitions();try{await deployment.initialize();}catch(value){report(value);}return deployment.state;},
   show,refresh:refreshPanel,refreshModels,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
-  destroy(){if(dead)return;dead=true;for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
+  destroy(){if(dead)return;dead=true;for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
  });
 }

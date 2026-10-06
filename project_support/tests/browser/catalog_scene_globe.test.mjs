@@ -1,5 +1,8 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {OrbitGlobe} from '../../../digital_twin/visualization/orbit_globe.js';
+import {SatelliteModelLayer} from '../../../digital_twin/visualization/satellite_model.js';
+import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
+import {NODE_COMMUNICATION_METADATA} from '../../../user_application/web/scripts/nodes/node_timeline.js';
 function fixture(){const collections=[],handlers=[],viewers=[],allocations={colors:0,scales:0};
  class Collection{constructor(){this.items=[];collections.push(this);}add(v){this.items.push(v);return v;}removeAll(){this.items=[];}}
  class Handler{constructor(){handlers.push(this);this.actions=new Map();}setInputAction(fn,type){this.actions.set(type,fn);if(type===1)this.pick=fn;}destroy(){this.dead=true;}}
@@ -10,6 +13,26 @@ function fixture(){const collections=[],handlers=[],viewers=[],allocations={colo
 }
 const utc='2020-07-12T21:16:01.000416000Z';
 const scene=(n=16633)=>({frame:'ITRF',utc,scene_sha256:'a'.repeat(64),count:n,valid_count:n,error_count:0,rows:Array.from({length:n},(_,i)=>({catalog_number:i+1,name:'sat'+i,status:'valid',normalized_gp_sha256:'b'.repeat(64),epoch_utc:utc,orbit_regime:['LEO','MEO','GEO','HEO'][i%4],position_m:[7000000,i+1,0]}))});
+test('native node picking shares one handler, requires owned primitive, and never becomes a catalog selection',()=>{
+ const {globe,handlers}=fixture(),selected=[],hover=[],catalog=[],primitive={show:true};globe.C.ScreenSpaceEventType.MOUSE_MOVE=2;
+ globe.setCatalogScene(scene(2),id=>catalog.push(id));
+ globe.setNodeInteraction({owns:(id,p)=>id==='NODE-1'&&p===primitive&&p.show,onSelect:id=>selected.push(id),onHover:id=>hover.push(id)});
+ globe.viewer.picked={id:{nodeId:'NODE-1'},primitive};handlers[0].pick({position:{}});assert.deepEqual(selected,['NODE-1']);assert.deepEqual(catalog,[]);
+ handlers[0].actions.get(2)({endPosition:{x:1,y:2}});assert.equal(hover.at(-1),'NODE-1');assert.equal(handlers.length,1);
+ globe.viewer.picked={id:{nodeId:'NODE-1',catalogNumber:1},primitive:{show:true}};handlers[0].pick({position:{}});assert.equal(selected.length,1);assert.deepEqual(catalog,[]);
+ primitive.show=false;globe.viewer.picked={id:{nodeId:'NODE-1'},primitive};handlers[0].pick({position:{}});assert.equal(selected.length,1);
+ globe.setNodeInteraction(null);globe.viewer.picked={id:{catalogNumber:1}};handlers[0].pick({position:{}});assert.deepEqual(catalog,[1]);assert.equal(hover.at(-1),null);globe.destroy();
+ handlers[0].pick({position:{}});assert.equal(selected.length,1);
+});
+test('selected source model pick requires the shared layer primitive and a currently validated native pose',async()=>{
+ const {globe,handlers}=fixture(),selected=[],codec=createUtcCodec(LEAP_SHA256),definition={schema:1,id:'NODE-1'},stamp=codec.advance(utc,0);
+ const sample={...NODE_COMMUNICATION_METADATA,node_id:'NODE-1',node_definition:definition,definition_hash:'a'.repeat(64),row:{utc:stamp,status:'valid',error_code:null,position_m:[7000000,0,0]}};
+ const layer=new SatelliteModelLayer({advanceUtc:codec.advance,timeSource:()=>stamp});await layer.show({pose_source:{kind:'source_node',node_definition:definition,definition_hash:sample.definition_hash}},()=>sample,stamp);
+ layer.model={show:true};globe.modelLayer=layer;globe.setNodeInteraction({owns:(_id,_primitive,selectedModel)=>selectedModel,onSelect:id=>selected.push(id)});
+ globe.viewer.picked={id:{node_id:'NODE-1'},primitive:layer.model};handlers[0].pick({position:{}});assert.deepEqual(selected,['NODE-1']);
+ sample.frame='ITRF';handlers[0].pick({position:{}});assert.equal(selected.length,1);sample.frame=NODE_COMMUNICATION_METADATA.frame;
+ globe.viewer.picked={id:{node_id:'NODE-1'},primitive:{show:true}};handlers[0].pick({position:{}});assert.equal(selected.length,1);globe.destroy();
+});
 test('native hover emits picked scene UTC or selected UTC, including model picks, without selecting or sharing geometry',()=>{
  const {globe,handlers}=fixture(),events=[],selected=[];globe.C.ScreenSpaceEventType.MOUSE_MOVE=2;
  globe.onSatelliteHover=value=>events.push(value);globe.setCatalogScene(scene(2),n=>selected.push(n));

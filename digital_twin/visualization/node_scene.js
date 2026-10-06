@@ -86,7 +86,7 @@ export class NodeScene{
       if(this.disposed||token!==this.loadToken)return;
       const d=entry.model,key=this.modelKey(id),existing=this.models.get(id);if(existing?.key===key&&!existing.failed)continue;if(existing){this.removeModel(id);count--;}
       if(!key||count>=MAX_MODELS)continue;count++;let model;
-      try{model=await C.Model.fromGltfAsync({url:d.url,id:{satelliteId:id},scale:Number(d.scale)>0?Number(d.scale):1,minimumPixelSize:Number(d.minimumPixelSize)||12,allowPicking:true,show:false,imageBasedLighting:this.ambientLighting(C)});}catch(e){this.status(id,'model_unavailable',String(e.message||e));continue;}
+      try{model=await C.Model.fromGltfAsync({url:d.url,id:{satelliteId:id,nodeId:id},scale:Number(d.scale)>0?Number(d.scale):1,minimumPixelSize:Number(d.minimumPixelSize)||12,allowPicking:true,show:false,imageBasedLighting:this.ambientLighting(C)});}catch(e){this.status(id,'model_unavailable',String(e.message||e));continue;}
       if(this.disposed||token!==this.loadToken||viewer!==this.viewer||!this.descriptions.has(id)||this.modelKey(id)!==key){model.destroy?.();continue;}
       const installed={model:viewer.scene.primitives.add(model),owner:viewer,key,orientation:structuredClone(d.orientation||{}),failed:false,removers:[]};this.models.set(id,installed);
       const current=()=>!this.disposed&&this.models.get(id)===installed&&this.viewer===viewer;

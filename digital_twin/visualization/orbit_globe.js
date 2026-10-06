@@ -6,6 +6,7 @@ const PALETTES={dark:{LEO:'#ff9f43',MEO:'#e6ed55',GEO:'#5ee277',HEO:'#53c8ff',se
 export class OrbitGlobe {
   constructor(Cesium,container,options={}){
     this.container=container;this.hoveredCatalog=null;
+    this.nodeInteraction=null;
     this.onSatelliteHover=options.onSatelliteHover??(()=>{});this.hoverPick=null;this.selectedHover=null;this.catalogUtc=null;
     this.C=Cesium;this.position=null;this.destroyed=false;this.stationEntities=new Map();this.stationSites=new Map();this.stationIds=new Map();this.selectedStation=null;this.catalogPoints=new Map();this.catalogLabels=new Map();this.catalogHashes=new Map();this.catalogStyles=new Map();this.catalogEpochs=new Map();this.catalogValid=new Set();this.selectedCatalog=null;
     this.viewer=new Cesium.Viewer(container,{
@@ -164,6 +165,23 @@ export class OrbitGlobe {
     if(!position){this._clearSatelliteHover();return;}
     this.onSatelliteHover(structuredClone({id:position.catalog_number,item,position,screen}));
   }
+  setNodeInteraction(interaction){
+    if(this.destroyed)return;
+    if(interaction!==null&&typeof interaction?.owns!=='function')throw new TypeError('node primitive ownership verifier required');
+    try{this.nodeInteraction?.onHover?.(null);}catch{/* Optional interaction cannot own the Viewer. */}
+    this.nodeInteraction=interaction;
+    if(interaction)this._ensurePickHandler();
+  }
+  _nodePick(picked){
+    const record=picked?.id?.id??picked?.id;
+    if(!record||typeof record!=='object'||(!Object.hasOwn(record,'nodeId')&&!Object.hasOwn(record,'node_id')))return null;
+    const id=record.nodeId??record.node_id;let owned=false;
+    try{
+      const layer=this.modelLayer,selectedModel=Boolean(picked.primitive&&picked.primitive===layer?.model&&layer.model.show&&layer.description?.pose_source?.node_definition?.id===id&&layer.nativeAt(layer.timeSource?.())?.node_id===id);
+      owned=typeof id==='string'&&id.length>0&&this.nodeInteraction?.owns(id,picked.primitive,selectedModel)===true;
+    }catch{/* Stale, failed or foreign native pick is unavailable. */}
+    return{id,owned};
+  }
   _ensurePickHandler(){
     const {C,viewer}=this;
     if(this.stationPickHandler||!C.ScreenSpaceEventHandler||!C.ScreenSpaceEventType)return;
@@ -171,6 +189,7 @@ export class OrbitGlobe {
     this.stationPickHandler.setInputAction(event=>{
       if(this.destroyed)return;
       const picked=viewer.scene.pick(event.position);const id=picked?.id?.id??picked?.id;
+      const node=this._nodePick(picked);if(node){if(node.owned)try{this.nodeInteraction?.onSelect?.(node.id);}catch{/* App reports its own command error. */}return;}
       if(id?.catalogNumber&&this.catalogPoints.get(id.catalogNumber)?.show){this.onCatalogSelect?.(id.catalogNumber);return;}
       if(id==='stored-orbit-satellite'&&this.selectedCatalog!==null){this.onCatalogSelect?.(this.selectedCatalog);return;}
       let key=this.stationIds.get(id);
@@ -179,12 +198,15 @@ export class OrbitGlobe {
     },C.ScreenSpaceEventType.LEFT_CLICK);
     if(C.ScreenSpaceEventType.MOUSE_MOVE!==undefined)this.stationPickHandler.setInputAction(event=>{
       if(this.destroyed)return;const picked=viewer.scene.pick(event.endPosition),id=picked?.id?.id??picked?.id;
+      const node=this._nodePick(picked);
+      try{this.nodeInteraction?.onHover?.(node?.owned?node.id:null);}catch{/* Optional hover cannot change geometry. */}
+      if(node){this.hoverCatalog(null);this._clearSatelliteHover();if(this.container.style)this.container.style.cursor=node.owned?'pointer':'';if(viewer.scene.canvas.style)viewer.scene.canvas.style.cursor=node.owned?'pointer':'';return;}
       this.hoverCatalog(id?.catalogNumber??(id==='stored-orbit-satellite'?this.selectedCatalog:null));
       this.hoverPick={id:typeof id==='object'?{catalogNumber:id?.catalogNumber,satelliteId:id?.satelliteId}:id,screen:{x:event.endPosition.x,y:event.endPosition.y}};
       this._refreshSatelliteHover();
       if(this.hoveredCatalog===null&&this.stationIds.has(id)&&viewer.scene.canvas.style)viewer.scene.canvas.style.cursor='pointer';
     },C.ScreenSpaceEventType.MOUSE_MOVE);
-    this.leaveCatalog=()=>{this.hoverCatalog(null);this._clearSatelliteHover();};this.container.addEventListener?.('mouseleave',this.leaveCatalog);
+    this.leaveCatalog=()=>{this.hoverCatalog(null);this._clearSatelliteHover();try{this.nodeInteraction?.onHover?.(null);}catch{/* Optional hover. */}};this.container.addEventListener?.('mouseleave',this.leaveCatalog);
   }
   setGroundPoint(point){
     if(this.destroyed)return;
@@ -270,5 +292,5 @@ export class OrbitGlobe {
     for(const [number,point]of this.catalogPoints){const visual=this.catalogVisuals.get(number);if(!visual)continue;const alpha=visual.alpha*(this.selectedCatalog!==null&&this.selectedCatalog!==number ? .65 : 1),css=palette[visual.regime]||palette.LEO,style=`${css}:${alpha}`;if(!colors.has(style))colors.set(style,C.Color.fromCssColorString(css).withAlpha(alpha));point.color=colors.get(style);this.catalogStyles.set(number,style);const label=this.catalogLabels.get(number);if(label){label.fillColor=labelColor;label.outlineColor=outline;}}
     this._paintHovered();this.viewer.scene.requestRender();
   }
-  destroy(){if(this.destroyed)return;this.hoverCatalog(null);this._clearSatelliteHover();this.selectedHover=null;this.container.removeEventListener?.('mouseleave',this.leaveCatalog);this.modelLayer?.dispose();this.cameraMotion.dispose();this.destroyed=true;this.position=null;this.viewControls.destroy();this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.viewer.destroy();}
+  destroy(){if(this.destroyed)return;this.setNodeInteraction(null);this.hoverCatalog(null);this._clearSatelliteHover();this.selectedHover=null;this.container.removeEventListener?.('mouseleave',this.leaveCatalog);this.modelLayer?.dispose();this.cameraMotion.dispose();this.destroyed=true;this.position=null;this.viewControls.destroy();this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.viewer.destroy();}
 }

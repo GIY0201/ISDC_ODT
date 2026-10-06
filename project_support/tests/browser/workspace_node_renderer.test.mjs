@@ -11,6 +11,7 @@ async function fixture({boot=true,displayUtc='2020-07-12T21:16:01Z'}={}){
  globalThis.NodeBoundGlobe=class{
   constructor(){this.viewer={scene:{preRender:frames,renderError:errors}};instances.push(this);}
   update(value){this.row=value;return Boolean(value);}focus(){return true;}setGroundPoint(){}setViewStyle(){}setViewImagery(){}setCatalogScene(){}setCatalogTrack(){}
+  setNodeInteraction(value){this.interaction=value;}
   destroy(){this.destroyed=true;}
  };
  const source=await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8');
@@ -23,6 +24,19 @@ async function fixture({boot=true,displayUtc='2020-07-12T21:16:01Z'}={}){
  return {ui,host,frames,errors,instances,loads,display,utc,set now(value){now=value;}};
 }
 
+test('node interaction binds preboot to the shared globe and fences replaced or disposed callbacks',async()=>{
+ const f=await fixture({boot:false}),selected=[];
+ const remove=f.ui.bindNodeInteraction({owns:()=>true,onSelect:id=>selected.push(id),onHover:()=>{}});
+ f.host.Cesium={};f.loads[0]();const old=f.instances[0].interaction;assert.equal(old.owns('N',{}),true);old.onSelect('N');
+ f.ui.bindNodeInteraction({owns:()=>false,onSelect:id=>selected.push('new:'+id)});assert.equal(old.owns('N',{}),false);old.onSelect('old');remove();
+ assert.ok(f.instances[0].interaction);assert.deepEqual(selected,['N']);f.ui.destroy();old.onSelect('disposed');assert.deepEqual(selected,['N']);
+});
+test('reentrant interaction cleanup cannot replace a newer owner or let an older remover clear it',async()=>{
+ const f=await fixture(),selected=[];let rebind=false;
+ f.ui.bindNodeInteraction({owns:()=>true,onHover:()=>{if(rebind)f.ui.bindNodeInteraction({owns:()=>true,onSelect:()=>selected.push('newest')});}});
+ rebind=true;const remove=f.ui.bindNodeInteraction({owns:()=>false,onSelect:()=>selected.push('outer')});
+ f.instances[0].interaction.onSelect('N');assert.deepEqual(selected,['newest']);remove();assert.ok(f.instances[0].interaction);f.ui.destroy();
+});
 test('node renderer uses the existing Viewer and display UTC; source frame callbacks create no clock',async()=>{
  const f=await fixture(),calls=[];let destroyed=0,solarDestroyed=0;
  f.ui.bindSolarRenderer(()=>({destroy(){solarDestroyed++;}}));
