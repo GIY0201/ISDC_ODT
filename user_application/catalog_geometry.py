@@ -1,5 +1,7 @@
 """Readonly catalog/native/precise-frame query assembly; no runtime ownership."""
 import hashlib,json,math,re
+from copy import deepcopy
+from numbers import Real
 from collections import OrderedDict
 from dataclasses import dataclass,asdict
 from threading import Lock
@@ -185,4 +187,55 @@ class CatalogGeometryQuery:
                 rows.append(output)
             failed=sum(row['status']=='error' for row in rows)
             return {'version':1,'status':'error' if failed==count else 'partial' if failed else 'valid','client_request_id':client_request_id,'group':group,'catalog_number':catalog_number,'name':item.get('OBJECT_NAME',''),'source':values['source'],'fetched_at':values['fetched_at'],'warning':values.get('warning',''),'stale':bool(values.get('stale',False)),'epoch_utc':orbit.epoch_utc,'normalized_gp_sha256':digest,'start_utc':utc[0],'step_seconds':step_seconds,'count':count,'ground_point':{'latitude_deg':ground_point.latitude_deg,'longitude_deg':ground_point.longitude_deg,'ellipsoid_height_m':ground_point.ellipsoid_height_m,'virtual':True,'ellipsoid':'WGS84'},'minimum_elevation_deg':minimum_elevation_deg,'frame':result.frame,'profile':result.profile,'eop_sha256':result.eop_sha256,'leap_sha256':result.leap_sha256,'eop_kind':'IERS_A','communication_status':'unknown','units':{'position':'m','range':'m','elevation':'deg','azimuth':'deg','time':'UTC'},'rows':rows}
+        return await self.execute(compute)
+
+
+    async def points(self,group,catalog_number,expected_hash,utc,client_request_id):
+        """Explicit planning/refinement instants, through the existing precise catalog calculator."""
+        if type(catalog_number) is not int or not 1<=catalog_number<=999999999:
+            raise ValueError('valid catalog identity required')
+        if not isinstance(expected_hash,str) or not re.fullmatch('[a-f0-9]{64}',expected_hash):
+            raise ValueError('explicit catalog GP hash required')
+        if not isinstance(client_request_id,str) or not client_request_id.strip() or len(client_request_id)>128:
+            raise ValueError('valid point request identity required')
+        if not isinstance(utc,(list,tuple)) or not 1<=len(utc)<=601:
+            raise ValueError('explicit catalog point grid1..601 required')
+        instants=tuple(parse_utc(value) for value in utc)
+        if any(b.as_time()<=a.as_time() for a,b in zip(instants,instants[1:])):
+            raise ValueError('catalog points must be strictly increasing')
+        stamps=tuple(instant.iso_utc for instant in instants)
+        eop=self.eop;calculate=self.calculate
+        values,item,orbit,digest=await self._input(group,catalog_number)
+        if expected_hash!=digest:raise CatalogGpChanged('catalog GP changed; reselect before calculating')
+        values=deepcopy(values);item=deepcopy(item)
+        def compute():
+            qualities=[eop.quality(instant) for instant in instants]
+            result=calculate(orbit,list(stamps),GroundPoint(0,0,0))
+            if (len(result.rows)!=len(stamps) or result.frame!='ITRF' or result.profile!=orbit.profile
+                or result.eop_sha256!=eop.eop_sha256 or result.leap_sha256!=eop.leap_sha256):
+                raise ValueError('catalog point provenance or row count mismatch')
+            rows=[]
+            for stamp,row,quality in zip(stamps,result.rows,qualities):
+                if row.utc!=stamp:raise ValueError('catalog point UTC mismatch')
+                error=row.error_code
+                if error is not None and (not isinstance(error,str) or not error.strip() or len(error)>128):
+                    raise ValueError('invalid catalog point error code')
+                position=None
+                if error is None:
+                    if (not isinstance(row.position_m,(tuple,list)) or len(row.position_m)!=3
+                        or any(isinstance(v,bool) or not isinstance(v,Real) or not math.isfinite(v) for v in row.position_m)):
+                        raise ValueError('invalid catalog point position')
+                    position=[float(v) for v in row.position_m]
+                rows.append({'utc':stamp,'status':'error' if error else 'valid','error_code':error,
+                             'position_m':position,'eop_quality':quality})
+            failed=sum(row['status']=='error' for row in rows)
+            return {'version':1,'status':'error' if failed==len(rows) else 'partial' if failed else 'valid',
+                    'client_request_id':client_request_id,'group':group,'catalog_number':catalog_number,
+                    'name':item.get('OBJECT_NAME',''),'source':values['source'],'fetched_at':values['fetched_at'],
+                    'warning':values.get('warning',''),'stale':bool(values.get('stale',False)),
+                    'epoch_utc':orbit.epoch_utc,'normalized_gp_sha256':digest,
+                    'count':len(rows),'valid_count':len(rows)-failed,'error_count':failed,
+                    'frame':result.frame,'profile':result.profile,'eop_sha256':result.eop_sha256,
+                    'leap_sha256':result.leap_sha256,'eop_kind':'IERS_A','communication_status':'unknown',
+                    'units':{'position':'m','time':'UTC'},'rows':rows}
         return await self.execute(compute)
