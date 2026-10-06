@@ -1,0 +1,11 @@
+# ADR0023: pass station ellipsoidal height into reused ground-link geometry
+
+Status: accepted within the authorized T077 source feature integration. Source commit1a1e002 remains pinned; original fixture is preserved alongside the explicitly corrected variant.
+
+The original ground-station model produces `altitude_km`, while original `orbit.lookAnglesAt` consumes `altitudeKm`. Original `groundLink` passed the station object unchanged, so every nonzero height was silently treated as zero. Offline original execution reproduces Daejeon70m with an overhead550km target:550km instead of549.93km. Original height range includes negative ellipsoidal heights.
+
+First structurally reuse original pure WGS84 ENU functions, ground links and network snapshot with injected existing node equipment/optical dependencies. Preserve original band priorities, formulas/constants, source rounding, OISL margins, mesh, payload/DTN and fault folding. Original compatibility tests retain sea-level behavior for comparison. Then change only the groundLink call site to map validated `station.altitude_km` to `altitudeKm`. Omitted height continues to mean zero; nonfinite explicit height returns unavailable via original geometry validation. No implicit Number coercion, invented position, EOP conversion or timed JS propagation is added.
+
+The pure model takes copied native source-model geodetic positions and an already validated station definition from its future application producer. Geometry reports visibility/mask/RF budget inputs; it does not establish an operational link. Existing precise GP/ITRF visibility, source orbit calculations, RF-Friis-v1 and scenario-contact-plan-v1 APIs remain unchanged. No new HTTP contract, runtime owner, clock, Viewer or optical-history owner.
+
+Regression: original/corrected captures across source nominal/safe/payload/faults/empty/no-radio/zero-height/negative-height snapshots, plus independently captured WGS84 ENU positions. Exact original records outside ground geometry remain equal. A dedicated test first fails550!=549.9 at source one-decimal range rounding, then passes with the explicit height adapter. All product tests/full suites are required; live T077 native producer/fabric/groundUI acceptance remains open.

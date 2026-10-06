@@ -1,0 +1,3798 @@
+{
+  "schema": 1,
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_hashes": {
+    "digital_twin/simulation/browser/satellite_dynamics.js": "5580263519e45f6b3e1f7d2a5dbceae097d99d6949f8190ce8c87fe2145f6eb5",
+    "digital_twin/model_library/browser/satellite_nodes.js": "722323b356b8c0937896aff45f919300099aed789372054ec142148520eadafb",
+    "digital_twin/model_library/browser/ground_stations.js": "d63b55ab5d1e354de743f96a8998871d426217b62d551caeca131c39dc8c5ce4",
+    "digital_twin/simulation/browser/orbit.js": "1f3f2b2121478cca9df030fa6facd5482f70bffbc01b428ca90af4b409f3b72a",
+    "digital_twin/simulation/browser/ground_links.js": "cf59e9fa5ede859efd3b3bb8c729d9ba633f3cc3cb41225209514528b2b26323",
+    "digital_twin/simulation/browser/oisl.js": "7f781056f135f9a0660040ed0091ee5e4f53e2dd45b89351f7848d99a97ee536",
+    "digital_twin/simulation/browser/network_snapshot.js": "4f69313b8ddc34c5c6eb315168d5483eb36e6ac70eda2399bf8ca435e9516987",
+    "user_application/web/scripts/nodes/links.js": "83a119b3aa9a129076db7bbf755946bd0582824e17d10b1966f1576b6d923cd5"
+  },
+  "correction": "Only groundLink adapts station altitude_km to original lookAnglesAt altitudeKm; original and corrected results both retained.",
+  "cases": [
+    {
+      "id": "nominal",
+      "input": {
+        "date": 1788825720000,
+        "nodes": [
+          {
+            "schema": 1,
+            "id": "NODE-1",
+            "catalog_number": 900001,
+            "name": "comms_small nominal",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1788825600000
+            },
+            "equipment": [
+              {
+                "id": "EQ-mtrwkqo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-09-08T00:00:00.000Z",
+            "updated_at": "2026-09-08T00:00:00.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-2",
+            "catalog_number": 900002,
+            "name": "comms_small nominal",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 20,
+              "epoch": 1788825600000
+            },
+            "equipment": [
+              {
+                "id": "EQ-mtrwkqo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-09-08T00:00:00.000Z",
+            "updated_at": "2026-09-08T00:00:00.000Z"
+          }
+        ],
+        "stations": [
+          {
+            "schema": 1,
+            "id": "GS-DAEJEON",
+            "preset": "daejeon",
+            "name": "대전",
+            "region": "대한민국",
+            "latitude": 36.3742,
+            "longitude": 127.3567,
+            "altitude_km": 0.07,
+            "dish_m": 13,
+            "bands": [
+              "S",
+              "X",
+              "Ka"
+            ],
+            "min_elevation_deg": 5,
+            "enabled": true
+          },
+          {
+            "schema": 1,
+            "id": "GS-JEJU",
+            "preset": "jeju",
+            "name": "제주",
+            "region": "대한민국",
+            "latitude": 33.4996,
+            "longitude": 126.5312,
+            "altitude_km": 0.03,
+            "dish_m": 7.3,
+            "bands": [
+              "S",
+              "X"
+            ],
+            "min_elevation_deg": 5,
+            "enabled": true
+          },
+          {
+            "schema": 1,
+            "id": "GS-SVALBARD",
+            "preset": "svalbard",
+            "name": "스발바르",
+            "region": "노르웨이",
+            "latitude": 78.2298,
+            "longitude": 15.4078,
+            "altitude_km": 0.45,
+            "dish_m": 11,
+            "bands": [
+              "S",
+              "X",
+              "Ka"
+            ],
+            "min_elevation_deg": 3,
+            "enabled": true
+          }
+        ],
+        "faults": [],
+        "pairs": [
+          {
+            "key": "NODE-1|NODE-2",
+            "a": "NODE-1",
+            "b": "NODE-2",
+            "state": "locked",
+            "range_km": 2406.116729353667,
+            "directions": [
+              {
+                "nodeId": "NODE-1",
+                "equipmentId": "EQ-mtrwkqo0-1",
+                "role": "fore",
+                "spec": {
+                  "kind": "oisl",
+                  "label": "OISL 광 단말 (표준)",
+                  "wavelength_nm": 1550,
+                  "data_rate_mbps": 10000,
+                  "max_range_km": 5000,
+                  "min_range_km": 30,
+                  "slew_rate_deg_s": 2,
+                  "acquisition_time_s": 20,
+                  "field_of_regard": {
+                    "azimuth_half_angle": 180,
+                    "elevation": [
+                      -20,
+                      90
+                    ]
+                  },
+                  "jitter_deg": 0.002,
+                  "power_w": 120,
+                  "mass_kg": 20,
+                  "mount": "gimbal",
+                  "id": "EQ-mtrwkqo0-1",
+                  "catalog": "oisl_standard",
+                  "role": "fore",
+                  "target": "auto",
+                  "enabled": true
+                },
+                "targetId": "NODE-2",
+                "geometry": {
+                  "azimuth": 5.497872485584667e-15,
+                  "elevation": -9.999999999999982,
+                  "range_km": 2406.116729353667,
+                  "range_rate_km_s": 2.834945694895393e-16,
+                  "gimbal": {
+                    "azimuth": 5.497872485584667e-15,
+                    "elevation": -9.999999999999982,
+                    "reachable": true
+                  },
+                  "clear": true,
+                  "inRange": true,
+                  "reachable": true,
+                  "feasible": true,
+                  "blockedBy": null
+                },
+                "state": {
+                  "target": "NODE-2",
+                  "since": 1788825600000,
+                  "at": 1788825720000,
+                  "phase": "tracking",
+                  "azimuth": 5.497872485584667e-15,
+                  "elevation": -9.999999999999982,
+                  "arrivedAt": 1788825605000,
+                  "lockedAt": 1788825625000,
+                  "blockedBy": null,
+                  "pointingError": 0.002
+                },
+                "margin": {
+                  "margin_db": 6.353066232758091,
+                  "quality": 82
+                },
+                "dataRateMbps": 10000
+              },
+              {
+                "nodeId": "NODE-2",
+                "equipmentId": "EQ-mtrwkqo0-9",
+                "role": "aft",
+                "spec": {
+                  "kind": "oisl",
+                  "label": "OISL 광 단말 (표준)",
+                  "wavelength_nm": 1550,
+                  "data_rate_mbps": 10000,
+                  "max_range_km": 5000,
+                  "min_range_km": 30,
+                  "slew_rate_deg_s": 2,
+                  "acquisition_time_s": 20,
+                  "field_of_regard": {
+                    "azimuth_half_angle": 180,
+                    "elevation": [
+                      -20,
+                      90
+                    ]
+                  },
+                  "jitter_deg": 0.002,
+                  "power_w": 120,
+                  "mass_kg": 20,
+                  "mount": "gimbal",
+                  "id": "EQ-mtrwkqo0-9",
+                  "catalog": "oisl_standard",
+                  "role": "aft",
+                  "target": "auto",
+                  "enabled": true
+                },
+                "targetId": "NODE-1",
+                "geometry": {
+                  "azimuth": -180,
+                  "elevation": -10.00000000000001,
+                  "range_km": 2406.116729353667,
+                  "range_rate_km_s": 2.834945694895393e-16,
+                  "gimbal": {
+                    "azimuth": 0,
+                    "elevation": -10.00000000000001,
+                    "reachable": true
+                  },
+                  "clear": true,
+                  "inRange": true,
+                  "reachable": true,
+                  "feasible": true,
+                  "blockedBy": null
+                },
+                "state": {
+                  "target": "NODE-1",
+                  "since": 1788825600000,
+                  "at": 1788825720000,
+                  "phase": "tracking",
+                  "azimuth": 0,
+                  "elevation": -10.00000000000001,
+                  "arrivedAt": 1788825605000,
+                  "lockedAt": 1788825625000,
+                  "blockedBy": null,
+                  "pointingError": 0.002
+                },
+                "margin": {
+                  "margin_db": 6.353066232758091,
+                  "quality": 82
+                },
+                "dataRateMbps": 10000
+              }
+            ]
+          }
+        ],
+        "states": [
+          [
+            "NODE-1",
+            {
+              "geodetic": {
+                "latitude": 36.3742,
+                "longitude": 127.3567,
+                "altitude": 550
+              }
+            }
+          ],
+          [
+            "NODE-2",
+            {
+              "geodetic": {
+                "latitude": 36.3742,
+                "longitude": 127.3567,
+                "altitude": 550
+              }
+            }
+          ]
+        ]
+      },
+      "original": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-1",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "NODE-2",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-JEJU",
+            "name": "제주",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-SVALBARD",
+            "name": "스발바르",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "NODE-1|NODE-2",
+            "a": "NODE-1",
+            "b": "NODE-2",
+            "kind": "oisl",
+            "state": "locked",
+            "range_km": 2406.1,
+            "data_rate_mbps": 10000,
+            "margin_db": 6.35,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|NODE-1",
+            "a": "GS-DAEJEON",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|NODE-2",
+            "a": "GS-DAEJEON",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-1",
+            "a": "GS-JEJU",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-2",
+            "a": "GS-JEJU",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-1",
+            "a": "GS-SVALBARD",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.13,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.2,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-2",
+            "a": "GS-SVALBARD",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.13,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.2,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-JEJU",
+            "a": "GS-DAEJEON",
+            "b": "GS-JEJU",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 328.7,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-SVALBARD",
+            "a": "GS-DAEJEON",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6536.9,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|GS-SVALBARD",
+            "a": "GS-JEJU",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6832.6,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          }
+        ]
+      },
+      "height_corrected": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-1",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "NODE-2",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-JEJU",
+            "name": "제주",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-SVALBARD",
+            "name": "스발바르",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "NODE-1|NODE-2",
+            "a": "NODE-1",
+            "b": "NODE-2",
+            "kind": "oisl",
+            "state": "locked",
+            "range_km": 2406.1,
+            "data_rate_mbps": 10000,
+            "margin_db": 6.35,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|NODE-1",
+            "a": "GS-DAEJEON",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 549.9,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|NODE-2",
+            "a": "GS-DAEJEON",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 549.9,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-1",
+            "a": "GS-JEJU",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-2",
+            "a": "GS-JEJU",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-1",
+            "a": "GS-SVALBARD",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.14,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.4,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-2",
+            "a": "GS-SVALBARD",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.14,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.4,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-JEJU",
+            "a": "GS-DAEJEON",
+            "b": "GS-JEJU",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 328.7,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-SVALBARD",
+            "a": "GS-DAEJEON",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6536.9,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|GS-SVALBARD",
+            "a": "GS-JEJU",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6832.6,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "safe-and-payload",
+      "input": {
+        "date": 1788825720000,
+        "nodes": [
+          {
+            "schema": 1,
+            "id": "NODE-3",
+            "catalog_number": 900003,
+            "name": "eo_smallsat nominal",
+            "bus": "eo_smallsat",
+            "model_key": "eo_1",
+            "mode": "nominal",
+            "mass_kg": 500,
+            "power": {
+              "generation_w": 900,
+              "bus_w": 150,
+              "battery_wh": 3000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1788825600000
+            },
+            "equipment": [
+              {
+                "id": "EQ-mtrwkqo0-15",
+                "catalog": "eo_camera",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-16",
+                "catalog": "x_band_downlink",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-17",
+                "catalog": "oisl_standard",
+                "role": "auto",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-18",
+                "catalog": "dtn_store",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-19",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-20",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-09-08T00:00:00.000Z",
+            "updated_at": "2026-09-08T00:00:00.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-4",
+            "catalog_number": 900004,
+            "name": "eo_smallsat safe",
+            "bus": "eo_smallsat",
+            "model_key": "eo_1",
+            "mode": "safe",
+            "mass_kg": 500,
+            "power": {
+              "generation_w": 900,
+              "bus_w": 150,
+              "battery_wh": 3000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1788825600000
+            },
+            "equipment": [
+              {
+                "id": "EQ-mtrwkqo0-21",
+                "catalog": "eo_camera",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-22",
+                "catalog": "x_band_downlink",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-23",
+                "catalog": "oisl_standard",
+                "role": "auto",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-24",
+                "catalog": "dtn_store",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-25",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-26",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-09-08T00:00:00.000Z",
+            "updated_at": "2026-09-08T00:00:00.000Z"
+          }
+        ],
+        "stations": [
+          {
+            "schema": 1,
+            "id": "GS-DAEJEON",
+            "preset": "daejeon",
+            "name": "대전",
+            "region": "대한민국",
+            "latitude": 36.3742,
+            "longitude": 127.3567,
+            "altitude_km": 0.07,
+            "dish_m": 13,
+            "bands": [
+              "S",
+              "X",
+              "Ka"
+            ],
+            "min_elevation_deg": 5,
+            "enabled": true
+          },
+          {
+            "schema": 1,
+            "id": "GS-JEJU",
+            "preset": "jeju",
+            "name": "제주",
+            "region": "대한민국",
+            "latitude": 33.4996,
+            "longitude": 126.5312,
+            "altitude_km": 0.03,
+            "dish_m": 7.3,
+            "bands": [
+              "S",
+              "X"
+            ],
+            "min_elevation_deg": 5,
+            "enabled": true
+          },
+          {
+            "schema": 1,
+            "id": "GS-SVALBARD",
+            "preset": "svalbard",
+            "name": "스발바르",
+            "region": "노르웨이",
+            "latitude": 78.2298,
+            "longitude": 15.4078,
+            "altitude_km": 0.45,
+            "dish_m": 11,
+            "bands": [
+              "S",
+              "X",
+              "Ka"
+            ],
+            "min_elevation_deg": 3,
+            "enabled": true
+          }
+        ],
+        "faults": [],
+        "pairs": [],
+        "states": [
+          [
+            "NODE-3",
+            {
+              "geodetic": {
+                "latitude": 36.3742,
+                "longitude": 127.3567,
+                "altitude": 550
+              }
+            }
+          ],
+          [
+            "NODE-4",
+            {
+              "geodetic": {
+                "latitude": 36.3742,
+                "longitude": 127.3567,
+                "altitude": 550
+              }
+            }
+          ]
+        ]
+      },
+      "original": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-3",
+            "name": "eo_smallsat nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 40.2,
+            "storage_gb": 2000,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "NODE-4",
+            "name": "eo_smallsat safe",
+            "kind": "satellite",
+            "mode": "safe",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-JEJU",
+            "name": "제주",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-SVALBARD",
+            "name": "스발바르",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "GS-DAEJEON|NODE-3",
+            "a": "GS-DAEJEON",
+            "b": "NODE-3",
+            "kind": "ground",
+            "state": "visible",
+            "band": "X",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 800,
+            "frequency_ghz": 8.2,
+            "eirp_dbw": 32.78151250383644,
+            "gt_dbk": 35.73294003633181,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|NODE-4",
+            "a": "GS-DAEJEON",
+            "b": "NODE-4",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 25.554503971184616,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-3",
+            "a": "GS-JEJU",
+            "b": "NODE-3",
+            "kind": "ground",
+            "state": "visible",
+            "band": "X",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 800,
+            "frequency_ghz": 8.2,
+            "eirp_dbw": 32.78151250383644,
+            "gt_dbk": 30.7205301926042,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-4",
+            "a": "GS-JEJU",
+            "b": "NODE-4",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-3",
+            "a": "GS-SVALBARD",
+            "b": "NODE-3",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "X",
+            "elevation_deg": -25.13,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.2,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 800,
+            "frequency_ghz": 8.2,
+            "eirp_dbw": 32.78151250383644,
+            "gt_dbk": 34.28192669335958,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-4",
+            "a": "GS-SVALBARD",
+            "b": "NODE-4",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "S",
+            "elevation_deg": -25.13,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.2,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 24.10349062821237,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-JEJU",
+            "a": "GS-DAEJEON",
+            "b": "GS-JEJU",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 328.7,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-SVALBARD",
+            "a": "GS-DAEJEON",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6536.9,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|GS-SVALBARD",
+            "a": "GS-JEJU",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6832.6,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          }
+        ]
+      },
+      "height_corrected": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-3",
+            "name": "eo_smallsat nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 40.2,
+            "storage_gb": 2000,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "NODE-4",
+            "name": "eo_smallsat safe",
+            "kind": "satellite",
+            "mode": "safe",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-JEJU",
+            "name": "제주",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-SVALBARD",
+            "name": "스발바르",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "GS-DAEJEON|NODE-3",
+            "a": "GS-DAEJEON",
+            "b": "NODE-3",
+            "kind": "ground",
+            "state": "visible",
+            "band": "X",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 549.9,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 800,
+            "frequency_ghz": 8.2,
+            "eirp_dbw": 32.78151250383644,
+            "gt_dbk": 35.73294003633181,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|NODE-4",
+            "a": "GS-DAEJEON",
+            "b": "NODE-4",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 549.9,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 25.554503971184616,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-3",
+            "a": "GS-JEJU",
+            "b": "NODE-3",
+            "kind": "ground",
+            "state": "visible",
+            "band": "X",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 800,
+            "frequency_ghz": 8.2,
+            "eirp_dbw": 32.78151250383644,
+            "gt_dbk": 30.7205301926042,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-4",
+            "a": "GS-JEJU",
+            "b": "NODE-4",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-3",
+            "a": "GS-SVALBARD",
+            "b": "NODE-3",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "X",
+            "elevation_deg": -25.14,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.4,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 800,
+            "frequency_ghz": 8.2,
+            "eirp_dbw": 32.78151250383644,
+            "gt_dbk": 34.28192669335958,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-4",
+            "a": "GS-SVALBARD",
+            "b": "NODE-4",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "S",
+            "elevation_deg": -25.14,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.4,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 24.10349062821237,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-JEJU",
+            "a": "GS-DAEJEON",
+            "b": "GS-JEJU",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 328.7,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-SVALBARD",
+            "a": "GS-DAEJEON",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6536.9,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|GS-SVALBARD",
+            "a": "GS-JEJU",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6832.6,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "faults",
+      "input": {
+        "date": 1788825720000,
+        "nodes": [
+          {
+            "schema": 1,
+            "id": "NODE-1",
+            "catalog_number": 900001,
+            "name": "comms_small nominal",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1788825600000
+            },
+            "equipment": [
+              {
+                "id": "EQ-mtrwkqo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-09-08T00:00:00.000Z",
+            "updated_at": "2026-09-08T00:00:00.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-2",
+            "catalog_number": 900002,
+            "name": "comms_small nominal",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 20,
+              "epoch": 1788825600000
+            },
+            "equipment": [
+              {
+                "id": "EQ-mtrwkqo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-09-08T00:00:00.000Z",
+            "updated_at": "2026-09-08T00:00:00.000Z"
+          }
+        ],
+        "stations": [
+          {
+            "schema": 1,
+            "id": "GS-DAEJEON",
+            "preset": "daejeon",
+            "name": "대전",
+            "region": "대한민국",
+            "latitude": 36.3742,
+            "longitude": 127.3567,
+            "altitude_km": 0.07,
+            "dish_m": 13,
+            "bands": [
+              "S",
+              "X",
+              "Ka"
+            ],
+            "min_elevation_deg": 5,
+            "enabled": true
+          },
+          {
+            "schema": 1,
+            "id": "GS-JEJU",
+            "preset": "jeju",
+            "name": "제주",
+            "region": "대한민국",
+            "latitude": 33.4996,
+            "longitude": 126.5312,
+            "altitude_km": 0.03,
+            "dish_m": 7.3,
+            "bands": [
+              "S",
+              "X"
+            ],
+            "min_elevation_deg": 5,
+            "enabled": true
+          },
+          {
+            "schema": 1,
+            "id": "GS-SVALBARD",
+            "preset": "svalbard",
+            "name": "스발바르",
+            "region": "노르웨이",
+            "latitude": 78.2298,
+            "longitude": 15.4078,
+            "altitude_km": 0.45,
+            "dish_m": 11,
+            "bands": [
+              "S",
+              "X",
+              "Ka"
+            ],
+            "min_elevation_deg": 3,
+            "enabled": true
+          }
+        ],
+        "faults": [
+          {
+            "kind": "link_loss",
+            "target": "comms_small nominal",
+            "active": true
+          },
+          {
+            "kind": "latency_spike",
+            "target": "NODE-1",
+            "severity": "high",
+            "active": true
+          },
+          {
+            "kind": "latency_spike",
+            "target": "NODE-1",
+            "severity": "low",
+            "active": true
+          }
+        ],
+        "pairs": [
+          {
+            "key": "NODE-1|NODE-2",
+            "a": "NODE-1",
+            "b": "NODE-2",
+            "state": "locked",
+            "range_km": 2406.116729353667,
+            "directions": [
+              {
+                "nodeId": "NODE-1",
+                "equipmentId": "EQ-mtrwkqo0-1",
+                "role": "fore",
+                "spec": {
+                  "kind": "oisl",
+                  "label": "OISL 광 단말 (표준)",
+                  "wavelength_nm": 1550,
+                  "data_rate_mbps": 10000,
+                  "max_range_km": 5000,
+                  "min_range_km": 30,
+                  "slew_rate_deg_s": 2,
+                  "acquisition_time_s": 20,
+                  "field_of_regard": {
+                    "azimuth_half_angle": 180,
+                    "elevation": [
+                      -20,
+                      90
+                    ]
+                  },
+                  "jitter_deg": 0.002,
+                  "power_w": 120,
+                  "mass_kg": 20,
+                  "mount": "gimbal",
+                  "id": "EQ-mtrwkqo0-1",
+                  "catalog": "oisl_standard",
+                  "role": "fore",
+                  "target": "auto",
+                  "enabled": true
+                },
+                "targetId": "NODE-2",
+                "geometry": {
+                  "azimuth": 5.497872485584667e-15,
+                  "elevation": -9.999999999999982,
+                  "range_km": 2406.116729353667,
+                  "range_rate_km_s": 2.834945694895393e-16,
+                  "gimbal": {
+                    "azimuth": 5.497872485584667e-15,
+                    "elevation": -9.999999999999982,
+                    "reachable": true
+                  },
+                  "clear": true,
+                  "inRange": true,
+                  "reachable": true,
+                  "feasible": true,
+                  "blockedBy": null
+                },
+                "state": {
+                  "target": "NODE-2",
+                  "since": 1788825600000,
+                  "at": 1788825720000,
+                  "phase": "tracking",
+                  "azimuth": 5.497872485584667e-15,
+                  "elevation": -9.999999999999982,
+                  "arrivedAt": 1788825605000,
+                  "lockedAt": 1788825625000,
+                  "blockedBy": null,
+                  "pointingError": 0.002
+                },
+                "margin": {
+                  "margin_db": 6.353066232758091,
+                  "quality": 82
+                },
+                "dataRateMbps": 10000
+              },
+              {
+                "nodeId": "NODE-2",
+                "equipmentId": "EQ-mtrwkqo0-9",
+                "role": "aft",
+                "spec": {
+                  "kind": "oisl",
+                  "label": "OISL 광 단말 (표준)",
+                  "wavelength_nm": 1550,
+                  "data_rate_mbps": 10000,
+                  "max_range_km": 5000,
+                  "min_range_km": 30,
+                  "slew_rate_deg_s": 2,
+                  "acquisition_time_s": 20,
+                  "field_of_regard": {
+                    "azimuth_half_angle": 180,
+                    "elevation": [
+                      -20,
+                      90
+                    ]
+                  },
+                  "jitter_deg": 0.002,
+                  "power_w": 120,
+                  "mass_kg": 20,
+                  "mount": "gimbal",
+                  "id": "EQ-mtrwkqo0-9",
+                  "catalog": "oisl_standard",
+                  "role": "aft",
+                  "target": "auto",
+                  "enabled": true
+                },
+                "targetId": "NODE-1",
+                "geometry": {
+                  "azimuth": -180,
+                  "elevation": -10.00000000000001,
+                  "range_km": 2406.116729353667,
+                  "range_rate_km_s": 2.834945694895393e-16,
+                  "gimbal": {
+                    "azimuth": 0,
+                    "elevation": -10.00000000000001,
+                    "reachable": true
+                  },
+                  "clear": true,
+                  "inRange": true,
+                  "reachable": true,
+                  "feasible": true,
+                  "blockedBy": null
+                },
+                "state": {
+                  "target": "NODE-1",
+                  "since": 1788825600000,
+                  "at": 1788825720000,
+                  "phase": "tracking",
+                  "azimuth": 0,
+                  "elevation": -10.00000000000001,
+                  "arrivedAt": 1788825605000,
+                  "lockedAt": 1788825625000,
+                  "blockedBy": null,
+                  "pointingError": 0.002
+                },
+                "margin": {
+                  "margin_db": 6.353066232758091,
+                  "quality": 82
+                },
+                "dataRateMbps": 10000
+              }
+            ]
+          }
+        ],
+        "states": [
+          [
+            "NODE-1",
+            {
+              "geodetic": {
+                "latitude": 36.3742,
+                "longitude": 127.3567,
+                "altitude": 550
+              }
+            }
+          ],
+          [
+            "NODE-2",
+            {
+              "geodetic": {
+                "latitude": 36.3742,
+                "longitude": 127.3567,
+                "altitude": 550
+              }
+            }
+          ]
+        ]
+      },
+      "original": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-1",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 240
+          },
+          {
+            "id": "NODE-2",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-JEJU",
+            "name": "제주",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-SVALBARD",
+            "name": "스발바르",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "NODE-1|NODE-2",
+            "a": "NODE-1",
+            "b": "NODE-2",
+            "kind": "oisl",
+            "state": "locked",
+            "range_km": 2406.1,
+            "data_rate_mbps": 10000,
+            "margin_db": 6.35,
+            "faulted": true
+          },
+          {
+            "id": "GS-DAEJEON|NODE-1",
+            "a": "GS-DAEJEON",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": true
+          },
+          {
+            "id": "GS-DAEJEON|NODE-2",
+            "a": "GS-DAEJEON",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": true
+          },
+          {
+            "id": "GS-JEJU|NODE-1",
+            "a": "GS-JEJU",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": true
+          },
+          {
+            "id": "GS-JEJU|NODE-2",
+            "a": "GS-JEJU",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": true
+          },
+          {
+            "id": "GS-SVALBARD|NODE-1",
+            "a": "GS-SVALBARD",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.13,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.2,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": true
+          },
+          {
+            "id": "GS-SVALBARD|NODE-2",
+            "a": "GS-SVALBARD",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.13,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.2,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": true
+          },
+          {
+            "id": "GS-DAEJEON|GS-JEJU",
+            "a": "GS-DAEJEON",
+            "b": "GS-JEJU",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 328.7,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-SVALBARD",
+            "a": "GS-DAEJEON",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6536.9,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|GS-SVALBARD",
+            "a": "GS-JEJU",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6832.6,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          }
+        ]
+      },
+      "height_corrected": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-1",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 240
+          },
+          {
+            "id": "NODE-2",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-JEJU",
+            "name": "제주",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-SVALBARD",
+            "name": "스발바르",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "NODE-1|NODE-2",
+            "a": "NODE-1",
+            "b": "NODE-2",
+            "kind": "oisl",
+            "state": "locked",
+            "range_km": 2406.1,
+            "data_rate_mbps": 10000,
+            "margin_db": 6.35,
+            "faulted": true
+          },
+          {
+            "id": "GS-DAEJEON|NODE-1",
+            "a": "GS-DAEJEON",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 549.9,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": true
+          },
+          {
+            "id": "GS-DAEJEON|NODE-2",
+            "a": "GS-DAEJEON",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 549.9,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": true
+          },
+          {
+            "id": "GS-JEJU|NODE-1",
+            "a": "GS-JEJU",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": true
+          },
+          {
+            "id": "GS-JEJU|NODE-2",
+            "a": "GS-JEJU",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": true
+          },
+          {
+            "id": "GS-SVALBARD|NODE-1",
+            "a": "GS-SVALBARD",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.14,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.4,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": true
+          },
+          {
+            "id": "GS-SVALBARD|NODE-2",
+            "a": "GS-SVALBARD",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.14,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.4,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": true
+          },
+          {
+            "id": "GS-DAEJEON|GS-JEJU",
+            "a": "GS-DAEJEON",
+            "b": "GS-JEJU",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 328.7,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-SVALBARD",
+            "a": "GS-DAEJEON",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6536.9,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|GS-SVALBARD",
+            "a": "GS-JEJU",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6832.6,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "inactive-fault",
+      "input": {
+        "date": 1788825720000,
+        "nodes": [
+          {
+            "schema": 1,
+            "id": "NODE-1",
+            "catalog_number": 900001,
+            "name": "comms_small nominal",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1788825600000
+            },
+            "equipment": [
+              {
+                "id": "EQ-mtrwkqo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-09-08T00:00:00.000Z",
+            "updated_at": "2026-09-08T00:00:00.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "NODE-2",
+            "catalog_number": 900002,
+            "name": "comms_small nominal",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 20,
+              "epoch": 1788825600000
+            },
+            "equipment": [
+              {
+                "id": "EQ-mtrwkqo0-8",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-9",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-10",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-11",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-12",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-13",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-14",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-09-08T00:00:00.000Z",
+            "updated_at": "2026-09-08T00:00:00.000Z"
+          }
+        ],
+        "stations": [
+          {
+            "schema": 1,
+            "id": "GS-DAEJEON",
+            "preset": "daejeon",
+            "name": "대전",
+            "region": "대한민국",
+            "latitude": 36.3742,
+            "longitude": 127.3567,
+            "altitude_km": 0.07,
+            "dish_m": 13,
+            "bands": [
+              "S",
+              "X",
+              "Ka"
+            ],
+            "min_elevation_deg": 5,
+            "enabled": true
+          },
+          {
+            "schema": 1,
+            "id": "GS-JEJU",
+            "preset": "jeju",
+            "name": "제주",
+            "region": "대한민국",
+            "latitude": 33.4996,
+            "longitude": 126.5312,
+            "altitude_km": 0.03,
+            "dish_m": 7.3,
+            "bands": [
+              "S",
+              "X"
+            ],
+            "min_elevation_deg": 5,
+            "enabled": true
+          },
+          {
+            "schema": 1,
+            "id": "GS-SVALBARD",
+            "preset": "svalbard",
+            "name": "스발바르",
+            "region": "노르웨이",
+            "latitude": 78.2298,
+            "longitude": 15.4078,
+            "altitude_km": 0.45,
+            "dish_m": 11,
+            "bands": [
+              "S",
+              "X",
+              "Ka"
+            ],
+            "min_elevation_deg": 3,
+            "enabled": true
+          }
+        ],
+        "faults": [
+          {
+            "kind": "link_loss",
+            "target": "NODE-1",
+            "active": false
+          }
+        ],
+        "pairs": [
+          {
+            "key": "NODE-1|NODE-2",
+            "a": "NODE-1",
+            "b": "NODE-2",
+            "state": "locked",
+            "range_km": 2406.116729353667,
+            "directions": [
+              {
+                "nodeId": "NODE-1",
+                "equipmentId": "EQ-mtrwkqo0-1",
+                "role": "fore",
+                "spec": {
+                  "kind": "oisl",
+                  "label": "OISL 광 단말 (표준)",
+                  "wavelength_nm": 1550,
+                  "data_rate_mbps": 10000,
+                  "max_range_km": 5000,
+                  "min_range_km": 30,
+                  "slew_rate_deg_s": 2,
+                  "acquisition_time_s": 20,
+                  "field_of_regard": {
+                    "azimuth_half_angle": 180,
+                    "elevation": [
+                      -20,
+                      90
+                    ]
+                  },
+                  "jitter_deg": 0.002,
+                  "power_w": 120,
+                  "mass_kg": 20,
+                  "mount": "gimbal",
+                  "id": "EQ-mtrwkqo0-1",
+                  "catalog": "oisl_standard",
+                  "role": "fore",
+                  "target": "auto",
+                  "enabled": true
+                },
+                "targetId": "NODE-2",
+                "geometry": {
+                  "azimuth": 5.497872485584667e-15,
+                  "elevation": -9.999999999999982,
+                  "range_km": 2406.116729353667,
+                  "range_rate_km_s": 2.834945694895393e-16,
+                  "gimbal": {
+                    "azimuth": 5.497872485584667e-15,
+                    "elevation": -9.999999999999982,
+                    "reachable": true
+                  },
+                  "clear": true,
+                  "inRange": true,
+                  "reachable": true,
+                  "feasible": true,
+                  "blockedBy": null
+                },
+                "state": {
+                  "target": "NODE-2",
+                  "since": 1788825600000,
+                  "at": 1788825720000,
+                  "phase": "tracking",
+                  "azimuth": 5.497872485584667e-15,
+                  "elevation": -9.999999999999982,
+                  "arrivedAt": 1788825605000,
+                  "lockedAt": 1788825625000,
+                  "blockedBy": null,
+                  "pointingError": 0.002
+                },
+                "margin": {
+                  "margin_db": 6.353066232758091,
+                  "quality": 82
+                },
+                "dataRateMbps": 10000
+              },
+              {
+                "nodeId": "NODE-2",
+                "equipmentId": "EQ-mtrwkqo0-9",
+                "role": "aft",
+                "spec": {
+                  "kind": "oisl",
+                  "label": "OISL 광 단말 (표준)",
+                  "wavelength_nm": 1550,
+                  "data_rate_mbps": 10000,
+                  "max_range_km": 5000,
+                  "min_range_km": 30,
+                  "slew_rate_deg_s": 2,
+                  "acquisition_time_s": 20,
+                  "field_of_regard": {
+                    "azimuth_half_angle": 180,
+                    "elevation": [
+                      -20,
+                      90
+                    ]
+                  },
+                  "jitter_deg": 0.002,
+                  "power_w": 120,
+                  "mass_kg": 20,
+                  "mount": "gimbal",
+                  "id": "EQ-mtrwkqo0-9",
+                  "catalog": "oisl_standard",
+                  "role": "aft",
+                  "target": "auto",
+                  "enabled": true
+                },
+                "targetId": "NODE-1",
+                "geometry": {
+                  "azimuth": -180,
+                  "elevation": -10.00000000000001,
+                  "range_km": 2406.116729353667,
+                  "range_rate_km_s": 2.834945694895393e-16,
+                  "gimbal": {
+                    "azimuth": 0,
+                    "elevation": -10.00000000000001,
+                    "reachable": true
+                  },
+                  "clear": true,
+                  "inRange": true,
+                  "reachable": true,
+                  "feasible": true,
+                  "blockedBy": null
+                },
+                "state": {
+                  "target": "NODE-1",
+                  "since": 1788825600000,
+                  "at": 1788825720000,
+                  "phase": "tracking",
+                  "azimuth": 0,
+                  "elevation": -10.00000000000001,
+                  "arrivedAt": 1788825605000,
+                  "lockedAt": 1788825625000,
+                  "blockedBy": null,
+                  "pointingError": 0.002
+                },
+                "margin": {
+                  "margin_db": 6.353066232758091,
+                  "quality": 82
+                },
+                "dataRateMbps": 10000
+              }
+            ]
+          }
+        ],
+        "states": [
+          [
+            "NODE-1",
+            {
+              "geodetic": {
+                "latitude": 36.3742,
+                "longitude": 127.3567,
+                "altitude": 550
+              }
+            }
+          ],
+          [
+            "NODE-2",
+            {
+              "geodetic": {
+                "latitude": 36.3742,
+                "longitude": 127.3567,
+                "altitude": 550
+              }
+            }
+          ]
+        ]
+      },
+      "original": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-1",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "NODE-2",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-JEJU",
+            "name": "제주",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-SVALBARD",
+            "name": "스발바르",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "NODE-1|NODE-2",
+            "a": "NODE-1",
+            "b": "NODE-2",
+            "kind": "oisl",
+            "state": "locked",
+            "range_km": 2406.1,
+            "data_rate_mbps": 10000,
+            "margin_db": 6.35,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|NODE-1",
+            "a": "GS-DAEJEON",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|NODE-2",
+            "a": "GS-DAEJEON",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-1",
+            "a": "GS-JEJU",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-2",
+            "a": "GS-JEJU",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-1",
+            "a": "GS-SVALBARD",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.13,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.2,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-2",
+            "a": "GS-SVALBARD",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.13,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.2,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-JEJU",
+            "a": "GS-DAEJEON",
+            "b": "GS-JEJU",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 328.7,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-SVALBARD",
+            "a": "GS-DAEJEON",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6536.9,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|GS-SVALBARD",
+            "a": "GS-JEJU",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6832.6,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          }
+        ]
+      },
+      "height_corrected": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-1",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "NODE-2",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-JEJU",
+            "name": "제주",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-SVALBARD",
+            "name": "스발바르",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "NODE-1|NODE-2",
+            "a": "NODE-1",
+            "b": "NODE-2",
+            "kind": "oisl",
+            "state": "locked",
+            "range_km": 2406.1,
+            "data_rate_mbps": 10000,
+            "margin_db": 6.35,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|NODE-1",
+            "a": "GS-DAEJEON",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 549.9,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|NODE-2",
+            "a": "GS-DAEJEON",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 549.9,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-1",
+            "a": "GS-JEJU",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|NODE-2",
+            "a": "GS-JEJU",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "visible",
+            "band": "S",
+            "elevation_deg": 56.65,
+            "azimuth_deg": 13.07,
+            "range_km": 647.4,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 2,
+            "frequency_ghz": 2.2,
+            "eirp_dbw": 12.030899869919436,
+            "gt_dbk": 20.54209412745699,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-1",
+            "a": "GS-SVALBARD",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.14,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.4,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": false
+          },
+          {
+            "id": "GS-SVALBARD|NODE-2",
+            "a": "GS-SVALBARD",
+            "b": "NODE-2",
+            "kind": "ground",
+            "state": "below_mask",
+            "band": "Ka",
+            "elevation_deg": -25.14,
+            "azimuth_deg": 60.88,
+            "range_km": 6549.4,
+            "min_elevation_deg": 3,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 40.265336968408064,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-JEJU",
+            "a": "GS-DAEJEON",
+            "b": "GS-JEJU",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 328.7,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-DAEJEON|GS-SVALBARD",
+            "a": "GS-DAEJEON",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6536.9,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          },
+          {
+            "id": "GS-JEJU|GS-SVALBARD",
+            "a": "GS-JEJU",
+            "b": "GS-SVALBARD",
+            "kind": "terrestrial",
+            "state": "connected",
+            "distance_km": 6832.6,
+            "data_rate_mbps": 10000,
+            "faulted": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "empty",
+      "input": {
+        "date": 1788825720000,
+        "nodes": [],
+        "stations": [],
+        "faults": [],
+        "pairs": [],
+        "states": []
+      },
+      "original": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [],
+        "links": []
+      },
+      "height_corrected": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [],
+        "links": []
+      }
+    },
+    {
+      "id": "no-radio",
+      "input": {
+        "date": 1788825720000,
+        "nodes": [
+          {
+            "schema": 1,
+            "id": "NODE-4",
+            "catalog_number": 900004,
+            "name": "eo_smallsat safe",
+            "bus": "eo_smallsat",
+            "model_key": "eo_1",
+            "mode": "safe",
+            "mass_kg": 500,
+            "power": {
+              "generation_w": 900,
+              "bus_w": 150,
+              "battery_wh": 3000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1788825600000
+            },
+            "equipment": [
+              {
+                "id": "EQ-mtrwkqo0-21",
+                "catalog": "eo_camera",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-22",
+                "catalog": "x_band_downlink",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-23",
+                "catalog": "oisl_standard",
+                "role": "auto",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-24",
+                "catalog": "dtn_store",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-25",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-26",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-09-08T00:00:00.000Z",
+            "updated_at": "2026-09-08T00:00:00.000Z"
+          }
+        ],
+        "stations": [
+          {
+            "schema": 1,
+            "id": "GS-DAEJEON",
+            "preset": "daejeon",
+            "name": "대전",
+            "region": "대한민국",
+            "latitude": 36.3742,
+            "longitude": 127.3567,
+            "altitude_km": 0.07,
+            "dish_m": 13,
+            "bands": [
+              "Ka"
+            ],
+            "min_elevation_deg": 5,
+            "enabled": true
+          }
+        ],
+        "faults": [],
+        "pairs": [],
+        "states": [
+          [
+            "NODE-4",
+            {
+              "geodetic": {
+                "latitude": 36.3742,
+                "longitude": 127.3567,
+                "altitude": 550
+              }
+            }
+          ]
+        ]
+      },
+      "original": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-4",
+            "name": "eo_smallsat safe",
+            "kind": "satellite",
+            "mode": "safe",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "GS-DAEJEON|NODE-4",
+            "a": "GS-DAEJEON",
+            "b": "NODE-4",
+            "kind": "ground",
+            "state": "no_radio",
+            "band": null,
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 0,
+            "frequency_ghz": null,
+            "eirp_dbw": null,
+            "gt_dbk": null,
+            "faulted": false
+          }
+        ]
+      },
+      "height_corrected": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-4",
+            "name": "eo_smallsat safe",
+            "kind": "satellite",
+            "mode": "safe",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "GS-DAEJEON|NODE-4",
+            "a": "GS-DAEJEON",
+            "b": "NODE-4",
+            "kind": "ground",
+            "state": "no_radio",
+            "band": null,
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 549.9,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 0,
+            "frequency_ghz": null,
+            "eirp_dbw": null,
+            "gt_dbk": null,
+            "faulted": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "zero-height",
+      "input": {
+        "date": 1788825720000,
+        "nodes": [
+          {
+            "schema": 1,
+            "id": "NODE-1",
+            "catalog_number": 900001,
+            "name": "comms_small nominal",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1788825600000
+            },
+            "equipment": [
+              {
+                "id": "EQ-mtrwkqo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-09-08T00:00:00.000Z",
+            "updated_at": "2026-09-08T00:00:00.000Z"
+          }
+        ],
+        "stations": [
+          {
+            "schema": 1,
+            "id": "GS-DAEJEON",
+            "preset": "daejeon",
+            "name": "대전",
+            "region": "대한민국",
+            "latitude": 36.3742,
+            "longitude": 127.3567,
+            "altitude_km": 0,
+            "dish_m": 13,
+            "bands": [
+              "S",
+              "X",
+              "Ka"
+            ],
+            "min_elevation_deg": 5,
+            "enabled": true
+          }
+        ],
+        "faults": [],
+        "pairs": [],
+        "states": [
+          [
+            "NODE-1",
+            {
+              "geodetic": {
+                "latitude": 36.3742,
+                "longitude": 127.3567,
+                "altitude": 550
+              }
+            }
+          ]
+        ]
+      },
+      "original": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-1",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "GS-DAEJEON|NODE-1",
+            "a": "GS-DAEJEON",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          }
+        ]
+      },
+      "height_corrected": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-1",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "GS-DAEJEON|NODE-1",
+            "a": "GS-DAEJEON",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          }
+        ]
+      }
+    },
+    {
+      "id": "below-sea-level",
+      "input": {
+        "date": 1788825720000,
+        "nodes": [
+          {
+            "schema": 1,
+            "id": "NODE-1",
+            "catalog_number": 900001,
+            "name": "comms_small nominal",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 550,
+              "eccentricity": 0,
+              "inclination": 53,
+              "raan": 0,
+              "argp": 0,
+              "mean_anomaly": 0,
+              "epoch": 1788825600000
+            },
+            "equipment": [
+              {
+                "id": "EQ-mtrwkqo0-1",
+                "catalog": "oisl_standard",
+                "role": "fore",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-2",
+                "catalog": "oisl_standard",
+                "role": "aft",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-3",
+                "catalog": "oisl_standard",
+                "role": "left",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-4",
+                "catalog": "oisl_standard",
+                "role": "right",
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-5",
+                "catalog": "ka_user_link",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-6",
+                "catalog": "s_band_ttc",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              },
+              {
+                "id": "EQ-mtrwkqo0-7",
+                "catalog": "gnss_receiver",
+                "role": null,
+                "target": "auto",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2026-09-08T00:00:00.000Z",
+            "updated_at": "2026-09-08T00:00:00.000Z"
+          }
+        ],
+        "stations": [
+          {
+            "schema": 1,
+            "id": "GS-DAEJEON",
+            "preset": "daejeon",
+            "name": "대전",
+            "region": "대한민국",
+            "latitude": 36.3742,
+            "longitude": 127.3567,
+            "altitude_km": -0.5,
+            "dish_m": 13,
+            "bands": [
+              "S",
+              "X",
+              "Ka"
+            ],
+            "min_elevation_deg": 5,
+            "enabled": true
+          }
+        ],
+        "faults": [],
+        "pairs": [],
+        "states": [
+          [
+            "NODE-1",
+            {
+              "geodetic": {
+                "latitude": 36.3742,
+                "longitude": 127.3567,
+                "altitude": 550
+              }
+            }
+          ]
+        ]
+      },
+      "original": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-1",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "GS-DAEJEON|NODE-1",
+            "a": "GS-DAEJEON",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          }
+        ]
+      },
+      "height_corrected": {
+        "time": "2026-09-08T00:02:00.000Z",
+        "nodes": [
+          {
+            "id": "NODE-1",
+            "name": "comms_small nominal",
+            "kind": "satellite",
+            "mode": "nominal",
+            "generation_mbps": 0.2,
+            "storage_gb": 64,
+            "extra_delay_ms": 0
+          },
+          {
+            "id": "GS-DAEJEON",
+            "name": "대전",
+            "kind": "ground",
+            "mode": "nominal",
+            "generation_mbps": 0,
+            "storage_gb": 0,
+            "extra_delay_ms": 0
+          }
+        ],
+        "links": [
+          {
+            "id": "GS-DAEJEON|NODE-1",
+            "a": "GS-DAEJEON",
+            "b": "NODE-1",
+            "kind": "ground",
+            "state": "visible",
+            "band": "Ka",
+            "elevation_deg": 90,
+            "azimuth_deg": 0,
+            "range_km": 550.5,
+            "min_elevation_deg": 5,
+            "data_rate_mbps": 500,
+            "frequency_ghz": 20,
+            "eirp_dbw": 39.54242509439325,
+            "gt_dbk": 41.716350311380296,
+            "faulted": false
+          }
+        ]
+      }
+    }
+  ],
+  "geometry": [
+    {
+      "position": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": -0.5
+      },
+      "expected": {
+        "azimuth": 0,
+        "elevation": 89.99999999999999,
+        "rangeKm": 550.5
+      }
+    },
+    {
+      "position": {
+        "latitude": -30,
+        "longitude": 20,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": -0.5
+      },
+      "expected": {
+        "azimuth": 253.55800453150403,
+        "elevation": -58.77152582537494,
+        "rangeKm": 11525.689115430148
+      }
+    },
+    {
+      "position": {
+        "latitude": 90,
+        "longitude": 0,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": -0.5
+      },
+      "expected": {
+        "azimuth": 0,
+        "elevation": -22.167246608616946,
+        "rangeKm": 6026.931586489289
+      }
+    },
+    {
+      "position": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": 0
+      },
+      "expected": {
+        "azimuth": 0,
+        "elevation": 89.99999999999994,
+        "rangeKm": 550.0000000000001
+      }
+    },
+    {
+      "position": {
+        "latitude": -30,
+        "longitude": 20,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": 0
+      },
+      "expected": {
+        "azimuth": 253.55800453150403,
+        "elevation": -58.7728144256158,
+        "rangeKm": 11526.116671701007
+      }
+    },
+    {
+      "position": {
+        "latitude": 90,
+        "longitude": 0,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": 0
+      },
+      "expected": {
+        "azimuth": 0,
+        "elevation": -22.171648449093567,
+        "rangeKm": 6027.120259999812
+      }
+    },
+    {
+      "position": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": 0.07
+      },
+      "expected": {
+        "azimuth": 0,
+        "elevation": 89.99999999999996,
+        "rangeKm": 549.9300000000004
+      }
+    },
+    {
+      "position": {
+        "latitude": -30,
+        "longitude": 20,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": 0.07
+      },
+      "expected": {
+        "azimuth": 253.55800453150403,
+        "elevation": -58.772994822020635,
+        "rangeKm": 11526.17653004415
+      }
+    },
+    {
+      "position": {
+        "latitude": 90,
+        "longitude": 0,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": 0.07
+      },
+      "expected": {
+        "azimuth": 0,
+        "elevation": -22.172264684767327,
+        "rangeKm": 6027.146677129992
+      }
+    },
+    {
+      "position": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": 9
+      },
+      "expected": {
+        "azimuth": 0,
+        "elevation": 89.99999999999991,
+        "rangeKm": 541.0000000000005
+      }
+    },
+    {
+      "position": {
+        "latitude": -30,
+        "longitude": 20,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": 9
+      },
+      "expected": {
+        "azimuth": 253.55800453150403,
+        "elevation": -58.79599289186551,
+        "rangeKm": 11533.813680817151
+      }
+    },
+    {
+      "position": {
+        "latitude": 90,
+        "longitude": 0,
+        "altitude": 550
+      },
+      "station": {
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitudeKm": 9
+      },
+      "expected": {
+        "azimuth": 0,
+        "elevation": -22.250834423415338,
+        "rangeKm": 6030.522462730931
+      }
+    }
+  ]
+}
