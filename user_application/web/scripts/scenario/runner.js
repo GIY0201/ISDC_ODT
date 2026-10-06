@@ -186,32 +186,40 @@ export function createScenarioRunner(deps = {}) {
     await tick();
   }
 
-  async function pause() {
-    stopTimers();while(runningTick)await runningTick;
-    if (state.phase !== "playing") return;
-    applyRuntime(await api.runtimeControl("pause"));
-    setPhase("paused");
+  // A pending explicit command owns the drain boundary. Telemetry and coalesced
+  // interval ticks must not restart playback while this same owner is draining.
+  let drainingCommands = 0, commandQueue = Promise.resolve();
+  function drainCommand(work) {
+    drainingCommands++; stopTimers();
+    let succeeded=false;
+    const task=commandQueue.then(async()=>{while(runningTick)await runningTick;const result=await work();succeeded=true;return result;});
+    commandQueue=task.catch(()=>{});
+    return task.finally(()=>{drainingCommands--;if(drainingCommands===0&&succeeded&&state.phase==='playing')startTimers();});
   }
 
-  async function setSpeed(speed) {
-    stopTimers();while(runningTick)await runningTick;
-    applyRuntime(await api.runtimeSpeed(speed));
-    if(state.phase==="playing")startTimers();
-    notify("phase");
+  function pause() {
+    return drainCommand(async()=>{
+      if(state.phase!=='playing')return;
+      applyRuntime(await api.runtimeControl('pause'));
+      setPhase('paused');
+    });
   }
 
-  async function advance(seconds) {
-    stopTimers();while(runningTick)await runningTick;
-    const lease=await deps.beginTick?.();let succeeded=false;
-    try {
-    const status = await api.scenarioAdvance(Math.max(1, Math.min(3600, Math.round(seconds))));
-    applyRuntime(status);
-    log("콘솔 → 프레임워크", "ICD-07", "CS-004 시계 전진", `${Math.round(seconds)}초 → T+${Math.round(status.elapsed_seconds)}s`);
-    // A jump in time changes the network and the fault state at once; the fabric sees it before
-    // the due steps are judged.
-    await tickTwin(true);
-    await tick();succeeded=true;
-    } finally { await deps.endTick?.(lease,succeeded,state.phase);if(succeeded&&state.phase==="playing")startTimers(); }
+  function setSpeed(speed) {
+    return drainCommand(async()=>{applyRuntime(await api.runtimeSpeed(speed));notify('phase');});
+  }
+
+  function advance(seconds) {
+    return drainCommand(async()=>{
+      const lease=await deps.beginTick?.();let succeeded=false;
+      try {
+        const status=await api.scenarioAdvance(Math.max(1,Math.min(3600,Math.round(seconds))));
+        applyRuntime(status);
+        log('콘솔 → 프레임워크','ICD-07','CS-004 시계 전진',`${Math.round(seconds)}초 → T+${Math.round(status.elapsed_seconds)}s`);
+        await tickTwin(true);
+        await tick(true);succeeded=true;
+      } finally {await deps.endTick?.(lease,succeeded,state.phase);}
+    });
   }
 
   // Jump to the next step that has a resolvable time in the future.
@@ -243,6 +251,7 @@ export function createScenarioRunner(deps = {}) {
   }
 
   function startTimers() {
+    if(drainingCommands>0)return;
     stopTimers();
     tickTimer = setInterval(() => tick().catch(error => console.warn("시나리오 틱 실패", error)), 1000);
     pollTimer = setInterval(() => pollModules(), POLL_INTERVAL_MS);
@@ -271,7 +280,8 @@ export function createScenarioRunner(deps = {}) {
   // One tick at a time: the interval tick and a tick after a skip must not interleave their
   // fabric exchanges and route samples, or a stale answer could overwrite a newer one. A tick
   // requested while one runs is coalesced into a single follow-up tick.
-  function tick() {
+  function tick(explicitCommand=false) {
+    if(drainingCommands>0&&!explicitCommand)return Promise.resolve();
     if (!definition || !["playing", "paused", "ready", "finished"].includes(state.phase)) return Promise.resolve();
     if (!runningTick) {
       runningTick = runTick().finally(() => { runningTick = null; });
@@ -416,6 +426,7 @@ export function createScenarioRunner(deps = {}) {
   }
 
   async function fireStep(step, at) {
+    if(state.currentStep&&state.currentStep!==step.id)captureCompletedStep(state.currentStep);
     state.steps[step.id] = { ...(state.steps[step.id] || {}), firedAt: at, status: "active" };
     state.currentStep = step.id;
     if (step.speed && Number(runtime()?.speed) !== Number(step.speed)) { try { applyRuntime(await api.runtimeSpeed(step.speed)); } catch { /* keep the current speed */ } }
@@ -423,6 +434,7 @@ export function createScenarioRunner(deps = {}) {
       if (action.delay_s) state.pending.push({ step: step.id, action, due: at + Number(action.delay_s) });
       else await runAction(action, step);
     }
+    if(state.phase==="finished")captureCompletedStep(step.id);
     persist();
     notify("step");
     if (state.autoFollow) switchTab(step.tab);
@@ -541,10 +553,25 @@ export function createScenarioRunner(deps = {}) {
   function stepView(step) {
     const record = state.steps[step.id] || {};
     const ctx = context();
+    const completed=record.firedAt!=null&&(state.currentStep!==step.id||state.phase==="finished");
+    const saved=record.completedEvidence;
+    const historical=completed&&Array.isArray(saved?.checks)&&Number.isFinite(saved.elapsed)&&saved.elapsed>=0;
+    const checkSource=historical?(saved.checks.every(check=>check.ok===true&&!check.pending)?'completed':'failed_completed'):completed?'legacy_current':'current';
     return {
       ...step, firedAt: record.firedAt ?? null, due: record.due ?? resolveAt(step.at), status: record.firedAt != null ? (state.currentStep === step.id && state.phase !== "finished" ? "active" : "done") : "pending",
-      narrativeText: fillTemplate(step.narrative, ctx), checkResults: record.firedAt != null ? evaluateChecks(step.checks, ctx) : [],
+      narrativeText: fillTemplate(step.narrative, historical?saved.context:ctx), checkResults: record.firedAt != null ? structuredClone(historical?saved.checks:evaluateChecks(step.checks, ctx)) : [],
+      checkSource,checksCapturedAt:historical?saved.capturedAt:null,checksCapturedElapsed:historical?saved.elapsed:null,
     };
+  }
+
+  // Completion evidence belongs to this past scenario record; it never owns or
+  // changes runtime/native/module state. Freeze just before the next step's
+  // actions, after the actual current native network has been refreshed.
+  function captureCompletedStep(id){
+    const step=orderedSteps().find(value=>value.id===id),record=state.steps[id];
+    if(!step||record?.firedAt==null||record.completedEvidence)return;
+    const ctx=structuredClone(context());
+    record.completedEvidence={capturedAt:clock.now(),elapsed:elapsed(),context:ctx,checks:structuredClone(evaluateChecks(step.checks,ctx))};
   }
 
   function view() {
@@ -580,12 +607,13 @@ export function createScenarioRunner(deps = {}) {
   }
 
   function setAutoFollow(value) { state.autoFollow = value !== false; persist(); notify("phase"); }
-  function onTelemetry() { if (state.phase === "playing" && !tickTimer) startTimers(); }
+  function onTelemetry() { if (drainingCommands===0 && state.phase === "playing" && !tickTimer) startTimers(); }
 
   const api_ = {
     list, select, setup, play, pause, setSpeed, advance, skipToNextStep, stop, suspend, tick, restore, view, record, context, setAutoFollow, onTelemetry,
     get definition() { return definition; }, get state() { return state; }, get clock() { return clock; },
     setHostTab(fn) { hostTab = fn; },
+    checkpointWorkspace(evidence){state.workspaceEvidence=structuredClone(evidence);persist();},
     subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
   };
   return api_;

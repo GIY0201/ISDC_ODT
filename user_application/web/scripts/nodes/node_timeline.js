@@ -102,7 +102,11 @@ export async function createNodeSampleBufferAsync(request,response,{yieldControl
   if(typeof yieldControl!=='function')throw new TypeError('node buffer cooperative executor required');
   const captured=structuredClone(request),work=prepareNodeSampleBuffer(captured,response,options);
   const check=()=>{if(signal?.aborted)throw signal.reason??new Error('node buffer aborted');};
-  for(;;){check();const next=work.next();if(next.done)return next.value;await yieldControl({signal});check();}
+  // A complete native point batch is at most240 rows. Validate that bounded
+  // receipt atomically through the same generator; timer scheduling must not
+  // add one wait per node to the command lane. Large display grids still yield.
+  const bounded=Array.isArray(captured?.nodes)&&Number.isSafeInteger(captured.count)&&captured.count>0&&captured.nodes.length*captured.count<=240;
+  for(;;){check();const next=work.next();if(next.done){check();return next.value;}if(!bounded)await yieldControl({signal});check();}
 }
 
 // Calendar conversion for the source Date TimeClip grid, not a display clock.
@@ -259,19 +263,46 @@ export function createNodeTimeline({api,requestId,yieldControl,onChange=()=>{},o
 
 // One application queue for source-native display work. No clock or animation scheduler.
 export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,onChange=()=>{},onError=()=>{}}={}){
-  const samples=createNodeTimeline({api,requestId,yieldControl}),tracks=createNodeTrackTimeline({api,periodFor,requestId,yieldControl});
+  if(typeof yieldControl!=='function')throw new TypeError('node display cooperative executor required');
+  const samples=createNodeTimeline({api,requestId,yieldControl:cooperate}),tracks=createNodeTrackTimeline({api,periodFor,requestId,yieldControl:cooperate});
   let disposed=false,utc=null,direction=1,nodeCount=0,runner=null,activeKind=null,inputError='';
   let definitions=[],communicationGeneration=0,communicationSequence=0,activeCommunication=null;
   const communicationJobs=[];
+  let validationWaiter=null;
+  // Immutable native point receipts in this existing query owner, never current
+  // runtime state. Keep only eight exact UTCs (prime history + recent ticks).
+  const communicationPoints=new Map(),communicationPointLimit=8;
   const requireOpen=()=>{if(disposed)throw new Error('node display timeline disposed');};
   const snapshot=()=>{const sample=samples.snapshot(),track=tracks.snapshot();return {utc,direction,pending:runner!==null,activeKind,error:inputError||sample.error||track.error,samples:sample,tracks:track,communicationPending:communicationJobs.length+(activeCommunication?1:0)};};
   const emit=()=>{if(disposed)return;try{onChange(snapshot());}catch(e){try{onError(e instanceof Error?e.message:String(e));}catch{/* Display observers do not own calculations. */}}};
+  // Called only after a display HTTP receipt has returned. Its uncommitted
+  // validation can yield to exact-point work without overlapping native HTTP.
+  async function cooperate({signal}={}){
+    let done=false,failure=null;const token={resolve:null};
+    const wake=()=>{if(validationWaiter===token)token.resolve?.();};
+    const check=()=>{if(signal?.aborted)throw signal.reason??new Error('node validation aborted');};
+    check();signal?.addEventListener('abort',wake,{once:true});
+    Promise.resolve().then(()=>yieldControl({signal})).then(()=>{done=true;wake();},error=>{failure=error;done=true;wake();});
+    try{
+      for(;;){
+        check();
+        while(communicationJobs.length){
+          const kind=activeKind;
+          try{await serveCommunication(communicationJobs.shift());}finally{activeKind=kind;}
+          check();
+        }
+        if(done){if(failure)throw failure;return;}
+        await new Promise(resolve=>{token.resolve=resolve;validationWaiter=token;if(done||communicationJobs.length||signal?.aborted)resolve();});
+      }
+    }finally{if(validationWaiter===token)validationWaiter=null;signal?.removeEventListener('abort',wake);}
+  }
   function settleCommunication(job,value,error){
     if(job.settled)return;job.settled=true;job.signal?.removeEventListener('abort',job.abort);
     if(error)job.reject(error);else job.resolve(value);
   }
   function invalidateCommunication(){
     communicationGeneration++;
+    communicationPoints.clear();
     for(const job of [...communicationJobs.splice(0),...(activeCommunication?[activeCommunication]:[])]){
       job.controller.abort();settleCommunication(job,null,new Error('native communication request invalidated'));
     }
@@ -282,12 +313,18 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
     const current=()=>!disposed&&!job.controller.signal.aborted&&job.generation===communicationGeneration&&job.scope===identity(definitions);
     try{
       if(!current())throw new Error('native communication request invalidated');
+      const cached=communicationPoints.get(job.utc),known=samples.snapshot().definitionHashes;
+      if(cached&&cached.generation===job.generation&&cached.scope===job.scope){
+        for(const [id,state]of cached.result.states)if(Object.hasOwn(known,id)&&known[id]!==state.definition_hash)throw new Error('native communication definition hash mismatch');
+        if(!current())throw new Error('native communication request invalidated');
+        communicationPoints.delete(job.utc);communicationPoints.set(job.utc,cached);
+        settleCommunication(job,structuredClone(cached.result));return;
+      }
       let states=job.nodes.map(node=>[node.id,samples.communicationStateFor(node,{utc:job.utc})]);
       if(states.some(([,state])=>!state)){
         const base=requestId();if(typeof base!=='string'||!base.trim())throw new Error('node request identity required');
         const request={request_id:`${base}-communication-${job.generation}-${++communicationSequence}`,nodes:structuredClone(job.nodes),start_utc:job.utc,count:1,step_seconds:1};
         if(request.request_id.length>128)throw new Error('node request identity exceeds128');
-        const known=samples.snapshot().definitionHashes;
         const response=await api.nodeSamples(structuredClone(request),{signal:job.controller.signal});
         if(!current())throw new Error('native communication request invalidated');
         const buffer=await createNodeSampleBufferAsync(request,response,{expectedHashes:known,yieldControl,signal:job.controller.signal});
@@ -296,7 +333,10 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
       }
       if(states.some(([,state])=>!state))throw new Error('native communication states unavailable');
       if(!current())throw new Error('native communication request invalidated');
-      settleCommunication(job,{utc:job.utc,node_definitions:structuredClone(job.nodes),states:structuredClone(states)});
+      const result={utc:job.utc,node_definitions:structuredClone(job.nodes),states:structuredClone(states)};
+      communicationPoints.set(job.utc,{generation:job.generation,scope:job.scope,result:structuredClone(result)});
+      if(communicationPoints.size>communicationPointLimit)communicationPoints.delete(communicationPoints.keys().next().value);
+      settleCommunication(job,result);
     }catch(error){settleCommunication(job,null,error instanceof Error?error:new Error(String(error)));}
     finally{activeCommunication=null;activeKind=null;emit();}
   }
@@ -308,7 +348,7 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
     return new Promise((resolve,reject)=>{
       const job={utc:canonical,nodes:structuredClone(definitions),scope:identity(definitions),generation:communicationGeneration,controller:new AbortController(),signal,resolve,reject,settled:false};
       job.abort=()=>{job.controller.abort();settleCommunication(job,null,signal.reason??new Error('native communication request aborted'));};
-      signal?.addEventListener('abort',job.abort,{once:true});communicationJobs.push(job);void schedule();
+      signal?.addEventListener('abort',job.abort,{once:true});communicationJobs.push(job);validationWaiter?.resolve?.();void schedule();
     });
   }
   function schedule(){

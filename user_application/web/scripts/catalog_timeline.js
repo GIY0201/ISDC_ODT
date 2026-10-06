@@ -1,6 +1,7 @@
 import {createBrowserId} from './browser_identity.js';
 import {createUtcCodec} from './orbit_utc.js';
 import {createSampleBuffer} from './orbit_playback.js';
+import {validateCatalogDetails,projectCatalogDetails} from './orbit/catalog_details.js';
 const copy=v=>structuredClone(v);
 const samePoint=(a,b)=>['latitude_deg','longitude_deg','ellipsoid_height_m','virtual','ellipsoid'].every(k=>a?.[k]===b?.[k]);
 const quality=v=>['ut1','polar_motion'].every(k=>['final_b','observed_a','predicted_a'].includes(v?.[k]));
@@ -19,7 +20,7 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
   const utc=s.playing?codec.advance(anchorUtc,Math.max(0,now()-anchorMs)/1000*s.rate):s.utc;
   s.utc=utc;
   const row=sampleBuffer.sampleAt(utc),elapsed=codec.difference(utc,s.buffer.start_utc),index=Math.floor(elapsed+1e-9),observed=s.buffer.rows[index];
-  if(row&&observed?.status==='valid')display({...s.selected,...row,eop_quality:observed.eop_quality,ground_point:s.observer,minimum_elevation_deg:s.minimumElevation,range_m:observed.range_m,azimuth_deg:observed.azimuth_deg,observation_utc:observed.utc,observed_elevation_deg:observed.elevation_deg,visible:observed.visible,interpolated:utc!==observed.utc});else display(null);
+  if(row&&observed?.status==='valid')display({...s.selected,...row,...projectCatalogDetails(s.buffer,observed),eop_quality:observed.eop_quality,ground_point:s.observer,minimum_elevation_deg:s.minimumElevation,range_m:observed.range_m,azimuth_deg:observed.azimuth_deg,observation_utc:observed.utc,observed_elevation_deg:observed.elevation_deg,visible:observed.visible,interpolated:utc!==observed.utc});else display(null);
   if(s.playing&&elapsed>=300&&!s.pending)query(codec.advance(s.buffer.start_utc,300),true);
   if(now()-lastNotify>=200){lastNotify=now();emit();}
  }
@@ -29,6 +30,7 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
   if(!v||v.version!==1||!['valid','partial','error'].includes(v.status)||v.client_request_id!==p.client_request_id||v.group!==p.group||v.catalog_number!==p.catalog_number||v.normalized_gp_sha256!==p.normalized_gp_sha256||v.epoch_utc!==base.epoch_utc||v.eop_sha256!==base.eop_sha256||v.leap_sha256!==base.leap_sha256||v.frame!=='ITRF'||v.profile!==base.profile||v.eop_kind!=='IERS_A'||v.communication_status!=='unknown'||!['celestrak-live','celestrak-cache','celestrak-stale'].includes(v.source)||!samePoint(v.ground_point,p.ground_point)||v.minimum_elevation_deg!==p.minimum_elevation_deg||v.start_utc!==p.start_utc||v.step_seconds!==1||v.count!==p.count||!Array.isArray(v.rows)||v.rows.length!==p.count||Object.entries({position:'m',range:'m',elevation:'deg',azimuth:'deg',time:'UTC'}).some(([k,value])=>v.units?.[k]!==value))throw Error('카탈로그 시간 응답의 선택·단위·자료가 일치하지 않습니다.');
   let failed=0;
   for(const [i,row] of v.rows.entries()){
+   validateCatalogDetails(v,row);
    if(row.utc!==codec.advance(p.start_utc,i)||!quality(row.eop_quality))throw Error('카탈로그 표본 시각·EOP 품질 오류');
    if(row.status==='error'){
     failed++;if(typeof row.error_code!=='string'||!row.error_code||['position_m','elevation_deg','range_m','azimuth_deg','visible'].some(k=>row[k]!==null))throw Error('카탈로그 실패 표본 오류');
@@ -62,7 +64,7 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
    const row=sampleBuffer.sampleAt(utc);if(!row)return null;
    const index=Math.floor(codec.difference(utc,s.buffer.start_utc)+1e-9),observed=s.buffer.rows[index];
    if(observed?.status!=='valid')return null;
-   return copy({...s.selected,...row,eop_quality:observed.eop_quality,interpolated:utc!==observed.utc});
+   return copy({...s.selected,...row,...projectCatalogDetails(s.buffer,observed),eop_quality:observed.eop_quality,interpolated:utc!==observed.utc});
   }
   const row=s.display;
   if(!row||row.utc!==utc||row.frame!=='ITRF'||row.status==='error'||row.error_code||
@@ -72,8 +74,8 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
  }
  return{snapshot:()=>copy({...s,buffer:s.buffer?{start_utc:s.buffer.start_utc,count:s.buffer.count,status:s.buffer.status}:null}),
   sampleAt,advanceUtc,currentUtc:()=>dead?null:s.utc||null,
-  select(base,pin=null){if(dead)return;cancel();s.selected=base?copy(base):null;codec=null;let first=base;try{codec=base?createUtcCodec(base.leap_sha256):null;
-   if(base&&pin){if(pin.normalized_gp_sha256!==base.normalized_gp_sha256||!Array.isArray(pin.position_m)||pin.position_m.length!==3||!pin.position_m.every(Number.isFinite))throw Error('지구 선택 GP/위치가 일치하지 않습니다.');const utc=codec.advance(pin.utc,0);first={...base,utc,position_m:copy(pin.position_m)};}
+  select(base,pin=null){if(dead)return;cancel();s.selected=base?copy(base):null;codec=null;let first=base?{...base,...projectCatalogDetails(base)}:base;try{codec=base?createUtcCodec(base.leap_sha256):null;
+   if(base&&pin){if(pin.normalized_gp_sha256!==base.normalized_gp_sha256||!Array.isArray(pin.position_m)||pin.position_m.length!==3||!pin.position_m.every(Number.isFinite))throw Error('지구 선택 GP/위치가 일치하지 않습니다.');const utc=codec.advance(pin.utc,0);first={...base,...(utc===base.utc?projectCatalogDetails(base):{geodetic:null,teme_speed_km_s:null,details_utc:null}),utc,position_m:copy(pin.position_m)};}
   }catch(e){s.error=e.message;first=pin?null:base;}s.utc=first?.utc??base?.epoch_utc??'';anchorUtc=s.utc;display(first);emit();},
   observer(point,minimum){if(dead)return false;if(!point||!['latitude_deg','longitude_deg','ellipsoid_height_m'].every(k=>Number.isFinite(point[k]))||Math.abs(point.latitude_deg)>90||Math.abs(point.longitude_deg)>180||point.virtual!==true||point.ellipsoid!=='WGS84'||!Number.isFinite(minimum)||minimum<0||minimum>90)return false;s.observer=copy(point);s.minimumElevation=minimum;reset();return true;},
   seek(utc){if(dead||!codec)return;const canonical=codec.advance(utc,0);cancel();s.utc=canonical;anchorUtc=canonical;display(null);emit();},

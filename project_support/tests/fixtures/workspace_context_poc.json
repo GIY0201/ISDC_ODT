@@ -1,0 +1,4141 @@
+{
+  "provenance": "t081_actual_20261007_023348.json actual captured HTTP responses; context first-query UTC, data last verified-query SIM time are distinct; projection fixture retains original consumed fields only, node id/name projections do not substitute native definition/propagation tests",
+  "context": {
+    "schema_version": 1,
+    "status": "verified_analysis_inputs",
+    "deployment": {
+      "deployment_id": "f6e97f82-9585-4a02-b57a-f5add6c56fc6",
+      "revision": 1,
+      "nodes": [
+        {
+          "id": "NODE-0001",
+          "name": "SDC-A1",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "425879d5-61e7-4b01-9c43-743ed14cdeb2",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3f19cb8f-a3e7-4c6a-9b27-d9231180f966",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "53552b8d-f3a3-4832-8bdb-c2825826e3ef",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "0efcba3e-e85f-4bcd-88c1-149d13437923",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "77bf33bd-7fc3-41ba-a767-878800955b3f",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "08b109e5-1a8d-4fc0-a8cd-a5a39e3f1d99",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "50f4fcf3-2f65-4870-9cd6-d8b939cb4734",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "fe0434c2-9513-4a49-8437-ee4b13e97707",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0002",
+          "name": "SDC-A2",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "8a2f0e9a-a4b6-436f-b124-14e5ae7cedd9",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6ac961d2-e818-436f-bb3e-bf2a9ddb5c68",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "dfcf663e-5151-4d45-b94d-8f430654865f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b5830836-fcca-4aa6-a1bc-f6fbadc2f798",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a3e12f14-9d3b-444e-865f-d1210ba15ec6",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "cab020d1-f4f5-4d23-ac48-9c3318583e6e",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "e1dc3cf7-e773-414b-b476-aa0397217937",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "63c2a6e1-2182-491b-8c90-f6ee1d548a2c",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0003",
+          "name": "SDC-A3",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "207e5c03-940b-49d7-9dec-7bf2d546394b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "484d92c0-f71b-4221-91bd-40c9b86736a6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5e6a4705-f838-4dff-ab40-ab4835c446bb",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8ef38df6-ebca-497f-8533-e9d13e471f8b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d5c2a819-1d04-4acb-a650-424ce162ea68",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "c1cfc5ad-4f84-4fa1-9330-3776318dd1ec",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "5bc241db-eb82-412a-b9f3-65d8ee86d3bc",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d0a5f9d6-0dca-4223-a048-acbc4b5d7b62",
+              "catalog": "dtn_store",
+              "enabled": true
+            },
+            {
+              "id": "75ffc267-dc67-483a-a741-c046d55a89ed",
+              "catalog": "eo_camera",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0004",
+          "name": "SDC-A4",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "62188209-78f8-4cee-a620-f4c1e770821e",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "65ee13f7-4f6b-4ba2-997e-9289e8ba38d9",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d8aaf6be-5183-44cb-a781-ee28a5f933b5",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6578bf1e-53ca-473d-a3c9-b691930915b1",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b7f78755-1bec-4d46-86ca-0d16a87d2f6c",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "58e83ee5-f560-4081-9a0b-adcf46cb2e57",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "1e0fec27-eaee-451f-9893-e481aac4319d",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "b486563d-87fe-47aa-93b4-b0908b283e53",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0005",
+          "name": "SDC-A5",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "3e08f5fc-aea9-4ca4-a9dc-e4efb6be283a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4166e342-49a9-424c-849b-36862a64ab6f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8497d3c5-9b11-4d05-a102-c7417b170073",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "e9b4d292-afda-4f4a-aa1e-4c87e989c4a2",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "c016340a-459e-478b-bb6c-c2e6f8176f8c",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "cbc2ab35-23ed-498e-9f59-66fa0f7a1b41",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "9f4d8c80-ae84-4168-974a-f7465884d116",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "5233fe0e-985c-4b93-bf83-353bef2c7104",
+              "catalog": "dtn_store",
+              "enabled": true
+            },
+            {
+              "id": "946835c1-5b7b-4a9a-ad81-7e3e622e22af",
+              "catalog": "x_band_downlink",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0006",
+          "name": "SDC-A6",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "b3d99d3f-4955-43ad-9b22-8083082ae2e2",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4c0f5ec8-4538-4308-a4d1-0c0af93bdb2c",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fdd76a32-a9ba-4d0e-870e-b9ca7f5b87c4",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "36702ca3-9cc7-407f-bcf0-55b5e38a2cac",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "85d17376-5a22-4c60-88c7-54dd14469816",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "5e17f525-f96b-4f6e-87e7-d52bdcc6d856",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "6ef93fc5-18d6-48e8-89c5-02b19f7892dd",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d93a5e1a-43e2-4138-a99c-7acd708cc3c8",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0007",
+          "name": "SDC-A7",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "5bc0f5da-be33-4084-9599-460d7dd3a76f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4f7086f8-0d07-47d5-b4c4-66a91dec3e69",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "1d08de69-342b-42ea-9446-72875e6ab6b6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fcc67cf9-4e0b-45c4-8f30-7e7d1e1b3a94",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "78cdc70b-87d4-464a-a09f-fcd687e636e1",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "dc4a6767-7eae-4bf3-9928-74f74ac91b5a",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "d69df0dc-6ee6-4cfd-b4e5-4a89462a0bc2",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "98de6b80-3d06-45aa-9493-6911fc006f19",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0008",
+          "name": "SDC-A8",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "89d406a5-2314-4826-9df6-4a746c895b6f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4ea98c6d-324d-466c-8882-9cf4aba2be7b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "051d98aa-38ff-4a7d-8b49-ae3eb3a40448",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "85f4a7b0-923e-4967-ac45-da313beb57a6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "aa02dd5d-3853-4ce7-ab5d-79445669ce1d",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "d4d208ba-4a29-4258-99f8-06e9461e9226",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "67614161-83d3-4304-bea9-5c9225a3ccaf",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "eabab2c6-f11a-4a83-9007-7915245a3336",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0009",
+          "name": "SDC-A9",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "1352b37c-6bfe-4a2a-a7dc-b130ade07105",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8feccfa6-2324-494f-96ac-f6d117478bf5",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6bc2a8ad-16f6-46d2-af75-03b8f7358834",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4a1b30a8-32a0-4fef-9e29-c4ef0441b653",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8120380a-a206-4529-bb73-3db8c33d7153",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "15b0da37-ad21-4499-9fa5-a1788c09ddc4",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "0155c47e-c650-4132-a7ab-8e8097ded418",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "24ae1ff4-0bac-477f-9bc5-2424d391a750",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0010",
+          "name": "SDC-A10",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "144e10f5-9689-4b16-891d-5e6b4c4dc188",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "450941e2-3d93-43da-94c1-4f65a2fd5d5f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3c968277-d8cb-4e02-9fdb-b48ed1b3df20",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "96db7b25-8940-482b-bc4e-3b72fb74f065",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "175c3920-63f6-42bd-a045-156aabb74b24",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "fa4ded50-6212-475e-ad65-e318bed06600",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "c7829f4e-d20d-41c2-a13b-45fb4e25323a",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "47ff9947-7e6c-4dfb-8507-470fa7f0afaa",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0011",
+          "name": "SDC-B1",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "170c30a9-e206-430f-a817-1ac50ab2f09a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "e0608586-e376-4c84-bddf-0e1f8f6b2170",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "c5da0a1c-bd6e-4579-af7c-0af761dad9cc",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "7c1fa627-1dda-43a2-8f6d-4bda30f7fd5f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5be16406-2b11-45c9-bb71-fe8fd8c7d274",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "b00637a1-877a-4933-8c3f-f6831f3556dd",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "955834fe-b4c2-4a67-994d-934c5b7860af",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "0a8911ba-35fe-4382-acd7-275165d9bcf0",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0012",
+          "name": "SDC-B2",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "e4217f8e-b796-46fb-9357-a496ab9b34ad",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "ff01255c-5d3d-4c27-974c-b547e1cc13a7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "bcce5a8c-6e09-4f12-a232-804ecb5636be",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "e90b6635-0b94-4bd7-a3b8-ecfb5862d8c8",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "352be5a0-dd56-4c8b-8eb0-13cb5ef810ba",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "2856a6b0-bce2-44a5-95a0-115b60dd066a",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "e45bf64e-a037-4fad-8c9c-c09fb778836e",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "92b24536-bf30-4782-a5a0-c77df9cd829f",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0013",
+          "name": "SDC-B3",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "023f42d7-cf19-429d-945e-61969988807d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f6f745c4-1a56-4b5e-9935-3977f2b812bd",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "13e715f4-59d9-45c6-99a8-b879fbf45fdc",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f103bb38-8097-4841-ac7f-5b3baa1ec738",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "afcf6a7f-cd57-4d2f-b1df-b53a97f2baa1",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "0cbba064-bd7b-44d5-a5e9-e6ce16008326",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "b70e0713-bdf9-4797-bb98-63705020ad06",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "2221e9f0-371b-4afa-9e85-f61fc0922eff",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0014",
+          "name": "SDC-B4",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "e8e49339-2833-48d7-943a-6b37c9660cd0",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d99efe62-e2d5-46fa-8a55-1bbd2ff28df2",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fe8e44ab-3e92-4012-8427-fcb34bf5077b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f90a0a7d-b7af-458e-a507-637f2aad4c9b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b77a3cd2-72f9-41f6-a273-56264e0eb348",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "83c6f88b-5a8d-4275-a946-1db388685090",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "e72fb65c-9de3-42e5-b2bb-cb9619ac0036",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "82bb60db-380e-4033-8570-6719dbbe0a5e",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0015",
+          "name": "SDC-B5",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "5905e7a8-9803-4333-86ee-206d17d28dca",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a1967f33-d15f-4b0b-9cd3-7e0115e7b0d6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3f839a6e-cb81-4bf8-b2d9-666cfa5ca8ec",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "68b9d623-2e37-4f2a-9633-463bea595012",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "82e0bcee-0d0f-4e2e-b643-75da4f0ae3a4",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "dc7ebf98-a254-4053-9336-3e253f6586bd",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "4574cd53-6ef1-41e4-9036-38d2748266f0",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "4c4e8e33-f241-42d9-a8de-243340a77893",
+              "catalog": "dtn_store",
+              "enabled": true
+            },
+            {
+              "id": "8ca0b268-4155-416b-9bce-240b7297a406",
+              "catalog": "x_band_downlink",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0016",
+          "name": "SDC-B6",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "99a8372a-7752-4cd0-8689-17eb727894c1",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "12029bc2-4651-44eb-be2c-8929c61d6e5d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "01e70ff3-b0ee-4c1f-b75c-a931cb8e216f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d6fb0a9a-3398-4d6f-aa05-7103e53acca6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "55e505d8-1494-493b-a7a1-bf921ac8c6f1",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "3a4ec9fa-53bc-4068-a1bd-c771a6453a82",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "aa188a95-0615-44be-8c73-4ba540750ef7",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "02b05df7-1225-4a44-9391-1989f97817d8",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0017",
+          "name": "SDC-B7",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "8d1ea78e-26b4-4947-b96a-6bc09d914177",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "12eb3cba-8a85-4d50-b0f6-a145bedfcce7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a79c2c8c-15fc-42fe-8241-64a8cda052ef",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b0e7b37c-82f9-4139-a608-5f7efa1a13c6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "502a4448-5c75-4e70-864d-c582a4fe3477",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "6dd6bf72-8f9d-4aab-b6ca-9fefcb8cec83",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "e041fb1a-ab63-4b87-9a34-d83556e29943",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "eec241a2-fd90-43ad-8fa4-86388df72038",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0018",
+          "name": "SDC-B8",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "c322141b-9fe2-482c-b099-25b9d65a458c",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "31d00fdd-15da-4287-a299-9db288c48cb7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5983c913-6891-46c7-a762-bd763d463c5a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d5c11064-3ee9-4188-b288-3943ba6d1b8f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5359bbe0-2d8a-4de1-b12b-89790834221c",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "963b33ac-b7da-4b6a-b8cb-e5034502153b",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "65e8ef95-52f7-41ae-a09d-b7efedd646e3",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "3cee8c69-f963-4fef-99a7-2518eba18c56",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0019",
+          "name": "SDC-B9",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "e5f08617-278d-4553-b0c3-1a45096c7a06",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8f8e943b-8e49-4964-9104-2624e02a17d4",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "45b065b4-ed30-4d59-8029-599fa661820b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4262e6b6-7727-4e0e-93c8-9460b9ba93e9",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "da75fc03-c209-4c02-bc36-f8950bf60818",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "4a7fbc5d-7722-431a-91d0-0d5570146064",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "ac5c68b4-42b5-4e02-bdcc-1433041331f7",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "94391188-16d8-4ccf-b346-b26baafd0c73",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0020",
+          "name": "SDC-B10",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "b0b8f460-570b-439b-9a72-67e6b03f660d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "85009cc6-b042-45a9-867c-6411d9b0df0a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "bda918b7-1ee5-4915-bf3a-7be60907422c",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "0ecc5902-e102-4f10-8ec2-8798e2f9be87",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "210e1ae7-6866-4a51-9ee8-6a4e2bf84bac",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "12c3d34d-8751-44c5-a5fa-447b62d105c3",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "171fe039-51e7-44ed-933d-46e7f5f93c6d",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "0f2e9f34-1e87-42aa-b336-0d4fcd64c96b",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0021",
+          "name": "SDC-C1",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "e0d59d76-6aa0-4376-bb05-228d5fdc26d8",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "73ac8784-c01d-4d03-ba4c-2e07b0266b75",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3e4ad811-56b9-434b-9a5d-0c52c4203d79",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "31829e5b-c11a-4d37-8903-2534c8e56558",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6914d976-5c5a-4474-8cde-cef39ba9f489",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "49e5e5f6-aa09-4e50-9cad-68a102a09bb5",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "179a3afd-f2c7-4cd4-b2cf-c35c070770d3",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "14f6c10d-1e85-4739-a6ae-8cd7e8dd8d99",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0022",
+          "name": "SDC-C2",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "972ebb9a-7953-43b5-bf6c-91be6327aa2a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "26139c6a-54c4-45f7-a84b-3d00369b5048",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b3a7efc1-99c5-497d-b412-0b511dd2dae2",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f2e40399-f4cb-4819-9e7f-e81cfd2325e7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b0d0a6ac-e6f8-44ec-ac0b-682e4b12c1ca",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "5a5d1dd7-567b-48d2-afbe-4fa377d77261",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "4eaf9fcf-8955-40d5-a4f5-5b50f6998635",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "9163acf5-5dde-4b29-aec3-5f103f41d1fa",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0023",
+          "name": "SDC-C3",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "fb79857f-d979-44fb-b9cd-72d04004c55d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "02b207fe-adc2-40cf-a2ed-89f24de26481",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "61f324b3-537f-40e9-99f7-8c31541953f9",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "481af5a9-a7da-41ed-8b8c-1e6c48de22fa",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "342b9af2-e09e-49ba-a345-204d8556aeee",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "fe64deff-b2c5-4c8a-a667-aff8c8622fd1",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "509130eb-e193-41fd-b638-76f4f39385ba",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "c2e889e6-b1cf-42b2-81ab-f611e9667d11",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0024",
+          "name": "SDC-C4",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "640d6bf1-3c18-462a-b41b-e2e1d4088ae1",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "63e993db-30bc-458f-88b4-d4e4d51c558a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "2758541b-c09d-4faa-a689-ddef4d96f61b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "90b802fe-3878-43a5-96f1-df9d7caa3f63",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "881bc35d-7f25-4a2c-aa7e-ef3ce3fda04a",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "1d276f79-f902-4307-b243-4c3662d3c006",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "211ea4ea-6180-4d41-ac87-0b9b55dff846",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "790377bf-eccb-4871-b23c-7bf22041bec2",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0025",
+          "name": "SDC-C5",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "8d69ea0c-16aa-4def-ae28-a21436f1a712",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6d32507a-9568-46ab-86e8-2c9c8afd3c78",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "dc9e51c8-2ed4-49b0-b5e9-24d9e43efd56",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "119f1918-bd93-4031-94a1-b75bf81783a3",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "feca2d9e-0537-4d31-a928-06ba4dbd7f01",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "a0f59a81-504f-408c-9020-cd231e1fa57b",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "753a7f00-4d2b-4c86-b529-e492398f9a58",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d44dfcd3-8053-45e3-8557-2170d8b90b21",
+              "catalog": "dtn_store",
+              "enabled": true
+            },
+            {
+              "id": "1ba54743-fb77-4e6d-bf90-3e2f188bac27",
+              "catalog": "x_band_downlink",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0026",
+          "name": "SDC-C6",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "3518e8e2-305e-4465-8903-00a6230f3240",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "313a8563-2a0b-42cc-bc45-721885d5e020",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4006eaeb-124f-480c-b89e-b0e3254a9e80",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f711866c-eacb-4373-b70d-0b403cef3a43",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "15d78ec6-823e-42b5-bd9e-706350c98204",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "83cd0829-0456-4fad-a1a1-3c6c1a126b10",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "1e23fbd9-16b2-4d55-be34-82f67f734e05",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "3c8845da-9215-480c-9507-b59c1e878532",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0027",
+          "name": "SDC-C7",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "5c027ac4-c3eb-4800-9060-7c8b0a29bcb5",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3e0de2ea-7175-4131-94f0-77ff685b3da7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "9b9bbf45-a840-4b6a-a8b0-79e1d144ae36",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "78ae3f50-8e70-4381-ad33-4507f6b2b4f9",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "91002a8d-6193-4ecd-b03b-895925e59cb0",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "38df86c4-6568-48e2-9fb6-8b5b6a2e65a7",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "8d0b7bef-bef0-4157-880c-847f189c9988",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "b8ddd0ab-1ba6-4ca4-b413-aab7103be13d",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0028",
+          "name": "SDC-C8",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "30611bdc-471c-40c2-83bb-75f83c319b84",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "ddbcd141-64b1-4c08-9a85-873deb164882",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "1cef0c92-24e5-459d-88be-7846467947da",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "19d74d84-407e-45ca-96f0-33d435b2bd6e",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "648ecfa4-ac91-4d1b-ab8c-8cae3af9aafd",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "9153fb7d-3c2e-45ba-a40d-0280ec3ac8cf",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "6f6197e5-8e41-4bdf-8a12-d1b7accc978b",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "2b094169-35d7-497c-bbc7-ac471b0b0765",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0029",
+          "name": "SDC-C9",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "0cb4cb3b-3e4e-4f4f-ba39-ab1058c412b3",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "50c68154-5ea5-4eca-a613-2c9afa029146",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "70cb4185-0c7b-4b42-a7af-1a2046340d50",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3a9097de-9882-4fed-9b2e-f271d214224d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d4657fbc-72c7-4633-8956-3d34fa306538",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "02ce66b7-9784-4b59-812f-8464bbd0312d",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "fd88ed29-a746-4c99-b745-feba26ceb88d",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "03b4a4e0-0906-4eab-a2a1-187c12e75933",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0030",
+          "name": "SDC-C10",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "1a419ae5-e679-4965-b8bf-2d546bff0626",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a06de600-bd34-468e-bf95-cf9a5b83d878",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "1ac1674e-7c70-439b-87a6-02534ee46dca",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "e1970d65-22a9-4a7c-8b0b-7961c625642d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4458eea7-fcc9-4842-979c-d110c99add15",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "e2a343fa-7f37-4dde-934d-287b02897771",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "384534af-09b9-4f97-9572-d96bbfeb2676",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "6d51edb5-0a95-460f-8154-948f639fb965",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0031",
+          "name": "SDC-D1",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "6cce7c13-b0b9-4d94-a073-9c737e760abc",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "bb4b980c-e18a-409e-b76d-dfc490244748",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "ab1b09d5-a3a6-4e9e-9d8a-fc71e38df137",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "af80db83-7724-450d-bbd7-47381fc75e47",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6c5529ad-05aa-414c-b9df-57c56ca9eba7",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "ccab539e-5cfc-4c00-a864-d03ec96d39bb",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "7b1141c9-8ced-4773-8861-d422b6293920",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "8c80e407-112e-4be4-a9dc-46181dd84086",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0032",
+          "name": "SDC-D2",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "590867b2-00bf-40ac-aa2e-4866e44f8806",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "7d7d301f-c51e-4a3c-9d43-dd93ef17135f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "032e7669-6121-4836-b6bd-c42eb2121c68",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "2d847410-dfdd-4479-a9a3-f7852900d948",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "589df9e0-fa51-4616-a198-0ab40aaec55c",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "c5338a78-db90-4631-afda-76b597ead893",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "0c2f0a73-7cf5-4598-a0ef-be7500995f86",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d5a68bd6-6f2a-4eba-8231-2b7b33661e24",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0033",
+          "name": "SDC-D3",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "bfa8e814-e3f6-4dcb-bc07-76318d3d194d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "53ca6e4b-9c4b-4e10-ac1a-cb200d1a4f0b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "db4bc8c6-2d37-4518-9526-c171c222ee8c",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "e2a8956a-2675-4642-bae2-a04c2ea18587",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5004159b-ea1f-4dae-b39b-c2c34f78d173",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "62e8dd29-4941-47b1-87b7-28f8a8c119b4",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "092b99dc-1462-4781-a3cc-ac743e0b12bb",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "3aa3db5b-b501-40e7-ad63-6d2f9d9bcb40",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0034",
+          "name": "SDC-D4",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "4c99a228-1153-4127-b782-7c050916ebd0",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "08febd7e-6769-440f-bc87-458636b4e7b8",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a9c791ed-6e39-49ab-a05a-17bd2a6ff7b7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5c867b32-6b83-4deb-8e17-ac99ddd8bf7b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f98aa2da-2fa3-49e9-bb7a-d6aac8bac979",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "5b1acbb1-beae-4058-90a3-adaa9220ef97",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "1fa60b97-30f8-4f32-98ac-0722fa1f3bb6",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d534a5f0-16e4-47a3-878b-c1554a2ccbd4",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0035",
+          "name": "SDC-D5",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "f8acabf9-8f40-450e-ba9f-6866401fa561",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "9a1b5563-9df4-4e88-a707-20fa59794881",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b4d0261b-3b07-4305-ada9-fd856caa33b0",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "c5279aef-23ed-4077-be34-f96796d3d398",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b3c2c797-c33a-4cac-8bfa-dfcdb3133a5d",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "b0c765eb-67f3-47be-93c9-8be8abb1826a",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "fd0a2ef5-2654-47ba-90b5-1916eb5dd777",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d1941b1b-d23f-47fb-9efd-e2c79e5f3d0d",
+              "catalog": "dtn_store",
+              "enabled": true
+            },
+            {
+              "id": "437045c6-ba7b-4a0f-9453-4c606e28a8ae",
+              "catalog": "x_band_downlink",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0036",
+          "name": "SDC-D6",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "ea0d4732-f443-40e2-b960-8f568c8e0cce",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "70aa8456-262a-4530-a4b3-32bd9acc4420",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "7d0da287-1a39-4822-ab7d-6173e380b683",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "075ddf4d-7ac8-4b3d-8324-d8f5a339df23",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a793be85-4d4c-4fca-907c-125767bfbef9",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "68a59d2c-77d2-4cdd-b132-f505b42b3dcd",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "2e49ec78-86f7-4c25-ac8a-624eb5868263",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "4ede32ee-3f35-4129-b1ad-d91f8783ba42",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0037",
+          "name": "SDC-D7",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "af0070cf-478e-4a25-80e6-680d32b9fd97",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "379424d8-25a3-48d6-88f2-b3765ce87a82",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "49405ad1-2413-43cb-9afa-7c51bcffd010",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "0c978c24-015a-4530-a029-28ef1b03ec65",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6f24e398-8e50-49e2-8d52-e5780feb4901",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "892c8df9-9aae-462a-80e0-e9321274f36e",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "cc36e2ce-1a13-4c6a-9fb9-d4082609f1bb",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "6dfcbfd3-a0dd-43e0-91cd-5b7300f872c7",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0038",
+          "name": "SDC-D8",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "c6bd1162-9dd5-4bd7-bbd9-f70ad7b40e6c",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "bb9ce8b2-cf86-42e9-947b-d36e31e84cf5",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "18fcae11-81d9-4739-aaf6-3a8810b10d31",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8483ebea-d224-43ea-9c66-311ba40c5510",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "1dd61b38-f0ab-45fe-902a-429e7bf193b9",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "750cc110-e817-4f59-823b-554185e49be1",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "e388d910-0b63-43b7-b203-9f7e250c071c",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "6344d44f-404b-4bfb-8f3f-b7d55b1f5df4",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0039",
+          "name": "SDC-D9",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "3e31a31c-80ac-4112-8f92-3b7903eec057",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fd99f9a9-4015-4ac6-8068-476cbc34f850",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "db70a0cf-cf67-4e4b-9522-19424b6a53b8",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fb6212a5-af6c-4645-b3fd-b3548c509de3",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "67ce36ec-6135-478e-9d58-42f75f651616",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "d2e657b7-780e-4f16-986d-ed2c3b69844a",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "15ae507a-ad86-4b9a-b591-55f8340f77ba",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "b977768f-a178-4612-adba-ad0da40a417c",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0040",
+          "name": "SDC-D10",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "a95b0aca-6126-40b4-8bce-3683da371435",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fb9c984d-ea39-4351-a105-5432f22d4566",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "eb4fb24a-9241-4b9a-84ad-3303f83bba62",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "836f2847-0500-4536-8b08-d555c80c1896",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "7238fba2-5d6b-40d1-8f2e-e38e83a05fc6",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "f97655b6-81f3-43f0-a3b5-0fb1f017a235",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "d4f7ed11-c2ea-4760-97f4-c6698838f8d1",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "7a447644-5b2e-4f03-ba36-0918abe84544",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        }
+      ],
+      "run_id": "RUN-E843C40F8388",
+      "scope_id": "RUN-E843C40F8388:deployment:f6e97f82-9585-4a02-b57a-f5add6c56fc6"
+    },
+    "faults": [],
+    "utc": "2026-10-06T17:33:49.065000000Z",
+    "nodes": [
+      {
+        "id": "NODE-0001",
+        "name": "SDC-A1"
+      },
+      {
+        "id": "NODE-0002",
+        "name": "SDC-A2"
+      },
+      {
+        "id": "NODE-0003",
+        "name": "SDC-A3"
+      },
+      {
+        "id": "NODE-0004",
+        "name": "SDC-A4"
+      },
+      {
+        "id": "NODE-0005",
+        "name": "SDC-A5"
+      },
+      {
+        "id": "NODE-0006",
+        "name": "SDC-A6"
+      },
+      {
+        "id": "NODE-0007",
+        "name": "SDC-A7"
+      },
+      {
+        "id": "NODE-0008",
+        "name": "SDC-A8"
+      },
+      {
+        "id": "NODE-0009",
+        "name": "SDC-A9"
+      },
+      {
+        "id": "NODE-0010",
+        "name": "SDC-A10"
+      },
+      {
+        "id": "NODE-0011",
+        "name": "SDC-B1"
+      },
+      {
+        "id": "NODE-0012",
+        "name": "SDC-B2"
+      },
+      {
+        "id": "NODE-0013",
+        "name": "SDC-B3"
+      },
+      {
+        "id": "NODE-0014",
+        "name": "SDC-B4"
+      },
+      {
+        "id": "NODE-0015",
+        "name": "SDC-B5"
+      },
+      {
+        "id": "NODE-0016",
+        "name": "SDC-B6"
+      },
+      {
+        "id": "NODE-0017",
+        "name": "SDC-B7"
+      },
+      {
+        "id": "NODE-0018",
+        "name": "SDC-B8"
+      },
+      {
+        "id": "NODE-0019",
+        "name": "SDC-B9"
+      },
+      {
+        "id": "NODE-0020",
+        "name": "SDC-B10"
+      },
+      {
+        "id": "NODE-0021",
+        "name": "SDC-C1"
+      },
+      {
+        "id": "NODE-0022",
+        "name": "SDC-C2"
+      },
+      {
+        "id": "NODE-0023",
+        "name": "SDC-C3"
+      },
+      {
+        "id": "NODE-0024",
+        "name": "SDC-C4"
+      },
+      {
+        "id": "NODE-0025",
+        "name": "SDC-C5"
+      },
+      {
+        "id": "NODE-0026",
+        "name": "SDC-C6"
+      },
+      {
+        "id": "NODE-0027",
+        "name": "SDC-C7"
+      },
+      {
+        "id": "NODE-0028",
+        "name": "SDC-C8"
+      },
+      {
+        "id": "NODE-0029",
+        "name": "SDC-C9"
+      },
+      {
+        "id": "NODE-0030",
+        "name": "SDC-C10"
+      },
+      {
+        "id": "NODE-0031",
+        "name": "SDC-D1"
+      },
+      {
+        "id": "NODE-0032",
+        "name": "SDC-D2"
+      },
+      {
+        "id": "NODE-0033",
+        "name": "SDC-D3"
+      },
+      {
+        "id": "NODE-0034",
+        "name": "SDC-D4"
+      },
+      {
+        "id": "NODE-0035",
+        "name": "SDC-D5"
+      },
+      {
+        "id": "NODE-0036",
+        "name": "SDC-D6"
+      },
+      {
+        "id": "NODE-0037",
+        "name": "SDC-D7"
+      },
+      {
+        "id": "NODE-0038",
+        "name": "SDC-D8"
+      },
+      {
+        "id": "NODE-0039",
+        "name": "SDC-D9"
+      },
+      {
+        "id": "NODE-0040",
+        "name": "SDC-D10"
+      }
+    ],
+    "stations": [
+      {
+        "schema": 1,
+        "id": "GS-DAEJEON",
+        "preset": "daejeon",
+        "name": "대전",
+        "region": "대한민국",
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitude_km": 0.07,
+        "dish_m": 13,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-JEJU",
+        "preset": "jeju",
+        "name": "제주",
+        "region": "대한민국",
+        "latitude": 33.4996,
+        "longitude": 126.5312,
+        "altitude_km": 0.03,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-SVALBARD",
+        "preset": "svalbard",
+        "name": "스발바르",
+        "region": "노르웨이",
+        "latitude": 78.2298,
+        "longitude": 15.4078,
+        "altitude_km": 0.45,
+        "dish_m": 11,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 3,
+        "enabled": true
+      }
+    ],
+    "external": null,
+    "module_instance": "ced782d4bf744552bb46ee51893b36b2",
+    "module_sequence": 0,
+    "definition_hashes": {
+      "NODE-0001": "156426318a4205a7827d80456a5d993f592e60278569d4641abdd0b300b178ab",
+      "NODE-0002": "dc7e6d8b0c95452d6be9977ea887bfb704e32ff5c006c1ce2720ab0d8084436e",
+      "NODE-0003": "6bcc0f5d18cb4c11750d67fbc6f3dc7c4fa3981b667c25949d36d9aca98f505c",
+      "NODE-0004": "82a52b3b01b8735c974bf60715ab524ce78811f78ca4c478eb5afae52472cab9",
+      "NODE-0005": "c6120cf10da5e591c68eb57f2b53e6eab7b239a85fab04e2d421e718b47a9682",
+      "NODE-0006": "d41c735dcc87e5d59e84f5984d3903414f614af589cccb38d294f5c8fcf96b58",
+      "NODE-0007": "3d5d3a35f0a283d2937b9b02498eed5e67c7c8d7dff14aed6d7ac3d76df7adfa",
+      "NODE-0008": "49c10a21b0faf7864b76e7ef3e1809c41f3f5006c508ddb4c54fcaa809db6d5b",
+      "NODE-0009": "1841a0884a5187d5c7a62dbb56e6e8b7d2bc28972e86da56afcb78ad9437ca3e",
+      "NODE-0010": "b20e6f664f9d87633da1fc11b2755057686d498ad278e56286e688847d71ea09",
+      "NODE-0011": "603964fcbe9618cf06f4dfde9d1a43a18d6784a323fcd7c43e8229c613c22f4d",
+      "NODE-0012": "decab0a4e24487b0475c84425daecdddc3f77a85a76c2466caac6aae5dcc683a",
+      "NODE-0013": "f6cea0a26469a7110351bc7506876c775d481358eb031c2affaae3d4815fe444",
+      "NODE-0014": "3b243c4defb317b518af90680d1b43a0ebb15f495d2433e6fd99df86adfbac74",
+      "NODE-0015": "0e29eb01e7fb6043960b389fc5caa0d7b7ca20d00f37a7139a7ca5179edbc409",
+      "NODE-0016": "72bf6bcb3708a0275e750b8c31c229012d4f5878368566f0267b584291b8a566",
+      "NODE-0017": "7fec5b771a9cf05349d617bba891bb81cdccb4f9e96349105811cc9e46da02bd",
+      "NODE-0018": "a273c392693c13ec7a20534674cb8bbcf592a3467927b7197af3f4a1e5d95419",
+      "NODE-0019": "427813783076b30192e7958065e86786dbc48f709dbd3c36b4e6cc325c867fdb",
+      "NODE-0020": "c0ec821507681604cf2db0b7f22d20a0d87c26513396537cb1b3c5b506f75367",
+      "NODE-0021": "a8088864843e61ba1259ffeb16010ea947b830a07abbf5fa414da7fb1536d044",
+      "NODE-0022": "2955ddcf533f5fbb673425601d0ade95685275bfa246ffa2665856863459ceba",
+      "NODE-0023": "5e57095ad7966f8e2b9d38a2077c3429aa344673d179c0ba93531854e34782cf",
+      "NODE-0024": "b5b388934bd051c861eee3d1151d9d80322d619363e78aacfc57c8e4119a9376",
+      "NODE-0025": "c85c3a508da8ceb6c0bce23d708b37f09840860f49e41e717d7d81684e74f834",
+      "NODE-0026": "9ae80c601695758f61b182133565b6cea94d1ff51fd967a890054652dee12339",
+      "NODE-0027": "4cacc465bb663bd7ca6aa89c17b64ea819e920aa766eafb14929df52b4b852a7",
+      "NODE-0028": "1086f3a53d164cecf663057ab36a6eba088acc066077879e797720188938f3a8",
+      "NODE-0029": "63d31879de77b0f7c58f6f3ea5f49e11e386a56ce44bf30099ef1b800cd6096c",
+      "NODE-0030": "079f194682b7d56cb914dffced81ce7eb0b2e1040de7b5be44a3fdd0c4237550",
+      "NODE-0031": "899bb768e17245cbfcd8cbbc90ecfbc478c2cae2bff58b0de612462127d2ef04",
+      "NODE-0032": "7e29238973a452cf86cf2566959b7209c4bfcb332c73ddcbeefceb287869f987",
+      "NODE-0033": "aa321bcad5af600d2777f8e4a82682b79f170afe5242a3c695dfaec1d4084a21",
+      "NODE-0034": "bdbfb99efa0122a568b673b47fafbe5e58d0b871b925d0705e99819c680695a0",
+      "NODE-0035": "00b51e51c60f42b67361d56edb57184ab8c114e9f0fa634b8bc25da883a6db62",
+      "NODE-0036": "429961de27418294600e08721fc17cd35696af2ff32e9241d38235767463564a",
+      "NODE-0037": "6c484881ad2781ffdcba031a242a93e155633581448b51559124c1fedc6f1da1",
+      "NODE-0038": "7a48ba71aa5f9ffa0bd7bde440274c64c9b74a8f5c13124677f5c5b894bddd75",
+      "NODE-0039": "2c4a4501faf2b98a9b61731c7f9675aa6ab2f9a62398fcf3e38fe48ce85e759c",
+      "NODE-0040": "b0174dc3a1f4e746719771fce0f1fccb83a88a53637f63d9a94598fdbf87c1c1"
+    },
+    "communication_status": "unknown",
+    "context_hash": "da1acf04281656f4ca65fdd01713c804ebeff4987e7e0403342d0556daa3d9c3"
+  },
+  "data": {
+    "runtime": {
+      "running": false,
+      "speed": 5.0,
+      "elapsed_seconds": 440.6513975998969,
+      "scenario_id": "SDC_POC_01",
+      "sequence": 10,
+      "active_faults": [],
+      "started_at": "2026-10-06T17:33:49.065015+00:00",
+      "run_id": "RUN-E843C40F8388",
+      "mode": "SIM",
+      "scenario_version": "1.0",
+      "random_seed": 2042,
+      "recording": true,
+      "data_quality": "GOOD"
+    },
+    "deployment": {
+      "deployment_id": "f6e97f82-9585-4a02-b57a-f5add6c56fc6",
+      "revision": 1,
+      "nodes": [
+        {
+          "id": "NODE-0001",
+          "name": "SDC-A1",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "425879d5-61e7-4b01-9c43-743ed14cdeb2",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3f19cb8f-a3e7-4c6a-9b27-d9231180f966",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "53552b8d-f3a3-4832-8bdb-c2825826e3ef",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "0efcba3e-e85f-4bcd-88c1-149d13437923",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "77bf33bd-7fc3-41ba-a767-878800955b3f",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "08b109e5-1a8d-4fc0-a8cd-a5a39e3f1d99",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "50f4fcf3-2f65-4870-9cd6-d8b939cb4734",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "fe0434c2-9513-4a49-8437-ee4b13e97707",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0002",
+          "name": "SDC-A2",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "8a2f0e9a-a4b6-436f-b124-14e5ae7cedd9",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6ac961d2-e818-436f-bb3e-bf2a9ddb5c68",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "dfcf663e-5151-4d45-b94d-8f430654865f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b5830836-fcca-4aa6-a1bc-f6fbadc2f798",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a3e12f14-9d3b-444e-865f-d1210ba15ec6",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "cab020d1-f4f5-4d23-ac48-9c3318583e6e",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "e1dc3cf7-e773-414b-b476-aa0397217937",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "63c2a6e1-2182-491b-8c90-f6ee1d548a2c",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0003",
+          "name": "SDC-A3",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "207e5c03-940b-49d7-9dec-7bf2d546394b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "484d92c0-f71b-4221-91bd-40c9b86736a6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5e6a4705-f838-4dff-ab40-ab4835c446bb",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8ef38df6-ebca-497f-8533-e9d13e471f8b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d5c2a819-1d04-4acb-a650-424ce162ea68",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "c1cfc5ad-4f84-4fa1-9330-3776318dd1ec",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "5bc241db-eb82-412a-b9f3-65d8ee86d3bc",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d0a5f9d6-0dca-4223-a048-acbc4b5d7b62",
+              "catalog": "dtn_store",
+              "enabled": true
+            },
+            {
+              "id": "75ffc267-dc67-483a-a741-c046d55a89ed",
+              "catalog": "eo_camera",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0004",
+          "name": "SDC-A4",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "62188209-78f8-4cee-a620-f4c1e770821e",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "65ee13f7-4f6b-4ba2-997e-9289e8ba38d9",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d8aaf6be-5183-44cb-a781-ee28a5f933b5",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6578bf1e-53ca-473d-a3c9-b691930915b1",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b7f78755-1bec-4d46-86ca-0d16a87d2f6c",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "58e83ee5-f560-4081-9a0b-adcf46cb2e57",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "1e0fec27-eaee-451f-9893-e481aac4319d",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "b486563d-87fe-47aa-93b4-b0908b283e53",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0005",
+          "name": "SDC-A5",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "3e08f5fc-aea9-4ca4-a9dc-e4efb6be283a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4166e342-49a9-424c-849b-36862a64ab6f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8497d3c5-9b11-4d05-a102-c7417b170073",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "e9b4d292-afda-4f4a-aa1e-4c87e989c4a2",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "c016340a-459e-478b-bb6c-c2e6f8176f8c",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "cbc2ab35-23ed-498e-9f59-66fa0f7a1b41",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "9f4d8c80-ae84-4168-974a-f7465884d116",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "5233fe0e-985c-4b93-bf83-353bef2c7104",
+              "catalog": "dtn_store",
+              "enabled": true
+            },
+            {
+              "id": "946835c1-5b7b-4a9a-ad81-7e3e622e22af",
+              "catalog": "x_band_downlink",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0006",
+          "name": "SDC-A6",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "b3d99d3f-4955-43ad-9b22-8083082ae2e2",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4c0f5ec8-4538-4308-a4d1-0c0af93bdb2c",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fdd76a32-a9ba-4d0e-870e-b9ca7f5b87c4",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "36702ca3-9cc7-407f-bcf0-55b5e38a2cac",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "85d17376-5a22-4c60-88c7-54dd14469816",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "5e17f525-f96b-4f6e-87e7-d52bdcc6d856",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "6ef93fc5-18d6-48e8-89c5-02b19f7892dd",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d93a5e1a-43e2-4138-a99c-7acd708cc3c8",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0007",
+          "name": "SDC-A7",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "5bc0f5da-be33-4084-9599-460d7dd3a76f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4f7086f8-0d07-47d5-b4c4-66a91dec3e69",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "1d08de69-342b-42ea-9446-72875e6ab6b6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fcc67cf9-4e0b-45c4-8f30-7e7d1e1b3a94",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "78cdc70b-87d4-464a-a09f-fcd687e636e1",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "dc4a6767-7eae-4bf3-9928-74f74ac91b5a",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "d69df0dc-6ee6-4cfd-b4e5-4a89462a0bc2",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "98de6b80-3d06-45aa-9493-6911fc006f19",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0008",
+          "name": "SDC-A8",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "89d406a5-2314-4826-9df6-4a746c895b6f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4ea98c6d-324d-466c-8882-9cf4aba2be7b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "051d98aa-38ff-4a7d-8b49-ae3eb3a40448",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "85f4a7b0-923e-4967-ac45-da313beb57a6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "aa02dd5d-3853-4ce7-ab5d-79445669ce1d",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "d4d208ba-4a29-4258-99f8-06e9461e9226",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "67614161-83d3-4304-bea9-5c9225a3ccaf",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "eabab2c6-f11a-4a83-9007-7915245a3336",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0009",
+          "name": "SDC-A9",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "1352b37c-6bfe-4a2a-a7dc-b130ade07105",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8feccfa6-2324-494f-96ac-f6d117478bf5",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6bc2a8ad-16f6-46d2-af75-03b8f7358834",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4a1b30a8-32a0-4fef-9e29-c4ef0441b653",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8120380a-a206-4529-bb73-3db8c33d7153",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "15b0da37-ad21-4499-9fa5-a1788c09ddc4",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "0155c47e-c650-4132-a7ab-8e8097ded418",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "24ae1ff4-0bac-477f-9bc5-2424d391a750",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0010",
+          "name": "SDC-A10",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "144e10f5-9689-4b16-891d-5e6b4c4dc188",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "450941e2-3d93-43da-94c1-4f65a2fd5d5f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3c968277-d8cb-4e02-9fdb-b48ed1b3df20",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "96db7b25-8940-482b-bc4e-3b72fb74f065",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "175c3920-63f6-42bd-a045-156aabb74b24",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "fa4ded50-6212-475e-ad65-e318bed06600",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "c7829f4e-d20d-41c2-a13b-45fb4e25323a",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "47ff9947-7e6c-4dfb-8507-470fa7f0afaa",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0011",
+          "name": "SDC-B1",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "170c30a9-e206-430f-a817-1ac50ab2f09a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "e0608586-e376-4c84-bddf-0e1f8f6b2170",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "c5da0a1c-bd6e-4579-af7c-0af761dad9cc",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "7c1fa627-1dda-43a2-8f6d-4bda30f7fd5f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5be16406-2b11-45c9-bb71-fe8fd8c7d274",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "b00637a1-877a-4933-8c3f-f6831f3556dd",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "955834fe-b4c2-4a67-994d-934c5b7860af",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "0a8911ba-35fe-4382-acd7-275165d9bcf0",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0012",
+          "name": "SDC-B2",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "e4217f8e-b796-46fb-9357-a496ab9b34ad",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "ff01255c-5d3d-4c27-974c-b547e1cc13a7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "bcce5a8c-6e09-4f12-a232-804ecb5636be",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "e90b6635-0b94-4bd7-a3b8-ecfb5862d8c8",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "352be5a0-dd56-4c8b-8eb0-13cb5ef810ba",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "2856a6b0-bce2-44a5-95a0-115b60dd066a",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "e45bf64e-a037-4fad-8c9c-c09fb778836e",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "92b24536-bf30-4782-a5a0-c77df9cd829f",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0013",
+          "name": "SDC-B3",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "023f42d7-cf19-429d-945e-61969988807d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f6f745c4-1a56-4b5e-9935-3977f2b812bd",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "13e715f4-59d9-45c6-99a8-b879fbf45fdc",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f103bb38-8097-4841-ac7f-5b3baa1ec738",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "afcf6a7f-cd57-4d2f-b1df-b53a97f2baa1",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "0cbba064-bd7b-44d5-a5e9-e6ce16008326",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "b70e0713-bdf9-4797-bb98-63705020ad06",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "2221e9f0-371b-4afa-9e85-f61fc0922eff",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0014",
+          "name": "SDC-B4",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "e8e49339-2833-48d7-943a-6b37c9660cd0",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d99efe62-e2d5-46fa-8a55-1bbd2ff28df2",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fe8e44ab-3e92-4012-8427-fcb34bf5077b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f90a0a7d-b7af-458e-a507-637f2aad4c9b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b77a3cd2-72f9-41f6-a273-56264e0eb348",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "83c6f88b-5a8d-4275-a946-1db388685090",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "e72fb65c-9de3-42e5-b2bb-cb9619ac0036",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "82bb60db-380e-4033-8570-6719dbbe0a5e",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0015",
+          "name": "SDC-B5",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "5905e7a8-9803-4333-86ee-206d17d28dca",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a1967f33-d15f-4b0b-9cd3-7e0115e7b0d6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3f839a6e-cb81-4bf8-b2d9-666cfa5ca8ec",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "68b9d623-2e37-4f2a-9633-463bea595012",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "82e0bcee-0d0f-4e2e-b643-75da4f0ae3a4",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "dc7ebf98-a254-4053-9336-3e253f6586bd",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "4574cd53-6ef1-41e4-9036-38d2748266f0",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "4c4e8e33-f241-42d9-a8de-243340a77893",
+              "catalog": "dtn_store",
+              "enabled": true
+            },
+            {
+              "id": "8ca0b268-4155-416b-9bce-240b7297a406",
+              "catalog": "x_band_downlink",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0016",
+          "name": "SDC-B6",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "99a8372a-7752-4cd0-8689-17eb727894c1",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "12029bc2-4651-44eb-be2c-8929c61d6e5d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "01e70ff3-b0ee-4c1f-b75c-a931cb8e216f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d6fb0a9a-3398-4d6f-aa05-7103e53acca6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "55e505d8-1494-493b-a7a1-bf921ac8c6f1",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "3a4ec9fa-53bc-4068-a1bd-c771a6453a82",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "aa188a95-0615-44be-8c73-4ba540750ef7",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "02b05df7-1225-4a44-9391-1989f97817d8",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0017",
+          "name": "SDC-B7",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "8d1ea78e-26b4-4947-b96a-6bc09d914177",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "12eb3cba-8a85-4d50-b0f6-a145bedfcce7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a79c2c8c-15fc-42fe-8241-64a8cda052ef",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b0e7b37c-82f9-4139-a608-5f7efa1a13c6",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "502a4448-5c75-4e70-864d-c582a4fe3477",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "6dd6bf72-8f9d-4aab-b6ca-9fefcb8cec83",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "e041fb1a-ab63-4b87-9a34-d83556e29943",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "eec241a2-fd90-43ad-8fa4-86388df72038",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0018",
+          "name": "SDC-B8",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "c322141b-9fe2-482c-b099-25b9d65a458c",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "31d00fdd-15da-4287-a299-9db288c48cb7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5983c913-6891-46c7-a762-bd763d463c5a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d5c11064-3ee9-4188-b288-3943ba6d1b8f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5359bbe0-2d8a-4de1-b12b-89790834221c",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "963b33ac-b7da-4b6a-b8cb-e5034502153b",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "65e8ef95-52f7-41ae-a09d-b7efedd646e3",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "3cee8c69-f963-4fef-99a7-2518eba18c56",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0019",
+          "name": "SDC-B9",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "e5f08617-278d-4553-b0c3-1a45096c7a06",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8f8e943b-8e49-4964-9104-2624e02a17d4",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "45b065b4-ed30-4d59-8029-599fa661820b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4262e6b6-7727-4e0e-93c8-9460b9ba93e9",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "da75fc03-c209-4c02-bc36-f8950bf60818",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "4a7fbc5d-7722-431a-91d0-0d5570146064",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "ac5c68b4-42b5-4e02-bdcc-1433041331f7",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "94391188-16d8-4ccf-b346-b26baafd0c73",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0020",
+          "name": "SDC-B10",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "b0b8f460-570b-439b-9a72-67e6b03f660d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "85009cc6-b042-45a9-867c-6411d9b0df0a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "bda918b7-1ee5-4915-bf3a-7be60907422c",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "0ecc5902-e102-4f10-8ec2-8798e2f9be87",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "210e1ae7-6866-4a51-9ee8-6a4e2bf84bac",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "12c3d34d-8751-44c5-a5fa-447b62d105c3",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "171fe039-51e7-44ed-933d-46e7f5f93c6d",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "0f2e9f34-1e87-42aa-b336-0d4fcd64c96b",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0021",
+          "name": "SDC-C1",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "e0d59d76-6aa0-4376-bb05-228d5fdc26d8",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "73ac8784-c01d-4d03-ba4c-2e07b0266b75",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3e4ad811-56b9-434b-9a5d-0c52c4203d79",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "31829e5b-c11a-4d37-8903-2534c8e56558",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6914d976-5c5a-4474-8cde-cef39ba9f489",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "49e5e5f6-aa09-4e50-9cad-68a102a09bb5",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "179a3afd-f2c7-4cd4-b2cf-c35c070770d3",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "14f6c10d-1e85-4739-a6ae-8cd7e8dd8d99",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0022",
+          "name": "SDC-C2",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "972ebb9a-7953-43b5-bf6c-91be6327aa2a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "26139c6a-54c4-45f7-a84b-3d00369b5048",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b3a7efc1-99c5-497d-b412-0b511dd2dae2",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f2e40399-f4cb-4819-9e7f-e81cfd2325e7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b0d0a6ac-e6f8-44ec-ac0b-682e4b12c1ca",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "5a5d1dd7-567b-48d2-afbe-4fa377d77261",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "4eaf9fcf-8955-40d5-a4f5-5b50f6998635",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "9163acf5-5dde-4b29-aec3-5f103f41d1fa",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0023",
+          "name": "SDC-C3",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "fb79857f-d979-44fb-b9cd-72d04004c55d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "02b207fe-adc2-40cf-a2ed-89f24de26481",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "61f324b3-537f-40e9-99f7-8c31541953f9",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "481af5a9-a7da-41ed-8b8c-1e6c48de22fa",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "342b9af2-e09e-49ba-a345-204d8556aeee",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "fe64deff-b2c5-4c8a-a667-aff8c8622fd1",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "509130eb-e193-41fd-b638-76f4f39385ba",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "c2e889e6-b1cf-42b2-81ab-f611e9667d11",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0024",
+          "name": "SDC-C4",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "640d6bf1-3c18-462a-b41b-e2e1d4088ae1",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "63e993db-30bc-458f-88b4-d4e4d51c558a",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "2758541b-c09d-4faa-a689-ddef4d96f61b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "90b802fe-3878-43a5-96f1-df9d7caa3f63",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "881bc35d-7f25-4a2c-aa7e-ef3ce3fda04a",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "1d276f79-f902-4307-b243-4c3662d3c006",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "211ea4ea-6180-4d41-ac87-0b9b55dff846",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "790377bf-eccb-4871-b23c-7bf22041bec2",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0025",
+          "name": "SDC-C5",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "8d69ea0c-16aa-4def-ae28-a21436f1a712",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6d32507a-9568-46ab-86e8-2c9c8afd3c78",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "dc9e51c8-2ed4-49b0-b5e9-24d9e43efd56",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "119f1918-bd93-4031-94a1-b75bf81783a3",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "feca2d9e-0537-4d31-a928-06ba4dbd7f01",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "a0f59a81-504f-408c-9020-cd231e1fa57b",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "753a7f00-4d2b-4c86-b529-e492398f9a58",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d44dfcd3-8053-45e3-8557-2170d8b90b21",
+              "catalog": "dtn_store",
+              "enabled": true
+            },
+            {
+              "id": "1ba54743-fb77-4e6d-bf90-3e2f188bac27",
+              "catalog": "x_band_downlink",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0026",
+          "name": "SDC-C6",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "3518e8e2-305e-4465-8903-00a6230f3240",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "313a8563-2a0b-42cc-bc45-721885d5e020",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4006eaeb-124f-480c-b89e-b0e3254a9e80",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f711866c-eacb-4373-b70d-0b403cef3a43",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "15d78ec6-823e-42b5-bd9e-706350c98204",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "83cd0829-0456-4fad-a1a1-3c6c1a126b10",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "1e23fbd9-16b2-4d55-be34-82f67f734e05",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "3c8845da-9215-480c-9507-b59c1e878532",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0027",
+          "name": "SDC-C7",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "5c027ac4-c3eb-4800-9060-7c8b0a29bcb5",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3e0de2ea-7175-4131-94f0-77ff685b3da7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "9b9bbf45-a840-4b6a-a8b0-79e1d144ae36",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "78ae3f50-8e70-4381-ad33-4507f6b2b4f9",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "91002a8d-6193-4ecd-b03b-895925e59cb0",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "38df86c4-6568-48e2-9fb6-8b5b6a2e65a7",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "8d0b7bef-bef0-4157-880c-847f189c9988",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "b8ddd0ab-1ba6-4ca4-b413-aab7103be13d",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0028",
+          "name": "SDC-C8",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "30611bdc-471c-40c2-83bb-75f83c319b84",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "ddbcd141-64b1-4c08-9a85-873deb164882",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "1cef0c92-24e5-459d-88be-7846467947da",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "19d74d84-407e-45ca-96f0-33d435b2bd6e",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "648ecfa4-ac91-4d1b-ab8c-8cae3af9aafd",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "9153fb7d-3c2e-45ba-a40d-0280ec3ac8cf",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "6f6197e5-8e41-4bdf-8a12-d1b7accc978b",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "2b094169-35d7-497c-bbc7-ac471b0b0765",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0029",
+          "name": "SDC-C9",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "0cb4cb3b-3e4e-4f4f-ba39-ab1058c412b3",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "50c68154-5ea5-4eca-a613-2c9afa029146",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "70cb4185-0c7b-4b42-a7af-1a2046340d50",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "3a9097de-9882-4fed-9b2e-f271d214224d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "d4657fbc-72c7-4633-8956-3d34fa306538",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "02ce66b7-9784-4b59-812f-8464bbd0312d",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "fd88ed29-a746-4c99-b745-feba26ceb88d",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "03b4a4e0-0906-4eab-a2a1-187c12e75933",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0030",
+          "name": "SDC-C10",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "1a419ae5-e679-4965-b8bf-2d546bff0626",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a06de600-bd34-468e-bf95-cf9a5b83d878",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "1ac1674e-7c70-439b-87a6-02534ee46dca",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "e1970d65-22a9-4a7c-8b0b-7961c625642d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "4458eea7-fcc9-4842-979c-d110c99add15",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "e2a343fa-7f37-4dde-934d-287b02897771",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "384534af-09b9-4f97-9572-d96bbfeb2676",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "6d51edb5-0a95-460f-8154-948f639fb965",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0031",
+          "name": "SDC-D1",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "6cce7c13-b0b9-4d94-a073-9c737e760abc",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "bb4b980c-e18a-409e-b76d-dfc490244748",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "ab1b09d5-a3a6-4e9e-9d8a-fc71e38df137",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "af80db83-7724-450d-bbd7-47381fc75e47",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6c5529ad-05aa-414c-b9df-57c56ca9eba7",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "ccab539e-5cfc-4c00-a864-d03ec96d39bb",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "7b1141c9-8ced-4773-8861-d422b6293920",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "8c80e407-112e-4be4-a9dc-46181dd84086",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0032",
+          "name": "SDC-D2",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "590867b2-00bf-40ac-aa2e-4866e44f8806",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "7d7d301f-c51e-4a3c-9d43-dd93ef17135f",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "032e7669-6121-4836-b6bd-c42eb2121c68",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "2d847410-dfdd-4479-a9a3-f7852900d948",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "589df9e0-fa51-4616-a198-0ab40aaec55c",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "c5338a78-db90-4631-afda-76b597ead893",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "0c2f0a73-7cf5-4598-a0ef-be7500995f86",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d5a68bd6-6f2a-4eba-8231-2b7b33661e24",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0033",
+          "name": "SDC-D3",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "bfa8e814-e3f6-4dcb-bc07-76318d3d194d",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "53ca6e4b-9c4b-4e10-ac1a-cb200d1a4f0b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "db4bc8c6-2d37-4518-9526-c171c222ee8c",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "e2a8956a-2675-4642-bae2-a04c2ea18587",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5004159b-ea1f-4dae-b39b-c2c34f78d173",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "62e8dd29-4941-47b1-87b7-28f8a8c119b4",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "092b99dc-1462-4781-a3cc-ac743e0b12bb",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "3aa3db5b-b501-40e7-ad63-6d2f9d9bcb40",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0034",
+          "name": "SDC-D4",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "4c99a228-1153-4127-b782-7c050916ebd0",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "08febd7e-6769-440f-bc87-458636b4e7b8",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a9c791ed-6e39-49ab-a05a-17bd2a6ff7b7",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "5c867b32-6b83-4deb-8e17-ac99ddd8bf7b",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "f98aa2da-2fa3-49e9-bb7a-d6aac8bac979",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "5b1acbb1-beae-4058-90a3-adaa9220ef97",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "1fa60b97-30f8-4f32-98ac-0722fa1f3bb6",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d534a5f0-16e4-47a3-878b-c1554a2ccbd4",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0035",
+          "name": "SDC-D5",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "f8acabf9-8f40-450e-ba9f-6866401fa561",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "9a1b5563-9df4-4e88-a707-20fa59794881",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b4d0261b-3b07-4305-ada9-fd856caa33b0",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "c5279aef-23ed-4077-be34-f96796d3d398",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "b3c2c797-c33a-4cac-8bfa-dfcdb3133a5d",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "b0c765eb-67f3-47be-93c9-8be8abb1826a",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "fd0a2ef5-2654-47ba-90b5-1916eb5dd777",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "d1941b1b-d23f-47fb-9efd-e2c79e5f3d0d",
+              "catalog": "dtn_store",
+              "enabled": true
+            },
+            {
+              "id": "437045c6-ba7b-4a0f-9453-4c606e28a8ae",
+              "catalog": "x_band_downlink",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0036",
+          "name": "SDC-D6",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "ea0d4732-f443-40e2-b960-8f568c8e0cce",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "70aa8456-262a-4530-a4b3-32bd9acc4420",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "7d0da287-1a39-4822-ab7d-6173e380b683",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "075ddf4d-7ac8-4b3d-8324-d8f5a339df23",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "a793be85-4d4c-4fca-907c-125767bfbef9",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "68a59d2c-77d2-4cdd-b132-f505b42b3dcd",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "2e49ec78-86f7-4c25-ac8a-624eb5868263",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "4ede32ee-3f35-4129-b1ad-d91f8783ba42",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0037",
+          "name": "SDC-D7",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "af0070cf-478e-4a25-80e6-680d32b9fd97",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "379424d8-25a3-48d6-88f2-b3765ce87a82",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "49405ad1-2413-43cb-9afa-7c51bcffd010",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "0c978c24-015a-4530-a029-28ef1b03ec65",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "6f24e398-8e50-49e2-8d52-e5780feb4901",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "892c8df9-9aae-462a-80e0-e9321274f36e",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "cc36e2ce-1a13-4c6a-9fb9-d4082609f1bb",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "6dfcbfd3-a0dd-43e0-91cd-5b7300f872c7",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0038",
+          "name": "SDC-D8",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "c6bd1162-9dd5-4bd7-bbd9-f70ad7b40e6c",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "bb9ce8b2-cf86-42e9-947b-d36e31e84cf5",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "18fcae11-81d9-4739-aaf6-3a8810b10d31",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "8483ebea-d224-43ea-9c66-311ba40c5510",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "1dd61b38-f0ab-45fe-902a-429e7bf193b9",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "750cc110-e817-4f59-823b-554185e49be1",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "e388d910-0b63-43b7-b203-9f7e250c071c",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "6344d44f-404b-4bfb-8f3f-b7d55b1f5df4",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0039",
+          "name": "SDC-D9",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "3e31a31c-80ac-4112-8f92-3b7903eec057",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fd99f9a9-4015-4ac6-8068-476cbc34f850",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "db70a0cf-cf67-4e4b-9522-19424b6a53b8",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fb6212a5-af6c-4645-b3fd-b3548c509de3",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "67ce36ec-6135-478e-9d58-42f75f651616",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "d2e657b7-780e-4f16-986d-ed2c3b69844a",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "15ae507a-ad86-4b9a-b591-55f8340f77ba",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "b977768f-a178-4612-adba-ad0da40a417c",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        },
+        {
+          "id": "NODE-0040",
+          "name": "SDC-D10",
+          "mode": "nominal",
+          "equipment": [
+            {
+              "id": "a95b0aca-6126-40b4-8bce-3683da371435",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "fb9c984d-ea39-4351-a105-5432f22d4566",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "eb4fb24a-9241-4b9a-84ad-3303f83bba62",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "836f2847-0500-4536-8b08-d555c80c1896",
+              "catalog": "oisl_standard",
+              "enabled": true
+            },
+            {
+              "id": "7238fba2-5d6b-40d1-8f2e-e38e83a05fc6",
+              "catalog": "ka_user_link",
+              "enabled": true
+            },
+            {
+              "id": "f97655b6-81f3-43f0-a3b5-0fb1f017a235",
+              "catalog": "s_band_ttc",
+              "enabled": true
+            },
+            {
+              "id": "d4f7ed11-c2ea-4760-97f4-c6698838f8d1",
+              "catalog": "gnss_receiver",
+              "enabled": true
+            },
+            {
+              "id": "7a447644-5b2e-4f03-ba36-0918abe84544",
+              "catalog": "dtn_store",
+              "enabled": true
+            }
+          ]
+        }
+      ],
+      "run_id": "RUN-E843C40F8388",
+      "scope_id": "RUN-E843C40F8388:deployment:f6e97f82-9585-4a02-b57a-f5add6c56fc6"
+    },
+    "module": {
+      "module": "data_management",
+      "implementation": "stand_in",
+      "version": "0.1",
+      "placement": "embedded",
+      "endpoint": "in-process",
+      "sequence": 11,
+      "last_update": "2026-10-06T17:39:29.894986+00:00",
+      "sim_elapsed_s": 440.651,
+      "objects": 564,
+      "nodes": 40,
+      "reachable": true,
+      "scope_id": "RUN-E843C40F8388:deployment:f6e97f82-9585-4a02-b57a-f5add6c56fc6",
+      "scope_contract": "isolated-v1"
+    }
+  },
+  "fabric": {
+    "time": "2026-10-06T17:41:09.716000Z",
+    "sequence": 5,
+    "instance_id": "302e3f38c844423d808faf1cf3c129a3",
+    "request_id": "capture:5",
+    "exchange_contract": "guarded-v1",
+    "network_hash": "4967297a3a00b3c8676ff102be11a64e78645952fb6dd6bf3fa0aded6c817664",
+    "implementation": "stand_in",
+    "version": "0.1"
+  }
+}

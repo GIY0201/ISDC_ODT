@@ -2,10 +2,12 @@ import {createGroundStationEditorTools} from './ground_station_editor.js';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const numeric=['latitude','longitude','altitude_km','dish_m','min_elevation_deg'];
 // Reuses original ground store and station editor; no native/clock/Viewer/transport owner.
-export function createGroundNetworkPanel({store,model,network,fabric=null,document,host,refreshRuntime}={}) {
+export function createGroundNetworkPanel({store,model,network,fabric=null,diagram=null,networkScene=null,contactWindows=null,document,host,refreshRuntime}={}) {
  let root=null,view=null,dead=false,editorId=null,externalPending=false,message='',busy=false,page=0;
  const editor=createGroundStationEditorTools({model,escape}),removers=[];
  const routeChoice={source:'',target:'',objective:'balanced'};
+ let passReceipt=null,passAbort=null,passGeneration=0,passBusy=false,passError='',passStation='',passPage=0;
+ let selection=null,groundLinksVisible=true,coverageVisible=true;
  const get=id=>root?.querySelector('#ground-node-'+id);
  function listen(element,event,handler){element.addEventListener(event,handler);removers.push(()=>element.removeEventListener(event,handler));}
  function attempt(action){if(dead)return;try{message='';action();}catch(error){message=String(error.message);}update();}
@@ -68,11 +70,19 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,docume
  }
  function mount(){
   root=document.createElement('section');root.id='ground-node-network';root.className='panel';
-  root.innerHTML='<header><h2>노드 통신망과 지상국 편집</h2></header><div class="body"><p>선배 프로토타입의 지상국 설정과 Kepler+J2 통신 기하입니다. 안테나·대역은 대표 설정이며 실제 수신 미확인입니다. 저장 궤도 RF/접촉 계획과 별개입니다. 계산 전 표시 시계를 정지하면 같은 UTC의 결과를 확인할 수 있습니다.</p><label>추가 지상국 <select id="ground-node-preset"></select></label><button type="button" id="ground-node-add">지상국 추가</button><label>편집 지상국 <select id="ground-node-select"></select></label><button type="button" id="ground-node-edit">선택 지상국 편집</button><button type="button" id="ground-node-reload">저장 설정 다시 불러오기</button><button type="button" id="ground-node-reset">기본 지상국으로 초기화</button><form id="ground-node-editor" class="form"></form><p id="ground-node-status" role="status"></p><button type="button" id="ground-node-calculate">SIM 상태 조회 후 노드 통신망 계산</button><p id="ground-node-summary"></p><div id="ground-node-results"></div><button type="button" id="ground-node-prev">이전 링크</button><button type="button" id="ground-node-next">다음 링크</button></div>';
+  root.innerHTML='<header><h2>노드 통신망과 지상국 편집</h2></header><div class="body"><p>선배 프로토타입의 지상국 설정과 Kepler+J2 통신 기하입니다. 안테나·대역은 대표 설정이며 실제 수신 미확인입니다. 저장 궤도 RF/접촉 계획과 별개입니다. 계산 전 표시 시계를 정지하면 같은 UTC의 결과를 확인할 수 있습니다.</p><label>추가 지상국 <select id="ground-node-preset"></select></label><button type="button" id="ground-node-add">지상국 추가</button><label>편집 지상국 <select id="ground-node-select"></select></label><button type="button" id="ground-node-edit">선택 지상국 편집</button><button type="button" id="ground-node-reload">저장 설정 다시 불러오기</button><button type="button" id="ground-node-reset">기본 지상국으로 초기화</button><form id="ground-node-editor" class="form"></form><p id="ground-node-status" role="status"></p><button type="button" id="ground-node-calculate">SIM 상태 조회 후 노드 통신망 계산</button><p id="ground-node-summary"></p><h3>배치 위성의 미래 지상국 통과 · SIM</h3><p>서버 수락 배치와 정지한 표시 UTC가 필요합니다. 통과는 고각 마스크에 따른 기하이며 실제 RF 수신 가능 여부는 미확인입니다.</p><label>표시 지상국 <select id="ground-node-pass-station"></select></label><button type="button" id="ground-node-pass-query">앞으로 3시간 native 통과 조회</button><button type="button" id="ground-node-pass-cancel">조회 취소</button><p id="ground-node-pass-status" role="status"></p><div id="ground-node-pass-results"></div><button type="button" id="ground-node-pass-prev">이전 통과</button><button type="button" id="ground-node-pass-next">다음 통과</button><button type="button" id="ground-node-scene-links" aria-pressed="true">지상 링크 3D</button><button type="button" id="ground-node-scene-coverage" aria-pressed="true">대표 고도 마스크 커버리지 3D · SIM</button><p id="ground-node-diagram-status"></p><div id="ground-node-diagram" style="max-height:420px;overflow:auto"></div><div id="ground-node-diagram-detail"></div><div id="ground-node-results"></div><button type="button" id="ground-node-prev">이전 링크</button><button type="button" id="ground-node-next">다음 링크</button></div>';
   document.getElementById('screen').prepend(root);close();
   const controls=document.createElement('section');controls.id='ground-node-fabric';
-  controls.innerHTML='<h3>모의 통신 경로와 DTN</h3><p>선배 프로토타입의 통신 모듈에 계산된 통신망을 명시적으로 전송합니다. DTN은 연결이 없을 때 데이터를 저장했다가 전달하는 모의 계산이며 실제 패킷·장비 전송은 미확인입니다.</p><button type="button" id="ground-node-fabric-send">계산된 통신망 전송</button><button type="button" id="ground-node-fabric-refresh">모듈 상태 조회</button><p id="ground-node-fabric-status" role="status"></p><label>출발 노드 <select id="ground-node-fabric-source"></select></label><label>목적 노드 <select id="ground-node-fabric-target"></select></label><label>경로 목적 <select id="ground-node-fabric-objective"><option value="balanced">균형</option><option value="latency">지연 최소</option><option value="reliability">신뢰도</option></select></label><button type="button" id="ground-node-fabric-route">경로 조회</button><p id="ground-node-fabric-dtn"></p><div id="ground-node-fabric-results"></div><p id="ground-node-fabric-path"></p>';
+  controls.innerHTML='<h3>모의 통신 경로와 DTN</h3><p>선배 프로토타입의 통신 모듈에 계산된 통신망을 명시적으로 전송합니다. DTN은 연결이 없을 때 데이터를 저장했다가 전달하는 모의 계산이며 실제 패킷·장비 전송은 미확인입니다.</p><button type="button" id="ground-node-fabric-send">계산된 통신망 전송</button><button type="button" id="ground-node-fabric-refresh">모듈 상태 조회</button><p id="ground-node-fabric-status" role="status"></p><label>출발 노드 <select id="ground-node-fabric-source"></select></label><label>목적 노드 <select id="ground-node-fabric-target"></select></label><label>경로 목적 <select id="ground-node-fabric-objective"><option value="balanced">균형</option><option value="latency">지연 최소</option><option value="reliability">신뢰도</option></select></label><button type="button" id="ground-node-fabric-route">경로 조회</button><p id="ground-node-fabric-dtn"></p><div id="ground-node-fabric-results"></div><div id="ground-node-fabric-custody"></div><p id="ground-node-fabric-path"></p><div id="ground-node-fabric-hops"></div>';
   (root.querySelector('.body')||root).append(controls);
+  listen(get('scene-links'),'click',()=>{groundLinksVisible=!groundLinksVisible;networkScene?.setGroundLinksVisible(groundLinksVisible);get('scene-links').setAttribute('aria-pressed',String(groundLinksVisible));});
+  listen(get('scene-coverage'),'click',()=>{coverageVisible=!coverageVisible;networkScene?.setCoverageVisible(coverageVisible);get('scene-coverage').setAttribute('aria-pressed',String(coverageVisible));});
+  for(const event of ['click','keydown'])listen(get('diagram'),event,value=>{
+   if(event==='keydown'&&!['Enter',' '].includes(value.key))return;
+   const target=value.target?.closest?.('[data-diagram-node],[data-diagram-link]');if(!target)return;
+   const node=target.getAttribute('data-diagram-node'),link=target.getAttribute('data-diagram-link');
+   if(!node&&!link)return;value.preventDefault?.();selection={type:node?'node':'link',id:node||link};update();
+  });
   for(const kind of ['send','refresh','route'])listen(get('fabric-'+kind),'click',()=>fabricAction(kind));
   for(const field of ['source','target','objective'])listen(get('fabric-'+field),'change',()=>{routeChoice[field]=get('fabric-'+field).value;update();});
   listen(get('add'),'click',()=>attempt(()=>{if(externalPending)throw Error('다른 창의 변경을 먼저 확인하세요.');const preset=get('preset').value;const station=store.add(preset==='custom'?{name:'',latitude:37.5,longitude:127}:{preset});open(station.id);}));
@@ -80,6 +90,8 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,docume
   listen(get('edit'),'click',()=>attempt(()=>{if(externalPending)throw Error('다른 창의 변경을 먼저 확인하세요.');open(store.selectedId);}));
   listen(get('editor'),'submit',save);listen(get('reload'),'click',reload);
   listen(get('reset'),'click',()=>attempt(()=>{if(!host.confirm('현재 지상국 설정과 편집을 기본 세 지점으로 바꿀까요?'))return;store.reset();externalPending=false;close();message='기본 지상국 설정 저장';}));
+  listen(get('pass-query'),'click',queryContacts);listen(get('pass-cancel'),'click',()=>{cancelContacts('통과 조회 취소 · 결과 미확인');update();});listen(get('pass-station'),'change',()=>{passStation=get('pass-station').value;passPage=0;update();});
+  listen(get('pass-prev'),'click',()=>{passPage=Math.max(0,passPage-1);update();});listen(get('pass-next'),'click',()=>{passPage++;update();});
   listen(get('calculate'),'click',calculate);listen(get('prev'),'click',()=>{page=Math.max(0,page-1);update();});listen(get('next'),'click',()=>{page++;update();});
  }
  function update(){
@@ -94,7 +106,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,docume
   get('calculate').disabled=busy||!store.ready||externalPending;
   get('status').textContent=externalPending?'다른 창의 지상국 변경이 있습니다. 편집 내용을 보존했습니다. 확인 후 다시 불러오세요.':store.error||message||`지상국 ${store.stations.length}개 · ${store.persistence==='memory_only'?'메모리만 사용 · 영구 저장 없음':'브라우저 설정'}`;
   const snapshot=network.networkSnapshot(),valid=store.ready&&!externalPending&&snapshot?.status==='valid'&&network.verifyNetworkSnapshot(snapshot);
-  renderFabric(snapshot,valid);
+  renderFabric(snapshot,valid);renderContacts();
   get('results').textContent='';get('results').innerHTML='';
   if(!valid){get('summary').textContent=snapshot?.error||'현재 UTC·입력의 검증된 노드 통신망 결과 없음';get('prev').disabled=true;get('next').disabled=true;return;}
   const links=snapshot.network.links;page=Math.min(page,Math.max(0,Math.ceil(links.length/50)-1));
@@ -118,15 +130,70 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,docume
   const links=receipt?.links??[];
   get('fabric-results').innerHTML=receipt?'<table><thead><tr><th>링크</th><th>모의 품질 (%)</th><th>모의 사용 가능</th></tr></thead><tbody>'+links.slice(page*50,(page+1)*50).map(link=>`<tr><td>${escape(link.id)}</td><td>${escape(format(link.quality))}</td><td>${link.usable===true?'가능':link.usable===false?'불가':'미확인'}</td></tr>`).join('')+'</tbody></table>':'';
   const route=receipt?state.route:null;
+  const name=id=>nodes.find(node=>node.id===id)?.name||id||'미확인';
+  const table=(heads,rows)=>'<table><thead><tr>'+heads.map(h=>'<th>'+escape(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.slice(passPage*50,(passPage+1)*50).map(row=>'<tr>'+row.map(cell=>'<td>'+escape(cell)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+  get('fabric-custody').innerHTML=receipt?table(['노드','모의 보관 상태','보관 MB','용량 MB','생성 Mbps','다음 홉'],(receipt.nodes??[]).map(node=>[name(node.id),diagram?.CUSTODY_LABELS?.[node.custody]||node.custody||'미확인',format(node.stored_mb),format(node.capacity_mb),format(node.generation_mbps),node.next_hop?name(node.next_hop):'—'])):'';
+  get('fabric-hops').innerHTML=route?.status==='available'?table(['#','구간','종류','지연 ms','용량 Gbps','품질 %'],(route.hop_list??[]).map((hop,index)=>[index+1,name(hop.from)+' → '+name(hop.to),diagram?.LINK_KIND_LABELS?.[hop.kind]||hop.kind,format(hop.delay_ms),Number.isFinite(hop.capacity_mbps)?format(hop.capacity_mbps/1000):'미확인',format(hop.quality)])):'';
+  renderDiagram(snapshot,valid,receipt,route);
+  get('scene-links').disabled=!networkScene||!valid;get('scene-links').setAttribute('aria-pressed',String(groundLinksVisible));
+  get('scene-coverage').disabled=!networkScene||!valid;get('scene-coverage').setAttribute('aria-pressed',String(coverageVisible));
+  if(valid&&networkScene){networkScene.setGroundLinksVisible(groundLinksVisible);networkScene.setCoverageVisible(coverageVisible);networkScene.setSnapshot({snapshot,receipt,route,selectedLinkId:selection?.type==='link'?selection.id:null});}else networkScene?.clear();
   get('fabric-path').textContent=route?route.status==='available'?`모의 경로 ${(route.path??[]).join(' → ')} · 지연 ${format(route.total_delay_ms)} ms · 병목 ${format(route.bottleneck_mbps)} Mbps · 신뢰도 ${format(route.reliability)}`:'현재 통신망에서 사용 가능한 모의 경로 없음':'현재 통신망의 경로 결과 미확인';
  }
- const unsubscribe=store.subscribe(()=>{network.clearNetwork();update();});
+ function cancelContacts(error=''){
+  passGeneration++;passAbort?.abort();passAbort=null;passBusy=false;passReceipt=null;passError=error;
+ }
+ async function queryContacts(){
+  if(dead||passBusy||!contactWindows)return;
+  cancelContacts();const generation=passGeneration,abort=new AbortController();passAbort=abort;passBusy=true;update();
+  try{
+   if(externalPending||!store.ready)throw Error('지상국 설정을 먼저 확인하세요.');
+   await refreshRuntime();if(dead||generation!==passGeneration||abort.signal.aborted)return;
+   const result=await contactWindows.query({hours:3,signal:abort.signal});
+   if(dead||view!=='ground'||generation!==passGeneration||abort.signal.aborted)return;
+   if(!contactWindows.verify(result))throw Error('native 통과 입력이 변경되었습니다. 배치와 UTC를 확인하세요.');
+   passReceipt=structuredClone(result);passPage=0;
+  }catch(error){if(!dead&&generation===passGeneration){passReceipt=null;passError=String(error.message);}}
+  finally{if(!dead&&generation===passGeneration){passBusy=false;passAbort=null;update();}}
+ }
+ function renderContacts(){
+  const stations=store.enabled,options=stations.map(s=>'<option value="'+escape(s.id)+'">'+escape(s.name)+'</option>').join('');
+  if(!stations.some(s=>s.id===passStation))passStation=stations[0]?.id??'';
+  get('pass-station').innerHTML=options;get('pass-station').value=passStation;
+  get('pass-query').disabled=!contactWindows||passBusy||!store.ready||externalPending||!stations.length;get('pass-cancel').disabled=!passBusy;
+  if(passReceipt){try{if(!contactWindows?.verify(passReceipt)){passReceipt=null;passError='배치·지상국·UTC 또는 승인 조건 변경 · 통과 결과 미확인';}}catch{passReceipt=null;passError='native 승인 상태 미확인';}}
+  get('pass-results').innerHTML='';get('pass-prev').disabled=true;get('pass-next').disabled=true;
+  if(!passReceipt){get('pass-status').textContent=passBusy?'원본 native 통과 조회 중 · 이전 결과 미확인':passError||'명시적 조회 전 통과 결과 미확인';return;}
+  const report=passReceipt.contact_reports.find(r=>r.station_id===passStation),rows=[...(report?.geometry.passes??[])].sort((a,b)=>Date.parse(a.start)-Date.parse(b.start)||String(a.satellite).localeCompare(String(b.satellite))),names=new Map(passReceipt.node_definitions.map(n=>[n.id,n.name||n.id]));
+  passPage=Math.min(passPage,Math.max(0,Math.ceil(rows.length/50)-1));get('pass-prev').disabled=passPage===0;get('pass-next').disabled=(passPage+1)*50>=rows.length;
+  get('pass-status').textContent=`모의 기하 · 승인 UTC ${passReceipt.accepted_context.utc} → ${passReceipt.conditions.end_utc} · 전체 수락 배치 ${passReceipt.node_definitions.length}기 · 선택 지상국 ${rows.length}구간 · ${passPage+1}/${Math.max(1,Math.ceil(rows.length/50))}페이지 · 원본 ${report?.geometry.coverage.resolution_seconds??'미확인'}초 탐색 · 짧은 구간 누락 가능 · 실제 RF 미확인`;
+  get('pass-results').innerHTML=rows.length?'<table><thead><tr><th>위성</th><th>AOS UTC</th><th>LOS UTC</th><th>최대 고각 °</th><th>지속 s</th><th>구간 상태</th></tr></thead><tbody>'+rows.slice(passPage*50,(passPage+1)*50).map(row=>'<tr>'+[names.get(row.satellite)||row.satellite,row.start,row.end,row.max_elevation_deg,Number.isFinite(row.duration_seconds)?row.duration_seconds:(Date.parse(row.end)-Date.parse(row.start))/1000,[row.in_progress?'이미 진행 중':'',row.truncated?'조회 범위에서 잘림':''].filter(Boolean).join(' · ')||'구간 완료'].map(v=>'<td>'+escape(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table>':'<p>조회한 범위에서 마스크 위 통과 없음 · RF 연결 상태를 뜻하지 않습니다.</p>';
+ }
+ function renderDiagram(snapshot,valid,receipt,route){
+  get('diagram').innerHTML='';get('diagram-detail').innerHTML='';
+  get('diagram-status').textContent=!valid?'현재 UTC·입력의 연결도 미확인':!diagram?'연결도 표시 모듈 미확인':receipt?'모의 연결 구조 · 지리적 위치 아님 · 움직이는 선은 실측 패킷이 아님':'모의 노드 배치 · 통신망 미전송으로 링크 품질·보관 상태 미확인';
+  if(!valid||!diagram)return;
+  const nodes=snapshot.network.nodes,ids=new Set(nodes.map(node=>node.id));
+  const layout=diagram.layoutNetwork({satellites:(snapshot.node_definitions??[]).filter(node=>ids.has(node.id)).map(node=>({id:node.id,name:node.name,raan:node.orbit?.raan,meanAnomaly:node.orbit?.mean_anomaly,formation:node.formation})),stations:(snapshot.stations??[]).filter(station=>station.enabled&&ids.has(station.id))});
+  const reports=new Map((receipt?.links??[]).map(link=>[link.id,link]));
+  // No receipt means unknown link quality, never an invented usable/unusable verdict.
+  const links=receipt?snapshot.network.links.filter(link=>reports.has(link.id)).map(link=>({...link,...reports.get(link.id)})):[];
+  const states=new Map((receipt?.nodes??[]).map(node=>[node.id,{tone:node.kind==='ground'?(node.serving?.length?'ok':'neutral'):node.ground_path?'ok':node.custody==='full'?'danger':node.custody?'warning':'neutral',title:diagram.CUSTODY_LABELS?.[node.custody]||node.custody||'미확인',badge:Number.isFinite(node.stored_mb)&&node.stored_mb>0?node.stored_mb+' MB':''}]));
+  const routeLinkIds=new Set(route?.status==='available'?(route.hop_list??[]).map(hop=>hop.link_id):[]);
+  const selected=selection&&((selection.type==='link'&&links.some(link=>link.id===selection.id))||(selection.type==='node'&&ids.has(selection.id)))?selection:null;
+  get('diagram').innerHTML=diagram.diagramMarkup(layout,links,{selected,routeLinkIds,nodeStates:states,showLabels:true,flowTimeSeconds:Number.isFinite(receipt?.elapsed_s)?receipt.elapsed_s:0});
+  if(selected){
+   const record=selected.type==='link'?links.find(link=>link.id===selected.id):{definition:(snapshot.node_definitions??[]).find(node=>node.id===selected.id)||(snapshot.stations??[]).find(node=>node.id===selected.id),fabric:(receipt?.nodes??[]).find(node=>node.id===selected.id)??null};
+   get('diagram-detail').innerHTML='<h4>선택한 모의 '+(selected.type==='link'?'링크':'노드')+'</h4><pre style="white-space:pre-wrap;overflow-wrap:anywhere">'+escape(JSON.stringify(record,null,2))+'</pre>';
+  }
+ }
+ const unsubscribe=store.subscribe(()=>{cancelContacts();network.clearNetwork();update();});
  const external=event=>{
-  if(dead||event.key!=='spacetwin-ground-stations-v1')return;
+  if(dead||event.key!=='spacetwin-ground-stations-v1')return;cancelContacts();
   if(editorId){externalPending=true;network.clearNetwork();update();}
   else{store.load();network.clearNetwork();update();}
  };
  host.addEventListener('storage',external);
- return Object.freeze({show(next){view=next;update();},update,hasExternalChange:()=>externalPending,
-  destroy(){if(dead)return;dead=true;unsubscribe();host.removeEventListener('storage',external);for(const remove of removers.splice(0))remove();root?.remove();root=null;}});
+ return Object.freeze({show(next){view=next;if(next!=='ground'){cancelContacts();networkScene?.clear();}update();},update,hasExternalChange:()=>externalPending,
+  destroy(){if(dead)return;dead=true;cancelContacts();networkScene?.clear();unsubscribe();host.removeEventListener('storage',external);for(const remove of removers.splice(0))remove();root?.remove();root=null;}});
 }

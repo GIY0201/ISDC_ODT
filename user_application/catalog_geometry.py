@@ -10,6 +10,7 @@ from astropy.time import TimeDelta
 from data.orbit_inputs import load_orbit_input_bytes
 from digital_twin.contracts.orbit import GroundPoint,OrbitUnavailable
 from digital_twin.contracts.catalog_geometry import CatalogGpChanged
+from digital_twin.contracts.catalog_details import details_metadata,detail_row_payload
 from digital_twin.simulation.orbit_geometry import observation_geometry,teme_positions_at_utc
 from communication.native.orbit_adapter import prepare_catalog_orbits,propagate_catalog
 from foundation.orbit_time import parse_utc,parse_utc_batch,format_utc_times
@@ -158,10 +159,15 @@ class CatalogGeometryQuery:
         values,item,orbit,digest=await self._input(group,catalog_number)
         def compute():
             quality=self.eop.quality(parse_utc(orbit.epoch_utc))
-            result=self.calculate(orbit,[orbit.epoch_utc],GroundPoint(0,0,0))
+            detail_calculate=getattr(self.calculate,'catalog_details',None)
+            result=(detail_calculate if callable(detail_calculate) else self.calculate)(orbit,[orbit.epoch_utc],GroundPoint(0,0,0))
+            metadata=details_metadata(result)
+            if result.frame!='ITRF' or result.profile!=orbit.profile or result.eop_sha256!=self.eop.eop_sha256 or result.leap_sha256!=self.eop.leap_sha256 or len(result.rows)!=1:raise ValueError('catalog position provenance mismatch')
             row=result.rows[0]
             if row.error_code or row.position_m is None:raise ValueError('native propagation failed: '+str(row.error_code))
-            return {'version':1,'status':'valid','group':group,'catalog_number':catalog_number,'name':item.get('OBJECT_NAME',''),'source':values['source'],'fetched_at':values['fetched_at'],'warning':values.get('warning',''),'stale':bool(values.get('stale',False)),'utc':row.utc,'epoch_utc':orbit.epoch_utc,'normalized_gp_sha256':digest,'frame':'ITRF','profile':orbit.profile,'position_m':list(row.position_m),'eop_sha256':result.eop_sha256,'leap_sha256':result.leap_sha256,'eop_kind':'IERS_A','eop_quality':quality}
+            payload={'version':1,'status':'valid','group':group,'catalog_number':catalog_number,'name':item.get('OBJECT_NAME',''),'source':values['source'],'fetched_at':values['fetched_at'],'warning':values.get('warning',''),'stale':bool(values.get('stale',False)),'utc':row.utc,'epoch_utc':orbit.epoch_utc,'normalized_gp_sha256':digest,'frame':'ITRF','profile':orbit.profile,'position_m':list(row.position_m),'eop_sha256':result.eop_sha256,'leap_sha256':result.leap_sha256,'eop_kind':'IERS_A','eop_quality':quality}
+            if metadata:payload.update(metadata,**detail_row_payload(row))
+            return payload
         return await self.execute(compute)
 
     async def samples(self,group,catalog_number,expected_hash,start_utc,step_seconds,count,ground_point,minimum_elevation_deg,client_request_id):
@@ -174,7 +180,9 @@ class CatalogGeometryQuery:
             times=(start.as_time()+TimeDelta(np.arange(count)*step_seconds,format='sec',scale='tai')).utc
             utc=format_utc_times(times)
             qualities=[self.eop.quality(t) for t in parse_utc_batch(utc)]
-            result=self.calculate(orbit,utc,ground_point)
+            detail_calculate=getattr(self.calculate,'catalog_details',None)
+            result=(detail_calculate if callable(detail_calculate) else self.calculate)(orbit,utc,ground_point)
+            metadata=details_metadata(result)
             if len(result.rows)!=count or result.frame!='ITRF' or result.profile!=orbit.profile or result.eop_sha256!=self.eop.eop_sha256 or result.leap_sha256!=self.eop.leap_sha256:raise ValueError('catalog calculation provenance or row count mismatch')
             rows=[]
             for time,row,quality in zip(utc,result.rows,qualities):
@@ -184,9 +192,12 @@ class CatalogGeometryQuery:
                     if row.position_m is None or len(row.position_m)!=3 or not all(math.isfinite(v) for v in row.position_m) or row.elevation_deg is None or not math.isfinite(row.elevation_deg) or abs(row.elevation_deg)>90:raise ValueError('invalid catalog calculation row')
                     distance,azimuth=observation_geometry([row.position_m],ground_point)[0]
                     output.update(position_m=list(row.position_m),elevation_deg=row.elevation_deg,range_m=distance,azimuth_deg=azimuth,visible=row.elevation_deg>=minimum_elevation_deg)
+                if metadata:output.update(detail_row_payload(row))
                 rows.append(output)
             failed=sum(row['status']=='error' for row in rows)
-            return {'version':1,'status':'error' if failed==count else 'partial' if failed else 'valid','client_request_id':client_request_id,'group':group,'catalog_number':catalog_number,'name':item.get('OBJECT_NAME',''),'source':values['source'],'fetched_at':values['fetched_at'],'warning':values.get('warning',''),'stale':bool(values.get('stale',False)),'epoch_utc':orbit.epoch_utc,'normalized_gp_sha256':digest,'start_utc':utc[0],'step_seconds':step_seconds,'count':count,'ground_point':{'latitude_deg':ground_point.latitude_deg,'longitude_deg':ground_point.longitude_deg,'ellipsoid_height_m':ground_point.ellipsoid_height_m,'virtual':True,'ellipsoid':'WGS84'},'minimum_elevation_deg':minimum_elevation_deg,'frame':result.frame,'profile':result.profile,'eop_sha256':result.eop_sha256,'leap_sha256':result.leap_sha256,'eop_kind':'IERS_A','communication_status':'unknown','units':{'position':'m','range':'m','elevation':'deg','azimuth':'deg','time':'UTC'},'rows':rows}
+            payload={'version':1,'status':'error' if failed==count else 'partial' if failed else 'valid','client_request_id':client_request_id,'group':group,'catalog_number':catalog_number,'name':item.get('OBJECT_NAME',''),'source':values['source'],'fetched_at':values['fetched_at'],'warning':values.get('warning',''),'stale':bool(values.get('stale',False)),'epoch_utc':orbit.epoch_utc,'normalized_gp_sha256':digest,'start_utc':utc[0],'step_seconds':step_seconds,'count':count,'ground_point':{'latitude_deg':ground_point.latitude_deg,'longitude_deg':ground_point.longitude_deg,'ellipsoid_height_m':ground_point.ellipsoid_height_m,'virtual':True,'ellipsoid':'WGS84'},'minimum_elevation_deg':minimum_elevation_deg,'frame':result.frame,'profile':result.profile,'eop_sha256':result.eop_sha256,'leap_sha256':result.leap_sha256,'eop_kind':'IERS_A','communication_status':'unknown','units':{'position':'m','range':'m','elevation':'deg','azimuth':'deg','time':'UTC'},'rows':rows}
+            payload.update(metadata)
+            return payload
         return await self.execute(compute)
 
 

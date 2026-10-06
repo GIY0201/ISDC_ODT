@@ -19,6 +19,11 @@ export function createScenarioClock({ runtime = () => null, receivedAt = () => n
   }
   const source = {
     elapsed,
+    displayProjection() {
+      const status=runtime(),stamp=receivedAt(),age=wallNow()-stamp;
+      if(!status||status.running!==true||!Number.isFinite(stamp)||!Number.isFinite(age)||age<0||age>3500||!Number.isFinite(Date.parse(status.started_at))||!Number.isFinite(status.elapsed_seconds)||!Number.isFinite(status.speed)||status.speed<.1||status.speed>128)return null;
+      return {time_ms:startMs()+(status.elapsed_seconds+age/1000*status.speed)*1000,run_id:status.run_id,sequence:status.sequence,elapsed_seconds:status.elapsed_seconds,projected:true,age_ms:age};
+    },
     startMs,
     now: () => startMs() + elapsed() * 1000,
     engage() { engaged = true; if(followAnalysis){ if(typeof followAll!=="function")throw Error("기존 분석 시계 owner가 필요합니다.");followAll(source); } },
@@ -31,8 +36,8 @@ export function createScenarioClock({ runtime = () => null, receivedAt = () => n
     play: () => control.play?.(),
     setSpeed: speed => control.setSpeed?.(speed),
     // The runtime only moves forward: a backward step or seek is refused, a forward one advances the clock.
-    step: seconds => { if (seconds > 0) control.advance?.(seconds); else control.refuse?.("시나리오 시계는 되감을 수 없습니다."); },
-    seek: date => { const delta = (date.getTime() - (startMs() + elapsed() * 1000)) / 1000; if (delta > 0) control.advance?.(delta); else control.refuse?.("시나리오 시계는 되감을 수 없습니다."); },
+    step: seconds => { if (seconds > 0) return control.advance?.(seconds); else return control.refuse?.("시나리오 시계는 되감을 수 없습니다."); },
+    seek: date => { const delta = (date.getTime() - (startMs() + elapsed() * 1000)) / 1000; if (delta > 0) return control.advance?.(delta); else return control.refuse?.("시나리오 시계는 되감을 수 없습니다."); },
     live: () => control.refuse?.("시나리오 재생 중에는 시계가 서버 SIM 시각을 따릅니다."),
   };
   return source;

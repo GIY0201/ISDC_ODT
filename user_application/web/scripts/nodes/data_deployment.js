@@ -2,6 +2,7 @@
 // browser display copy; requests carry only equipment identities, never expanded model values.
 const ENDPOINT = '/api/data-management/deployment';
 const clone = value => structuredClone(value);
+const canonical = value => JSON.stringify(value, (_,item) => item && typeof item === 'object' && !Array.isArray(item) ? Object.fromEntries(Object.keys(item).sort().map(key => [key,item[key]])) : item);
 
 function deploymentNodes(nodes) {
   return nodes.map(node => ({
@@ -172,6 +173,26 @@ export function createDataDeployment({
     return clone(server);
   }
 
+  async function reacceptCachedDeployment(expectedReceipt, expectedNodes) {
+    validateReceipt(expectedReceipt);
+    const receipt = clone(expectedReceipt), nodes = clone(expectedNodes);
+    const matchesCache = () => !constellation.isDirty()
+      && canonical(constellation.deployed) === canonical(nodes)
+      && canonical(constellation.snapshot().receipt) === canonical(receipt);
+    if (pending || !matchesCache()) throw new Error('저장 배치와 현재 초안이 달라 재확인할 수 없습니다.');
+    const response = await read();
+    ensureActive();
+    if (!matchesCache() || canonical(response) !== canonical(receipt)
+        || signature(response.nodes) !== signature(nodes)) {
+      throw new Error('현재 서버 실행·배치 수락 증명이 저장된 배치와 다릅니다.');
+    }
+    authorization = {nodes: clone(nodes), receipt: clone(receipt), kind: 'restore'};
+    try { constellation.deploy(nodes, receipt, {restore: true}); }
+    finally { authorization = null; }
+    syncRequired = false; changed();
+    return clone(receipt);
+  }
+
   return {
     get state() { return state(); },
     verifyAcceptance(nodes, receipt, kind) {
@@ -197,6 +218,10 @@ export function createDataDeployment({
       return initializing;
     },
     refresh: () => serial(read),
+    reacceptCachedDeployment(receipt, nodes) {
+      const savedReceipt = clone(receipt), savedNodes = clone(nodes);
+      return serial(() => reacceptCachedDeployment(savedReceipt, savedNodes));
+    },
     deploy() { const nodes = clone(constellation.drafts); return serial(() => apply(nodes, 'deploy')); },
     recall: () => serial(() => apply([], 'recall')),
     // Several owners (the node tab, the scenario player) watch one client; each gets state copies.

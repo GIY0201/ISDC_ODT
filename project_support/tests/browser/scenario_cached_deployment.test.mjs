@@ -1,0 +1,25 @@
+// Unit guard tests: fake HTTP responses exercise the existing acceptance owners; no native claim.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {createDataDeployment} from '../../../user_application/web/scripts/nodes/data_deployment.js';
+import {createConstellationStore} from '../../../user_application/web/scripts/nodes/constellation.js';
+import {createNodeLibrary} from '../../../digital_twin/model_library/browser/satellite_nodes.js';
+import {createMissionTypes} from '../../../digital_twin/model_library/browser/mission_types.js';
+import {createScenarioAssembly} from '../../../digital_twin/model_library/browser/scenario_assembly.js';
+import * as stationModel from '../../../digital_twin/model_library/browser/ground_stations.js';
+import {orbitElements,catalogElements} from '../../../digital_twin/simulation/browser/node_orbit_definition.js';
+const definition=JSON.parse(await readFile(new URL('../fixtures/source_sdc_poc.json',import.meta.url)));
+async function fixture(){let equipment=0,data,now=1791300000000,server={run_id:'run',revision:0,deployment_id:null,scope_id:'run:unconfigured',nodes:[]};let duringRead=()=>{};const storageMap=new Map(),storage={getItem:k=>storageMap.get(k)??null,setItem:(k,v)=>storageMap.set(k,v)},calls=[];
+ const library=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>`EQ-${++equipment}`});const store=createConstellationStore({library,storage,now:()=>now,verifyAcceptance:(...args)=>data.verifyAcceptance(...args)});store.load();
+ const assembly=createScenarioAssembly({nodeLibrary:library,missionTypes:createMissionTypes(library),stationModel});store.addMany(assembly.assembleConstellation(definition,{epoch:now,idFactory:()=>store.nextIds()}).nodes);
+ data=createDataDeployment({constellation:store,createId:()=> 'deployment',fetchImpl:async(url,options)=>{calls.push(options.method);if(options.method==='GET')duringRead();if(options.method==='POST'){const request=JSON.parse(options.body);server={run_id:'run',revision:1,deployment_id:request.deployment_id,scope_id:'run:deployment:'+request.deployment_id,nodes:request.nodes};}return {ok:true,status:200,headers:{get:()=> 'application/json'},json:async()=>structuredClone(server)};}});
+ await data.initialize();await data.deploy();const before=store.snapshot();store.load({discardLocal:true});assert.deepEqual(store.deployed,before.deployed);assert.equal(store.isDirty(),false);assert.equal(store.deploymentConfirmed,false);calls.length=0;now+=5000;
+ return {data,store,before,calls,server,storageMap,duringRead:fn=>{duringRead=fn;},close:()=>data.destroy()};
+}
+test('explicit fresh readonly reaccept restores cached40-node confirmation and original receipt/time without POST',async()=>{const f=await fixture();try{await f.data.reacceptCachedDeployment(f.before.receipt,f.before.deployed);assert.equal(f.store.deploymentConfirmed,true);assert.deepEqual(f.store.deployed,f.before.deployed);assert.deepEqual(f.store.snapshot().receipt,f.before.receipt);assert.equal(f.store.deployedAt,f.before.deployedAt);assert.deepEqual(f.calls,['GET']);}finally{f.close();}});
+for(const [name,change] of [['foreign run',f=>{f.server.run_id='other';f.server.scope_id='other:deployment:deployment';}],['server revision',f=>f.server.revision++],['server projected equipment',f=>f.server.nodes[0].equipment[0].enabled=false],['dirty draft',f=>f.store.update(f.store.drafts[0].id,{...f.store.drafts[0],name:'edited'})],['changed full cached evidence',f=>f.before.deployed[0].orbit.altitude_km++]])test(name+' cannot confirm or send a deployment',async()=>{const f=await fixture();try{change(f);await assert.rejects(f.data.reacceptCachedDeployment(f.before.receipt,f.before.deployed));assert.equal(f.store.deploymentConfirmed,false);assert.ok(!f.calls.includes('POST'));}finally{f.close();}});
+
+test('normal deploy still stamps a new deployment time while restore preserves the original',async()=>{const f=await fixture();try{await f.data.deploy();assert.notEqual(f.store.deployedAt,f.before.deployedAt);assert.deepEqual(f.calls,['POST']);}finally{f.close();}});
+test('draft drift during the fresh GET cannot publish confirmation',async()=>{const f=await fixture();try{f.duringRead(()=>f.store.update(f.store.drafts[0].id,{...f.store.drafts[0],notes:'late edit'}));await assert.rejects(f.data.reacceptCachedDeployment(f.before.receipt,f.before.deployed));assert.equal(f.store.deploymentConfirmed,false);assert.deepEqual(f.calls,['GET']);}finally{f.close();}});
+for(const role of [null,{key:'source',label:'label',extra:true},{key:'',label:'label'},{key:'source',label:42}])test('damaged saved source role rejects whole restoration '+JSON.stringify(role),async()=>{const f=await fixture();try{const key='spacetwin-nodes-deployed-v1',raw=JSON.parse(f.storageMap.get(key));raw.nodes[0].role=role;f.storageMap.set(key,JSON.stringify(raw));assert.throws(()=>f.store.load({discardLocal:true}),/손상/);assert.deepEqual(f.store.deployed,f.before.deployed);}finally{f.close();}});

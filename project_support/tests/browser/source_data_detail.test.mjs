@@ -2,15 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createSourceDataPanel} from '../../../user_application/web/scripts/tabs/source_data.js';
 import * as model from '../../../user_application/web/scripts/data_management/view_model.js';
-function fixture(drawSparkline=null){
+function fixture(drawSparkline=null,onContextChange=()=>{}){
  const elements=new Map(),calls=[];const deployment={run_id:'RUN-TEST',scope_id:'scope-1',revision:1,nodes:[{id:'A'}]};
  const report={runtime:{run_id:'RUN-TEST'},deployment,module:{reachable:true,scope_id:'scope-1',scope_contract:'isolated-v1'},overview:{scope_id:'scope-1',scope_contract:'isolated-v1',metrics:{objects:1},policy:{replication:{imagery:3}},jobs:[{id:'JOB-1',kind:'verify',status:'running',started_s:0,eta_s:3}],requests:[{id:'REQ-1',status:'served',served_from:'A',destination:'B',latency_ms:460,object_id:'DM-1'}]},nodes:[{id:'A',name:'Storage A',kind:'onboard',capacity_gb:2000,available:true}],objects:{scope_id:'scope-1',scope_contract:'isolated-v1',total:1,items:[{id:'DM-1',class:'imagery',source:'A',label:'Original product',ref:'A:imagery:1',size_mb:1,version:1,checksum:'0123456789abcdef',tier:'hot',retention_days:365,last_verified_s:15,requests:1,created_s:0,status:'healthy',replicas:[{node:'A',state:'verified',placed_s:0,verified_s:15,lag_s:2.5,ready_s:null}]}]},events:{scope_id:'scope-1',scope_contract:'isolated-v1',items:[]}};
  class Element{constructor(){this.listeners=new Map();this.value='';this.hidden=false;this.html='';}set innerHTML(html){this.html=html;for(const m of html.matchAll(/\bid="([^"]+)"/g))elements.set(m[1],new Element());}get innerHTML(){return this.html;}prepend(child){elements.set(child.id,child);}querySelector(q){return elements.get(q.slice(1));}addEventListener(e,f){this.listeners.set(e,f);}removeEventListener(e){this.listeners.delete(e);}remove(){elements.delete(this.id);}async dispatch(e){return this.listeners.get(e)?.({target:this,preventDefault(){}});}}
  elements.set('screen',new Element());const document={createElement:()=>new Element(),getElementById:id=>elements.get(id)};
  const api={dataDeploymentState:async()=>structuredClone(deployment),dataManagementDashboard:async()=>structuredClone(report),dataManagementAction:async body=>{calls.push(body);return{...body,scope_contract:'isolated-v1',status:'done'};},dataManagementRequest:async body=>{calls.push(body);return{...body,scope_contract:'isolated-v1',status:'served'};}};
  report.overview.sim_elapsed_s=120;report.overview.metrics.ingest_mbps=4;report.overview.metrics.mean_sync_lag_s=2.5;report.overview.metrics.mean_latency_ms=460;
- const panel=createSourceDataPanel({api,model,document,host:{},drawSparkline});panel.show('data');return{panel,calls,api,get:id=>elements.get('dm-'+id)};
+ const panel=createSourceDataPanel({api,model,document,host:{},drawSparkline,onContextChange});panel.show('data');return{panel,calls,api,get:id=>elements.get('dm-'+id)};
 }
+
+test('readonly shared context observes pending/error and preserves original full snapshot, observer cannot corrupt action',async()=>{
+ let notifications=0;const f=fixture(null,()=>{notifications++;throw Error('observer failure');});
+ let resolve;f.api.dataManagementDashboard=()=>new Promise(r=>resolve=r);
+ const wait=f.get('refresh').dispatch('click');await Promise.resolve();await Promise.resolve();assert.equal(f.panel.contextSnapshot().busy,true);assert.equal(f.panel.contextSnapshot().report,null);
+ resolve({});await wait;assert.equal(f.panel.contextSnapshot().busy,false);assert.ok(f.panel.contextSnapshot().error);assert.equal(notifications,2);
+ const normal=fixture();await normal.get('refresh').dispatch('click');normal.get('object').value='DM-1';await normal.get('object').dispatch('change');
+ const context=normal.panel.contextSnapshot();assert.equal(context.selected_id,'DM-1');assert.equal(context.report.objects,undefined);assert.equal(normal.panel.snapshot().objects.items.length,1);context.report.deployment.scope_id='corrupt';assert.equal(normal.panel.contextSnapshot().report.deployment.scope_id,'scope-1');f.panel.destroy();normal.panel.destroy();
+});
 test('original object checksum/tier are separate from actual replica state and lag; lifecycle job/request reports remain visible',async()=>{
  const f=fixture();await f.get('refresh').dispatch('click');f.get('object').value='DM-1';await f.get('object').dispatch('change');
  assert.match(f.get('detail').innerHTML,/0123456789abcdef/);assert.match(f.get('detail').innerHTML,/2\.5/);assert.match(f.get('detail').innerHTML,/Storage A/);assert.match(f.get('detail').innerHTML,/365/);

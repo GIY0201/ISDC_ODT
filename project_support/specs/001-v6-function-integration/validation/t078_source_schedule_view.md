@@ -1,0 +1,9 @@
+# T078 original mission schedule/details view
+
+Pinned source `1a1e002`: `tabs/mission.js` allTasks/renderTimeline/renderChecks/renderTaskTable, and `missions/planner.js` affectedTasks. Current V6 previously displayed only the selected plan's timeline and four task columns.
+
+`tabs/source_missions.js` now projects every active local mission plan onto the unchanged original pure `mission_timeline.js`, with 6/12/24-hour range, busy/all satellite rows, per-mission deadlines, selected inspection contact/eclipse/access windows and selected task highlight. Timeline task selection uses the task's owning mission ID, preserving correctness when different plans reuse task IDs. Task rows expose counterpart, duration in minutes, MB and analysis-derived status; selected raw task details retain source fields. Checks expose original details, unavailable satellites/reasons, reconfiguration targets, alternatives, module version and receive UTC.
+
+The projection reads the existing service context and store; it does not execute a mission, change module approval or create a clock. If actual current native context is unavailable, committed task status is unknown and the axis may use explicitly labeled historical inspection time. Window approval UTC remains visible; increasing display hours does not invent new native window coverage. Reconfiguration follows the original outstanding-task mode/link-loss rules. Native owner acceptance/commit guards remain unchanged.
+
+RED: schedule export absent. GREEN: four projection/view tests plus two-resolution readonly filter/hour controls; existing store, model, byte-original timeline, panel and mission-service regressions passed (initial combined 29, additional selected-task regression passed separately). No server/browser/Git changes. Actual multi-mission GPU/browser schedule selection remains a separate root validation step.

@@ -1,0 +1,19 @@
+# Original scenario console functions in V6
+
+Source `1a1e00297a0301637455b0ef2cf48b2e74576b07`, `user_application/web/scripts/scenario/console.js`: original `flowChips`, dock/guide step tabs, guide dismissal, `sd-follow` stage-navigation toggle, result event list and `downloadRecord` were missing from the V6 wrapper while the reused runner already exposed the necessary data.
+
+`tabs/source_scenarios.js` now consumes those existing runner functions and values: distinct `setAutoFollow` toggle (not analysis-clock follow); current-step guide, safe ICD module flows, manual step tab navigation through `onOpenTab`; five original recovery events and source reconvergence duration; and VF-03 result JSON from the exact `runner.record()` object using the original serialization, MIME, filename expression, anchor lifecycle and one-second URL revocation. No scenario execution/plan/state calculation is added. Missing navigation is explicitly disabled, and a result without a verdict cannot download. Guide dismissal is local presentation state only.
+
+RED: new buttons/guide absent. GREEN: 3 new focused tests check byte-exact Blob JSON versus runner record, filename and cleanup, navigation/guide/event escaping, and separation of stage auto-follow from SIM analysis follow. Existing two-resolution workspace, explicit review, runner, KPI, transport and drain regressions: **24 passed**.
+
+Command: `node --test project_support/tests/browser/source_scenario_console_features.test.mjs project_support/tests/browser/source_scenario_review.test.mjs project_support/tests/browser/source_scenario_workspace.test.mjs project_support/tests/browser/scenario_runner.test.mjs project_support/tests/browser/scenario_kpi.test.mjs project_support/tests/browser/scenario_command_drain.test.mjs project_support/tests/browser/scenario_clock_transport.test.mjs`.
+
+Root owns actual navigation injection and browser checks. Blob tests are not evidence of a saved disk file, and do not extend the earlier T084 CSV/JSON browser-file proof to this newly exposed VF-03 record. Actual V6 source PoC execution/GPU acceptance remains separately recorded by the assembly owner.
+
+Persistent compact dock: outside run/composer/compare during an active source phase, a sibling of existing window-quick retains current-step guide, stage autoFollow and existing runner play/pause/return-run. Fixtures without that sibling API use screen prepend. No second runner, clock, Viewer or state owner. Added a dedicated tab-change/transport/dismiss/reopen/cleanup regression; mission and scenario focused suite 29 passed at this step. Existing V6 button/actions classes are reused.
+
+## Persistent dock original quick-control parity
+
+Readonly source/current audit found that the full V6 panel already exposed next-step, speed and results, but the outside-tab dock did not expose the original console shortcuts (`scenario/console.js` sd-skip/sd-speed/sd-result/sd-collapse). A meaningful RED asserted the absent next shortcut before the product change. The existing dock now delegates next to `runner.skipToNextStep`, uses the original scenario speed options with `runner.setSpeed`, opens the existing compare workspace for results, and supports collapsing its controls/guide while retaining its state header. Collapsed state is local presentation state only and persists across tabs; no runtime, selected object, clock or Viewer is added. Existing `.button`/`.actions` presentation is reused.
+
+Focused console/runner/KPI/two-resolution workspace command: 18 passed, 0 failed. The new console regression verifies calls on the same runner, exact speed choice, navigation to compare, collapse/expand across tabs and listener teardown. Actual browser dock rendering and newly saved record-file bytes remain parent acceptance work; the earlier T084 HTTP JSON/CSV byte proof does not establish this new VF-03 download.

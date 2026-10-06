@@ -1,7 +1,7 @@
 """Composition root: owns application instances, lifespan and web deployment."""
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -188,6 +188,8 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
 
     @app.get('/{full_path:path}', include_in_schema=False)
     async def frontend(full_path: str):
+        if full_path in ('api', 'static') or full_path.startswith(('api/', 'static/')):
+            raise HTTPException(status_code=404, detail='Not Found')
         return FileResponse(WEB_DIR / 'index.html')
 
     return app

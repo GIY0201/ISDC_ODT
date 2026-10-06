@@ -6,6 +6,8 @@ from digital_twin.simulation.orbit_geometry import teme_to_itrf,teme_positions_t
 
 def create_orbit_calculation(eop_provider):
     def calculate(orbit,utc,ground_point):
+        return calculate_rows(orbit,utc,ground_point)
+    def calculate_rows(orbit,utc,ground_point,details=False):
         # Import at use, so an unconfigured legacy app can still start without a wheel.
         try:
             from communication.native.orbit_adapter import propagate_instants
@@ -19,9 +21,18 @@ def create_orbit_calculation(eop_provider):
         native=propagate_instants(orbit,instants);indices,values=native.valid_rows()
         geometry=teme_to_itrf(values[:,:3],[instants[i] for i in indices],[points[i] for i in indices])
         angles=elevation_deg(geometry.position_m,ground_point)
+        if details:
+            from digital_twin.contracts.catalog_details import CatalogDetailSample,CatalogDetailCalculation
+            from digital_twin.simulation.catalog_details import catalog_detail_values
+            if any(point.snapshot_sha256!=eop_provider.eop_sha256 or point.leap_sha256!=eop_provider.leap_sha256 for point in points):raise ValueError('catalog detail EOP provenance mismatch')
+            detail_values=catalog_detail_values(geometry.position_m,values[:,3:])
+            valid={index:CatalogDetailSample(utc[index],tuple(float(v) for v in position),float(angle),None,geo,speed) for index,position,angle,(geo,speed) in zip(indices,geometry.position_m,angles,detail_values)}
+            rows=tuple(valid[i] if i in valid else CatalogDetailSample(t,None,None,native.errors[i]) for i,t in enumerate(utc))
+            return CatalogDetailCalculation(rows,eop_provider.eop_sha256,eop_provider.leap_sha256)
         valid={index:OrbitSample(utc[index],tuple(float(v) for v in position),float(angle),None) for index,position,angle in zip(indices,geometry.position_m,angles)}
         rows=tuple(valid[i] if i in valid else OrbitSample(t,None,None,native.errors[i]) for i,t in enumerate(utc))
         return OrbitCalculation(rows,eop_provider.eop_sha256,eop_provider.leap_sha256)
+    calculate.catalog_details=lambda orbit,utc,ground_point:calculate_rows(orbit,utc,ground_point,details=True)
     def evaluate_times(orbit,times,ground_point):
         try:
             from communication.native.orbit_adapter import propagate_times

@@ -1,6 +1,8 @@
-import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView} from './workspace_orbit.js?v=t151-r1';
+import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceContext,observeWorkspaceContext} from './workspace_orbit.js?v=t151-r1';
 (() => {
   const screen = document.getElementById('screen');
+  function applySharedContext(value=readWorkspaceContext()){const t=value.text;for(const [id,text] of Object.entries({'desktop-handoff':t.next,'desktop-handoff-state':t.status,'desktop-scene-credit':('NASA Blue Marble / Cesium WGS84 · '+t.satellite+' · '+t.clock+' · 모델 계산 / 실제 RF 미확인'),'clock':t.clock,'desktop-event':t.event,'desktop-data-utc':t.clock,'quick-sat':t.satellite,'quick-pass':t.next,'quick-event':t.event,'desktop-sat-name':t.satellite,'desktop-sat-status':t.status,'desktop-next':t.next,'context-id':t.contextId,'context-rel':t.contextRelated,'alert-text':t.alert})){const el=document.getElementById(id);if(el&&el.textContent!==text)el.textContent=text;}}
+  const stopSharedContext=observeWorkspaceContext(applySharedContext);window.addEventListener('pagehide',event=>{if(!event.persisted)stopSharedContext();});
   const groups = [
     ['공용', [['wall','공용 상황판'],['normal','정상 임무 흐름'],['initial','초기 운용 흐름'],['exception','장애·복구 흐름']]],
     ['운용자', [['mission','임무·결과'],['operations','지상 운용'],['satellite','위성 상태·궤도'],['ground','지상국·통신'],['data','데이터·산출물'],['security','보안·사고'],['facility','지상 IT·시설'],['em','EM·통합검증'],['settings','모듈 연결 설정']]],
@@ -99,6 +101,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView} from './worksp
     document.getElementById('context-id').textContent=v==='exception'?state.case:['initial','scene','composer','run','compare'].includes(v)?(state.scenario||'SCN-01'):v==='normal'?'M-204':v==='em'?'X-EM01':'E-014';
     document.getElementById('context-rel').textContent=['initial','scene','composer','run','compare'].includes(v)?`${state.orbit} / ${state.station} / 분리 +${state.insertion}분 · DT 연구`:v==='normal'?'SAT-B / D-731 / GS-02 / USER-02 · 정상 기준 예시':'SAT-A / M-204 / GS-02 / D-731';
     document.getElementById('alert-text').textContent=v==='exception'?`${state.case} ${cases[state.case][0]} · 독립 연구 가정, 실제 경보 아님`:['initial','scene','composer','run','compare'].includes(v)?'DT 가정 화면 · E-014 운용 사건/EM 상태와 동기화되지 않음':'E-014 링크 품질 저하 · 실제 경보·우선순위 판정 없음';
+    applySharedContext();
     if(!applyingRemote&&!awaitingInitial)syncChannel?.postMessage({type:'state',sender:windowId,state:{...state}});
   }
   const workWindow=document.getElementById('work-window'),launcher=document.getElementById('launcher'),nav=document.getElementById('nav'),shelf=document.getElementById('shelf-restore');

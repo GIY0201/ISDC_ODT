@@ -13,6 +13,28 @@ function fixture(){const collections=[],handlers=[],viewers=[],allocations={colo
 }
 const utc='2020-07-12T21:16:01.000416000Z';
 const scene=(n=16633)=>({frame:'ITRF',utc,scene_sha256:'a'.repeat(64),count:n,valid_count:n,error_count:0,rows:Array.from({length:n},(_,i)=>({catalog_number:i+1,name:'sat'+i,status:'valid',normalized_gp_sha256:'b'.repeat(64),epoch_utc:utc,orbit_regime:['LEO','MEO','GEO','HEO'][i%4],position_m:[7000000,i+1,0]}))});
+
+test('catalog label visibility survives native updates, selection changes and scene replacement without changing points',()=>{
+ const {globe,viewers}=fixture();globe.setCatalogLabels(false);globe.setCatalogScene(scene(2));
+ assert.ok([...globe.catalogLabels.values()].every(label=>label.show===false));
+ assert.ok([...globe.catalogPoints.values()].every(point=>point.show===true));
+ const selected={...scene(2).rows[0],frame:'ITRF',utc};globe.update(selected);
+ assert.equal(globe.entity.label.show,false);globe.setCatalogScene(scene(2));globe.clearSatellite();
+ assert.ok([...globe.catalogLabels.values()].every(label=>label.show===false));
+ globe.setCatalogLabels(true);assert.ok([...globe.catalogLabels.values()].every(label=>label.show===true));
+ globe.setCatalogLabels(false);globe.setCatalogScene({...scene(2),scene_sha256:'c'.repeat(64)});
+ assert.ok([...globe.catalogLabels.values()].every(label=>label.show===false));assert.equal(viewers.length,1);globe.destroy();
+});
+
+test('observer line uses exact native observation UTC and explicit virtual WGS84 point, then clears on stale or absent geometry',()=>{
+ const {globe}=fixture();globe.C.ArcType={NONE:'none'};globe.C.Cartesian3.fromDegrees=(longitude,latitude,height)=>({longitude,latitude,height});
+ const sample={frame:'ITRF',status:'valid',utc,observation_utc:utc,position_m:[7000000,1,2],ground_point:{virtual:true,ellipsoid:'WGS84',latitude_deg:36,longitude_deg:127,ellipsoid_height_m:80},observed_elevation_deg:20,minimum_elevation_deg:10,visible:true};
+ assert.equal(globe.setCatalogObservationLine(sample),true);assert.deepEqual(globe.observationLine.polyline.positions[0],{longitude:127,latitude:36,height:80});
+ assert.equal(globe.setCatalogObservationLine({...sample,observation_utc:'2020-07-12T21:16:00Z'}),false);assert.equal(globe.observationLine,null);
+ assert.equal(globe.setCatalogObservationLine({...sample,visible:false}),false);
+ assert.equal(globe.setCatalogObservationLine({...sample,observed_elevation_deg:0,visible:false}),true);
+ globe.clearSatellite();assert.equal(globe.observationLine,null);globe.destroy();
+});
 test('native node picking shares one handler, requires owned primitive, and never becomes a catalog selection',()=>{
  const {globe,handlers}=fixture(),selected=[],hover=[],catalog=[],primitive={show:true};globe.C.ScreenSpaceEventType.MOUSE_MOVE=2;
  globe.setCatalogScene(scene(2),id=>catalog.push(id));

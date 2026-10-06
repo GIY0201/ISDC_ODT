@@ -1,5 +1,6 @@
 """Native-backed source interval scanning, with explicit sampled coverage and failures."""
 from copy import deepcopy
+from functools import lru_cache
 from uuid import uuid4
 from astropy.time import TimeDelta
 from foundation.orbit_time import parse_utc,format_utc_batch
@@ -31,10 +32,14 @@ class NativeMissionWindows:
         hashes={p.node_id:p.definition_hash for p in prepared}
         metadata={'model_profile':NODE_PROFILE,'frame':NODE_FRAME,'inertial_frame':NODE_INERTIAL_FRAME,
                   'time_model':NODE_TIME_MODEL,'source_commit':SOURCE_COMMIT,'quality':'engineering_assumption'}
+        # Pure UTC formatting only, bounded to this invocation; native rows and
+        # source grid/peak/boundary decisions are never cached or skipped.
+        stamp_origin=first.as_time()
+        @lru_cache(maxsize=8192)
         def stamp(offset):
             if offset==0:return first.iso_utc
             if offset==duration:return last.iso_utc
-            return (first.as_time()+TimeDelta(offset,format='sec')).utc.isot+'Z'
+            return (stamp_origin+TimeDelta(offset,format='sec')).utc.isot+'Z'
         async def read(indices,offsets):
             nonlocal sequence
             sequence+=1;request_id='mission-window-'+token+':'+str(sequence)
@@ -48,7 +53,7 @@ class NativeMissionWindows:
                     raise RuntimeError('required native eclipse sample unavailable')
                 states.append([not row['sunlit'] for row in node_rows])
             return states
-        windows=await scan_native_intervals(read,len(captured),duration,step_seconds,refine_seconds,self.max_windows)
+        windows=await scan_native_intervals(read,len(captured),duration,step_seconds,refine_seconds,self.max_windows,stamp=stamp)
         result=[]
         for item in windows:
             identity=captured[item['index']]['id'];start=stamp(item['start']);end=stamp(item['end'])
@@ -82,11 +87,11 @@ def validate_native_window_points(report,nodes,times,request_id,hashes):
     return rows
 
 
-async def scan_native_intervals(read,node_count,duration,step_seconds,refine_seconds,max_windows):
+async def scan_native_intervals(read,node_count,duration,step_seconds,refine_seconds,max_windows,*,stamp=None):
     """Source interval scan over injected required native predicates; invocation-local only."""
     windows=[];edges=[];active=[None]*node_count;previous=[None]*node_count
     offsets=[float(i*step_seconds) for i in range(int(duration//step_seconds)+1)]
-    if offsets[-1]<duration:offsets.append(duration)
+    if offsets[-1]<duration and (stamp is None or stamp(offsets[-1])!=stamp(duration)):offsets.append(duration)
     else:offsets[-1]=duration
     chunk=min(MAX_NODE_SAMPLES,MAX_NODE_ROWS//node_count)
     for begin in range(0,len(offsets),chunk):

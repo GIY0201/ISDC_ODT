@@ -1,20 +1,23 @@
 /** Explicit whole-group query controls; copied drafts never execute requests. */
-export function createCatalogScenePanel(controller,getTimeline=()=>null){
+export function createCatalogScenePanel(controller,getTimeline=()=>null,hooks={}){
  let view,follow=true,dirty=false,draft=new Date().toISOString();
  const visible=()=>view==='satellite';
  function draw(){
   if(!visible())return;let panel=document.getElementById('catalog-scene');
   if(!panel){panel=document.createElement('section');panel.id='catalog-scene';panel.className='panel';document.getElementById('screen').prepend(panel);
-   panel.innerHTML='<header><h2>전체 위성 지구 표시</h2></header><div class="body"><p>적용된 카탈로그 검색 결과 전체를 Rust로 계산합니다. 목록의 100개 페이지와 지구 표시 개수는 별개입니다. GP 모델이며 실측이 아닙니다.</p><label>조회 UTC <input id="scene-utc" type="text"></label> <label><input id="scene-follow" type="checkbox" checked> 선택 위성의 시간 탐색 UTC 따라가기</label><br><button id="scene-load" class="button">전체 위성 계산·표시</button> <button id="scene-clear" class="button">전체 표시 해제</button><p id="scene-status" role="status"></p><p id="scene-context"></p><p id="scene-source"></p><details><summary>전체 위치 자료의 SHA-256</summary><pre id="scene-hashes"></pre></details></div>';
+   panel.innerHTML='<header><h2>전체 위성 지구 표시</h2></header><div class="body"><p>적용된 카탈로그 검색 결과 전체를 Rust로 계산합니다. 목록의 100개 페이지와 지구 표시 개수는 별개입니다. GP 모델이며 실측이 아닙니다.</p><label>조회 UTC <input id="scene-utc" type="text"></label> <label><input id="scene-follow" type="checkbox" checked> 선택 위성의 시간 탐색 UTC 따라가기</label><br><button id="scene-load" class="button">전체 위성 계산·표시</button> <button id="scene-clear" class="button">전체 표시 해제</button><label><input id="scene-labels" type="checkbox"> 위성 이름 표시 (선택 GP·전체 카탈로그)</label><p id="scene-label-status"></p><p id="scene-status" role="status"></p><p id="scene-context"></p><p id="scene-source"></p><details><summary>전체 위치 자료의 SHA-256</summary><pre id="scene-hashes"></pre></details></div>';
    const node=id=>panel.querySelector('#'+id);
    node('scene-utc').value=draft;node('scene-follow').checked=follow;
    node('scene-utc').addEventListener('input',e=>{draft=e.target.value;dirty=true;});
    node('scene-follow').addEventListener('change',e=>{follow=e.target.checked;draw();});
    node('scene-load').addEventListener('click',()=>controller.load(follow&&getTimeline()?.utc||draft));
    node('scene-clear').addEventListener('click',()=>controller.clear());
+   node('scene-labels').addEventListener('change',e=>{hooks.setLabelsVisible?.(e.target.checked);draw();});
   }
   const node=id=>panel.querySelector('#'+id),s=controller.snapshot(),r=s.result;
   if(!dirty&&s.desiredUtc){draft=s.desiredUtc;node('scene-utc').value=draft;}
+  const labels=hooks.labelsVisible?.();node('scene-labels').checked=labels===true;node('scene-labels').disabled=typeof labels!=='boolean'||typeof hooks.setLabelsVisible!=='function';
+  node('scene-label-status').textContent=typeof labels==='boolean'?`위성 이름 ${labels?'표시':'숨김'} · 지상국·노드 이름은 별도입니다. 대량 카탈로그는 성능 보호 기준에 따라 이름 표시가 제한됩니다.`:'위성 이름 표시 제어 미연결';
   node('scene-follow').checked=follow;
   node('scene-follow').value=String(follow);
   node('scene-load').disabled=s.pending||!s.context;

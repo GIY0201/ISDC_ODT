@@ -121,6 +121,19 @@ test('stale links hide and freeze flow; new matching snapshot reuses material; m
  const fresh=linkSnapshot();fresh.utc=f.scene.timeSource();f.scene.setLinks(fresh);assert.equal(line.show,true);assert.equal(line.material,material);
  f.morph=true;f.scene.syncFrame(f.scene.timeSource(),6000);assert.equal(line.show,false);f.morph=false;f.scene.syncFrame(f.scene.timeSource(),7000);assert.equal(line.show,true);assert.equal(material.uniforms.time,7000/1000*1.4);f.scene.destroy();
 });
+test('each syncFrame reuses only its exact native poses for points, models and repeated link endpoints',async()=>{
+ const calls=[];const f=fixture({geometry:g=>{calls.push([g.node_id,g.row.utc]);return g;},verifyLinkSnapshot:()=>true});await f.scene.setNodes(entries());f.scene.setLinks(linkSnapshot());calls.length=0;
+ f.scene.syncFrame(utc,3000);assert.equal(calls.length,4,'two nodes/current plus forward native orientation sample');assert.equal(new Set(calls.map(c=>JSON.stringify(c))).size,4);const positions=plain(f.scene.links.get('pair').line.positions);
+ calls.length=0;f.scene.syncFrame(utc,3016);assert.equal(calls.length,4,'next frame verifies fresh native poses');assert.deepEqual(plain(f.scene.links.get('pair').line.positions),positions);
+ f.display=codec.advance(utc,1);calls.length=0;f.scene.syncFrame(f.scene.timeSource(),3032);assert.equal(calls.length,4);assert.equal(calls[0][1],f.scene.timeSource());assert.equal(f.scene.links.get('pair').line.show,false);f.scene.destroy();
+});
+test('time, definition scope, morph, viewer or destruction change in a geometry callback cannot publish a mixed frame',async()=>{
+ for(const change of ['time','scope','morph','viewer','destroy']){
+  let armed=false,count=0;const f=fixture({geometry:g=>{if(armed&&++count===2){if(change==='time')f.display=codec.advance(utc,1);else if(change==='scope')void f.scene.setNodes([{...entries(1)[0],definition:{...definition('1'),name:'changed'}}]);else if(change==='morph')f.morph=true;else if(change==='viewer')f.scene.viewerProvider={scene:{primitives:new Collection(),mode:3}};else f.scene.destroy();}return g;},verifyLinkSnapshot:()=>true});
+  await f.scene.setNodes(entries());f.scene.setLinks(linkSnapshot());armed=true;f.scene.syncFrame(utc,3000);
+  assert.ok([...f.scene.points.values()].every(p=>p.show===false),change+' markers');assert.ok([...f.scene.models.values()].every(m=>m.model.show===false),change+' models');assert.ok([...f.scene.links.values()].every(l=>l.line.show===false),change+' links');assert.equal(f.scene.frameMemo,null);f.scene.destroy();
+ }
+});
 test('copied verified receipts cannot be mutated by caller or verifier; edited scope invalidates immediately',async()=>{
  const f=fixture({verifyLinkSnapshot:(candidate,context)=>{candidate.pairs[0].state='blocked';context.nodes[0].orbit.altitude_km=999;return true;}});await f.scene.setNodes(entries());const receipt=linkSnapshot();assert.equal(f.scene.setLinks(receipt),true);receipt.pairs[0].state='blocked';f.scene.syncFrame(utc);assert.equal(f.scene.links.get('pair').line.show,true);
  const changed=entries();changed[0].definition.orbit.altitude_km=600;await f.scene.setNodes(changed);assert.equal(f.scene.links.size,0);f.scene.destroy();

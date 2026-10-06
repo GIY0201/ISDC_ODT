@@ -1,15 +1,21 @@
+import {createAnalysisTransport} from '../scenario/analysis_transport.js';
 import {LEAP_SHA256} from '../orbit_utc.js';
 
 // Commands target the existing displayed owner. This adapter neither advances a clock nor owns UTC.
-export function createNodeClockControls({readContext,stored,catalog,advanceUtc,now,runStored=work=>work(),scenario=null}={}){
+export function createNodeClockControls({readContext,stored,catalog,advanceUtc,now,runStored=work=>work(),scenario=null,follow=null}={}){
  if([readContext,advanceUtc,now,runStored].some(value=>typeof value!=='function')||!stored||!catalog)throw new TypeError('explicit node clock owners required');
+ const transport=createAnalysisTransport({follow});
  const speeds=Object.freeze([.1,1,10,60]);let dead=false;
  function owner(context){
   if(dead||!context||context.leap_sha256!==LEAP_SHA256)return null;
   try{if(advanceUtc(context.utc,0)!==context.utc)return null;}catch{return null;}
   if(context.key?.startsWith('sim:')){
    if(context.source!=='sim'||context.eop_sha256!==null||typeof scenario?.readRuntime!=='function'||typeof scenario?.utcOfRuntime!=='function')return null;
-   try{const s=scenario.readRuntime();if(!s||typeof s.run_id!=='string'||!s.run_id||context.key!==`sim:${s.run_id}`||s.running!==false||!Number.isFinite(s.speed)||s.speed<=0||scenario.utcOfRuntime(s)!==context.utc)return null;return{kind:'sim',state:structuredClone(s)};}catch{return null;}
+   try{const s=scenario.readRuntime();if(!s||typeof s.run_id!=='string'||!s.run_id||context.key!==`sim:${s.run_id}`||!Number.isFinite(s.speed)||s.speed<=0)return null;
+    if(s.running===false){if(context.projected===true||scenario.utcOfRuntime(s)!==context.utc)return null;}
+    else if(s.running===true){const age=context.projection_age_ms,delta=Date.parse(context.utc)-Date.parse(scenario.utcOfRuntime(s));if(context.projected!==true||context.runtime_sequence!==s.sequence||context.runtime_elapsed_seconds!==s.elapsed_seconds||context.frame!=='EARTH_FIXED_GMST_UTC_APPROX'||context.quality!=='engineering_assumption'||!Number.isFinite(age)||age<0||age>3500||!Number.isFinite(delta)||Math.abs(delta-age*s.speed)>2)return null;}
+    else return null;
+    return{kind:'sim',state:structuredClone(s)};}catch{return null;}
   }
   if(context.key?.startsWith('stored:')){
    const snapshot=stored.snapshot(),s=snapshot.state;
@@ -27,6 +33,7 @@ export function createNodeClockControls({readContext,stored,catalog,advanceUtc,n
  function current(){const context=readContext(),target=owner(context);if(!target)throw unavailable();return{context:structuredClone(context),...target};}
  async function control(action,rate){
   const target=current();
+  if(target.kind!=='sim'&&transport.locked())return transport.run(action,...(action==='speed'?[rate]:[]));
   if(target.kind==='sim'){const controls=scenario?.controls,command=action==='speed'?controls?.setSpeed:controls?.[action];if(typeof command!=='function')throw new Error('명시적인 SIM 소유자 제어가 없습니다.');if(action==='speed'&&(!Number.isFinite(rate)||rate<=0))throw new Error('유효한 SIM 배속이 필요합니다.');return action==='speed'?command.call(controls,rate):command.call(controls);}
   if(action==='speed'&&!speeds.includes(rate))throw new Error('지원하는 기존 분석 배속을 선택하세요.');
   if(target.kind==='stored')return runStored(()=>stored.control(action,...(action==='speed'?[rate]:[])));
@@ -41,12 +48,12 @@ export function createNodeClockControls({readContext,stored,catalog,advanceUtc,n
   catalog.seek(canonical);return catalog.calculate();
  }
  return Object.freeze({
-  read(context){const target=owner(context);if(!target)return{};const s=target.state;
-   if(target.kind==='sim')return{mode:'SIM',running:false,speed:s.speed,speeds:Array.isArray(scenario?.controls?.speeds)?[...scenario.controls.speeds]:[]};
+  read(context){const target=owner(context);if(!target)return{};const s=target.state;const followed=transport.source();if(target.kind!=='sim'&&followed)return{mode:'SIM 따라가기',running:followed.running===true,speed:followed.speed,speeds:[]};
+   if(target.kind==='sim')return{mode:'SIM',running:s.running,speed:s.speed,speeds:Array.isArray(scenario?.controls?.speeds)?[...scenario.controls.speeds]:[]};
    return{mode:target.kind==='stored'?'저장 궤도':'카탈로그',...(target.kind==='stored'||s.buffer||s.playing?{running:s.playing}:{}),speed:target.kind==='stored'?s.play_rate:s.rate,speeds:[...speeds]};},
   actions:Object.freeze({play:()=>control('play'),pause:()=>control('pause'),setSpeed:value=>control('speed',value),
-   step:async seconds=>{const target=current();if(!Number.isFinite(seconds))throw new Error('유한한 UTC 이동 간격이 필요합니다.');return seek(target,advanceUtc(target.context.utc,seconds));},
-   live:async()=>{const target=current(),value=now();if(!Number.isFinite(value))throw new Error('명시적인 현재 시각이 필요합니다.');return seek(target,new Date(value).toISOString());},
+   step:async seconds=>{const target=current();if(!Number.isFinite(seconds))throw new Error('유한한 UTC 이동 간격이 필요합니다.');if(target.kind!=='sim'&&transport.locked())return transport.run('step',seconds);if(target.kind==='sim'&&typeof scenario?.controls?.step==='function')return scenario.controls.step(seconds);return seek(target,advanceUtc(target.context.utc,seconds));},
+   live:async()=>{const target=current();if(target.kind!=='sim'&&transport.locked())return transport.run('live');const value=now();if(!Number.isFinite(value))throw new Error('명시적인 현재 시각이 필요합니다.');return seek(target,new Date(value).toISOString());},
   }),
   destroy(){dead=true;},
  });

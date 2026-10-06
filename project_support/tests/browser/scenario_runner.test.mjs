@@ -267,3 +267,26 @@ test('ticks requested while one runs are coalesced into a single follow-up tick'
   assert.equal(ticks - before, 2, 'one running tick plus one coalesced follow-up');
   h.runner.stop();
 });
+
+test('completed fault synchronization retains immutable checks after actual recovery context changes',async t=>{
+ const h=harness();t.after(()=>h.runner.suspend());await h.runner.select('SDC_POC_01');await h.runner.setup();await h.runner.play();
+ await h.advance(21);await h.advance(5);assert.equal(h.runner.view().steps[2].checkResults[0].ok,true);
+ assert.equal(h.runner.view().steps[2].checkSource,'current');
+ await h.advance(6);h.runtime.active_faults=[];h.state.cleared=true;await h.advance(500);
+ const sync=h.runner.view().steps[2];assert.equal(sync.status,'done');assert.equal(sync.checkSource,'completed');assert.equal(sync.checkResults[0].ok,true);
+ sync.checkResults[0].ok=false;assert.equal(h.runner.view().steps[2].checkResults[0].ok,true);
+ const restored=harness({storage:h.storage});assert.equal(await restored.runner.restore(),true);assert.equal(restored.runner.view().steps[2].checkSource,'completed');assert.equal(restored.runner.view().steps[2].checkResults[0].ok,true);
+ const legacy=JSON.parse(h.storage.getItem(STORAGE_KEY));for(const record of Object.values(legacy.steps))delete record.completedEvidence;
+ h.storage.setItem(STORAGE_KEY,JSON.stringify(legacy));const old=harness({storage:h.storage});await old.runner.restore();assert.equal(old.runner.view().steps[2].checkSource,'legacy_current');
+ h.runner.suspend();restored.runner.suspend();old.runner.suspend();
+});
+
+test('failed completion evidence remains visibly historical after recovery',async t=>{
+ const h=harness();t.after(()=>h.runner.suspend());await h.runner.select('SDC_POC_01');await h.runner.setup();await h.runner.play();
+ await h.advance(21);await h.advance(5);await h.advance(6);
+ const saved=JSON.parse(h.storage.getItem(STORAGE_KEY));saved.steps.sync.completedEvidence.checks[0].ok=false;h.storage.setItem(STORAGE_KEY,JSON.stringify(saved));
+ const restored=harness({storage:h.storage});await restored.runner.restore();const step=restored.runner.view().steps[2];assert.equal(step.checkSource,'failed_completed');assert.equal(typeof step.checksCapturedAt,'number');assert.equal(step.checkResults[0].ok,false);assert.equal(restored.runner.state.steps.sync.completedEvidence.checks[0].ok,false);
+ restored.runner.suspend();
+});
+
+test('historical completion keeps absolute timestamp separate from explicit elapsed and legacy missing elapsed stays unknown',async()=>{const h=harness();await h.runner.select('SDC_POC_01');await h.runner.setup();await h.runner.play();for(let i=0;i<5&&h.runner.state.phase!=='finished';i++)await h.runner.skipToNextStep();const step=h.runner.view().steps.find(s=>s.checkSource==='completed');assert.ok(step);assert.ok(step.checksCapturedAt>T0-1);assert.ok(step.checksCapturedElapsed>=0&&step.checksCapturedElapsed<36000);h.runner.suspend();const saved=JSON.parse(h.storage.getItem(STORAGE_KEY));delete saved.steps[step.id].completedEvidence.elapsed;h.storage.setItem(STORAGE_KEY,JSON.stringify(saved));const restored=harness({storage:h.storage});await restored.runner.restore();const legacy=restored.runner.view().steps.find(s=>s.id===step.id);assert.equal(legacy.checkSource,'legacy_current');assert.equal(legacy.checksCapturedElapsed,null);restored.runner.stop();});

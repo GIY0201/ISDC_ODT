@@ -15,6 +15,7 @@ function copy(value){
   });
   return JSON.parse(encoded);
 }
+function canonical(value){return JSON.stringify(value,(_,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.keys(item).sort().map(key=>[key,item[key]])):item);}
 function strip(node){const {updated_at,...rest}=node;return rest;}
 
 export function createConstellationStore({library,storage=null,now,verifyAcceptance=null}={}){
@@ -65,7 +66,15 @@ export function createConstellationStore({library,storage=null,now,verifyAccepta
       if(!value||value.schema!==1||!Array.isArray(value.nodes)||value.nodes.length>MAX_NODES)throw new Error();
       const revision=value.revision??0;
       if(!Number.isSafeInteger(revision)||revision<0)throw new Error();
-      const normalized=value.nodes.map(node=>library.normalizeNode(node,epoch));
+      const normalized=value.nodes.map(node=>{
+        const restored=library.normalizeNode(node,epoch);
+        if(restored&&Object.hasOwn(node,'role')){
+          const role=node.role;
+          if(!role||typeof role!=='object'||Array.isArray(role)||Object.keys(role).some(key=>!['key','label'].includes(key))||typeof role.key!=='string'||!role.key||role.key.length>80||typeof role.label!=='string'||!role.label||role.label.length>160)throw new Error();
+          restored.role=copy(role);
+        }
+        return restored;
+      });
       if(normalized.some(node=>node===null))throw new Error();
       const nodes=validate(normalized);
       if(kind==='draft'){
@@ -153,10 +162,11 @@ export function createConstellationStore({library,storage=null,now,verifyAccepta
     const drafts=firstIndex<0?[...others,...owned]:[...others.slice(0,firstIndex),...owned,...others.slice(firstIndex)];
     commit({...state,drafts,selectedId:drafts.some(n=>n.id===state.selectedId)?state.selectedId:owned[0]?.id??drafts[0]?.id??null},'update');return copy(owned);
   }
-  function deploy(nodes=state.drafts,receipt=null){
+  function deploy(nodes=state.drafts,receipt=null,{restore=false}={}){
     ready();const owned=validate(nodes);
-    if(typeof verifyAcceptance!=='function'||verifyAcceptance(copy(owned),copy(receipt),'deploy')!==true)throw fail('unconfirmed_deployment','서버 수락 검증이 필요합니다.');
-    commit({...state,deployed:owned,deployedAt:new Date(time()).toISOString(),receipt:copy(receipt)},'deploy','live',true);return copy(owned);
+    if(restore&&(isDirty()||canonical(owned)!==canonical(state.deployed)||canonical(receipt)!==canonical(state.receipt)))throw fail('unconfirmed_deployment','저장 배치와 현재 초안이 달라 재확인할 수 없습니다.');
+    if(typeof verifyAcceptance!=='function'||verifyAcceptance(copy(owned),copy(receipt),restore?'restore':'deploy')!==true)throw fail('unconfirmed_deployment','서버 수락 검증이 필요합니다.');
+    commit({...state,deployed:owned,deployedAt:restore?state.deployedAt:new Date(time()).toISOString(),receipt:copy(receipt)},'deploy','live',true);return copy(owned);
   }
   function recall(receipt=null){
     ready();if(typeof verifyAcceptance!=='function'||verifyAcceptance([],copy(receipt),'recall')!==true)throw fail('unconfirmed_deployment','서버 수락 검증이 필요합니다.');

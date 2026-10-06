@@ -9,15 +9,18 @@ import {createNodeEditorTools} from './nodes/editor.js';
 import {createUtcCodec,LEAP_SHA256} from './orbit_utc.js';
 
 // Application composition only. Native buffers, source store and shared globe retain ownership.
-export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now,resolveModel,models,fetchImpl,clockActions={},readClock=()=>({}),onHover=()=>{},networkInputs=null,scenarioClock=null}={}){
+export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements,catalogElements,oisl,Scene,NetworkScene=null,tools,document,host,now,resolveModel,models,fetchImpl,clockActions={},readClock=()=>({}),onHover=()=>{},networkInputs=null,scenarioClock=null}={}){
  const codec=createUtcCodec(LEAP_SHA256),advanceUtc=codec.advance;
  let dead=false,started=false,root=null,panel=null,scene=null,display=null,deployment=null,activeSelection=false,selectedSignature=null,definitionsSignature=null,error='';
+ let networkScene=null,networkSceneInput=null,groundLinksVisible=true,coverageVisible=true;
  let tracks=true,links=true,modelsVisible=true;const readiness=new Map(),removers=[];
  let restorePromise=null,scenarioReceipt=null;
+ let applyingSelectedPose=false;
  let reviewedRevision=null;
  const id=()=>createBrowserId(host.crypto);
  const report=value=>{if(dead)return;error=String(value?.message??value);refreshPanel();};
- const readDisplay=()=>({...readClock(display),utc:display?.utc??null});
+ const projectedSim=value=>value?.source==='sim'&&value.projected===true;
+ const readDisplay=()=>{if(projectedSim(display))throw Error('보간 SIM 표시는 실제 native 통신 입력이 아닙니다. SIM을 정지하여 검증하세요.');return {...readClock(display),utc:display?.utc??null};};
  let storage=null;const storagePort={getItem:key=>host.localStorage.getItem(key),setItem:(key,value)=>host.localStorage.setItem(key,value)};
  try{if(host.localStorage)storage=storagePort;}catch{storage=storagePort;}
  const store=createConstellationStore({library,storage,now,verifyAcceptance:(...args)=>deployment?.verifyAcceptance(...args)===true});
@@ -37,11 +40,20 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   if(dead||!activeSelection)return;
   const node=store.selected,geometry=node&&display?.utc?geometryFor(node,{utc:display.utc}):null;
   if(!node||!geometry||geometry.row?.status!=='valid'){
-   if(selectedSignature!==null){selectedSignature=null;globe.clearSatelliteModel();}return;
+   if(selectedSignature!==null){selectedSignature=null;applyingSelectedPose=true;try{globe.clearSatelliteModel();}finally{applyingSelectedPose=false;}}return;
   }
   const match=modelFor(node),description={...match,url:modelsVisible?match?.url:null,pose_source:{kind:'source_node',node_definition:node,definition_hash:geometry.definition_hash}};
   const signature=JSON.stringify(description);if(signature===selectedSignature)return;selectedSignature=signature;
-  globe.setSatelliteModel(description,{timeSource:()=>display?.utc??null,advanceUtc,sampleAt:utc=>{const current=store.selected;return current&&JSON.stringify(current)===JSON.stringify(node)?geometryFor(current,{utc}):null;}});
+  applyingSelectedPose=true;try{globe.setSatelliteModel(description,{timeSource:()=>display?.utc??null,advanceUtc,sampleAt:utc=>{const current=store.selected;return current&&JSON.stringify(current)===JSON.stringify(node)?geometryFor(current,{utc}):null;}});}finally{applyingSelectedPose=false;}
+  networkInputs?.onChange?.();
+ }
+ // Explicit node-selection intent is not an alternative selection authority.
+ // Current target identity is read from the existing shared model owner.
+ function selection(){
+  if(dead||!activeSelection||!display?.utc||typeof globe.modelState!=='function')return null;
+  const selected=globe.modelState().selected,node=store.selected,geometry=node&&geometryFor(node,{utc:display.utc});
+  if(!node||selected?.node_id!==node.id||selected.definition_hash!==geometry?.definition_hash||geometry?.row?.status!=='valid'||geometry.row.error_code!==null)return null;
+  return {domain:'source_node',id:node.id,definition_hash:geometry.definition_hash,utc:display.utc};
  }
  function select(){if(dead)return;if(!activeSelection)globe.clearSatelliteModel();activeSelection=true;scene?.select(store.selectedId);refreshPose();refreshPanel();}
  async function focus(){
@@ -83,19 +95,29 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  deployment=createDataDeployment({constellation:store,fetchImpl,createId:id,setTimer:host.setTimeout.bind(host),clearTimer:host.clearTimeout.bind(host),onChange:refreshPanel});
  const removeStore=store.subscribe(()=>syncDefinitions());
  const removeDisplay=globe.observeDisplayContext(value=>{
-  if(dead)return;const previousUtc=display?.utc??null;display=value?structuredClone(value):null;
+  if(dead)return;const previousUtc=display?.utc??null,wasProjected=projectedSim(display);display=value?structuredClone(value):null;
   if(previousUtc!==(display?.utc??null))network?.clear();
-  if(display?.utc){void timeline.observe(display.utc);void optical.update();}else{timeline.clear();optical.resetHistories();}
+  if(display?.utc){void timeline.observe(display.utc);if(projectedSim(display)){if(!wasProjected)optical.resetHistories();}else void optical.update();}else{timeline.clear();optical.resetHistories();}
   refreshPose();refreshPanel();
  });
  const removeRenderer=globe.bindNodeRenderer((cesium,viewer)=>{
   scene=new Scene({cesium,viewer,timeSource:()=>display?.utc??null,advanceUtc,geometryFor,pathFor:timeline.pathFor,pathRevisionFor:timeline.pathRevisionFor,tracksVisible:()=>tracks,palette:theme=>globe.palette?.(theme)??{},isTransitioning:()=>globe.viewState?.().mode.phase!=='ready',verifyLinkSnapshot:optical.verifyLinkSnapshot,onStatus:value=>{if(dead)return;readiness.set(value.node_id,structuredClone(value));refreshPanel();}});
-  scene.setTheme(globe.viewState?.().choice.theme??'dark');refreshModels();return scene;
+  scene.setTheme(globe.viewState?.().choice.theme??'dark');refreshModels();
+  if(!NetworkScene||!network)return scene;
+  const nodeRenderer=scene,groundRenderer=networkScene=new NetworkScene({cesium,viewer,timeSource:()=>display?.utc??null,geometryFor,verifyNetworkSnapshot:value=>!dead&&network.verifySnapshot(value),readFabricState:()=>networkInputs.readFabricState?.(),coverageRadiusKm:station=>networkInputs.coverageRadiusKm?.(station,networkSceneInput?.snapshot?.node_definitions??[])??0,isTransitioning:()=>globe.viewState?.().mode.phase!=='ready'});
+  groundRenderer.setGroundLinksVisible(groundLinksVisible);groundRenderer.setCoverageVisible(coverageVisible);if(networkSceneInput)groundRenderer.setSnapshot(networkSceneInput);
+  return {syncFrame(...args){nodeRenderer.syncFrame(...args);groundRenderer.syncFrame(...args);},destroy(){try{groundRenderer.destroy();}finally{nodeRenderer.destroy();if(networkScene===groundRenderer)networkScene=null;}}};
  });
  const removeStatus=globe.observeNodeRenderer(refreshPanel);
  const removeView=globe.observeView?.(value=>{if(dead)return;scene?.setTheme(value.choice.theme);scene?.update(display?.utc??null);panel?.refreshScene?.();})??(()=>{});
  const removeLighting=solar?.observe(()=>{if(!dead)panel?.refreshScene?.();})??(()=>{});
  const removeCamera=globe.observeCamera?.(()=>{if(!dead)panel?.refreshScene?.();})??(()=>{});
+ const removeModel=globe.observeModel?.(value=>{
+  if(dead||applyingSelectedPose||!activeSelection)return;
+  // A GP selection or an explicit model clear releases node selection. Late
+  // native/model/definition notifications must not overwrite that newer owner.
+  if(value?.selected?.node_id!==store.selectedId){activeSelection=false;selectedSignature=null;scene?.select(null);refreshPanel();networkInputs?.onChange?.();}
+ })??(()=>{});
  function pickGeometry(id){
   if(dead||!started||!display?.utc||globe.nodeRendererState().phase!=='ready')return null;
   const node=store.find(id),geometry=node&&geometryFor(node,{utc:display.utc});return geometry?.row?.status==='valid'&&geometry.row.error_code===null?geometry:null;
@@ -163,10 +185,11 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   if(utc!==simUtc())throw Error('요청 UTC가 현재 실제 SIM UTC와 다릅니다.');
   if(!store.deploymentConfirmed||store.deployed.length===0||store.isDirty()||deployment.state.server.run_id!==runtime.run_id)throw Error('현재 SIM 실행의 수락 배치 roster를 먼저 확인하세요.');
   const definitions=store.deployed,scope=JSON.stringify(definitions),accepted=JSON.stringify(deployment.state.server);
+  const exactRequest=timeline.requestCommunicationStates(utc);void exactRequest.catch(()=>{});
   if(await scenarioClock.setDisplayUtc({run_id:runtime.run_id,utc,leap_sha256:LEAP_SHA256})!==true)throw Error('공용 SIM 표시 UTC가 수락되지 않았습니다.');
   const authoritative=typeof globe.displayContext==='function'?globe.displayContext():display;
   if(authoritative?.key!=='sim:'+runtime.run_id||authoritative.utc!==utc)throw Error('공용 표시 owner가 현재 SIM UTC와 일치하지 않습니다.');
-  await timeline.observe(utc);const result=await timeline.requestCommunicationStates(utc);
+  const result=await exactRequest;
   if(dead||scenarioClock.readRuntime().running!==false||simUtc()!==utc||JSON.stringify(store.deployed)!==scope||JSON.stringify(deployment.state.server)!==accepted||JSON.stringify(result.node_definitions)!==scope||result.states.length!==definitions.length||result.states.some(([nodeId,state],i)=>nodeId!==definitions[i].id||!isNodeCommunicationState(state,{node:definitions[i],utc})))throw Error('native SIM 입력 수락 중 UTC 또는 배치 정의가 바뀌었습니다.');
   await optical.update();
   scenarioReceipt=structuredClone({run_id:runtime.run_id,utc,nodes:definitions,deployment:deployment.state.server,states:result.states});
@@ -179,7 +202,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  return Object.freeze({
   async start(){if(dead||started)return;started=true;return retryRestore();},retryRestore,
   scenarioPorts:()=>scenarioPorts,
-  show,refresh:refreshPanel,refreshModels,sceneSnapshot,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
+  show,refresh:refreshPanel,refreshModels,sceneSnapshot,selection,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
   missionInputs(){
    const state=deployment.state;
    if(dead||!started||!store.loaded||!store.deploymentConfirmed||store.deployed.length===0||store.error||state.server===null||state.syncRequired||state.busy||store.isDirty())throw Error('위성 설정을 불러오고 현재 초안을 서버에 배치하세요.');
@@ -189,10 +212,14 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   },
   updateMissionLinks:()=>dead?Promise.reject(Error('위성 작업 창이 종료되었습니다.')):optical.update(),
   verifyMissionLinks:(...args)=>!dead&&optical.verifyLinkSnapshot(...args)===true,
+  setNetworkScene:value=>{if(dead)return false;networkSceneInput=value?structuredClone(value):null;return networkScene?.setSnapshot(networkSceneInput??{})??false;},
+  setGroundLinksVisible:value=>{if(dead)return;groundLinksVisible=Boolean(value);networkScene?.setGroundLinksVisible(groundLinksVisible);},
+  setCoverageVisible:value=>{if(dead)return;coverageVisible=Boolean(value);networkScene?.setCoverageVisible(coverageVisible);},
+  clearNetworkScene:()=>{networkSceneInput=null;networkScene?.clear();},
   updateNetwork:()=>dead?Promise.resolve(null):network?.update()??Promise.resolve(null),
   networkSnapshot:()=>dead?null:network?.snapshot()??null,
   verifyNetworkSnapshot:value=>!dead&&network?.verifySnapshot(value)===true,
   clearNetwork:()=>{if(!dead)network?.clear();},
-  destroy(){if(dead)return;dead=true;scenarioReceipt=null;try{onHover(null);}catch{/* Scoped presentation cleanup. */}for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();network?.destroy();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
+  destroy(){if(dead)return;dead=true;scenarioReceipt=null;try{onHover(null);}catch{/* Scoped presentation cleanup. */}for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeModel();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();network?.destroy();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
  });
 }

@@ -21,8 +21,8 @@ const original=JSON.parse(gunzipSync(await readFile(new URL('../fixtures/origina
 const steps=original.cases.find(c=>c.id==='dense-two-plane:0').rows;
 let calls=0,maxNumericError=0,maxTimeErrorMs=0;
 const timeline=createNodeDisplayTimeline({api:{nodeSamples:async payload=>{
-  // Fourth consumer request reuses the same already captured current native receipt.
-  const row=wire[calls]??(calls===3?wire.at(-1):null);calls++;assert.ok(row);assert.deepEqual({...payload,request_id:row.request.request_id},row.request);
+  // Optical priming fetches three exact timestamps; network consumers reuse the current receipt.
+  const row=wire[calls];calls++;assert.ok(row);assert.deepEqual({...payload,request_id:row.request.request_id},row.request);
   return {...structuredClone(row.response),request_id:payload.request_id};
 },nodeTrack:()=>{throw Error('communication points cannot query display tracks');}},periodFor:()=>95,requestId:()=> 'native-optical',yieldControl:async()=>{}});
 const library=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>{throw Error('no equipment creation');}});
@@ -51,7 +51,7 @@ assert.equal(calls,3);assert.equal(timeline.snapshot().utc,null);
 const stations=stationModel.DEFAULT_STATION_KEYS.map(preset=>stationModel.createStation({preset}));
 const networkModel=createNetworkSnapshotModel({library,groundLinks:createGroundLinkModel({library,stationModel}),oisl});
 const network=createNodeNetworkTimeline({model:networkModel,optical,requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>nodes,readDisplay:()=>({utc}),readStations:()=>stations,readFaults:()=>[],validateNode:library.validateNode,validateStation:stationModel.validateStation,advanceUtc:createUtcCodec(LEAP_SHA256).advance});
-const joined=await network.update();assert.equal(joined.status,'valid');assert.equal(network.verifySnapshot(joined),true);assert.equal(calls,4);
+const joined=await network.update();assert.equal(joined.status,'valid');assert.equal(network.verifySnapshot(joined),true);assert.equal(calls,3);
 assert.equal(joined.network.nodes.length,nodes.length+stations.length);
 assert.equal(joined.network.links.filter(link=>link.kind==='ground').length,nodes.length*stations.length);
 const sourceNetwork=networkModel.buildNetworkSnapshot({date:Date.parse(utc),nodes,states:new Map(steps.at(-1).input.states),pairs:steps.at(-1).expected.pairs,stations,faults:[]});
@@ -95,7 +95,7 @@ const workspace=createWorkspaceNodes({
 await workspace.start();assert.deepEqual(workspace.sceneSnapshot().drafts,nodes);
 displayCallback({utc});const workspaceNetwork=await workspace.updateNetwork();
 assert.equal(workspaceNetwork.status,'valid');assert.equal(workspace.verifyNetworkSnapshot(workspaceNetwork),true);
-assert.deepEqual(workspaceNetwork.network,sourceNetwork);assert.equal(workspacePointReads,4);
+assert.deepEqual(workspaceNetwork.network,sourceNetwork);assert.equal(workspacePointReads,3);
 assert.deepEqual(workspace.sceneSnapshot().drafts,nodes);assert.equal(workspace.sceneSnapshot().server.revision,0);
 workspace.destroy();assert.equal(workspace.verifyNetworkSnapshot(workspaceNetwork),false);
 process.stdout.write(JSON.stringify({native_rows:60,prime_steps_seconds:[-120,-60,0],maxNumericError,maxTimeErrorMs,source_semantics_equal:true,verified_snapshot:true,selected_node_poses:selectedNodePoses,network_snapshot_verified:true,network_records_match_source:true,network_current_native_rows:nodes.length,network_links:networkLinks,workspace_network_verified:true,workspace_point_receipt_reuses:workspacePointReads})+'\n');

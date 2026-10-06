@@ -4,6 +4,7 @@ import {LEAP_SHA256,createUtcCodec} from './orbit_utc.js';
 /** Render-only copy, never a clock/selection authority. One controller per document. */
 export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let globe=null,latest=null,catalog=null,sceneInput=null,sceneMetadata=null,trackInput=null,onCatalogSelect=()=>{},groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
+  let catalogLabelsVisible=true;
   let choice={mode:'3d',imagery:'blue_marble',theme:'dark',emphasis:true},imagery={requestedImagery:'blue_marble',displayedImagery:null,phase:'pending',error:null},mode={phase:'ready',error:null},modeRevision=0;
   const viewObservers=new Set();
   const displayObservers=new Set();let displayKey=null,solarFactory=null,solarRenderer=null;
@@ -58,7 +59,17 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let scenarioBinding=null,scenarioContext=null,sceneCopy=null;const scenarioUtcCodec=createUtcCodec(LEAP_SHA256);
   function validScenarioContext(candidate=scenarioContext){
     if(!candidate||!scenarioBinding||candidate.leap_sha256!==LEAP_SHA256||typeof candidate.run_id!=='string'||!candidate.run_id||typeof candidate.utc!=='string')return null;
-    try{if(scenarioUtcCodec.advance(candidate.utc,0)!==candidate.utc)return null;const runtime=scenarioBinding.readRuntime();if(!runtime||runtime.run_id!==candidate.run_id||runtime.running!==false||scenarioBinding.utcOfRuntime(runtime)!==candidate.utc)return null;return{key:`sim:${candidate.run_id}`,utc:candidate.utc,leap_sha256:LEAP_SHA256,eop_sha256:null,source:'sim'};}catch{return null;}
+    try{
+      if(scenarioUtcCodec.advance(candidate.utc,0)!==candidate.utc)return null;
+      const runtime=scenarioBinding.readRuntime();if(!runtime||runtime.run_id!==candidate.run_id)return null;
+      const exactUtc=scenarioBinding.utcOfRuntime(runtime);
+      if(runtime.running===false){if(typeof scenarioBinding.projectDisplay!=='function'&&exactUtc!==candidate.utc)return null;const pausedUtc=typeof scenarioBinding.projectDisplay==='function'?exactUtc:candidate.utc;if(scenarioUtcCodec.advance(pausedUtc,0)!==pausedUtc)return null;return{key:`sim:${candidate.run_id}`,utc:pausedUtc,leap_sha256:LEAP_SHA256,eop_sha256:null,source:'sim'};}
+      const projected=scenarioBinding.projectDisplay?.(runtime);
+      if(runtime.running!==true||!Number.isFinite(runtime.speed)||runtime.speed<.1||runtime.speed>128||!Number.isFinite(runtime.elapsed_seconds)||!Number.isSafeInteger(runtime.sequence)||!projected||projected.run_id!==runtime.run_id||projected.sequence!==runtime.sequence||projected.elapsed_seconds!==runtime.elapsed_seconds||projected.projected!==true||!Number.isFinite(projected.age_ms)||projected.age_ms<0||projected.age_ms>3500||scenarioUtcCodec.advance(projected.utc,0)!==projected.utc)return null;
+      const delta=scenarioUtcCodec.difference(projected.utc,exactUtc);
+      if(!Number.isFinite(delta)||delta<0||Math.abs(delta-projected.age_ms/1000*runtime.speed)>.002)return null;
+      return{key:`sim:${candidate.run_id}`,utc:projected.utc,leap_sha256:LEAP_SHA256,eop_sha256:null,source:'sim',projected:true,runtime_sequence:runtime.sequence,runtime_elapsed_seconds:runtime.elapsed_seconds,projection_age_ms:projected.age_ms,quality:'engineering_assumption',time_model:'unix_ms_utc_approx',frame:'EARTH_FIXED_GMST_UTC_APPROX'};
+    }catch{return null;}
   }
   const validPosition=value=>value?.frame==='ITRF'&&value.status!=='error'&&!value.error_code&&typeof value.utc==='string'&&value.utc.endsWith('Z')&&Array.isArray(value.position_m)&&value.position_m.length===3&&value.position_m.every(Number.isFinite);
   function displayContext(){
@@ -108,9 +119,10 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     focusButton.disabled=true;
     if(!globe){if(!failed)describe('Cesium 준비 중 · 계산 위치는 아직 표시하지 않습니다.');return;}
     try{
-      if(scenarioContext){globe.update(null);globe.setCatalogScene(null,onCatalogSelect);globe.setCatalogTrack(null);container.dataset.orbitVisible='false';const sim=validScenarioContext();describe(sim?`SIM 표시 UTC ${sim.utc} · 실제 수신/실측 아님 · GP 위치는 이 UTC로 재표시하지 않습니다.`:'현재 paused SIM 실행과 일치하는 표시 UTC가 없습니다.');return;}
+      if(scenarioContext){globe.update(null);globe.setCatalogScene(null,onCatalogSelect);globe.setCatalogTrack(null);container.dataset.orbitVisible='false';const sim=validScenarioContext();describe(sim?`SIM ${sim.projected?'보간 표시':'정지 표시'} UTC ${sim.utc} · 실제 수신/실측 아님 · GP 위치는 이 UTC로 재표시하지 않습니다.`:'현재 SIM 실행과 일치하는 신선한 표시 UTC가 없습니다.');return;}
       const display=validPosition(catalog)?catalog:latest;
       const shown=globe.update(display);
+      globe.setCatalogObservationLine?.(display===catalog?catalog:null);
       globe.setGroundPoint(groundPoint);
       container.dataset.orbitVisible=String(shown);
       if(shown){
@@ -142,6 +154,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
         throw Error('지원하지 않는 지도입니다.');
       };
       globe=new OrbitGlobe(C,container,{createProvider,onSatelliteHover:notifyHover,onStatus:value=>{if(disposed)return;imagery=structuredClone(value);container.dataset.imagery=imagery.displayedImagery||'unavailable';notifyView();}});
+      globe.setCatalogLabels?.(catalogLabelsVisible);
       if(stations.length){globe.setStations(stations,onStationSelect);globe.selectStation(selectedStation);}
       if(sceneInput){globe.setCatalogScene(sceneInput,onCatalogSelect);sceneInput=null;}
       if(trackInput)globe.setCatalogTrack(trackInput);
@@ -160,9 +173,9 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
     displayContext,
-    bindScenarioRuntime(readRuntime,utcOfRuntime){
+    bindScenarioRuntime(readRuntime,utcOfRuntime,{projectDisplay=null}={}){
       if(typeof readRuntime!=='function'||typeof utcOfRuntime!=='function')throw new TypeError('actual SIM runtime and canonical UTC accessors required');
-      if(disposed)return()=>{};const binding={readRuntime,utcOfRuntime};scenarioBinding=binding;notifyDisplay();
+      if(disposed)return()=>{};const binding={readRuntime,utcOfRuntime,projectDisplay};scenarioBinding=binding;notifyDisplay();
       return()=>{if(scenarioBinding!==binding)return;scenarioBinding=null;notifyDisplay();};
     },
     setScenarioDisplayContext(value){if(disposed)return false;if(!validScenarioContext(value)){if(scenarioContext)paint();return false;}scenarioContext=structuredClone({run_id:value.run_id,utc:value.utc,leap_sha256:value.leap_sha256});paint();return true;},
@@ -226,6 +239,8 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       sceneInput=globe?null:sceneCopy;
       try{globe?.setCatalogScene(scenarioContext?null:value,onSelect);container.dataset.catalogCount=String(value?.valid_count??0);paint();}catch{fail();}
     },
+    setCatalogLabels(value){if(disposed)return false;catalogLabelsVisible=Boolean(value);try{globe?.setCatalogLabels(catalogLabelsVisible);}catch{fail();}return catalogLabelsVisible;},
+    catalogLabelsVisible(){return catalogLabelsVisible;},
     catalogTrack(value){if(disposed)return;trackInput=value?structuredClone(value):null;try{globe?.setCatalogTrack(scenarioContext?null:trackInput);container.dataset.trackSegmentCount=String(value?.segments?.length??0);}catch{fail();}},
     catalog(sample){if(disposed)return;const changed=catalog?.catalog_number!==sample?.catalog_number||catalog?.normalized_gp_sha256!==sample?.normalized_gp_sha256;catalog=sample?structuredClone(sample):null;if(changed)focused=false;paint();},
     update(snapshot,display,displayUtc){

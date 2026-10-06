@@ -13,6 +13,7 @@ export class NodeScene{
     if(typeof advanceUtc!=='function'||typeof geometryFor!=='function'||typeof pathFor!=='function')throw new TypeError('node scene native display dependencies required');
     Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,palette,tracksVisible,isTransitioning,onStatus,verifyLinkSnapshot,animationNow});
     this.links=new Map();this.linkPolylines=null;this.linkOwner=null;this.linkReceipt=null;this.definitionScope='[]';this.linksVisible=true;this.models=new Map();this.descriptions=new Map();this.paths=new Map();this.points=new Map();this.labels=new Map();this.selectedId=null;this.hoveredId=null;this.visibleIds=null;this.sdcMode=false;this.theme='dark';this.loadToken=0;this.modelsVisible=true;this.disposed=false;this.dataSource=null;this.dataSourceOwner=null;this.markerOwner=null;this.pointCollection=null;this.labelCollection=null;
+    this.frameMemo=null;
   }
   get viewer(){return typeof this.viewerProvider==='function'?this.viewerProvider():this.viewerProvider;}
   get cesium(){return typeof this.cesiumProvider==='function'?this.cesiumProvider():this.cesiumProvider;}
@@ -27,9 +28,21 @@ export class NodeScene{
   }
   ambientLighting(C){try{if(!C.ImageBasedLighting||!C.Cartesian3)return undefined;return new C.ImageBasedLighting({sphericalHarmonicCoefficients:Array.from({length:9},(_,i)=>i===0?new C.Cartesian3(AMBIENT_IRRADIANCE,AMBIENT_IRRADIANCE,AMBIENT_IRRADIANCE*1.05):new C.Cartesian3())});}catch{return undefined;}}
   matches(value,id){const entry=this.descriptions.get(id);return !!entry&&value?.node_id===id&&Object.entries(metadata).every(([k,v])=>value[k]===v)&&typeof value.definition_hash==='string'&&/^[a-f0-9]{64}$/.test(value.definition_hash)&&signature(value.node_definition)===entry.signature;}
+  frameCurrent(frame){
+    try{return !this.disposed&&this.frameMemo===frame&&!frame.invalid&&this.viewer===frame.viewer&&this.cesium===frame.cesium&&this.descriptions===frame.descriptions&&this.definitionScope===frame.scope&&this.timeSource?.()===frame.utc&&this.isTransitioning()===frame.transition&&this.viewer?.scene?.mode===frame.mode;}catch{return false;}
+  }
   geometryAt(id,utc){
     const entry=this.descriptions.get(id);if(!entry||typeof utc!=='string')return null;
-    try{if(this.advanceUtc(utc,0)!==utc)return null;const g=this.geometryFor(structuredClone(entry.definition),{utc});return this.matches(g,id)&&g.row?.utc===utc&&g.row.status==='valid'&&g.row.error_code===null&&vector(g.row.position_m)?g:null;}catch{return null;}
+    const frame=this.frameMemo;
+    if(frame&&!this.frameCurrent(frame)){frame.invalid=true;return null;}
+    const cached=frame?.geometry.get(id);if(cached?.has(utc))return cached.get(utc);
+    let result=null;
+    try{if(this.advanceUtc(utc,0)!==utc)return null;const g=this.geometryFor(structuredClone(entry.definition),{utc});result=this.matches(g,id)&&g.row?.utc===utc&&g.row.status==='valid'&&g.row.error_code===null&&vector(g.row.position_m)?g:null;}catch{/* Invalid native projection remains hidden. */}
+    if(frame){
+      if(!this.frameCurrent(frame)){frame.invalid=true;return null;}
+      const values=cached??new Map();values.set(utc,result);frame.geometry.set(id,values);
+    }
+    return result;
   }
   cartesianAt(id,utc,expectedHash){const C=this.cesium,g=this.geometryAt(id,utc);return C?.Cartesian3&&g&&(!expectedHash||g.definition_hash===expectedHash)?new C.Cartesian3(...g.row.position_m):null;}
   async setNodes(entries){
@@ -194,7 +207,18 @@ export class NodeScene{
   setModelsVisible(visible){this.modelsVisible=visible!==false;this.placeModels(this.timeSource?.());return this.modelsVisible;}
   setTheme(theme){this.theme=theme==='light'?'light':'dark';this.refreshMarkerStyles();const C=this.cesium;if(C?.Color)for(const [id,p]of this.paths)p.entity.polyline.material=this.pathColor(C,id);}
   update(utc=this.timeSource?.()){if(this.disposed)return;this.placePoints(utc);this.placeModels(utc);this.placeLinks(utc);this.rebuildPaths();}
-  syncFrame(utc,nowMs){if(!this.disposed){this.placePoints(utc);this.placeModels(utc);this.placeLinks(utc);this.animateLinkFlow(nowMs,utc);}}
+  syncFrame(utc,nowMs){
+    if(this.disposed)return;
+    const frame={utc,viewer:this.viewer,cesium:this.cesium,descriptions:this.descriptions,scope:this.definitionScope,transition:this.isTransitioning(),mode:this.viewer?.scene?.mode,geometry:new Map(),invalid:false};
+    this.frameMemo=frame;
+    try{this.placePoints(utc);this.placeModels(utc);this.placeLinks(utc);this.animateLinkFlow(nowMs,utc);}
+    finally{
+      // A callback may replace a selection, Viewer or UTC within this frame.
+      // Suppress every owned primitive rather than publish a mixture of scopes.
+      if(!this.frameCurrent(frame)){for(const p of this.points.values())p.show=false;for(const label of this.labels.values())label.show=false;for(const m of this.models.values())m.model.show=false;for(const link of this.links.values())link.line.show=false;}
+      if(this.frameMemo===frame)this.frameMemo=null;
+    }
+  }
   clear(){this.loadToken++;this.clearLinks();if(this.linkPolylines)this.linkOwner?.scene?.primitives?.remove(this.linkPolylines);this.linkPolylines=null;this.linkOwner=null;for(const id of [...this.models.keys()])this.removeModel(id);for(const id of [...this.paths.keys()])this.removePath(id);for(const id of [...this.points.keys()])this.removeMarker(id);if(this.markerOwner){if(this.pointCollection)this.markerOwner.scene.primitives.remove(this.pointCollection);if(this.labelCollection)this.markerOwner.scene.primitives.remove(this.labelCollection);}this.pointCollection=null;this.labelCollection=null;this.markerOwner=null;this.descriptions.clear();this.definitionScope='[]';this.selectedId=null;this.hoveredId=null;}
   destroy(){if(this.disposed)return;this.clear();this.disposed=true;if(this.dataSource){this.dataSourceOwner?.dataSources?.remove?.(this.dataSource,true);this.dataSource=null;this.dataSourceOwner=null;}}
 }

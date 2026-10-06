@@ -6,6 +6,7 @@
   <title>ISDC–ODT Satellite · V6 작업 창 시안</title>
   <link rel="stylesheet" href="/static/styles/workspace.css?v=t135-r1">
   <link rel="stylesheet" href="/static/styles/satellite_nodes.css?v=t151-r1">
+  <link rel="stylesheet" href="/static/styles/network_diagram.css">
   <script>window.CESIUM_BASE_URL='https://cesium.com/downloads/cesiumjs/releases/1.143/Build/Cesium/';</script>
   <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.143/Build/Cesium/Widgets/widgets.css">
   <script defer src="https://cesium.com/downloads/cesiumjs/releases/1.143/Build/Cesium/Cesium.js"></script>
@@ -28,9 +29,9 @@
         <div id="orbit-solar-overlay" class="space-sun" hidden aria-hidden="true"></div>
         <div class="orbit-globe-caption"><p id="orbit-globe-status" role="status">Cesium 준비 중</p><button id="orbit-globe-focus" type="button" disabled>계산 위치로 이동</button></div>
         <div class="desktop-globe" aria-label="AerODT Satellite 지구 배경 · CSS 개념 시안"><div class="desktop-orbit one"></div><div class="desktop-orbit two"></div><div class="desktop-earth" aria-hidden="true"></div><button class="desktop-sat a" data-sat="SAT-A">SAT-A</button><button class="desktop-sat b" data-sat="SAT-B">SAT-B</button><button class="desktop-sat c" data-sat="SAT-C">SAT-C · DT</button><span class="desktop-station one">GS-01</span><span class="desktop-station two">GS-02</span></div>
-        <section class="glass overview" aria-label="선택 위성 빠른 상태"><div class="eyebrow">선택 위성 · 빠른 상태</div><strong id="desktop-sat-name">SAT-A</strong><div id="desktop-sat-status">운용 상태 예시 · 실측 없음</div><dl><div><dt>다음 접촉</dt><dd id="desktop-next">GS-02 · 03:24 UTC 계획</dd></div><div><dt>사건</dt><dd>E-014 링크 품질 저하</dd></div><div><dt>자료 시각</dt><dd>03:18 UTC 예시</dd></div></dl><button type="button" data-view="satellite">위성 상태·궤도 열기</button></section>
-        <section class="glass contact" aria-label="접촉과 인계"><div class="eyebrow">다음 확인 · 계획</div><strong>GS-02 / 03:24 UTC</strong><p>실제 AOS·RF·수신 증거 없음</p><div class="actions"><button type="button" data-view="ground">지상국 창</button><button type="button" data-view="normal">정상 임무 창</button></div></section>
-        <div class="scene-credit">NASA Blue Marble / Cesium WGS84 · 저장 자료의 SGP4 모델 위치 · 다른 운용 값은 예시</div>
+        <section class="glass overview" aria-label="선택 위성 빠른 상태"><div class="eyebrow">선택 위성 · 빠른 상태</div><strong id="desktop-sat-name">SAT-A</strong><div id="desktop-sat-status">운용 상태 예시 · 실측 없음</div><dl><div><dt>다음 접촉</dt><dd id="desktop-next">GS-02 · 03:24 UTC 계획</dd></div><div><dt>사건</dt><dd id="desktop-event">실제 사건 미확인</dd></div><div><dt>자료 시각</dt><dd id="desktop-data-utc">자료 시각 미확인</dd></div></dl><button type="button" data-view="satellite">위성 상태·궤도 열기</button></section>
+        <section class="glass contact" aria-label="접촉과 인계"><div class="eyebrow">다음 확인 · 계획</div><strong id="desktop-handoff">접촉 구간 미확인</strong><p id="desktop-handoff-state">실제 AOS·RF·수신 증거 없음</p><div class="actions"><button type="button" data-view="ground">지상국 창</button><button type="button" data-view="normal">정상 임무 창</button></div></section>
+        <div class="scene-credit" id="desktop-scene-credit">NASA Blue Marble / Cesium WGS84 · 현재 계산 출처 미확인</div>
       </div>
       <footer><span id="footer-view">공간 상황</span><span>창을 이동·크기 조절·확장할 수 있습니다. 작은 창과 확장 창은 같은 입력 상태를 사용합니다.</span><span>V6 / HTML</span></footer>
     </div>

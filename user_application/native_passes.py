@@ -1,5 +1,6 @@
 """Original coarse/peak/crossing pass algorithm over the existing native point query."""
 from copy import deepcopy
+from functools import lru_cache
 import math
 from uuid import uuid4
 from astropy.time import TimeDelta
@@ -27,11 +28,18 @@ class NativeMissionPasses:
         duration=float((last.as_time()-first.as_time()).sec)
         if not 0<duration<=86400.00000001:raise ValueError('explicit pass horizon must be greater than0 and at most24h')
         hashes={p.node_id:p.definition_hash for p in prepared};token=uuid4().hex;sequence=0;passes=[]
-        def rounded(value):return min(duration,max(0,math.floor(value*1000+0.5)/1000))
+        def rounded(value):
+            # Source interior searches use milliseconds; the caller's exact
+            # captured endpoint must survive that interior rounding.
+            return duration if value==duration else min(duration,max(0,math.floor(value*1000+0.5)/1000))
+        # Pure UTC formatting only, bounded to this invocation; native rows and
+        # source grid/peak/boundary decisions are never cached or skipped.
+        stamp_origin=first.as_time()
+        @lru_cache(maxsize=8192)
         def stamp(value):
             if value==0:return first.iso_utc
             if value==duration:return last.iso_utc
-            return (first.as_time()+TimeDelta(value,format='sec')).utc.isot+'Z'
+            return (stamp_origin+TimeDelta(value,format='sec')).utc.isot+'Z'
         for index,node in enumerate(captured):
             cache={}
             async def samples(values):
@@ -61,7 +69,9 @@ class NativeMissionPasses:
                     else:right=b[0];b=a;a=await sample(right-ratio*(right-left))
                 await sample((left+right)/2)
             grid=[float(i*30) for i in range(int(duration//30)+1)]
-            if grid[-1]<duration:grid.append(duration)
+            # Astropy's seconds subtraction can leave a float remainder even when
+            # both offsets encode the exact same canonical UTC endpoint.
+            if grid[-1]<duration and stamp(grid[-1])!=stamp(duration):grid.append(duration)
             else:grid[-1]=duration
             coarse=await samples(grid)
             for i,point in enumerate(coarse):

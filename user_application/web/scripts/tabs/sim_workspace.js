@@ -19,14 +19,15 @@ function number(value, low, high, integer=false) {
 
 export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()=>{}, timers={setTimer:(fn,ms)=>setTimeout(fn,ms),clearTimer:id=>clearTimeout(id)}, observers={}) {
   let state={runtime:null,scenarios:[],events:[],metrics:null,wallTime:'',busy:false,stale:true,connection:'idle',status:'서버 SIM 연결 대기',error:'',draft:{speed:'',scenario_id:'',target:'',kind:'link_loss',severity:'medium',duration_seconds:'60'}};
-  let ended=false,close=null,connected=false,timer=null,barrier=null,received=0,initialized=false;
+  let ended=false,close=null,connected=false,timer=null,barrier=null,received=0,initialized=false,receivedAtMs=null;
+  const receiptNow=typeof timers.now==='function'?timers.now:Date.now;
   function watch() { timers.clearTimer(timer); timer=timers.setTimer(()=>{if(!ended){state.stale=true;observers.status?.('stale');changed('stream');}},3500);timer?.unref?.(); }
   function installBootstrap(value, keepStream=false) {
     const r=runtime(value?.runtime), list=value.scenarios;
     if (!Array.isArray(list) || list.some(s=>!s || typeof s.id!=='string' || !s.id || typeof s.name!=='string') || new Set(list.map(s=>s.id)).size!==list.length || !Array.isArray(value.missions)) throw Error('SIM 목록 응답 오류');
     const e=events(value.events);
     state.scenarios=copy(list);
-    if(!keepStream){if(state.runtime?.run_id!==r.run_id || state.runtime?.scenario_id!==r.scenario_id){state.metrics=null;state.wallTime='';state.stale=true;}state.runtime=r;state.events=e;onMissions(copy(value.missions));}
+    if(!keepStream){if(state.runtime?.run_id!==r.run_id || state.runtime?.scenario_id!==r.scenario_id){state.metrics=null;state.wallTime='';state.stale=true;}state.runtime=r;state.events=e;receivedAtMs=null;onMissions(copy(value.missions));}
     if(!initialized){state.draft.speed=String(r.speed);state.draft.scenario_id=r.scenario_id;initialized=true;}
     return r;
   }
@@ -42,7 +43,7 @@ export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()
       }else if(r.run_id===state.runtime?.run_id && r.sequence<state.runtime.sequence)return;
       onMissions(copy(value.missions));
       state.runtime=r;state.events=e;state.metrics=copy(value.telemetry);state.wallTime=value.wall_time;
-      state.stale=false;if(!state.error)state.status='서버 SIM 스트림 수신';barrier=null;received++;watch();changed('stream');
+      state.stale=false;if(!state.error)state.status='서버 SIM 스트림 수신';barrier=null;received++;receivedAtMs=receiptNow();watch();changed('stream');
       observers.frame?.(copy(value));
     } catch(error) {state.stale=true;state.error=error.message;observers.status?.('invalid');changed('stream');}
   }
@@ -60,6 +61,7 @@ export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()
   }
   const controller={
     snapshot:()=>copy(state),
+    displayReceipt(){return !ended&&!state.stale&&!state.error&&!state.busy&&Number.isFinite(receivedAtMs)?{received_at_ms:receivedAtMs,run_id:state.runtime.run_id,sequence:state.runtime.sequence,elapsed_seconds:state.runtime.elapsed_seconds,running:state.runtime.running,speed:state.runtime.speed}:null;},
     connect(){if(ended || connected)return;connected=true;watch();close=connector(receive,status=>{if(!ended){state.connection=status;state.stale=true;observers.status?.(status);changed('stream');}});},
     async load(){if(ended || state.busy)return;state.busy=true;state.error='';changed('controls');const start=received;
       try{const value=await api.bootstrap();if(!ended){installBootstrap(value,received!==start);barrier=null;state.status='서버 상태 조회 · 지표는 스트림 표본';}}
@@ -71,7 +73,7 @@ export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()
     speed(){return command(()=>api.runtimeSpeed(number(state.draft.speed,.1,128)),'배속 응답');},
     scenario(){return command(()=>{const id=state.draft.scenario_id;if(!state.scenarios.some(s=>s.id===id))throw Error('서버 시나리오를 선택하세요.');return api.selectScenario(id);},'시나리오 응답');},
     fault(){return command(()=>{const d=state.draft,target=d.target.trim();if(!target || [...target].length>80 || !kinds.includes(d.kind) || !severities.includes(d.severity))throw Error('장애 대상·유형·심각도를 확인하세요.');return api.injectFault({target,kind:d.kind,severity:d.severity,duration_seconds:number(d.duration_seconds,1,3600,true)});},'장애 주입 응답');},
-    destroy(){if(ended)return;ended=true;timers.clearTimer(timer);close?.();}
+    destroy(){if(ended)return;ended=true;receivedAtMs=null;timers.clearTimer(timer);close?.();}
   };
   return controller;
 }

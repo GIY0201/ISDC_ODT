@@ -18,7 +18,7 @@ export class OrbitGlobe {
     });
     this.viewer.scene.globe.baseColor=Cesium.Color.fromCssColorString('#225c77');
     this.viewer.clock.shouldAnimate=false;
-    this.catalogVisuals=new Map();
+    this.catalogVisuals=new Map();this.catalogLabelsVisible=true;
     this.viewControls=new GlobeView(Cesium,this.viewer,options.createProvider,options.onStatus);
     this.modelLayer=options.modelLayer??null;
     this.cameraMotion=new CenteredCameraMotion(Cesium,this.viewer,{model:()=>this.modelLayer,now:options.motionNow});
@@ -61,14 +61,33 @@ export class OrbitGlobe {
     });
     this.entity.name=sample.name?`${sample.name} · SGP4 모델`:'ISS · SGP4 모델';
     this.entity.label.text=sample.name?`${sample.name} · GP 모델`:'ISS · GP 예측';
-    this._styleSelected();
+    this.entity.label.show=this.catalogLabelsVisible;this._styleSelected();
     this._refreshSatelliteHover();this._ensurePickHandler();viewer.scene.requestRender();return true;
   }
+  setCatalogObservationLine(sample){
+    if(this.destroyed)return false;
+    const p=sample?.ground_point,c=sample?.position_m;
+    const valid=sample?.frame==='ITRF'&&sample?.status==='valid'&&sample.observation_utc===sample.utc&&typeof sample.utc==='string'&&sample.utc.endsWith('Z')&&Array.isArray(c)&&c.length===3&&c.every(Number.isFinite)&&p?.ellipsoid==='WGS84'&&p.virtual===true&&Number.isFinite(p.latitude_deg)&&Math.abs(p.latitude_deg)<=90&&Number.isFinite(p.longitude_deg)&&Math.abs(p.longitude_deg)<=180&&Number.isFinite(p.ellipsoid_height_m)&&Number.isFinite(sample.observed_elevation_deg)&&Number.isFinite(sample.minimum_elevation_deg)&&typeof sample.visible==='boolean'&&sample.visible===(sample.observed_elevation_deg>=sample.minimum_elevation_deg);
+    if(!valid){if(this.observationLine)this.viewer.entities.remove(this.observationLine);this.observationLine=null;this.viewer.scene.requestRender();return false;}
+    const C=this.C,positions=[C.Cartesian3.fromDegrees(p.longitude_deg,p.latitude_deg,p.ellipsoid_height_m),new C.Cartesian3(...c)];
+    const material=C.Color.fromCssColorString(sample.visible?'#53c6a0':'#8395a6');
+    if(this.observationLine){this.observationLine.polyline.positions=positions;this.observationLine.polyline.material=material;}
+    else this.observationLine=this.viewer.entities.add({id:'catalog-observation-line',name:'관측선 · GP 기하 모델 · 실제 통신 미확인',polyline:{positions,width:2,arcType:C.ArcType.NONE,material}});
+    this.viewer.scene.requestRender();return true;
+  }
   clearSatellite(){
+    this.setCatalogObservationLine(null);
     this._selectCatalogMarker(null);
     if(this.entity){if(this.viewer.entities.remove)this.viewer.entities.remove(this.entity);else this.viewer.entities.removeAll();}
     this.entity=null;this.position=null;
     this.selectedHover=null;this._refreshSatelliteHover();
+  }
+  setCatalogLabels(visible){
+    if(this.destroyed)return false;
+    this.catalogLabelsVisible=Boolean(visible);
+    for(const [number,label]of this.catalogLabels)label.show=this.catalogLabelsVisible&&this.catalogValid.has(number)&&number!==this.selectedCatalog;
+    if(this.entity?.label)this.entity.label.show=this.catalogLabelsVisible;
+    this.viewer.scene.requestRender();return this.catalogLabelsVisible;
   }
   setCatalogTrack(value){
     if(this.destroyed)return false;
@@ -84,7 +103,7 @@ export class OrbitGlobe {
   _selectCatalogMarker(number,gpHash){
     const oldSelection=this.selectedCatalog;
     const previous=this.catalogPoints.get(this.selectedCatalog);if(previous)previous.show=this.catalogValid.has(this.selectedCatalog);
-    const previousLabel=this.catalogLabels.get(this.selectedCatalog);if(previousLabel)previousLabel.show=this.catalogValid.has(this.selectedCatalog);
+    const previousLabel=this.catalogLabels.get(this.selectedCatalog);if(previousLabel)previousLabel.show=this.catalogLabelsVisible&&this.catalogValid.has(this.selectedCatalog);
     this.selectedCatalog=this.catalogHashes.get(number)===gpHash&&this.catalogPoints.has(number)?number:null;
     const selected=this.catalogPoints.get(this.selectedCatalog);if(selected)selected.show=false;
     const label=this.catalogLabels.get(this.selectedCatalog);if(label)label.show=false;
@@ -133,12 +152,12 @@ export class OrbitGlobe {
         pointScale??=new C.NearFarScalar(1e6,1.35,5e8,.58);
         point=this.catalogCollection.add({position,pixelSize:size,color:color(style,css,alpha),outlineColor:C.Color.TRANSPARENT,outlineWidth:0,scaleByDistance:pointScale,disableDepthTestDistance:0,id,show:true});
         this.catalogPoints.set(row.catalog_number,point);
-        if(value.count<=80){labelScale??=new C.NearFarScalar(1e6,1,8e7,.38);labelOutline??=C.Color.fromCssColorString(colors.outline);this.catalogLabels.set(row.catalog_number,this.catalogLabelCollection.add({position,text:row.name,font:'600 12px Segoe UI',fillColor:color('label',this.viewControls.theme==='light'?'#1c2833':'#ffffff',1),outlineColor:labelOutline,outlineWidth:3,style:C.LabelStyle.FILL_AND_OUTLINE,pixelOffset:new C.Cartesian2(0,-18),scaleByDistance:labelScale,show:true,id}));}
+        if(value.count<=80){labelScale??=new C.NearFarScalar(1e6,1,8e7,.38);labelOutline??=C.Color.fromCssColorString(colors.outline);this.catalogLabels.set(row.catalog_number,this.catalogLabelCollection.add({position,text:row.name,font:'600 12px Segoe UI',fillColor:color('label',this.viewControls.theme==='light'?'#1c2833':'#ffffff',1),outlineColor:labelOutline,outlineWidth:3,style:C.LabelStyle.FILL_AND_OUTLINE,pixelOffset:new C.Cartesian2(0,-18),scaleByDistance:labelScale,show:this.catalogLabelsVisible,id}));}
       }else{point.position=position;point.show=true;if(this.catalogStyles.get(row.catalog_number)!==style)point.color=color(style,css,alpha);}
       this.catalogStyles.set(row.catalog_number,style);
       this.catalogHashes.set(row.catalog_number,row.normalized_gp_sha256);
       point.id.name=row.name;point.id.orbit_regime=row.orbit_regime;
-      const label=this.catalogLabels.get(row.catalog_number);if(label){label.position=position;label.show=true;}
+      const label=this.catalogLabels.get(row.catalog_number);if(label){label.position=position;label.show=this.catalogLabelsVisible;}
     }
     // The same GP can transition to/from a propagation failure at another UTC.
     for(const [number,point]of this.catalogPoints){if(!seen.has(number)){point.show=false;const label=this.catalogLabels.get(number);if(label)label.show=false;}}

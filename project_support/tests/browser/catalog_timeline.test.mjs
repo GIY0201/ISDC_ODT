@@ -9,6 +9,14 @@ test('time query pins GP and observer with no stored orbit commands; playback us
  const f=fixture();f.c.select(base);f.c.observer(point,5);await f.c.calculate();assert.equal(f.requests[0].count,601);assert.equal(f.requests[0].normalized_gp_sha256,H);assert.deepEqual(f.requests[0].ground_point,point);assert.equal(f.shown.at(-1).elevation_deg,10);
  f.c.play();f.tick(500);assert.equal(f.shown.at(-1).position_m[0],7000000.5);assert.equal(f.requests.length,1);assert.equal(f.shown.at(-1).observation_utc,base.utc);f.c.pause();f.tick(2000);assert.equal(f.requests.length,1);f.c.destroy();
 });
+
+test('geodetic and TEME speed remain exact native sample observations during interpolated playback',async()=>{
+ const metadata={details_version:1,details_profile:'WGS84_ERFA_GC2GD_TEME_SPEED',details_units:{latitude:'deg',longitude:'deg',ellipsoid_height:'m',teme_speed:'km/s'}};
+ const f=fixture(p=>{const v={...response(p),...metadata};v.rows.forEach((row,i)=>Object.assign(row,{geodetic:{latitude_deg:i/100,longitude_deg:127,ellipsoid_height_m:400000+i,ellipsoid:'WGS84'},teme_speed_km_s:7+i/10000}));return v;});
+ f.c.select(base);f.c.observer(point,5);await f.c.calculate();f.c.play();f.tick(500);
+ const v=f.shown.at(-1);assert.equal(v.utc,codec.advance(base.utc,.5));assert.equal(v.details_utc,base.utc);assert.equal(v.geodetic.latitude_deg,0);assert.equal(v.teme_speed_km_s,7);assert.equal(v.position_m[0],7000000.5);
+ assert.equal(f.c.sampleAt(v.utc).details_utc,base.utc);f.c.destroy();
+});
 test('late result after observer change or clear never restores position',async()=>{
  let release;const f=fixture(p=>new Promise(r=>release=()=>r(response(p))));f.c.select(base);f.c.observer(point,5);const work=f.c.calculate();f.c.observer({...point,latitude_deg:78},3);release();await work;assert.equal(f.c.snapshot().buffer,null);assert.equal(f.c.snapshot().playing,false);f.c.clear();assert.equal(f.c.snapshot().selected,null);
 });

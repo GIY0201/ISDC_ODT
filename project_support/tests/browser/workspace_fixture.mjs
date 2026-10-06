@@ -39,6 +39,8 @@ import {NodeScene} from '../../../digital_twin/visualization/node_scene.js';
 import {createSatelliteNodePanelTools} from '../../../user_application/web/scripts/tabs/satellite_nodes.js';
 import {createGroundSegmentStore} from '../../../user_application/web/scripts/communication/ground_segment.js';
 import {createGroundNetworkPanel} from '../../../user_application/web/scripts/tabs/ground_network.js';
+import * as networkDiagram from '../../../digital_twin/visualization/network_diagram.js';
+import {NativeNetworkScene} from '../../../digital_twin/visualization/native_network_scene.js';
 import {createFabricExchange} from '../../../user_application/web/scripts/tabs/fabric_exchange.js';
 import {createDataFabricClient} from '../../../communication/browser/data_fabric.js';
 import * as sourceStationModel from '../../../digital_twin/model_library/browser/ground_stations.js';
@@ -51,6 +53,9 @@ import {createMissionServices} from '../../../user_application/web/scripts/missi
 import {createSourceDataPanel} from '../../../user_application/web/scripts/tabs/source_data.js';
 import {createSourceSecurityPanel} from '../../../user_application/web/scripts/tabs/source_security.js';
 import {createSourceSettingsPanel} from '../../../user_application/web/scripts/tabs/source_settings.js';
+import {projectWorkspaceContext} from '../../../user_application/web/scripts/workspace_context.js';
+import {createAnalysisTransport} from '../../../user_application/web/scripts/scenario/analysis_transport.js';
+import {createAnalysisFollowCoordinator} from '../../../user_application/web/scripts/scenario/analysis_follow.js';
 import {createWorkspaceScenario} from '../../../user_application/web/scripts/scenario/workspace_adapter.js';
 import {createSourceScenarioPanel} from '../../../user_application/web/scripts/tabs/source_scenarios.js';
 import {createScenarioAssembly} from '../../../digital_twin/model_library/browser/scenario_assembly.js';
@@ -147,7 +152,7 @@ export function fixture(width=1280,height=720,options={}){
   Object.assign(context,{createWorkspaceSolar:args=>createWorkspaceSolar({...args,host:win,createDisplay:()=>({setStyle(){},clear(){},update(){},destroy(){}})}),createSatelliteHover,createSatelliteModelPanel,createSatelliteModelSelection,createModelResolver,validateSatelliteManifest,createGlobeViewPanel,createCatalogTrack,createCatalogPasses,createCatalogPassPanel,createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
   // Imported ground UI uses the same adapted document as the VM assembly.
   Object.assign(context,{createBrowserId,createWorkspaceNodes,createNodeLibrary,orbitElements,catalogElements,nodeOisl,NodeScene,createSatelliteNodePanelTools,createNodeClockControls,createUtcCodec,LEAP_SHA256});
-  Object.assign(context,{createWorkspaceScenario,createSourceScenarioPanel,createScenarioAssembly,scenarioKpi,createSourceSettingsPanel,createSourceSecurityPanel,createSourceDataPanel,dataViewModel,createMissionServices,createSourceMissionPanel,createMissionTypes,createMissionConstraints,createOrchestrationClient,layoutTimeline,timelineMarkup,createGroundSegmentStore,createGroundNetworkPanel,createFabricExchange,createDataFabricClient,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
+  Object.assign(context,{projectWorkspaceContext,createAnalysisTransport,createAnalysisFollowCoordinator,createWorkspaceScenario,createSourceScenarioPanel,createScenarioAssembly,scenarioKpi,createSourceSettingsPanel,createSourceSecurityPanel,createSourceDataPanel,dataViewModel,createMissionServices,createSourceMissionPanel,createMissionTypes,createMissionConstraints,createOrchestrationClient,layoutTimeline,timelineMarkup,createGroundSegmentStore,createGroundNetworkPanel,networkDiagram,NativeNetworkScene,createFabricExchange,createDataFabricClient,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
   globalThis.document=doc;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}

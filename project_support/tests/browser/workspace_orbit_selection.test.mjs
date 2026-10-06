@@ -20,10 +20,15 @@ test('empty UI choice restores server selection without clearing its result or s
     .replace(/import \{createSourceSecurityPanel\} from [^;]+;/,'const createSourceSecurityPanel=()=>({show(){},updateTelemetry(){},updateSocket(){},destroy(){}});')
     .replace(/import \{createSourceSettingsPanel\} from [^;]+;/,'const createSourceSettingsPanel=()=>({show(){},destroy(){}});')
     .replace(/import \* as dataViewModel from [^;]+;/,'const dataViewModel={};')
+    .replace(/import \{projectWorkspaceContext\} from [^;]+;/,'const projectWorkspaceContext=()=>({text:{}});')
+    .replace(/import \{createAnalysisTransport\} from [^;]+;/,`const {createAnalysisTransport}=await import(${JSON.stringify(new URL('../../../user_application/web/scripts/scenario/analysis_transport.js',import.meta.url).href)});`)
+    .replace(/import \{createAnalysisFollowCoordinator\} from [^;]+;/,'const createAnalysisFollowCoordinator=()=>({isFollowing:()=>false,isPending:()=>false,followedSource:()=>null,invalidate(){},destroy(){}});')
     .replace(/import \{createWorkspaceScenario\} from [^;]+;/,'const createWorkspaceScenario=()=>({runner:{},destroy(){}});')
     .replace(/import \{createSourceScenarioPanel\} from [^;]+;/,'const createSourceScenarioPanel=()=>({show(){},destroy(){}});')
     .replace(/import \{createScenarioAssembly\} from [^;]+;/,'const createScenarioAssembly=()=>({});')
     .replace(/import \* as scenarioKpi from [^;]+;/,'const scenarioKpi={};')
+    .replace(/import \* as networkDiagram from [^;]+;/,'const networkDiagram={};')
+    .replace(/import \{NativeNetworkScene\} from [^;]+;/,'const NativeNetworkScene=class{};')
     .replace(/import \{createSourceMissionPanel\} from [^;]+;/,'const createSourceMissionPanel=()=>({show(){},update(){},destroy(){}});')
     .replace(/import \{createMissionTypes\} from [^;]+;/,'const createMissionTypes=()=>({});')
     .replace(/import \{createMissionConstraints\} from [^;]+;/,'const createMissionConstraints=()=>({});')
@@ -76,7 +81,7 @@ test('empty UI choice restores server selection without clearing its result or s
     .replace(/import \{createOrbitSelection\} from [^;]+;/,'const createOrbitSelection=()=>globalThis.testOrbitClient;')
     .replace(/import \{createWorkspacePlayback\} from [^;]+;/,'const createWorkspacePlayback=()=>({update(){},destroy(){}});')
     .replace(/import \{createSatelliteHover\} from [^;]+;/,'const createSatelliteHover=()=>({show(){},clear(){},destroy(){}});')
-    .replace(/import \{createWorkspaceGlobe\} from [^;]+;/,'const createWorkspaceGlobe=()=>({observeSatelliteHover(){return()=>{};},bindScenarioRuntime(){return()=>{};},update(){},catalog(){},stations(){},selectStation(){},focusStation(){},destroy(){}});');
+    .replace(/import \{createWorkspaceGlobe\} from [^;]+;/,'const createWorkspaceGlobe=()=>({observeDisplayContext(){return()=>{};},observeSatelliteHover(){return()=>{};},bindScenarioRuntime(){return()=>{};},update(){},catalog(){},stations(){},selectStation(){},focusStation(){},destroy(){}});');
   try {
     const ui=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
     ui.showWorkspaceOrbit('satellite');
