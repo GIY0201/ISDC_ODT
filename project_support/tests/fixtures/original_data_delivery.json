@@ -1,0 +1,238 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_hashes": {
+    "communication/external/data_management.py": "134d235ea609f0a7f49e12a29c7ae117583afd6ee1837c28f38739fd11d50841"
+  },
+  "evidence": "Original class executed against MockTransport; component wire behavior, not remote connectivity",
+  "calls": [
+    {
+      "method": "GET",
+      "path": "/api/data-management/status",
+      "query": {},
+      "body": null
+    },
+    {
+      "method": "GET",
+      "path": "/api/data-management/status",
+      "query": {},
+      "body": null
+    },
+    {
+      "method": "POST",
+      "path": "/api/data-management/nodes",
+      "query": {},
+      "body": {
+        "scope_id": "run:deployment:A",
+        "example": "update_nodes"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/data-management/ingest",
+      "query": {},
+      "body": {
+        "scope_id": "run:deployment:A",
+        "example": "ingest"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/data-management/requests",
+      "query": {},
+      "body": {
+        "scope_id": "run:deployment:A",
+        "example": "request"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/data-management/actions",
+      "query": {},
+      "body": {
+        "scope_id": "run:deployment:A",
+        "example": "action"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/data-management/overview",
+      "query": {
+        "scope_id": "run:deployment:A"
+      },
+      "body": null
+    },
+    {
+      "method": "GET",
+      "path": "/api/data-management/objects",
+      "query": {
+        "class": "telemetry",
+        "scope_id": "run:deployment:A"
+      },
+      "body": null
+    },
+    {
+      "method": "GET",
+      "path": "/api/data-management/nodes",
+      "query": {
+        "scope_id": "run:deployment:A"
+      },
+      "body": null
+    },
+    {
+      "method": "GET",
+      "path": "/api/data-management/events",
+      "query": {
+        "after": "7",
+        "scope_id": "run:deployment:A"
+      },
+      "body": null
+    },
+    {
+      "method": "GET",
+      "path": "/api/data-management/status",
+      "query": {
+        "scope_id": "run:deployment:A"
+      },
+      "body": null
+    }
+  ],
+  "results": [
+    {
+      "scope_contract": "isolated-v1",
+      "reachable": true,
+      "echo": {
+        "method": "GET",
+        "path": "/api/data-management/status",
+        "query": {},
+        "body": null
+      },
+      "placement": "remote",
+      "endpoint": "http://module.test"
+    },
+    {
+      "scope_contract": "isolated-v1",
+      "reachable": true,
+      "scope_id": "run:deployment:A",
+      "echo": {
+        "method": "POST",
+        "path": "/api/data-management/nodes",
+        "query": {},
+        "body": {
+          "scope_id": "run:deployment:A",
+          "example": "update_nodes"
+        }
+      }
+    },
+    {
+      "scope_contract": "isolated-v1",
+      "reachable": true,
+      "scope_id": "run:deployment:A",
+      "echo": {
+        "method": "POST",
+        "path": "/api/data-management/ingest",
+        "query": {},
+        "body": {
+          "scope_id": "run:deployment:A",
+          "example": "ingest"
+        }
+      }
+    },
+    {
+      "scope_contract": "isolated-v1",
+      "reachable": true,
+      "scope_id": "run:deployment:A",
+      "echo": {
+        "method": "POST",
+        "path": "/api/data-management/requests",
+        "query": {},
+        "body": {
+          "scope_id": "run:deployment:A",
+          "example": "request"
+        }
+      }
+    },
+    {
+      "scope_contract": "isolated-v1",
+      "reachable": true,
+      "scope_id": "run:deployment:A",
+      "echo": {
+        "method": "POST",
+        "path": "/api/data-management/actions",
+        "query": {},
+        "body": {
+          "scope_id": "run:deployment:A",
+          "example": "action"
+        }
+      }
+    },
+    {
+      "scope_contract": "isolated-v1",
+      "reachable": true,
+      "scope_id": "run:deployment:A",
+      "echo": {
+        "method": "GET",
+        "path": "/api/data-management/overview",
+        "query": {
+          "scope_id": "run:deployment:A"
+        },
+        "body": null
+      }
+    },
+    {
+      "scope_contract": "isolated-v1",
+      "reachable": true,
+      "scope_id": "run:deployment:A",
+      "echo": {
+        "method": "GET",
+        "path": "/api/data-management/objects",
+        "query": {
+          "class": "telemetry",
+          "scope_id": "run:deployment:A"
+        },
+        "body": null
+      }
+    },
+    {
+      "scope_contract": "isolated-v1",
+      "reachable": true,
+      "scope_id": "run:deployment:A",
+      "echo": {
+        "method": "GET",
+        "path": "/api/data-management/nodes",
+        "query": {
+          "scope_id": "run:deployment:A"
+        },
+        "body": null
+      }
+    },
+    {
+      "scope_contract": "isolated-v1",
+      "reachable": true,
+      "scope_id": "run:deployment:A",
+      "echo": {
+        "method": "GET",
+        "path": "/api/data-management/events",
+        "query": {
+          "after": "7",
+          "scope_id": "run:deployment:A"
+        },
+        "body": null
+      }
+    },
+    {
+      "scope_contract": "isolated-v1",
+      "reachable": true,
+      "scope_id": "run:deployment:A",
+      "echo": {
+        "method": "GET",
+        "path": "/api/data-management/status",
+        "query": {
+          "scope_id": "run:deployment:A"
+        },
+        "body": null
+      },
+      "placement": "remote",
+      "endpoint": "http://module.test"
+    }
+  ]
+}

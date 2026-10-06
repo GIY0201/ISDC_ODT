@@ -1,3 +1,8 @@
+## 2026-10-06 T079 / T149 전달 수락 및 원격 어댑터 부분 이식
+- 변경: 원본 Protocol/오류와 HTTP 어댑터 재사용. isolated-v1 범위·명부·시간·제품ref 수락 확인 후 전달cursor 반영, source6h clock catch-up/2000chunk/부분실패 retry 보존. 역행시간은 쓰기 전 차단, shared/injected HTTP client 소유권 보존.
+- 검증: initial missingmodule RED 및 malformedref/역행catalogue reset19PASS2FAIL 후수정. target22PASS0.49s; 원본HTTP class 두capture5522bytes/SHAcb1e8bc0… 동일 및wire full 비교. 최종Python618PASS8기존warnings159.84s(session66449exit0)/Node540PASS3004.0646ms/syntax/stageddiff PASS. validation/t149_data_delivery.md.
+- 남음: T149 schema/RuntimeState candidate activation·revision·idempotency·rollback·HTTP assembly, T150–153/전체T079/T075–84/T032/실장비·RF·HIL/다운로드. 시험은 내장module 및MockTransport 구성요소 증거; 실제원격연결/8891화면 아님. 서버8891/native설치/사용자화면/원격PR·병합 변경없음.
+
 # 현재 개발 상태
 
 ## 2026-09-07: 프레임워크 기반 구조 개편
