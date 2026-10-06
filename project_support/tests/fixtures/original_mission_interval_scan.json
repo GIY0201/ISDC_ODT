@@ -1,0 +1,82 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "cases": [
+    {
+      "id": "two_edges",
+      "end": 120,
+      "step": 30,
+      "ranges": [
+        [
+          10,
+          70
+        ],
+        [
+          95,
+          121
+        ]
+      ],
+      "expected": [
+        {
+          "start": 10312.5,
+          "end": 69375
+        },
+        {
+          "start": 95625,
+          "end": 120000,
+          "truncated": true
+        }
+      ]
+    },
+    {
+      "id": "all",
+      "end": 120,
+      "step": 60,
+      "ranges": [
+        [
+          0,
+          121
+        ]
+      ],
+      "expected": [
+        {
+          "start": 0,
+          "end": 120000,
+          "truncated": true
+        }
+      ]
+    },
+    {
+      "id": "none",
+      "end": 120,
+      "step": 60,
+      "ranges": [],
+      "expected": []
+    },
+    {
+      "id": "source_missed_short_gap",
+      "end": 120,
+      "step": 60,
+      "ranges": [
+        [
+          10,
+          70
+        ],
+        [
+          95,
+          121
+        ]
+      ],
+      "expected": [
+        {
+          "start": 10312.5,
+          "end": 120000,
+          "truncated": true
+        }
+      ]
+    }
+  ],
+  "source_function_sha256": "8c1b400c38b6f40e0cd1bdcb149b68e090cdc131500349d505dc78bc61e3f35a",
+  "source_path": "digital_twin/simulation/browser/mission_windows.js",
+  "source_function": "scanIntervals",
+  "units": "milliseconds"
+}
