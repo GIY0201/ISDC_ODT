@@ -81,6 +81,12 @@ test('Escape and source zoom wheel amounts delegate only from this panel, never 
   await root.dispatch('keydown',{key:'Escape'});await root.ids.get('node-zoom-in').dispatch('click');await root.ids.get('node-zoom-out').dispatch('click');
   assert.deepEqual(calls,[['untrack',{aimAtEarth:true}],['wheel',120],['wheel',-120]]);controls.destroy();await root.dispatch('keydown',{key:'Escape'});assert.equal(calls.length,3);
 });
+
+test('unavailable shared camera disables home before it can release tracking',async()=>{
+ const {tools,root}=setup();let calls=0;
+ const controls=tools.createNodeSceneControls({root,readScene:()=>({ready:true,cameraReady:false,zoom:null}),readDisplay:()=>({utc}),actions:{untrack:()=>calls++,home:()=>calls++}});
+ const home=root.scene.find(button=>button.dataset.nodeScene==='home');assert.equal(home.disabled,true);await home.dispatch('click');assert.equal(calls,0);controls.destroy();
+});
 test('formation/inspector markup and source presentation rules match pinned original static receipt',async()=>{
   const {tools}=setup();const fixture=JSON.parse(await readFile(new URL('../fixtures/original_node_work_panel.json',import.meta.url),'utf8'));
   const formation=fixture.formationMarkup.replace('id="nodes-deploy" class="ns-deploy"','id="nodes-deploy" class="ns-deploy" disabled').replace('대시보드 미반영','서버 배치 미확인').replace('작업 세트의 사본을 대시보드(궤도 탭) 카탈로그에 반영합니다. 대시보드의 SDC 버튼으로 내 위성만 볼 수 있습니다.','서버 수락 경로 연결 후 명시적으로 배치합니다. 현재는 서버 배치 미확인입니다.').replace('대시보드에서 내 위성을 모두 제거합니다. 작업 세트는 유지됩니다.','서버 수락 경로 연결 후 명시적으로 회수합니다. 작업 세트는 유지됩니다.');

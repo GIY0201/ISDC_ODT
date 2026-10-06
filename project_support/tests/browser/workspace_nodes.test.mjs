@@ -22,8 +22,17 @@ function fixture({native=false}={}){
  const codec=createUtcCodec(LEAP_SHA256),row=utc=>({utc,status:'valid',error_code:null,position_m:[7000000,2,3],inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550});
  const api={nodeSamples:async p=>{calls.push(['samples']);if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>row(codec.advance(p.start_utc,i)))}))};},nodeTrack:async p=>{if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>{const period=orbitElements(node.orbit).period/60;return{node_id:node.id,definition_hash:'a'.repeat(64),period_minutes:period,path_visible:true,rows:Array.from({length:121},(_,i)=>row(codec.advance(new Date(Math.trunc(Date.parse(p.center_utc)+(i-60)*period*60000/120)).toISOString(),0)))};})};}};
  const workspace=createWorkspaceNodes({api,globe,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now:()=>1791151272000,resolveModel:()=>({key:'flat',url:'/flat.glb'}),models:()=>[],fetchImpl});
- return{workspace,calls,buttons,sections,context(value){context=value;displayListener(value);},get options(){return panelOptions;},get interaction(){return interaction;},get renderer(){return renderer;},attach(){return renderer=rendererFactory({},{});},get removeCount(){return removeCount;}};
+ return{workspace,globe,calls,buttons,sections,context(value){context=value;displayListener(value);},get options(){return panelOptions;},get interaction(){return interaction;},get renderer(){return renderer;},attach(){return renderer=rendererFactory({},{});},get removeCount(){return removeCount;}};
 }
+
+test('source node panel camera callbacks route to shared owner and reject callbacks after disposal',async()=>{
+ const f=fixture();f.globe.cameraState=()=>({ready:true,zoom:42});
+ f.globe.zoomBy=value=>f.calls.push(['wheel',value]);f.globe.setZoom=value=>f.calls.push(['zoom',value]);f.globe.home=()=>f.calls.push(['home']);
+ await f.workspace.start();f.workspace.show('satellite');assert.equal(f.options.readScene().zoom,42);
+ f.options.actions.zoomBy(120);f.options.actions.setZoom(70);f.options.actions.home();
+ assert.deepEqual(f.calls.slice(-3),[['wheel',120],['zoom',70],['home']]);
+ const held=f.options.actions;f.workspace.destroy();const count=f.calls.length;held.home();held.setZoom(20);held.zoomBy(-120);assert.equal(f.calls.length,count);
+});
 test('source node workspace starts with readonly GET, mounts existing panel and never deploys or focuses passively',async()=>{
  const f=fixture();assert.equal(f.calls.length,0);await f.workspace.start();assert.deepEqual(f.calls.filter(c=>c[0]==='http').map(c=>c[2]),['GET']);
  f.workspace.show('satellite');assert.ok(f.sections.has('satellite-nodes'));assert.ok(f.options.store);f.options.store.add({name:'test'});

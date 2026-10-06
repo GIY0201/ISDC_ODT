@@ -29,6 +29,42 @@ export class CenteredCameraMotion {
   cancel(){this.range.cancel();}
   release(options){this.cancel();this.model()?.untrack(options);}
   distance(){const {scene,camera}=this.viewer;return scene.mode===this.C.SceneMode.SCENE2D?camera.frustum.right-camera.frustum.left:this.C.Cartesian3.magnitude(camera.positionWC);}
+  zoomState(){
+    const {scene,camera}=this.viewer,C=this.C;
+    if(this.disposed||!C.SceneMode||![C.SceneMode.SCENE2D,C.SceneMode.SCENE3D].includes(scene.mode))return null;
+    const map=scene.mode===C.SceneMode.SCENE2D,model=this.model(),tracking=model?.tracking===true;
+    const distance=map?camera.frustum?.right-camera.frustum?.left:tracking?model.zoomDistance():C.Cartesian3?.magnitude?.(camera.positionWC);
+    if(!Number.isFinite(distance)||distance<=0)return null;
+    const minimum=map?1000:tracking?Math.max(1,Math.min(20,(Number(model.current?.sizeMeters)||20)*.6)):6498137;
+    const maximum=map?40000000:1006378137;
+    return {distance,tracking,minimum,maximum,zoom:Math.max(0,Math.min(100,100*Math.log(maximum/distance)/Math.log(maximum/minimum)))};
+  }
+  setZoom(value){
+    const state=this.zoomState();if(!state||!Number.isFinite(value))return false;
+    const target=state.maximum*(state.minimum/state.maximum)**(Math.max(0,Math.min(100,value))/100);
+    const ok=state.tracking?this.model().setZoomDistance(target):this.setZoomDistance(target);
+    if(state.tracking)this.cancel();if(ok)this.viewer.scene.requestRender();return ok;
+  }
+  setZoomDistance(distance){
+    if(this.disposed||!Number.isFinite(distance)||!this.zoomState())return false;
+    const {scene,camera}=this.viewer,map=scene.mode===this.C.SceneMode.SCENE2D;
+    camera.cancelFlight?.();const ok=this.range.moveTo(this.distance(),Math.max(map?1000:6498137,Math.min(map?40000000:1006378137,distance)));
+    this.mode=scene.mode;this.stamp=this.now();if(ok)scene.requestRender();return ok;
+  }
+  home(duration=1.4){
+    const {scene,camera}=this.viewer,C=this.C;
+    if(this.disposed||!Number.isFinite(duration)||duration<0||!C.SceneMode||![C.SceneMode.SCENE2D,C.SceneMode.SCENE3D].includes(scene.mode))return false;
+    const map=scene.mode===C.SceneMode.SCENE2D,canvas=scene.canvas;
+    if(map?typeof camera.flyHome!=='function':typeof camera.flyTo!=='function'||!C.Cartesian3?.fromDegrees||!C.Math?.toRadians||!(canvas?.clientWidth>0&&canvas?.clientHeight>0))return false;
+    this.release();camera.cancelFlight?.();
+    if(map)camera.flyHome(duration);
+    else{
+      const aspect=Math.max(1,canvas.clientWidth/Math.max(1,canvas.clientHeight));
+      const halfFov=Math.atan(Math.tan((camera.frustum.fov||Math.PI/3)/2)/aspect);
+      camera.flyTo({destination:C.Cartesian3.fromDegrees(126.9,20,8000000/Math.sin(halfFov)*1.06-6378137),orientation:{heading:0,pitch:C.Math.toRadians(-89),roll:0},duration});
+    }
+    scene.requestRender();return true;
+  }
   zoomBy(delta){
     delta=Number(delta);if(this.disposed||!Number.isFinite(delta)||!delta||this.transitioning())return false;
     const {scene,camera}=this.viewer;

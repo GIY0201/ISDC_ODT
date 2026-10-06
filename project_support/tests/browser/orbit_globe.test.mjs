@@ -20,6 +20,14 @@ test('ITRF metres are fixed-frame coordinates and clock uses the exact injected 
   assert.equal(viewer.items[0].position.frame,'fixed');assert.equal(viewer.clock.currentTime,sample.utc);assert.equal(viewer.clock.shouldAnimate,false);
   sample.position_m[0]=0;assert.equal(viewer.items[0].position.value.x,6202527.7);
 });
+
+test('camera UI routes through the existing owner and queued scene morph rejects all commands',()=>{
+ const {globe,viewers}=fixture(),calls=[];
+ globe.cameraMotion.zoomState=()=>({zoom:44});globe.cameraMotion.zoomBy=value=>{calls.push(['wheel',value]);return true;};globe.cameraMotion.setZoom=value=>{calls.push(['slider',value]);return true;};globe.cameraMotion.home=()=>{calls.push(['home']);return true;};
+ assert.deepEqual(globe.cameraState(),{ready:true,zoom:44});assert.equal(globe.zoomBy(120),true);assert.equal(globe.setZoom(50),true);assert.equal(globe.home(),true);assert.equal(viewers.length,1);
+ globe.viewControls.cancelMorph=()=>{};assert.deepEqual(globe.cameraState(),{ready:false,zoom:null});assert.equal(globe.zoomBy(120),false);assert.equal(globe.setZoom(50),false);assert.equal(globe.home(),false);assert.equal(calls.length,3);
+ globe.destroy();assert.equal(globe.home(),false);
+});
 test('catalog marker labels describe the current model rather than implying epoch time during playback',()=>{
  const {globe,sample}=fixture();globe.update({...sample,name:'ISS (ZARYA)',epoch_utc:sample.utc,utc:'2020-07-12T21:17:01.000416000Z'});
  assert.equal(globe.entity.label.text,'ISS (ZARYA) · GP 모델');assert.equal(globe.entity.name,'ISS (ZARYA) · SGP4 모델');

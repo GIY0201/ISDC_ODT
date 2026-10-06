@@ -33,6 +33,10 @@ export class OrbitGlobe {
   }
   focusSatelliteModel(options={}){if(this.destroyed)return false;this.cameraMotion.cancel();return this.modelLayer?.focus(undefined,options)??false;}
   releaseSatelliteModel(options){if(!this.destroyed)this.cameraMotion.release(options);}
+  cameraState(){const state=!this.destroyed&&!this.viewControls.cancelMorph?this.cameraMotion.zoomState():null;return {ready:Boolean(state),zoom:state?.zoom??null};}
+  zoomBy(delta){return this.cameraState().ready?this.cameraMotion.zoomBy(delta):false;}
+  setZoom(value){return this.cameraState().ready?this.cameraMotion.setZoom(value):false;}
+  home(){return this.cameraState().ready?this.cameraMotion.home():false;}
   retrySatelliteModel(){return this.destroyed?Promise.resolve(null):this.modelLayer?.retry()??Promise.resolve(null);}
   clearSatelliteModel(){if(!this.destroyed){this.cameraMotion.cancel();this.modelLayer?.clear();}}
   update(sample){

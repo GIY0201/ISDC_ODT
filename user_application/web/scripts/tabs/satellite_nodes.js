@@ -429,7 +429,7 @@ function createNodeSceneControls({root,readScene=()=>null,readDisplay,actions={}
   const speedsOf=display=>Array.isArray(display?.speeds)&&display.speeds.length>0&&display.speeds.length<=16&&display.speeds.every(value=>Number.isFinite(value)&&value>0)?[...new Set(display.speeds)]:null;
   function enabled(mode,scene,display){
     if(mode==='focus')return scene?.ready===true&&typeof onFocus==='function'&&canFocus();
-    if(mode==='home')return scene?.ready===true&&has('home')&&has('untrack');
+    if(mode==='home')return scene?.ready===true&&scene.cameraReady!==false&&has('home')&&has('untrack');
     if(mode==='untrack')return scene?.ready===true&&has('untrack');
     if(mode==='tracks')return scene?.ready===true&&typeof scene.tracks==='boolean'&&has('toggleTracks');
     if(mode==='links'||mode==='models'||mode==='lighting')return scene?.ready===true&&typeof scene[mode]==='boolean'&&has({links:'setLinksVisible',models:'setModelsVisible',lighting:'setLighting'}[mode]);
@@ -498,7 +498,7 @@ function createNodeWorkPanel({root,store,editorTools,now,timers,createFormationI
     // Source default live slider mode affects future explicit edits only; setLive doesn't generate.
     draft.formation.setLive(true);initializing=false;refresh();
   }catch(error){destroy();throw error;}
-  return Object.freeze({refresh,destroy,draft});
+  return Object.freeze({refresh,refreshScene:()=>{if(!disposed&&!initializing)controls.refresh();},destroy,draft});
 }
 
 function workPanelMarkup(){return `<div class="satellite-node-work-panel">

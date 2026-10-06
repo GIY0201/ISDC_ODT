@@ -40,3 +40,30 @@ test('an incomplete Viewer boundary installs nothing and remains safe to dispose
   const motion=new CenteredCameraMotion({}, {scene:{canvas:{}},camera:{}});
   assert.doesNotThrow(()=>motion.dispose());assert.doesNotThrow(()=>motion.dispose());
 });
+
+test('source logarithmic slider preserves Earth/map limits and uses existing eased owner',()=>{
+ const f=fixture();const state=f.motion.zoomState();
+ assert.equal(state.minimum,6498137);assert.equal(state.maximum,1006378137);
+ assert.equal(state.zoom,100*Math.log(state.maximum/30000000)/Math.log(state.maximum/state.minimum));
+ assert.equal(f.motion.setZoom(100),true);assert.equal(Vector.magnitude(f.camera.positionWC),30000000);
+ f.advance(3000);assert.ok(Math.abs(Vector.magnitude(f.camera.positionWC)-6498137)<1);
+ f.scene.mode=2;assert.equal(f.motion.setZoom(0),true);f.advance(3000);assert.ok(Math.abs(f.camera.frustum.right-f.camera.frustum.left-40000000)<1);
+ f.scene.mode=0;assert.equal(f.motion.zoomState(),null);assert.equal(f.motion.setZoom(50),false);
+ f.motion.dispose();assert.equal(f.motion.setZoom(50),false);assert.equal(f.motion.zoomState(),null);
+});
+
+test('source slider delegates tracking to existing model and cancels pending Earth motion',()=>{
+ const f=fixture(),calls=[];f.wheel(120);f.model.tracking=true;f.model.current={sizeMeters:10};f.model.zoomDistance=()=>100;
+ f.model.setZoomDistance=value=>{calls.push(value);return true;};
+ assert.equal(f.motion.zoomState().minimum,6);assert.equal(f.motion.setZoom(100),true);assert.deepEqual(calls,[6]);assert.equal(f.motion.range.active,false);
+ assert.equal(f.motion.setZoom(NaN),false);f.motion.dispose();
+});
+
+test('source home keeps viewport fit and releases the same tracking owner without a new clock',()=>{
+ const f=fixture(),calls=[];f.camera.flyTo=value=>calls.push(value);f.camera.flyHome=value=>calls.push(value);
+ f.motion.C.Cartesian3.fromDegrees=(lon,lat,height)=>({lon,lat,height});f.motion.C.Math={toRadians:degrees=>degrees*Math.PI/180};
+ assert.equal(f.motion.home(),true);assert.equal(f.model.releases,1);assert.equal(calls[0].destination.lon,126.9);assert.equal(calls[0].destination.lat,20);
+ const halfFov=Math.atan(Math.tan(Math.PI/6)/(1000/700));assert.equal(calls[0].destination.height,8000000/Math.sin(halfFov)*1.06-6378137);assert.equal(calls[0].duration,1.4);
+ f.scene.mode=2;assert.equal(f.motion.home(),true);assert.equal(calls[1],1.4);
+ f.scene.mode=0;assert.equal(f.motion.home(),false);assert.equal(calls.length,2);f.motion.dispose();assert.equal(f.motion.home(),false);
+});

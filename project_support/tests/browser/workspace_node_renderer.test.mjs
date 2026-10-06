@@ -31,6 +31,16 @@ test('node interaction binds preboot to the shared globe and fences replaced or 
  f.ui.bindNodeInteraction({owns:()=>false,onSelect:id=>selected.push('new:'+id)});assert.equal(old.owns('N',{}),false);old.onSelect('old');remove();
  assert.ok(f.instances[0].interaction);assert.deepEqual(selected,['N']);f.ui.destroy();old.onSelect('disposed');assert.deepEqual(selected,['N']);
 });
+
+test('shared camera port is unavailable preboot, observes existing node frame and fences disposal',async()=>{
+ const f=await fixture({boot:false}),seen=[],calls=[];f.ui.observeCamera(value=>seen.push(value));
+ assert.deepEqual(f.ui.cameraState(),{ready:false,zoom:null});assert.equal(f.ui.zoomBy(120),false);
+ f.host.Cesium={};f.loads[0]();const owner=f.instances[0];owner.cameraState=()=>({ready:true,zoom:30});
+ owner.zoomBy=value=>{calls.push(['wheel',value]);return true;};owner.setZoom=value=>{calls.push(['zoom',value]);return true;};owner.home=()=>{calls.push(['home']);return true;};
+ f.ui.bindNodeRenderer(()=>({syncFrame(){},destroy(){}}));f.frames.raise();assert.deepEqual(seen.at(-1),{ready:true,zoom:30});
+ assert.equal(f.ui.zoomBy(120),true);assert.equal(f.ui.setZoom(40),true);assert.equal(f.ui.home(),true);assert.deepEqual(calls,[['wheel',120],['zoom',40],['home']]);
+ const count=seen.length;f.frames.raise();assert.equal(seen.length,count);f.ui.destroy();assert.equal(f.ui.home(),false);assert.equal(f.ui.zoomBy(120),false);assert.deepEqual(f.ui.cameraState(),{ready:false,zoom:null});
+});
 test('reentrant interaction cleanup cannot replace a newer owner or let an older remover clear it',async()=>{
  const f=await fixture(),selected=[];let rebind=false;
  f.ui.bindNodeInteraction({owns:()=>true,onHover:()=>{if(rebind)f.ui.bindNodeInteraction({owns:()=>true,onSelect:()=>selected.push('newest')});}});

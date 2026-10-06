@@ -6,6 +6,9 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let choice={mode:'3d',imagery:'blue_marble',theme:'dark',emphasis:true},imagery={requestedImagery:'blue_marble',displayedImagery:null,phase:'pending',error:null},mode={phase:'ready',error:null},modeRevision=0;
   const viewObservers=new Set();
   const displayObservers=new Set();let displayKey=null,solarFactory=null,solarRenderer=null;
+  const cameraObservers=new Set();let cameraKey=null;
+  const cameraState=()=>!disposed&&!failed&&globe?globe.cameraState?.()??{ready:false,zoom:null}:{ready:false,zoom:null};
+  function notifyCamera(){const value=cameraState(),key=JSON.stringify(value);if(key===cameraKey)return;cameraKey=key;for(const fn of cameraObservers){try{fn({...value});}catch{/* Readonly camera observer. */}}}
   let nodeBinding=null;const nodeObservers=new Set();
   let nodeInteractionBinding=null;
   function attachNodeInteraction(){
@@ -40,6 +43,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
         try{
           const phase=host.performance?.now?.();
           renderer.syncFrame(displayContext()?.utc??null,Number.isFinite(phase)?phase:0);
+          notifyCamera();
         }catch(error){binding.phase='error';binding.error=String(error?.message||error);detachNodes(binding);notifyNodes();}
       };
       binding.removeFrame=frames.addEventListener(frame);binding.phase='ready';binding.error=null;notifyNodes();
@@ -79,7 +83,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     }catch(error){report({phase:'error',errorKind:'renderer',error:String(error?.message||error),satelliteId:description.satelliteId});}
   }
   const viewState=()=>structuredClone({choice,imagery,mode,available:Boolean(globe)&&!failed&&!disposed});
-  const notifyView=()=>{if(!disposed)for(const fn of viewObservers)fn(viewState());};
+  const notifyView=()=>{if(!disposed)for(const fn of viewObservers)fn(viewState());notifyCamera();};
   function applyView(fields){
     if(!globe||disposed)return;
     if(fields.includes('theme')||fields.includes('emphasis'))globe.setViewStyle(choice.theme,choice.emphasis);
@@ -145,6 +149,11 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   if(host.Cesium)boot();else host.addEventListener('load',boot,{once:true});
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
+    cameraState,
+    observeCamera(fn){if(disposed)return()=>{};cameraObservers.add(fn);fn({...cameraState()});return()=>cameraObservers.delete(fn);},
+    zoomBy(value){return !disposed&&!failed?globe?.zoomBy?.(value)??false:false;},
+    setZoom(value){return !disposed&&!failed?globe?.setZoom?.(value)??false:false;},
+    home(){return !disposed&&!failed?globe?.home?.()??false:false;},
     nodeRendererState,
     observeNodeRenderer(fn){if(disposed)return()=>{};nodeObservers.add(fn);try{fn(structuredClone(nodeRendererState()));}catch{/* Readonly observer. */}return()=>nodeObservers.delete(fn);},
     bindNodeRenderer(factory){
@@ -176,7 +185,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     },
     clearSatelliteModel(){if(disposed)return;++modelRevision;modelDescription=null;modelSource=null;modelStatus={phase:'unassigned'};globe?.clearSatelliteModel();notifyModel();},
     focusSatelliteModel(options={}){if(disposed||!modelDescription)return false;const result=globe?.focusSatelliteModel(options)??false;notifyModel();return result;},
-    releaseSatelliteModel(){if(disposed)return;globe?.releaseSatelliteModel();notifyModel();},
+    releaseSatelliteModel(options){if(disposed)return;globe?.releaseSatelliteModel(options);notifyModel();},
     retrySatelliteModel(){if(disposed)return Promise.resolve(null);return Promise.resolve(globe?.retrySatelliteModel()).finally(notifyModel);},
     viewState,
     observeView(fn){if(disposed)return()=>{};viewObservers.add(fn);fn(viewState());return()=>viewObservers.delete(fn);},
@@ -210,6 +219,6 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       paint();
       if(!catalog&&!latest&&!sceneMetadata&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
     },
-    destroy(){if(disposed)return;disposed=true;nodeInteractionBinding=null;nodeObservers.clear();detachNodes();nodeBinding=null;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;displayObservers.clear();hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
+    destroy(){if(disposed)return;disposed=true;cameraObservers.clear();nodeInteractionBinding=null;nodeObservers.clear();detachNodes();nodeBinding=null;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;displayObservers.clear();hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
   };
 }
