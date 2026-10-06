@@ -1,0 +1,17 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "files": {
+    "digital_twin/simulation/mission_planning/scheduler.py": {
+      "source_path": "operations_software/orchestration/scheduler.py",
+      "source_sha256": "8dffc9ae5fb9b7653b3797a2b62b6329e5e261754c695f85c167a5fceb5b8bda",
+      "normalized_source_sha256": "8c8dfb5802e49781c9c36fd52da7cc400e5c793c5de3235aca8cee33c39c8a2d",
+      "port_sha256": "8c8dfb5802e49781c9c36fd52da7cc400e5c793c5de3235aca8cee33c39c8a2d"
+    },
+    "digital_twin/runtime/mission_planning/stand_in.py": {
+      "source_path": "operations_software/orchestration/stand_in.py",
+      "source_sha256": "d80b26ae2fbf28084a5774a17357a8b083b2e4400ec23041b245f7d2022c3de0",
+      "normalized_source_sha256": "004e71211d3b099414a6602d12678f022c3c90358f774ae12e9cc6ed8b8623cc",
+      "port_sha256": "29c746549e9d01334bd77b2849b6de368ecec3609ad8aa8450f13547f38663bd"
+    }
+  }
+}
