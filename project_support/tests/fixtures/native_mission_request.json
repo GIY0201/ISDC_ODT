@@ -1,0 +1,892 @@
+{
+  "context": {
+    "utc": "2020-07-12T21:16:01.000416000Z",
+    "nodes": [
+      {
+        "schema": 1,
+        "id": "N-1",
+        "catalog_number": 900001,
+        "name": "N-1",
+        "bus": "comms_small",
+        "model_key": "oneweb",
+        "mode": "nominal",
+        "mass_kg": 150,
+        "power": {
+          "generation_w": 1200,
+          "bus_w": 120,
+          "battery_wh": 2000
+        },
+        "orbit": {
+          "altitude_km": 418.16463447119895,
+          "eccentricity": 0.0001413,
+          "inclination": 51.6461,
+          "raan": 221.2784,
+          "argp": 89.1723,
+          "mean_anomaly": 280.4612,
+          "epoch": 1594588561000.416
+        },
+        "equipment": [
+          {
+            "id": "N-1-S",
+            "catalog": "s_band_ttc",
+            "enabled": true
+          }
+        ],
+        "formation": null,
+        "notes": "",
+        "created_at": "2020-07-12T21:16:01.000Z",
+        "updated_at": "2020-07-12T21:16:01.000Z"
+      },
+      {
+        "schema": 1,
+        "id": "N-2",
+        "catalog_number": 900002,
+        "name": "N-2",
+        "bus": "comms_small",
+        "model_key": "oneweb",
+        "mode": "nominal",
+        "mass_kg": 150,
+        "power": {
+          "generation_w": 1200,
+          "bus_w": 120,
+          "battery_wh": 2000
+        },
+        "orbit": {
+          "altitude_km": 418.16463447119895,
+          "eccentricity": 0.0001413,
+          "inclination": 51.6461,
+          "raan": 221.2784,
+          "argp": 89.1723,
+          "mean_anomaly": 100.46120000000002,
+          "epoch": 1594588561000.416
+        },
+        "equipment": [
+          {
+            "id": "N-2-S",
+            "catalog": "s_band_ttc",
+            "enabled": true
+          }
+        ],
+        "formation": null,
+        "notes": "",
+        "created_at": "2020-07-12T21:16:01.000Z",
+        "updated_at": "2020-07-12T21:16:01.000Z"
+      }
+    ],
+    "stations": [
+      {
+        "id": "GS-DAEJEON",
+        "name": "Daejeon",
+        "latitude": 36.3504,
+        "longitude": 127.3845,
+        "altitude_km": 0.07,
+        "min_elevation_deg": 10,
+        "bands": [
+          "S"
+        ]
+      }
+    ],
+    "missions": [],
+    "faults": [],
+    "deployment": {
+      "revision": 1
+    },
+    "settings": {
+      "endpoint": "/api/orchestration"
+    },
+    "module": {
+      "instance": "fixture-module"
+    }
+  },
+  "mission": {
+    "id": "M-native",
+    "name": "native source compute",
+    "kind": "compute",
+    "priority": 1,
+    "window_start": "2020-07-12T21:16:01.000416000Z",
+    "deadline": "2020-07-12T22:16:01.000416000Z",
+    "params": {
+      "input_mb": 10,
+      "output_ratio": 0.1
+    },
+    "exclude": []
+  },
+  "end": "2020-07-12T23:16:01.000416000Z",
+  "optical_receipts": [
+    {
+      "request": {
+        "nodes": [
+          {
+            "schema": 1,
+            "id": "N-1",
+            "catalog_number": 900001,
+            "name": "N-1",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 418.16463447119895,
+              "eccentricity": 0.0001413,
+              "inclination": 51.6461,
+              "raan": 221.2784,
+              "argp": 89.1723,
+              "mean_anomaly": 280.4612,
+              "epoch": 1594588561000.416
+            },
+            "equipment": [
+              {
+                "id": "N-1-S",
+                "catalog": "s_band_ttc",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2020-07-12T21:16:01.000Z",
+            "updated_at": "2020-07-12T21:16:01.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "N-2",
+            "catalog_number": 900002,
+            "name": "N-2",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 418.16463447119895,
+              "eccentricity": 0.0001413,
+              "inclination": 51.6461,
+              "raan": 221.2784,
+              "argp": 89.1723,
+              "mean_anomaly": 100.46120000000002,
+              "epoch": 1594588561000.416
+            },
+            "equipment": [
+              {
+                "id": "N-2-S",
+                "catalog": "s_band_ttc",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2020-07-12T21:16:01.000Z",
+            "updated_at": "2020-07-12T21:16:01.000Z"
+          }
+        ],
+        "start_utc": "2020-07-12T21:14:01.000000000Z",
+        "count": 1,
+        "step_seconds": 1,
+        "request_id": "native-optical-0"
+      },
+      "reply": {
+        "schema_version": 1,
+        "request_id": "native-optical-0",
+        "status": "valid",
+        "model_profile": "SOURCE_KEPLER_J2_V1",
+        "frame": "EARTH_FIXED_GMST_UTC_APPROX",
+        "inertial_frame": "SOURCE_MEAN_EQUATOR_EQUINOX_APPROX",
+        "time_model": "unix_ms_utc_approx",
+        "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+        "quality": "engineering_assumption",
+        "nodes": [
+          {
+            "node_id": "N-1",
+            "definition_hash": "e4e9085e43098a09c23d7c20648d51039067422d07979690b47cae63d5864839",
+            "rows": [
+              {
+                "utc": "2020-07-12T21:14:01.000000000Z",
+                "status": "valid",
+                "error_code": null,
+                "position_m": [
+                  6038070.702371658,
+                  -3114603.834945989,
+                  173335.21285638277
+                ],
+                "inertial_position_km": [
+                  -5013.737201523488,
+                  -4584.920296969038,
+                  173.33521285638278
+                ],
+                "inertial_velocity_km_s": [
+                  3.32180402510545,
+                  -3.4039577409154282,
+                  6.002423015483993
+                ],
+                "lvlh_basis": {
+                  "x": [
+                    0.43364494010076987,
+                    -0.44457161493259845,
+                    0.7837781223798107
+                  ],
+                  "y": [
+                    -0.5174172575512874,
+                    0.5892690446068575,
+                    0.6205170220519547
+                  ],
+                  "z": [
+                    -0.737720439945312,
+                    -0.6746243934696871,
+                    0.025504513768206515
+                  ]
+                },
+                "mean_anomaly_deg": 272.71277419813464,
+                "raan_deg": 221.28527592927628,
+                "argp_deg": 89.16717390611336,
+                "sunlit": true,
+                "longitude_deg": -27.2859350769273,
+                "latitude_deg": 1.4706951145329985,
+                "height_km": 418.13329360101125
+              }
+            ]
+          },
+          {
+            "node_id": "N-2",
+            "definition_hash": "666dac9babfd6ca550dc88d31d492e0a055e2c72de2d56059153cc92573b7192",
+            "rows": [
+              {
+                "utc": "2020-07-12T21:14:01.000000000Z",
+                "status": "valid",
+                "error_code": null,
+                "position_m": [
+                  -6039174.155207264,
+                  3112493.1425770326,
+                  -176344.85280486234
+                ],
+                "inertial_position_km": [
+                  5012.139571273886,
+                  4586.686708026051,
+                  -176.34485280486234
+                ],
+                "inertial_velocity_km_s": [
+                  -3.3233541324099907,
+                  3.4024535405701544,
+                  -6.002287118438571
+                ],
+                "lvlh_basis": {
+                  "x": [
+                    -0.4340613632900538,
+                    0.44419067370247545,
+                    -0.7837635984750255
+                  ],
+                  "y": [
+                    -0.5174172575512875,
+                    0.5892690446068574,
+                    0.6205170220519547
+                  ],
+                  "z": [
+                    0.7374755009401225,
+                    0.674875276228032,
+                    -0.02594700462968642
+                  ]
+                },
+                "mean_anomaly_deg": 92.71277419813465,
+                "raan_deg": 221.28527592927628,
+                "argp_deg": 89.16717390611336,
+                "sunlit": true,
+                "longitude_deg": 152.73415025615276,
+                "latitude_deg": -1.4962163656597158,
+                "height_km": 418.2246847341339
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "nodes": [
+          {
+            "schema": 1,
+            "id": "N-1",
+            "catalog_number": 900001,
+            "name": "N-1",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 418.16463447119895,
+              "eccentricity": 0.0001413,
+              "inclination": 51.6461,
+              "raan": 221.2784,
+              "argp": 89.1723,
+              "mean_anomaly": 280.4612,
+              "epoch": 1594588561000.416
+            },
+            "equipment": [
+              {
+                "id": "N-1-S",
+                "catalog": "s_band_ttc",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2020-07-12T21:16:01.000Z",
+            "updated_at": "2020-07-12T21:16:01.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "N-2",
+            "catalog_number": 900002,
+            "name": "N-2",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 418.16463447119895,
+              "eccentricity": 0.0001413,
+              "inclination": 51.6461,
+              "raan": 221.2784,
+              "argp": 89.1723,
+              "mean_anomaly": 100.46120000000002,
+              "epoch": 1594588561000.416
+            },
+            "equipment": [
+              {
+                "id": "N-2-S",
+                "catalog": "s_band_ttc",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2020-07-12T21:16:01.000Z",
+            "updated_at": "2020-07-12T21:16:01.000Z"
+          }
+        ],
+        "start_utc": "2020-07-12T21:15:01.000000000Z",
+        "count": 1,
+        "step_seconds": 1,
+        "request_id": "native-optical-1"
+      },
+      "reply": {
+        "schema_version": 1,
+        "request_id": "native-optical-1",
+        "status": "valid",
+        "model_profile": "SOURCE_KEPLER_J2_V1",
+        "frame": "EARTH_FIXED_GMST_UTC_APPROX",
+        "inertial_frame": "SOURCE_MEAN_EQUATOR_EQUINOX_APPROX",
+        "time_model": "unix_ms_utc_approx",
+        "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+        "quality": "engineering_assumption",
+        "nodes": [
+          {
+            "node_id": "N-1",
+            "definition_hash": "e4e9085e43098a09c23d7c20648d51039067422d07979690b47cae63d5864839",
+            "rows": [
+              {
+                "utc": "2020-07-12T21:15:01.000000000Z",
+                "status": "valid",
+                "error_code": null,
+                "position_m": [
+                  6134085.928057844,
+                  -2876982.4858405683,
+                  533087.226676197
+                ],
+                "inertial_position_km": [
+                  -4803.241046066736,
+                  -4778.379835259057,
+                  533.087226676197
+                ],
+                "inertial_velocity_km_s": [
+                  3.6960094328157815,
+                  -3.0470715856726995,
+                  5.9754814226689525
+                ],
+                "lvlh_basis": {
+                  "x": [
+                    0.4825076403232786,
+                    -0.39797040818342716,
+                    0.780260168943653
+                  ],
+                  "y": [
+                    -0.5173818983590526,
+                    0.5893000904413277,
+                    0.6205170220519546
+                  ],
+                  "z": [
+                    -0.7067548006770414,
+                    -0.7030966915127388,
+                    0.07843911080447111
+                  ]
+                },
+                "mean_anomaly_deg": 276.58697366800476,
+                "raan_deg": 221.28183797655683,
+                "argp_deg": 89.16973694417115,
+                "sunlit": true,
+                "longitude_deg": -25.127313762906393,
+                "latitude_deg": 4.527176149495384,
+                "height_km": 418.18678864599315
+              }
+            ]
+          },
+          {
+            "node_id": "N-2",
+            "definition_hash": "666dac9babfd6ca550dc88d31d492e0a055e2c72de2d56059153cc92573b7192",
+            "rows": [
+              {
+                "utc": "2020-07-12T21:15:01.000000000Z",
+                "status": "valid",
+                "error_code": null,
+                "position_m": [
+                  -6135080.296618942,
+                  2874825.3973136786,
+                  -536081.8772558421
+                ],
+                "inertial_position_km": [
+                  4801.5547631852905,
+                  4780.052632255671,
+                  -536.0818772558421
+                ],
+                "inertial_velocity_km_s": [
+                  -3.6974087912890212,
+                  3.0454609707031484,
+                  -5.975118607797076
+                ],
+                "lvlh_basis": {
+                  "x": [
+                    -0.48290438518356793,
+                    0.39757557845381364,
+                    -0.7802160048266094
+                  ],
+                  "y": [
+                    -0.5173818983590526,
+                    0.5893000904413277,
+                    0.6205170220519546
+                  ],
+                  "z": [
+                    0.706483776190836,
+                    0.7033200287372445,
+                    -0.07887719034155778
+                  ]
+                },
+                "mean_anomaly_deg": 96.58697366800473,
+                "raan_deg": 221.28183797655683,
+                "argp_deg": 89.16973694417115,
+                "sunlit": true,
+                "longitude_deg": 154.89277242500933,
+                "latitude_deg": -4.552510526683621,
+                "height_km": 418.40858765093526
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "request": {
+        "nodes": [
+          {
+            "schema": 1,
+            "id": "N-1",
+            "catalog_number": 900001,
+            "name": "N-1",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 418.16463447119895,
+              "eccentricity": 0.0001413,
+              "inclination": 51.6461,
+              "raan": 221.2784,
+              "argp": 89.1723,
+              "mean_anomaly": 280.4612,
+              "epoch": 1594588561000.416
+            },
+            "equipment": [
+              {
+                "id": "N-1-S",
+                "catalog": "s_band_ttc",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2020-07-12T21:16:01.000Z",
+            "updated_at": "2020-07-12T21:16:01.000Z"
+          },
+          {
+            "schema": 1,
+            "id": "N-2",
+            "catalog_number": 900002,
+            "name": "N-2",
+            "bus": "comms_small",
+            "model_key": "oneweb",
+            "mode": "nominal",
+            "mass_kg": 150,
+            "power": {
+              "generation_w": 1200,
+              "bus_w": 120,
+              "battery_wh": 2000
+            },
+            "orbit": {
+              "altitude_km": 418.16463447119895,
+              "eccentricity": 0.0001413,
+              "inclination": 51.6461,
+              "raan": 221.2784,
+              "argp": 89.1723,
+              "mean_anomaly": 100.46120000000002,
+              "epoch": 1594588561000.416
+            },
+            "equipment": [
+              {
+                "id": "N-2-S",
+                "catalog": "s_band_ttc",
+                "enabled": true
+              }
+            ],
+            "formation": null,
+            "notes": "",
+            "created_at": "2020-07-12T21:16:01.000Z",
+            "updated_at": "2020-07-12T21:16:01.000Z"
+          }
+        ],
+        "start_utc": "2020-07-12T21:16:01.000416000Z",
+        "count": 1,
+        "step_seconds": 1,
+        "request_id": "native-optical-2"
+      },
+      "reply": {
+        "schema_version": 1,
+        "request_id": "native-optical-2",
+        "status": "valid",
+        "model_profile": "SOURCE_KEPLER_J2_V1",
+        "frame": "EARTH_FIXED_GMST_UTC_APPROX",
+        "inertial_frame": "SOURCE_MEAN_EQUATOR_EQUINOX_APPROX",
+        "time_model": "unix_ms_utc_approx",
+        "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+        "quality": "engineering_assumption",
+        "nodes": [
+          {
+            "node_id": "N-1",
+            "definition_hash": "e4e9085e43098a09c23d7c20648d51039067422d07979690b47cae63d5864839",
+            "rows": [
+              {
+                "utc": "2020-07-12T21:16:01.000416000Z",
+                "status": "valid",
+                "error_code": null,
+                "position_m": [
+                  6204311.0423429655,
+                  -2626986.207997643,
+                  890401.9352791151
+                ],
+                "inertial_position_km": [
+                  -4570.78234231024,
+                  -4949.998063269682,
+                  890.4019352791152
+                ],
+                "inertial_velocity_km_s": [
+                  4.05335596768745,
+                  -2.6762709640036464,
+                  5.921190468386729
+                ],
+                "lvlh_basis": {
+                  "x": [
+                    0.5291689557356785,
+                    -0.349552289038519,
+                    0.7731710118166248
+                  ],
+                  "y": [
+                    -0.5173465370588339,
+                    0.5893311343693005,
+                    0.6205170220519546
+                  ],
+                  "z": [
+                    -0.6725568949009774,
+                    -0.7283556900930515,
+                    0.1310160747016591
+                  ]
+                },
+                "mean_anomaly_deg": 280.4612,
+                "raan_deg": 221.2784,
+                "argp_deg": 89.1723,
+                "sunlit": true,
+                "longitude_deg": -22.948432865722385,
+                "latitude_deg": 7.575354635653015,
+                "height_km": 418.3591459143245
+              }
+            ]
+          },
+          {
+            "node_id": "N-2",
+            "definition_hash": "666dac9babfd6ca550dc88d31d492e0a055e2c72de2d56059153cc92573b7192",
+            "rows": [
+              {
+                "utc": "2020-07-12T21:16:01.000416000Z",
+                "status": "valid",
+                "error_code": null,
+                "position_m": [
+                  -6205194.895035226,
+                  2624792.838430949,
+                  -893368.1536281294
+                ],
+                "inertial_position_km": [
+                  4569.0172315105865,
+                  4951.571737156693,
+                  -893.3681536281294
+                ],
+                "inertial_velocity_km_s": [
+                  -4.0545790169331175,
+                  2.6745833446870524,
+                  -5.920607363811874
+                ],
+                "lvlh_basis": {
+                  "x": [
+                    -0.5295426846609558,
+                    0.3491474111222409,
+                    -0.7730980729692092
+                  ],
+                  "y": [
+                    -0.5173465370588339,
+                    0.5893311343693006,
+                    0.6205170220519546
+                  ],
+                  "z": [
+                    0.6722626761283869,
+                    0.7285498605926917,
+                    -0.1314457869810576
+                  ]
+                },
+                "mean_anomaly_deg": 100.46120000000002,
+                "raan_deg": 221.2784,
+                "argp_deg": 89.1723,
+                "sunlit": true,
+                "longitude_deg": 157.07167395444762,
+                "latitude_deg": -7.600339218187344,
+                "height_km": 418.71029737624394
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "bundle": {
+    "schema_version": 1,
+    "status": "sampled",
+    "request_id": "native-mission-request",
+    "node_definitions": [
+      {
+        "schema": 1,
+        "id": "N-1",
+        "catalog_number": 900001,
+        "name": "N-1",
+        "bus": "comms_small",
+        "model_key": "oneweb",
+        "mode": "nominal",
+        "mass_kg": 150,
+        "power": {
+          "generation_w": 1200,
+          "bus_w": 120,
+          "battery_wh": 2000
+        },
+        "orbit": {
+          "altitude_km": 418.16463447119895,
+          "eccentricity": 0.0001413,
+          "inclination": 51.6461,
+          "raan": 221.2784,
+          "argp": 89.1723,
+          "mean_anomaly": 280.4612,
+          "epoch": 1594588561000.416
+        },
+        "equipment": [
+          {
+            "id": "N-1-S",
+            "catalog": "s_band_ttc",
+            "enabled": true
+          }
+        ],
+        "formation": null,
+        "notes": "",
+        "created_at": "2020-07-12T21:16:01.000Z",
+        "updated_at": "2020-07-12T21:16:01.000Z"
+      },
+      {
+        "schema": 1,
+        "id": "N-2",
+        "catalog_number": 900002,
+        "name": "N-2",
+        "bus": "comms_small",
+        "model_key": "oneweb",
+        "mode": "nominal",
+        "mass_kg": 150,
+        "power": {
+          "generation_w": 1200,
+          "bus_w": 120,
+          "battery_wh": 2000
+        },
+        "orbit": {
+          "altitude_km": 418.16463447119895,
+          "eccentricity": 0.0001413,
+          "inclination": 51.6461,
+          "raan": 221.2784,
+          "argp": 89.1723,
+          "mean_anomaly": 100.46120000000002,
+          "epoch": 1594588561000.416
+        },
+        "equipment": [
+          {
+            "id": "N-2-S",
+            "catalog": "s_band_ttc",
+            "enabled": true
+          }
+        ],
+        "formation": null,
+        "notes": "",
+        "created_at": "2020-07-12T21:16:01.000Z",
+        "updated_at": "2020-07-12T21:16:01.000Z"
+      }
+    ],
+    "definition_hashes": {
+      "N-1": "e4e9085e43098a09c23d7c20648d51039067422d07979690b47cae63d5864839",
+      "N-2": "666dac9babfd6ca550dc88d31d492e0a055e2c72de2d56059153cc92573b7192"
+    },
+    "conditions": {
+      "sites": [
+        {
+          "station_id": "GS-DAEJEON",
+          "ground_point": {
+            "latitude_deg": 36.3504,
+            "longitude_deg": 127.3845,
+            "ellipsoid_height_m": 70.0
+          },
+          "minimum_elevation_deg": 10.0
+        }
+      ],
+      "target": null,
+      "external": null,
+      "max_external_range_km": null,
+      "start_utc": "2020-07-12T21:16:01.000416000Z",
+      "end_utc": "2020-07-12T23:16:01.000416000Z"
+    },
+    "contact_reports": [
+      {
+        "station_id": "GS-DAEJEON",
+        "geometry": {
+          "schema_version": 1,
+          "status": "sampled",
+          "model_profile": "SOURCE_KEPLER_J2_V1",
+          "frame": "EARTH_FIXED_GMST_UTC_APPROX",
+          "inertial_frame": "SOURCE_MEAN_EQUATOR_EQUINOX_APPROX",
+          "time_model": "unix_ms_utc_approx",
+          "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+          "quality": "engineering_assumption",
+          "definition_hashes": {
+            "N-1": "e4e9085e43098a09c23d7c20648d51039067422d07979690b47cae63d5864839",
+            "N-2": "666dac9babfd6ca550dc88d31d492e0a055e2c72de2d56059153cc92573b7192"
+          },
+          "passes": [
+            {
+              "id": "pass|N-1|2020-07-12T21:48:59.594416000Z",
+              "satellite": "N-1",
+              "start": "2020-07-12T21:48:59.594416000Z",
+              "end": "2020-07-12T21:51:24.907416000Z",
+              "peak": "2020-07-12T21:50:12.667416000Z",
+              "max_elevation_deg": 11.52071846522628,
+              "duration_seconds": 145,
+              "in_progress": false,
+              "truncated": false
+            }
+          ],
+          "site": {
+            "latitude_deg": 36.3504,
+            "longitude_deg": 127.3845,
+            "ellipsoid_height_m": 70.0
+          },
+          "minimum_elevation_deg": 10.0,
+          "coverage": {
+            "start_utc": "2020-07-12T21:16:01.000416000Z",
+            "end_utc": "2020-07-12T23:16:01.000416000Z",
+            "resolution_seconds": 30,
+            "peak_bracket_seconds": 0.1,
+            "boundary_bracket_seconds": 1,
+            "short_intervals_may_be_missed": true
+          }
+        }
+      }
+    ],
+    "eclipse_report": {
+      "model_profile": "SOURCE_KEPLER_J2_V1",
+      "frame": "EARTH_FIXED_GMST_UTC_APPROX",
+      "inertial_frame": "SOURCE_MEAN_EQUATOR_EQUINOX_APPROX",
+      "time_model": "unix_ms_utc_approx",
+      "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+      "quality": "engineering_assumption",
+      "status": "sampled",
+      "definition_hashes": {
+        "N-1": "e4e9085e43098a09c23d7c20648d51039067422d07979690b47cae63d5864839",
+        "N-2": "666dac9babfd6ca550dc88d31d492e0a055e2c72de2d56059153cc92573b7192"
+      },
+      "windows": [
+        {
+          "id": "eclipse|N-1|2020-07-12T21:16:50.687916000Z",
+          "satellite": "N-1",
+          "start": "2020-07-12T21:16:50.687916000Z",
+          "end": "2020-07-12T21:31:14.125416000Z",
+          "in_progress": false,
+          "truncated": false
+        },
+        {
+          "id": "eclipse|N-1|2020-07-12T22:50:08.500416000Z",
+          "satellite": "N-1",
+          "start": "2020-07-12T22:50:08.500416000Z",
+          "end": "2020-07-12T23:04:01.000416000Z",
+          "in_progress": false,
+          "truncated": false
+        },
+        {
+          "id": "eclipse|N-2|2020-07-12T22:03:29.125416000Z",
+          "satellite": "N-2",
+          "start": "2020-07-12T22:03:29.125416000Z",
+          "end": "2020-07-12T22:17:37.562916000Z",
+          "in_progress": false,
+          "truncated": false
+        }
+      ],
+      "coverage": {
+        "start_utc": "2020-07-12T21:16:01.000416000Z",
+        "end_utc": "2020-07-12T23:16:01.000416000Z",
+        "resolution_seconds": 60,
+        "boundary_tolerance_seconds": 1,
+        "short_intervals_may_be_missed": true
+      }
+    },
+    "target_report": null,
+    "external_report": null,
+    "communication_status": "unknown"
+  },
+  "transport": "installed native and actual ASGI factory, offline fixture",
+  "orbit_state_unchanged": true
+}

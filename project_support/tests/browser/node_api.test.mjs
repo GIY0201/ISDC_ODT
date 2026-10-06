@@ -29,3 +29,14 @@ test('node transport surfaces HTTP failures and rejects HTML or malformed JSON',
   }
  }finally{globalThis.fetch=original;}
 });
+
+test('native mission windows use same-origin readonly API and preserve typed failures and abort during JSON',async()=>{
+ const original=globalThis.fetch,controller=new AbortController(),payload={request_id:'windows',nodes:[{id:'N-1'}],sites:[],start_utc:'2020-07-12T21:16:01.000416000Z',end_utc:'2020-07-12T23:16:01.000416000Z'};
+ try{
+  globalThis.fetch=async(url,options)=>{assert.equal(url,'/api/nodes/mission-windows');assert.equal(options.signal,controller.signal);assert.equal(options.body,JSON.stringify(payload));assert.equal(options.cache,'no-store');return Response.json({schema_version:1,status:'sampled'});};
+  assert.equal((await api.nodeMissionWindows(payload,{signal:controller.signal})).status,'sampled');
+  for(const status of [409,422,502,503]){globalThis.fetch=async()=>Response.json({detail:'unavailable'},{status});await assert.rejects(api.nodeMissionWindows(payload),e=>e instanceof OrbitApiError&&e.status===status);}
+  globalThis.fetch=async()=>({ok:true,status:200,headers:new Headers({'content-type':'application/json'}),json:async()=>{controller.abort();throw new DOMException('cancelled','AbortError');}});
+  await assert.rejects(api.nodeMissionWindows(payload,{signal:controller.signal}),{name:'AbortError'});
+ }finally{globalThis.fetch=original;}
+});

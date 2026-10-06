@@ -49,7 +49,13 @@ async function nodeRequest(path,payload,{signal}={}) {
   return data;
 }
 
+async function missionWindowRequest(payload,{signal}={}) {
+  try{return await nodeRequest('/api/nodes/mission-windows',payload,{signal});}
+  catch(error){if(signal?.aborted)signal.throwIfAborted();throw error;}
+}
+
 export const api = {
+  nodeMissionWindows: missionWindowRequest,
   nodeSamples: (payload,options={}) => nodeRequest('/api/nodes/samples',payload,options),
   nodeTrack: (payload,options={}) => nodeRequest('/api/nodes/track',payload,options),
   solarSamples: (payload,{signal}={}) => orbitRequest('/api/solar/samples',{method:'POST',headers:jsonHeaders,body:JSON.stringify(payload),signal}),
