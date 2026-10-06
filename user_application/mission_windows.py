@@ -41,23 +41,12 @@ class NativeMissionWindows:
             times=[stamp(value) for value in offsets]
             subset=[captured[i] for i in indices]
             report=await self.node_query.points(subset,times,request_id)
-            if (not isinstance(report,dict) or report.get('request_id')!=request_id or report.get('schema_version')!=1
-                or report.get('status')!='valid' or any(report.get(key)!=value for key,value in metadata.items())
-                or not isinstance(report.get('nodes'),list) or len(report['nodes'])!=len(subset)):
-                raise RuntimeError('required native window result unavailable or misaligned')
+            rows=validate_native_window_points(report,subset,times,request_id,hashes)
             states=[]
-            for i,result in zip(indices,report['nodes']):
-                if (not isinstance(result,dict) or result.get('node_id')!=captured[i]['id']
-                    or result.get('definition_hash')!=hashes[captured[i]['id']]
-                    or not isinstance(result.get('rows'),list) or len(result['rows'])!=len(times)):
-                    raise RuntimeError('native window identity/hash mismatch')
-                values=[]
-                for utc,row in zip(times,result['rows']):
-                    if (not isinstance(row,dict) or row.get('utc')!=utc or row.get('status')!='valid'
-                        or row.get('error_code') is not None or type(row.get('sunlit')) is not bool):
-                        raise RuntimeError('required native eclipse sample unavailable')
-                    values.append(not row['sunlit'])
-                states.append(values)
+            for node_rows in rows:
+                if any(type(row.get('sunlit')) is not bool for row in node_rows):
+                    raise RuntimeError('required native eclipse sample unavailable')
+                states.append([not row['sunlit'] for row in node_rows])
             return states
         windows=[];edges=[];active=[None]*len(captured);previous=[None]*len(captured)
         offsets=[float(i*step_seconds) for i in range(int(duration//step_seconds)+1)]
@@ -108,3 +97,25 @@ class NativeMissionWindows:
         return {**metadata,'status':'sampled','definition_hashes':hashes,'windows':result,
                 'coverage':{'start_utc':first.iso_utc,'end_utc':last.iso_utc,'resolution_seconds':step_seconds,
                             'boundary_tolerance_seconds':refine_seconds,'short_intervals_may_be_missed':True}}
+
+
+def validate_native_window_points(report,nodes,times,request_id,hashes):
+    """Shared receipt fence for eclipse and pass producers; no state/query ownership."""
+    metadata={'model_profile':NODE_PROFILE,'frame':NODE_FRAME,'inertial_frame':NODE_INERTIAL_FRAME,
+              'time_model':NODE_TIME_MODEL,'source_commit':SOURCE_COMMIT,'quality':'engineering_assumption'}
+    if (not isinstance(report,dict) or report.get('request_id')!=request_id or report.get('schema_version')!=1
+        or report.get('status')!='valid' or any(report.get(key)!=value for key,value in metadata.items())
+        or not isinstance(report.get('nodes'),list) or len(report['nodes'])!=len(nodes)):
+        raise RuntimeError('required native window result unavailable or misaligned')
+    rows=[]
+    for node,result in zip(nodes,report['nodes']):
+        if (not isinstance(result,dict) or result.get('node_id')!=node['id']
+            or result.get('definition_hash')!=hashes[node['id']]
+            or not isinstance(result.get('rows'),list) or len(result['rows'])!=len(times)):
+            raise RuntimeError('native window identity/hash mismatch')
+        for utc,row in zip(times,result['rows']):
+            if (not isinstance(row,dict) or row.get('utc')!=utc or row.get('status')!='valid'
+                or row.get('error_code') is not None):
+                raise RuntimeError('required native window sample unavailable')
+        rows.append(result['rows'])
+    return rows
