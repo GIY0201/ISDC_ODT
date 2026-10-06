@@ -1,0 +1,1451 @@
+{
+  "schema": 1,
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_file": "digital_twin/model_library/browser/ground_stations.js",
+  "source_sha256": "d63b55ab5d1e354de743f96a8998871d426217b62d551caeca131c39dc8c5ce4",
+  "trace": {
+    "presets": {
+      "seoul": {
+        "key": "seoul",
+        "name": "서울",
+        "region": "대한민국",
+        "latitude": 37.5665,
+        "longitude": 126.978,
+        "altitude_km": 0.04,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 5
+      },
+      "daejeon": {
+        "key": "daejeon",
+        "name": "대전",
+        "region": "대한민국",
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitude_km": 0.07,
+        "dish_m": 13,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 5
+      },
+      "jeju": {
+        "key": "jeju",
+        "name": "제주",
+        "region": "대한민국",
+        "latitude": 33.4996,
+        "longitude": 126.5312,
+        "altitude_km": 0.03,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5
+      },
+      "svalbard": {
+        "key": "svalbard",
+        "name": "스발바르",
+        "region": "노르웨이",
+        "latitude": 78.2298,
+        "longitude": 15.4078,
+        "altitude_km": 0.45,
+        "dish_m": 11,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 3
+      },
+      "tromso": {
+        "key": "tromso",
+        "name": "트롬쇠",
+        "region": "노르웨이",
+        "latitude": 69.6627,
+        "longitude": 18.9401,
+        "altitude_km": 0.1,
+        "dish_m": 11,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5
+      },
+      "fairbanks": {
+        "key": "fairbanks",
+        "name": "페어뱅크스",
+        "region": "미국 알래스카",
+        "latitude": 64.8378,
+        "longitude": -147.7164,
+        "altitude_km": 0.14,
+        "dish_m": 11,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 5
+      },
+      "inuvik": {
+        "key": "inuvik",
+        "name": "이누빅",
+        "region": "캐나다",
+        "latitude": 68.3607,
+        "longitude": -133.723,
+        "altitude_km": 0.02,
+        "dish_m": 13,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5
+      },
+      "singapore": {
+        "key": "singapore",
+        "name": "싱가포르",
+        "region": "싱가포르",
+        "latitude": 1.3521,
+        "longitude": 103.8198,
+        "altitude_km": 0.02,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 7
+      },
+      "hawaii": {
+        "key": "hawaii",
+        "name": "하와이",
+        "region": "미국",
+        "latitude": 19.0136,
+        "longitude": -155.6634,
+        "altitude_km": 0.2,
+        "dish_m": 9,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5
+      },
+      "atacama": {
+        "key": "atacama",
+        "name": "아타카마",
+        "region": "칠레",
+        "latitude": -23.0229,
+        "longitude": -67.753,
+        "altitude_km": 2.4,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5
+      },
+      "punta_arenas": {
+        "key": "punta_arenas",
+        "name": "푼타아레나스",
+        "region": "칠레",
+        "latitude": -53.1638,
+        "longitude": -70.9171,
+        "altitude_km": 0.03,
+        "dish_m": 11,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 5
+      },
+      "hobart": {
+        "key": "hobart",
+        "name": "호바트",
+        "region": "호주",
+        "latitude": -42.8821,
+        "longitude": 147.3272,
+        "altitude_km": 0.02,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5
+      }
+    },
+    "bands": [
+      "S",
+      "X",
+      "Ka"
+    ],
+    "labels": {
+      "S": "S 대역 (TT&C)",
+      "X": "X 대역 (데이터)",
+      "Ka": "Ka 대역 (고속 데이터)"
+    },
+    "frequencies": {
+      "S": 2.2,
+      "X": 8.2,
+      "Ka": 20
+    },
+    "defaults": [
+      "daejeon",
+      "jeju",
+      "svalbard"
+    ],
+    "created": [
+      {
+        "schema": 1,
+        "id": "GS-SEOUL",
+        "preset": "seoul",
+        "name": "서울",
+        "region": "대한민국",
+        "latitude": 37.5665,
+        "longitude": 126.978,
+        "altitude_km": 0.04,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-DAEJEON",
+        "preset": "daejeon",
+        "name": "대전",
+        "region": "대한민국",
+        "latitude": 36.3742,
+        "longitude": 127.3567,
+        "altitude_km": 0.07,
+        "dish_m": 13,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-JEJU",
+        "preset": "jeju",
+        "name": "제주",
+        "region": "대한민국",
+        "latitude": 33.4996,
+        "longitude": 126.5312,
+        "altitude_km": 0.03,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-SVALBARD",
+        "preset": "svalbard",
+        "name": "스발바르",
+        "region": "노르웨이",
+        "latitude": 78.2298,
+        "longitude": 15.4078,
+        "altitude_km": 0.45,
+        "dish_m": 11,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 3,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-TROMSO",
+        "preset": "tromso",
+        "name": "트롬쇠",
+        "region": "노르웨이",
+        "latitude": 69.6627,
+        "longitude": 18.9401,
+        "altitude_km": 0.1,
+        "dish_m": 11,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-FAIRBANKS",
+        "preset": "fairbanks",
+        "name": "페어뱅크스",
+        "region": "미국 알래스카",
+        "latitude": 64.8378,
+        "longitude": -147.7164,
+        "altitude_km": 0.14,
+        "dish_m": 11,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-INUVIK",
+        "preset": "inuvik",
+        "name": "이누빅",
+        "region": "캐나다",
+        "latitude": 68.3607,
+        "longitude": -133.723,
+        "altitude_km": 0.02,
+        "dish_m": 13,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-SINGAPORE",
+        "preset": "singapore",
+        "name": "싱가포르",
+        "region": "싱가포르",
+        "latitude": 1.3521,
+        "longitude": 103.8198,
+        "altitude_km": 0.02,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 7,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-HAWAII",
+        "preset": "hawaii",
+        "name": "하와이",
+        "region": "미국",
+        "latitude": 19.0136,
+        "longitude": -155.6634,
+        "altitude_km": 0.2,
+        "dish_m": 9,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-ATACAMA",
+        "preset": "atacama",
+        "name": "아타카마",
+        "region": "칠레",
+        "latitude": -23.0229,
+        "longitude": -67.753,
+        "altitude_km": 2.4,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-PUNTA_ARENAS",
+        "preset": "punta_arenas",
+        "name": "푼타아레나스",
+        "region": "칠레",
+        "latitude": -53.1638,
+        "longitude": -70.9171,
+        "altitude_km": 0.03,
+        "dish_m": 11,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      {
+        "schema": 1,
+        "id": "GS-HOBART",
+        "preset": "hobart",
+        "name": "호바트",
+        "region": "호주",
+        "latitude": -42.8821,
+        "longitude": 147.3272,
+        "altitude_km": 0.02,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      }
+    ],
+    "custom": {
+      "schema": 1,
+      "id": "GS-CUSTOM",
+      "preset": null,
+      "name": "고흥",
+      "region": "대한민국",
+      "latitude": 34.6,
+      "longitude": 127.2,
+      "altitude_km": 0.04,
+      "dish_m": 5,
+      "bands": [
+        "X"
+      ],
+      "min_elevation_deg": 10,
+      "enabled": true
+    },
+    "restored": {
+      "schema": 1,
+      "id": "GS-SEOUL",
+      "preset": "seoul",
+      "name": "서울",
+      "region": "대한민국",
+      "latitude": 37.5665,
+      "longitude": 126.978,
+      "altitude_km": 0.04,
+      "dish_m": 7.3,
+      "bands": [
+        "S",
+        "X",
+        "Ka"
+      ],
+      "min_elevation_deg": 8,
+      "enabled": false
+    },
+    "invalidRestore": null,
+    "validation": [
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [
+        "위도는 -90~90°여야 합니다.",
+        "안테나 지름은 0.5~70 m여야 합니다.",
+        "대역을 하나 이상 선택하세요 (S, X, Ka)."
+      ],
+      [
+        "지상국 이름은 1~40자여야 합니다.",
+        "경도는 -180~180°여야 합니다.",
+        "고도는 -0.5~9 km여야 합니다.",
+        "최소 고각은 0° 이상 90° 미만이어야 합니다."
+      ]
+    ],
+    "antenna": [
+      {
+        "dish": 0,
+        "band": "S",
+        "gain": null,
+        "gt": null
+      },
+      {
+        "dish": 0,
+        "band": "X",
+        "gain": null,
+        "gt": null
+      },
+      {
+        "dish": 0,
+        "band": "Ka",
+        "gain": null,
+        "gt": null
+      },
+      {
+        "dish": 0,
+        "band": "L",
+        "gain": null,
+        "gt": null
+      },
+      {
+        "dish": 0.5,
+        "band": "S",
+        "gain": 19.015949602325062,
+        "gt": -2.7449629882317517
+      },
+      {
+        "dish": 0.5,
+        "band": "X",
+        "gain": 30.443773033555274,
+        "gt": 7.433473076915462
+      },
+      {
+        "dish": 0.5,
+        "band": "Ka",
+        "gain": 38.188095899160565,
+        "gt": 13.41688335196394
+      },
+      {
+        "dish": 0.5,
+        "band": "L",
+        "gain": null,
+        "gt": null
+      },
+      {
+        "dish": 7.3,
+        "band": "S",
+        "gain": 42.303006718013805,
+        "gt": 20.54209412745699
+      },
+      {
+        "dish": 7.3,
+        "band": "X",
+        "gain": 53.730830149244014,
+        "gt": 30.7205301926042
+      },
+      {
+        "dish": 7.3,
+        "band": "Ka",
+        "gain": 61.475153014849305,
+        "gt": 36.70394046765268
+      },
+      {
+        "dish": 7.3,
+        "band": "L",
+        "gain": null,
+        "gt": null
+      },
+      {
+        "dish": 11,
+        "band": "S",
+        "gain": 45.86440321876918,
+        "gt": 24.10349062821237
+      },
+      {
+        "dish": 11,
+        "band": "X",
+        "gain": 57.29222664999939,
+        "gt": 34.28192669335958
+      },
+      {
+        "dish": 11,
+        "band": "Ka",
+        "gain": 65.03654951560469,
+        "gt": 40.265336968408064
+      },
+      {
+        "dish": 11,
+        "band": "L",
+        "gain": null,
+        "gt": null
+      },
+      {
+        "dish": 13,
+        "band": "S",
+        "gain": 47.31541656174143,
+        "gt": 25.554503971184616
+      },
+      {
+        "dish": 13,
+        "band": "X",
+        "gain": 58.743239992971624,
+        "gt": 35.73294003633181
+      },
+      {
+        "dish": 13,
+        "band": "Ka",
+        "gain": 66.48756285857692,
+        "gt": 41.716350311380296
+      },
+      {
+        "dish": 13,
+        "band": "L",
+        "gain": null,
+        "gt": null
+      },
+      {
+        "dish": 70,
+        "band": "S",
+        "gain": 61.93851031588983,
+        "gt": 40.177597725333015
+      },
+      {
+        "dish": 70,
+        "band": "X",
+        "gain": 73.36633374712002,
+        "gt": 50.35603379048021
+      },
+      {
+        "dish": 70,
+        "band": "Ka",
+        "gain": 81.11065661272532,
+        "gt": 56.339444065528696
+      },
+      {
+        "dish": 70,
+        "band": "L",
+        "gain": null,
+        "gt": null
+      }
+    ],
+    "distances": [
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-SEOUL",
+        "km": 0
+      },
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-DAEJEON",
+        "km": 136.9326350541321
+      },
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-JEJU",
+        "km": 454.52905099874533
+      },
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-SVALBARD",
+        "km": 6399.9696341882145
+      },
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-TROMSO",
+        "km": 6779.072425941828
+      },
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-FAIRBANKS",
+        "km": 6077.0379883166215
+      },
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-INUVIK",
+        "km": 6534.728862425343
+      },
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-SINGAPORE",
+        "km": 4677.178411723088
+      },
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-HAWAII",
+        "km": 7651.867936597053
+      },
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-ATACAMA",
+        "km": 17892.462118641382
+      },
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 17820.31279159559
+      },
+      {
+        "a": "GS-SEOUL",
+        "b": "GS-HOBART",
+        "km": 9189.275622374176
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-SEOUL",
+        "km": 136.9326350541321
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-DAEJEON",
+        "km": 0
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-JEJU",
+        "km": 328.7423216596108
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-SVALBARD",
+        "km": 6536.864579950855
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-TROMSO",
+        "km": 6914.73031190873
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-FAIRBANKS",
+        "km": 6173.233211013774
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-INUVIK",
+        "km": 6640.653455422318
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-SINGAPORE",
+        "km": 4590.7421455223985
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-HAWAII",
+        "km": 7637.634997669827
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-ATACAMA",
+        "km": 17958.695751478
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 17689.986620957832
+      },
+      {
+        "a": "GS-DAEJEON",
+        "b": "GS-HOBART",
+        "km": 9052.349036213958
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-SEOUL",
+        "km": 454.52905099874533
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-DAEJEON",
+        "km": 328.7423216596108
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-JEJU",
+        "km": 0
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-SVALBARD",
+        "km": 6832.597417951886
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-TROMSO",
+        "km": 7184.164106514788
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-FAIRBANKS",
+        "km": 6487.330249897348
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-INUVIK",
+        "km": 6962.999530288182
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-SINGAPORE",
+        "km": 4291.614613388933
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-HAWAII",
+        "km": 7762.953568174237
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-ATACAMA",
+        "km": 18218.37994830173
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 17447.495692114164
+      },
+      {
+        "a": "GS-JEJU",
+        "b": "GS-HOBART",
+        "km": 8762.810724565912
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-SEOUL",
+        "km": 6399.9696341882145
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-DAEJEON",
+        "km": 6536.864579950855
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-JEJU",
+        "km": 6832.597417951886
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-SVALBARD",
+        "km": 0
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-TROMSO",
+        "km": 959.4346016870405
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-FAIRBANKS",
+        "km": 4071.4843039027674
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-INUVIK",
+        "km": 3593.8200721226335
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-SINGAPORE",
+        "km": 9835.347075055512
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-HAWAII",
+        "km": 9197.394343901906
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-ATACAMA",
+        "km": 12371.165916367074
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 15681.26463251354
+      },
+      {
+        "a": "GS-SVALBARD",
+        "b": "GS-HOBART",
+        "km": 15584.724141280301
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-SEOUL",
+        "km": 6779.072425941828
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-DAEJEON",
+        "km": 6914.73031190873
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-JEJU",
+        "km": 7184.164106514788
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-SVALBARD",
+        "km": 959.4346016870405
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-TROMSO",
+        "km": 0
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-FAIRBANKS",
+        "km": 5029.209077357135
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-INUVIK",
+        "km": 4534.6473816806065
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-SINGAPORE",
+        "km": 9679.696302181925
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-HAWAII",
+        "km": 10156.816456167695
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-ATACAMA",
+        "km": 12287.602372911831
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 15427.248574102996
+      },
+      {
+        "a": "GS-TROMSO",
+        "b": "GS-HOBART",
+        "km": 15893.0766779079
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-SEOUL",
+        "km": 6077.0379883166215
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-DAEJEON",
+        "km": 6173.233211013774
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-JEJU",
+        "km": 6487.330249897348
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-SVALBARD",
+        "km": 4071.4843039027674
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-TROMSO",
+        "km": 5029.209077357135
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-FAIRBANKS",
+        "km": 0
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-INUVIK",
+        "km": 730.0015040146774
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-SINGAPORE",
+        "km": 10742.713024402934
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-HAWAII",
+        "km": 5135.369139767417
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-ATACAMA",
+        "km": 11867.329443780069
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 14669.010967322203
+      },
+      {
+        "a": "GS-FAIRBANKS",
+        "b": "GS-HOBART",
+        "km": 13241.372292084738
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-SEOUL",
+        "km": 6534.728862425343
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-DAEJEON",
+        "km": 6640.653455422318
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-JEJU",
+        "km": 6962.999530288182
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-SVALBARD",
+        "km": 3593.8200721226335
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-TROMSO",
+        "km": 4534.6473816806065
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-FAIRBANKS",
+        "km": 730.0015040146774
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-INUVIK",
+        "km": 0
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-SINGAPORE",
+        "km": 11146.63249198572
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-HAWAII",
+        "km": 5702.667348399282
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-ATACAMA",
+        "km": 11468.396282181386
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 14472.554602911958
+      },
+      {
+        "a": "GS-INUVIK",
+        "b": "GS-HOBART",
+        "km": 13970.902794508247
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-SEOUL",
+        "km": 4677.178411723088
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-DAEJEON",
+        "km": 4590.7421455223985
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-JEJU",
+        "km": 4291.614613388933
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-SVALBARD",
+        "km": 9835.347075055512
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-TROMSO",
+        "km": 9679.696302181925
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-FAIRBANKS",
+        "km": 10742.713024402934
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-INUVIK",
+        "km": 11146.63249198572
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-SINGAPORE",
+        "km": 0
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-HAWAII",
+        "km": 11074.88196571053
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-ATACAMA",
+        "km": 17458.966132867245
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 14249.376497918527
+      },
+      {
+        "a": "GS-SINGAPORE",
+        "b": "GS-HOBART",
+        "km": 6566.259586757961
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-SEOUL",
+        "km": 7651.867936597053
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-DAEJEON",
+        "km": 7637.634997669827
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-JEJU",
+        "km": 7762.953568174237
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-SVALBARD",
+        "km": 9197.394343901906
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-TROMSO",
+        "km": 10156.816456167695
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-FAIRBANKS",
+        "km": 5135.369139767417
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-INUVIK",
+        "km": 5702.667348399282
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-SINGAPORE",
+        "km": 11074.88196571053
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-HAWAII",
+        "km": 0
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-ATACAMA",
+        "km": 10630.01334411186
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 11360.691410127165
+      },
+      {
+        "a": "GS-HAWAII",
+        "b": "GS-HOBART",
+        "km": 9022.790015628836
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-SEOUL",
+        "km": 17892.462118641382
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-DAEJEON",
+        "km": 17958.695751478
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-JEJU",
+        "km": 18218.37994830173
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-SVALBARD",
+        "km": 12371.165916367074
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-TROMSO",
+        "km": 12287.602372911831
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-FAIRBANKS",
+        "km": 11867.329443780069
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-INUVIK",
+        "km": 11468.396282181386
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-SINGAPORE",
+        "km": 17458.966132867245
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-HAWAII",
+        "km": 10630.01334411186
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-ATACAMA",
+        "km": 0
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 3365.9388413170955
+      },
+      {
+        "a": "GS-ATACAMA",
+        "b": "GS-HOBART",
+        "km": 11867.045711083176
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-SEOUL",
+        "km": 17820.31279159559
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-DAEJEON",
+        "km": 17689.986620957832
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-JEJU",
+        "km": 17447.495692114164
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-SVALBARD",
+        "km": 15681.26463251354
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-TROMSO",
+        "km": 15427.248574102996
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-FAIRBANKS",
+        "km": 14669.010967322203
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-INUVIK",
+        "km": 14472.554602911958
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-SINGAPORE",
+        "km": 14249.376497918527
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-HAWAII",
+        "km": 11360.691410127165
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-ATACAMA",
+        "km": 3365.9388413170955
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 0
+      },
+      {
+        "a": "GS-PUNTA_ARENAS",
+        "b": "GS-HOBART",
+        "km": 8737.003235242511
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-SEOUL",
+        "km": 9189.275622374176
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-DAEJEON",
+        "km": 9052.349036213958
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-JEJU",
+        "km": 8762.810724565912
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-SVALBARD",
+        "km": 15584.724141280301
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-TROMSO",
+        "km": 15893.0766779079
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-FAIRBANKS",
+        "km": 13241.372292084738
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-INUVIK",
+        "km": 13970.902794508247
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-SINGAPORE",
+        "km": 6566.259586757961
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-HAWAII",
+        "km": 9022.790015628836
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-ATACAMA",
+        "km": 11867.045711083176
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-PUNTA_ARENAS",
+        "km": 8737.003235242511
+      },
+      {
+        "a": "GS-HOBART",
+        "b": "GS-HOBART",
+        "km": 0
+      }
+    ],
+    "coverage": [
+      {
+        "altitude": 0,
+        "mask": 0,
+        "km": 0
+      },
+      {
+        "altitude": 0,
+        "mask": 5,
+        "km": 0
+      },
+      {
+        "altitude": 0,
+        "mask": 10,
+        "km": 1.4162309103227243e-12
+      },
+      {
+        "altitude": 0,
+        "mask": 30,
+        "km": 0
+      },
+      {
+        "altitude": 0,
+        "mask": 89,
+        "km": 0
+      },
+      {
+        "altitude": 550,
+        "mask": 0,
+        "km": 2558.5729127447044
+      },
+      {
+        "altitude": 550,
+        "mask": 5,
+        "km": 2058.6060225210326
+      },
+      {
+        "altitude": 550,
+        "mask": 10,
+        "km": 1664.9650060910335
+      },
+      {
+        "altitude": 550,
+        "mask": 30,
+        "km": 793.6364765199182
+      },
+      {
+        "altitude": 550,
+        "mask": 89,
+        "km": 8.838049333150526
+      },
+      {
+        "altitude": 1200,
+        "mask": 0,
+        "km": 3638.506521667351
+      },
+      {
+        "altitude": 1200,
+        "mask": 5,
+        "km": 3119.56301976735
+      },
+      {
+        "altitude": 1200,
+        "mask": 10,
+        "km": 2673.6563827692603
+      },
+      {
+        "altitude": 1200,
+        "mask": 30,
+        "km": 1470.1493466707557
+      },
+      {
+        "altitude": 1200,
+        "mask": 89,
+        "km": 17.628858125798377
+      },
+      {
+        "altitude": 35786,
+        "mask": 0,
+        "km": 9050.220267786772
+      },
+      {
+        "altitude": 35786,
+        "mask": 5,
+        "km": 8497.336804790502
+      },
+      {
+        "altitude": 35786,
+        "mask": 10,
+        "km": 7951.85109432706
+      },
+      {
+        "altitude": 35786,
+        "mask": 30,
+        "km": 5841.205746841821
+      },
+      {
+        "altitude": 35786,
+        "mask": 89,
+        "km": 94.4811112631852
+      }
+    ],
+    "ids": [
+      "GS-PUNTA_ARENAS",
+      "GS-SITE",
+      "GS-CUSTOM_SITE",
+      "GS-_"
+    ]
+  }
+}
