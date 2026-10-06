@@ -40,8 +40,13 @@ checkpoint의 차이를 재현했다.
 ‘완료 실행의 현재 입력 새 검토’는 엄격한 과거 입력 재검증과 별도 작업이다.
 기존 source commit·정의·실행·시작·전체 노드·배치·지상국·native hash와 임무
 정의를 보존하고 같은 모듈 인스턴스만 허용한다. 현재 임무의 guarded 수락
-receipt, 로컬 버전·전체 수락 필드, 모듈 확정 버전·작업·sequence·UTC를 모두
-비교한다. 다른 실행의 확정 임무나 오래된 로컬 계획은 거절하며 최신 버전 새
+receipt, 로컬 버전·전체 수락 필드, 모듈 확정 요약과 guarded 결정 receipt를 모두
+확인한다. 확정 status는 원본의 {version, tasks: 개수} 요약이다. 전체 작업·계획 UTC는
+guarded commit이 수락 전에 원본 accepted plan과 정확히 비교한다. 새 검토는
+accepted_decisions의 같은 instance/mission/context/version/plan_sequence와 commit
+수락, held_tasks 개수, 유효한 wallstamp, 범위 내 sequence를 함께 확인한다.
+마지막 await 후에도 accepted_decisions 전체가 바뀌지 않았는지 검사한다.
+다른 실행의 확정 임무나 오래된 로컬 계획은 거절하며 최신 버전 새
 계획 또는 기존 명시적 취소를 검토하도록 안내한다.
 
 그 뒤 실제 정지 SIM UTC에서 전체 native 계산과 기존 입력 수락 API를 사용하고,
@@ -57,3 +62,19 @@ native 요청 경로에 사용될 수 있지만, 과거 계획의 commit/재사�
 stale 로컬 수락·확정 작업·버전·외부 임무·source 정의·roster·모듈 인스턴스,
 마지막 await의 UTC/sequence/record/disposal 변경 거절을 포함한다. 실제 고정
 8891 화면에서 새 작업의 수용 증거는 별도 검증한다.
+
+### 실제 HTTP 확정 계약에 대한 보정
+
+원본 stand_in.status().committed에는 내부 held task 배열·sequence·UTC가 없다.
+초기 새 검토의 내부 held 형태 가정은 실제 HTTP 요약 계약과 달라 유효한
+MSN-0004를 거절했다. backend/wire 변경 없이 실제 status 요약과 exchange의
+accepted_decisions 수락 연쇄로 보정했다. commit receipt.time은 계획 UTC가
+아닌 모듈의 wallstamp이며, 둘의 일치를 요구하지 않는다. 과거 checkpoint
+계약에는 필드를 추가하거나 과거 증명을 수정하지 않는다.
+
+mission_execution_http.json의 실제 router status/commit 캡처를 그대로 사용한
+RED가 기존 ‘확정 작업 증명’ 오류를 재현했다. GREEN은 서로 다른 plan UTC와
+commit wallstamp를 가진 실제 수락을 허용하고 요약/결정 작업 개수·context·버전·
+plan_sequence·인스턴스·mission·결정·sequence·시간 형식·누락을 거절한다.
+sequence를 바꾸지 않는 마지막 await의 결정-only 변경도 거절한다. 이는
+현재 live 실행의 새로운 브라우저 수용 증거와 별도로 기록하는 회귀 증거다.

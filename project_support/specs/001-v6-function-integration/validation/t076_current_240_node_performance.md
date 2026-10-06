@@ -94,3 +94,11 @@ p95 72.9ms,p99 90.9ms,max145.5ms였다. CPU Profiler는 실행하지 않았고
 숨김 표본은0이다. p95 추가 개선은 관측되지 않았으며 여전히 목표 미달이다.
 전체 feedback/eventTiming 집계에는 시각 적용/준비 동작이 포함돼 입력
 최종 성능으로 사용하지 않는다. 원문은 CUA 메모리에 보존하고 있다.
+
+## 2026-10-07 06:24 registered readonly projection live diagnostic
+
+Same localhost240draft origin,1280x720/DPR1/NVIDIA5070,models/path/OISL enabled and existing64-model profile,0accepted validation nodes. Reload retained240definitions and same selected GPU240-B-A1; independent catalogTERRA and UTC2026-10-06T07:11:41.280576000Z/DAEJEON reapplied withoutSIMcommands. Current reload cataloglist GPepoch07:11 differs from preceding refreshed14:00, so do not claim identical GPinput comparison.
+
+First30.0083s foreground RAF trial1504samples p9536.4/p9954.8/max127.6ms,hidden0. Second30.003s1634samples p9519.4/p9919.6/max19.8ms includesCPUprofiling; aggregate3138p9519.4 is cumulative, not independenttrialresult. Both miss16.7ms and neither proves sustainedGPU presentation. Rawrecorder/CPUprofile remainsCUApersistentmemoryonly; no standalone rawfile acceptance. Firsttrial has pausedview and sparsezoomoutsideitsmeasurement, so sustainedinteractioncriterion remainsopen.
+
+31.75298s CPU18724samples: idle6933; frameCurrent1414+388; CesiumOet1104; geometryAt829+203; structuredClone626+335+190; displayGeometryAt260; CesiumwriteUpdate243; GC214. No capturedconsoleerrors. Independent catalogPlay then advancedUTC but subsequentmeasure-start andtwoPauseattempts failedCDP responsiveness. Same temporarytab reloaded successfully after retries, preserving240localdrafts. Originalserver40/SIMrun untouched. Continuousadvancing performance FAILED/unmeasured; readonlypacket miss still fullgeometryFor clones/freezes, targetedrepair authorized. Fullgoal remainsactive.

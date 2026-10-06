@@ -9,9 +9,10 @@ const vector=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite);
 function signature(value){const ordered=v=>Array.isArray(v)?v.map(ordered):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,ordered(v[k])])):v;return JSON.stringify(ordered(value));}
 
 export class NodeScene{
-  constructor({viewer,cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,palette=()=>({}),tracksVisible=()=>true,isTransitioning=()=>false,onStatus=()=>{},verifyLinkSnapshot,animationNow=()=>0}={}){
+  constructor({viewer,cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry=null,palette=()=>({}),tracksVisible=()=>true,isTransitioning=()=>false,onStatus=()=>{},verifyLinkSnapshot,animationNow=()=>0}={}){
     if(typeof advanceUtc!=='function'||typeof geometryFor!=='function'||typeof pathFor!=='function')throw new TypeError('node scene native display dependencies required');
-    Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,palette,tracksVisible,isTransitioning,onStatus,verifyLinkSnapshot,animationNow});
+    if(displayGeometry!==null&&['revision','viewFor','isCurrent','sampleAt','verifySample'].some(key=>typeof displayGeometry?.[key]!=='function'))throw new TypeError('registered readonly native display geometry port required');
+    Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry,palette,tracksVisible,isTransitioning,onStatus,verifyLinkSnapshot,animationNow});
     this.links=new Map();this.linkPolylines=null;this.linkOwner=null;this.linkReceipt=null;this.definitionScope='[]';this.linksVisible=true;this.models=new Map();this.descriptions=new Map();this.paths=new Map();this.points=new Map();this.labels=new Map();this.selectedId=null;this.hoveredId=null;this.visibleIds=null;this.sdcMode=false;this.theme='dark';this.loadToken=0;this.modelsVisible=true;this.disposed=false;this.dataSource=null;this.dataSourceOwner=null;this.markerOwner=null;this.pointCollection=null;this.labelCollection=null;
     this.frameMemo=null;
   }
@@ -28,8 +29,36 @@ export class NodeScene{
   }
   ambientLighting(C){try{if(!C.ImageBasedLighting||!C.Cartesian3)return undefined;return new C.ImageBasedLighting({sphericalHarmonicCoefficients:Array.from({length:9},(_,i)=>i===0?new C.Cartesian3(AMBIENT_IRRADIANCE,AMBIENT_IRRADIANCE,AMBIENT_IRRADIANCE*1.05):new C.Cartesian3())});}catch{return undefined;}}
   matches(value,id){const entry=this.descriptions.get(id);return !!entry&&value?.node_id===id&&Object.entries(metadata).every(([k,v])=>value[k]===v)&&typeof value.definition_hash==='string'&&/^[a-f0-9]{64}$/.test(value.definition_hash)&&signature(value.node_definition)===entry.signature;}
-  frameCurrent(frame){
-    try{return !this.disposed&&this.frameMemo===frame&&!frame.invalid&&this.viewer===frame.viewer&&this.cesium===frame.cesium&&this.descriptions===frame.descriptions&&this.definitionScope===frame.scope&&this.timeSource?.()===frame.utc&&this.isTransitioning()===frame.transition&&this.viewer?.scene?.mode===frame.mode;}catch{return false;}
+  frameCurrent(frame,verifyNative=true){
+    try{return (!verifyNative||!frame.displayGeometry||frame.displayGeometry.revision()===frame.nativeRevision)&&!this.disposed&&this.frameMemo===frame&&!frame.invalid&&this.displayGeometry===frame.displayGeometry&&this.advanceUtc===frame.advanceUtc&&this.viewer===frame.viewer&&this.cesium===frame.cesium&&this.descriptions===frame.descriptions&&this.definitionScope===frame.scope&&this.timeSource?.()===frame.utc&&this.isTransitioning()===frame.transition&&this.viewer?.scene?.mode===frame.mode&&(!verifyNative||!frame.displayGeometry||frame.displayGeometry.revision()===frame.nativeRevision);}catch{return false;}
+  }
+  frameCall(frame,callback){
+    if(frame&&!this.frameCurrent(frame)){frame.invalid=true;return null;}
+    const value=callback();
+    if(frame&&!this.frameCurrent(frame)){frame.invalid=true;return null;}
+    return value;
+  }
+  advanceFrameUtc(utc,seconds){
+    const frame=this.frameMemo,known=frame?.utcAdvances.get(utc);if(known?.has(seconds))return known.get(seconds);
+    const value=this.frameCall(frame,()=>this.advanceUtc(utc,seconds));
+    if(frame&&!frame.invalid){const values=known??new Map();values.set(seconds,value);frame.utcAdvances.set(utc,values);}return value;
+  }
+  displayGeometryAt(entry,id,utc,frame){
+    const port=this.displayGeometry,revision=frame?frame.nativeRevision:port.revision();if(!revision)return null;
+    const call=callback=>{const value=this.frameCall(frame,callback);return port.revision()===revision?value:null;};
+    if(this.advanceFrameUtc(utc,0)!==utc)return null;
+    let binding=entry.displayBinding;
+    if(!binding||binding.revision!==revision){
+      const view=call(()=>port.viewFor(structuredClone(entry.definition)));
+      if(!view||call(()=>port.isCurrent(view))!==true||!Object.isFrozen(view)||!Object.isFrozen(view.node_definition)||!Object.isFrozen(view.receipt_revision)||view.definition_key!==entry.signature||!this.matches(view,id))return null;
+      binding={revision,view,packets:new WeakMap()};entry.displayBinding=binding;
+    }
+    const value=call(()=>port.sampleAt(binding.view,utc));if(!value||typeof value!=='object')return null;
+    if(binding.packets.get(value)!==utc){
+      if(call(()=>port.verifySample(binding.view,value,utc))!==true||!Object.isFrozen(value)||!Object.isFrozen(value.row)||value.node_definition!==binding.view.node_definition||value.node_id!==id||value.definition_hash!==binding.view.definition_hash||Object.entries(metadata).some(([key,expected])=>value[key]!==expected)||value.row?.utc!==utc)return null;
+      binding.packets.set(value,utc);
+    }
+    return value.row.status==='valid'&&value.row.error_code===null&&vector(value.row.position_m)?value:null;
   }
   geometryAt(id,utc){
     const entry=this.descriptions.get(id);if(!entry||typeof utc!=='string')return null;
@@ -39,9 +68,11 @@ export class NodeScene{
     // A cached hit performs no external callback. Its exact frame was checked
     // around the native read, and syncFrame checks the whole binding again
     // before returning. New reads retain both external-context guards.
-    if(frame&&!this.frameCurrent(frame)){frame.invalid=true;return null;}
     let result=null;
-    try{if(this.advanceUtc(utc,0)!==utc)return null;const g=this.geometryFor(structuredClone(entry.definition),{utc});result=this.matches(g,id)&&g.row?.utc===utc&&g.row.status==='valid'&&g.row.error_code===null&&vector(g.row.position_m)?g:null;}catch{/* Invalid native projection remains hidden. */}
+    try{
+      if(this.displayGeometry)result=this.displayGeometryAt(entry,id,utc,frame);
+      else{if(frame&&!this.frameCurrent(frame)){frame.invalid=true;return null;}if(this.advanceUtc(utc,0)!==utc)return null;const g=this.geometryFor(structuredClone(entry.definition),{utc});result=this.matches(g,id)&&g.row?.utc===utc&&g.row.status==='valid'&&g.row.error_code===null&&vector(g.row.position_m)?g:null;}
+    }catch{/* Invalid native projection remains hidden. */}
     if(frame){
       if(!this.frameCurrent(frame)){frame.invalid=true;return null;}
       const values=cached??new Map();values.set(utc,result);frame.geometry.set(id,values);
@@ -115,7 +146,7 @@ export class NodeScene{
   }
   removeModel(id){const entry=this.models.get(id);if(!entry)return;this.models.delete(id);for(const remove of entry.removers||[])try{remove();}catch{/* A disposed event cannot retain ownership. */}try{entry.owner.scene.primitives.remove(entry.model);}catch{/* Owner already removed. */}}
   bodyMatrix(C,id,here,utc,orientation,hash){
-    let ahead;try{ahead=this.cartesianAt(id,this.advanceUtc(utc,1),hash);}catch{ahead=null;}
+    let ahead;try{ahead=this.cartesianAt(id,this.displayGeometry?this.advanceFrameUtc(utc,1):this.advanceUtc(utc,1),hash);}catch{ahead=null;}
     let rotation=null;if(ahead){const velocity=C.Cartesian3.subtract(ahead,here,new C.Cartesian3());if(C.Cartesian3.magnitude(velocity)>1){C.Cartesian3.normalize(velocity,velocity);rotation=C.Transforms.rotationMatrixFromPositionVelocity(here,velocity,C.Ellipsoid.WGS84,new C.Matrix3());}}
     if(!rotation)return C.Transforms.eastNorthUpToFixedFrame(here);
     const {heading=0,pitch=0,roll=0}=orientation||{};
@@ -218,8 +249,14 @@ export class NodeScene{
   update(utc=this.timeSource?.()){if(this.disposed)return;this.placePoints(utc);this.placeModels(utc);this.placeLinks(utc);this.rebuildPaths();}
   syncFrame(utc,nowMs){
     if(this.disposed)return;
-    const frame={utc,viewer:this.viewer,cesium:this.cesium,descriptions:this.descriptions,scope:this.definitionScope,transition:this.isTransitioning(),mode:this.viewer?.scene?.mode,geometry:new Map(),invalid:false};
+    const frame={utc,viewer:this.viewer,cesium:this.cesium,descriptions:this.descriptions,scope:this.definitionScope,transition:this.isTransitioning(),mode:this.viewer?.scene?.mode,geometry:new Map(),utcAdvances:new Map(),displayGeometry:this.displayGeometry,nativeRevision:null,advanceUtc:this.advanceUtc,invalid:false};
     this.frameMemo=frame;
+    if(frame.displayGeometry){
+      // Capture the owner token inside the already bound frame, so a revision
+      // callback changing UTC, mode, Viewer or definitions cannot adopt a mixed
+      // initial context. Only this first read has no prior token to compare.
+      try{if(!this.frameCurrent(frame,false))frame.invalid=true;else frame.nativeRevision=frame.displayGeometry.revision();if(!this.frameCurrent(frame))frame.invalid=true;}catch{frame.invalid=true;}
+    }
     // animateLinkFlow performs the guarded endpoint placement even when phase
     // is unavailable; do not write every OISL positions array twice per frame.
     try{this.placePoints(utc);this.placeModels(utc);this.animateLinkFlow(nowMs,utc);}

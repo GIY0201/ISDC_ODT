@@ -88,14 +88,20 @@ export function createWorkspaceScenario({api,nodeWorkspace,ground,missionService
   const templates=rows=>rows.map(m=>Object.fromEntries(['id','kind','params','notes','version'].map(k=>[k,m[k]])));
   requireValue(same(templates(current.missions),templates(saved.missions)),'완료 실행의 원본 임무 정의가 바뀌었습니다.');
   const hash=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
-  const heldTasks=tasks=>tasks.map(t=>({task_id:String(t.id??''),satellite:String(t.satellite),kind:String(t.kind??''),start:t.start,end:t.end}));
+  requireValue(status.accepted_decisions&&Object.getPrototypeOf(status.accepted_decisions)===Object.prototype,'현재 모듈의 guarded 확정·취소 수락 증명을 확인하세요.');
   for(const m of current.missions){
    const p=current.module.accepted_plans[m.id],held=current.module.committed[m.id];
    if(!p){requireValue(!m.plan&&!held&&m.status!=='committed','현재 모듈에 수락된 임무 계획이 없습니다: '+m.id);continue;}
    requireValue(p.exchange_contract==='guarded-v1'&&p.instance_id===status.instance_id&&p.mission_id===m.id&&typeof p.request_id==='string'&&p.request_id.length>0&&hash(p.context_hash)&&Number.isSafeInteger(p.mission_version)&&p.mission_version>=1&&Number.isSafeInteger(p.plan_sequence)&&p.plan_sequence>=1&&p.sequence===p.plan_sequence&&p.sequence<=status.sequence&&typeof p.feasible==='boolean'&&Array.isArray(p.tasks)&&p.tasks.length<=2000&&typeof p.time==='string'&&Number.isFinite(Date.parse(p.time)),'현재 모듈 계획의 guarded 증명이 잘못되었습니다: '+m.id);
    requireValue(m.plan?.version===p.mission_version&&same(Object.fromEntries(Object.keys(p).filter(k=>k!=='version').map(k=>[k,m.plan?.[k]])),Object.fromEntries(Object.entries(p).filter(([k])=>k!=='version'))),'저장된 임무 계획과 현재 모듈 수락이 다릅니다. 먼저 임무의 최신 버전 새 계획 또는 명시적 취소를 검토하세요: '+m.id);
    requireValue(Boolean(held)===(m.status==='committed'),'확정 임무 상태와 현재 모듈이 다릅니다: '+m.id);
-   if(held)requireValue(p.feasible&&held.version===p.mission_version&&Number.isSafeInteger(held.sequence)&&held.sequence>=p.plan_sequence&&held.sequence<=status.sequence&&held.time===p.time&&same(held.tasks,heldTasks(p.tasks)),'현재 모듈의 확정 작업 증명이 다릅니다: '+m.id);
+   if(held){
+    // Source status publishes only {version, tasks: COUNT}. Its guarded commit
+    // validates full plan tasks/time before acceptance; the decision receipt
+    // links that accepted plan to this held summary. Receipt.time is wallstamp.
+    const d=status.accepted_decisions[m.id];
+    requireValue(p.feasible&&held.version===p.mission_version&&Number.isSafeInteger(held.tasks)&&held.tasks===p.tasks.length&&d?.exchange_contract==='guarded-v1'&&d.instance_id===status.instance_id&&d.mission_id===m.id&&typeof d.request_id==='string'&&d.request_id.length>0&&d.context_hash===p.context_hash&&d.mission_version===p.mission_version&&d.version===p.mission_version&&d.plan_sequence===p.plan_sequence&&d.decision==='commit'&&d.accepted===true&&d.held_tasks===held.tasks&&Number.isSafeInteger(d.sequence)&&d.sequence>p.plan_sequence&&d.sequence<=status.sequence&&typeof d.time==='string'&&Number.isFinite(Date.parse(d.time)),'현재 모듈의 확정 작업 증명이 다릅니다: '+m.id);
+   }
   }
  }
  async function resumePreflight(){return validateInputs(false);}
@@ -115,13 +121,14 @@ export function createWorkspaceScenario({api,nodeWorkspace,ground,missionService
   const current=currentEvidence(status);
   if(currentReview){validateCurrentReview(current,saved,status);}else requireValue(same(current,saved),`저장된 실행과 현재 증명이 달라 입력을 확인할 수 없습니다. 불일치: ${mismatchFields(current,saved).join(', ')}`);
   const expected=currentReview?structuredClone(current):saved;
+  const decisions=currentReview?structuredClone(status.accepted_decisions):null;
   const utc=ports.simUtc(),receipt=await ports.prepareSimUtc(utc);
   requireValue(ports.verifySimUtc(receipt,utc)===true&&same(hashesOf(receipt),saved.native_definition_hashes),'현재 실제 SIM UTC의 전체 native 노드 정의 증명이 일치하지 않습니다.');
   const context=missionServices.context();requireValue(context.utc===utc&&same(context.nodes,saved.nodes)&&same(context.stations,ground.enabled)&&same(context.faults,expected.faults)&&same(context.deployment,saved.deployment)&&context.module.instance===saved.module.instance_id,'현재 native 임무 입력 범위가 저장 실행과 다릅니다.');
   const accepted=await api.nodeMissionContext({request_id:'scenario-resume:'+ (++resumeCounter),nodes:context.nodes,run_id:context.deployment.run_id,deployment_revision:context.deployment.revision,utc,stations:context.stations,faults:context.faults,module_instance:context.module.instance,module_sequence:context.module.sequence,external:context.external});
   requireValue(accepted?.schema_version===1&&accepted.status==='verified_analysis_inputs'&&accepted.communication_status==='unknown'&&/^[a-f0-9]{64}$/.test(accepted.context_hash??'')&&accepted.utc===utc&&same(accepted.nodes,saved.nodes)&&same(accepted.stations,context.stations)&&same(accepted.faults,expected.faults)&&same(accepted.deployment,saved.deployment)&&same(accepted.definition_hashes,saved.native_definition_hashes)&&same(accepted.external,context.external)&&accepted.module_instance===context.module.instance&&accepted.module_sequence===context.module.sequence,'native 재개 입력 수락 증명이 일치하지 않습니다.');
   status=await missionServices.queryModule();
-  requireValue(readRuntime()?.running===false&&ports.simUtc()===utc&&ports.verifySimUtc(receipt,utc)===true&&same(currentEvidence(status),expected)&&same(missionServices.context(),context)&&status.sequence===accepted.module_sequence,'재개 검증 도중 실제 UTC·배치·임무 또는 모듈 상태가 바뀌었습니다.');
+  requireValue(readRuntime()?.running===false&&ports.simUtc()===utc&&ports.verifySimUtc(receipt,utc)===true&&same(currentEvidence(status),expected)&&(!currentReview||same(status.accepted_decisions,decisions))&&same(missionServices.context(),context)&&status.sequence===accepted.module_sequence,'재개 검증 도중 실제 UTC·배치·임무 또는 모듈 상태가 바뀌었습니다.');
   requireValue(!dead&&same(runner.state,runnerBefore)&&same(runtimeIdentity(readRuntime()),runtimeBefore),'입력 검증 도중 완료 기록 또는 실제 실행 상태가 바뀌었습니다.');
   // Finished inputs can be reaccepted for readonly/current mission tools. They
   // never grant the source runner permission to advance or restart its stages.

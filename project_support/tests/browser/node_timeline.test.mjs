@@ -109,3 +109,15 @@ test('native row validation memo cannot approve nonfinite interpolation or mutat
  for(const value of [captured,captured.position_m,captured.inertial_velocity_km_s,captured.extra,captured.extra.power,captured.extra.power.samples,captured.extra.basis,captured.extra.basis.x])assert.equal(Object.isFrozen(value),true);
  assert.throws(()=>{captured.extra.power.samples[0]=999;},TypeError);assert.equal(owned.sampleAt(start).extra.power.samples[0],1);
 });
+
+test('native display projections are privately registered deeply readonly exact packets with a two-UTC cache',()=>{
+ const f=fixture(),buffer=createNodeSampleBuffer(f.request,f.response),port=buffer.displayGeometry,node=f.request.nodes[0];
+ assert.ok(port);const view=port.viewFor(node);assert.ok(view);assert.equal(port.isCurrent(view),true);assert.equal(view.receipt_revision,port.revision());
+ assert.equal(port.isCurrent(Object.freeze({...view})),false);assert.equal(port.viewFor({...node,name:'changed'}),null);
+ const first=port.sampleAt(view,start);assert.deepEqual(first,buffer.geometryFor(node,{utc:start}));assert.equal(port.sampleAt(view,start),first);assert.equal(port.verifySample(view,first,start),true);assert.equal(port.verifySample(view,structuredClone(first),start),false);
+ for(const value of [view,view.node_definition,view.node_definition.orbit,first,first.row,first.row.position_m,first.row.inertial_velocity_km_s])assert.equal(Object.isFrozen(value),true);
+ assert.throws(()=>{first.row.position_m[0]=0;},TypeError);assert.throws(()=>{view.node_definition.orbit.altitude_km=0;},TypeError);
+ assert.equal(port.sampleAt(view,codec.advance(start,-1)),null);assert.equal(port.sampleAt(view,'2026-10-04T22:01:12Z'),null);
+ const middle=port.sampleAt(view,codec.advance(start,1)),last=port.sampleAt(view,codec.advance(start,2));assert.ok(middle);assert.ok(last);assert.notEqual(port.sampleAt(view,start),first,'third exact UTC evicts the earliest strong cached packet');assert.equal(port.verifySample(view,first,start),true,'held immutable genuine packets retain their provenance after eviction');
+ const copy=buffer.geometryFor(node,{utc:start});copy.row.position_m[0]=0;assert.equal(port.sampleAt(view,start).row.position_m[0],7000000);
+});

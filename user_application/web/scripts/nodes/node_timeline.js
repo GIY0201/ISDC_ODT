@@ -29,6 +29,26 @@ function definitionKeyFor(node,ids,catalogs){
   }else if(typeof epoch!=='number'||!Number.isFinite(epoch)||Math.abs(epoch)>8.64e15)throw new Error('invalid node definition epoch');
   return key;
 }
+function freezeProjection(value,seen=new WeakSet()){
+  if(value&&typeof value==='object'&&!seen.has(value)){seen.add(value);for(const child of Object.values(value))freezeProjection(child,seen);Object.freeze(value);}
+  return value;
+}
+function bindDisplayGeometryOwner({revision,bufferForNode}){
+  const registered=new WeakMap();
+  const isCurrent=view=>{const own=registered.get(view);return !!own&&revision()===own.revision&&bufferForNode(view.node_id)===own.buffer&&own.buffer.displayGeometry.isCurrent(view);};
+  return Object.freeze({revision,isCurrent,
+    viewFor(node){const token=revision(),buffer=token&&bufferForNode(node?.id);if(!buffer)return null;const view=buffer.displayGeometry.viewFor(node);if(!view||revision()!==token||bufferForNode(node.id)!==buffer)return null;registered.set(view,{revision:token,buffer});return view;},
+    sampleAt(view,utc){if(!isCurrent(view))return null;const value=registered.get(view).buffer.displayGeometry.sampleAt(view,utc);return isCurrent(view)?value:null;},
+    verifySample(view,value,utc){return isCurrent(view)&&registered.get(view).buffer.displayGeometry.verifySample(view,value,utc)&&isCurrent(view);},
+  });
+}
+function guardDisplayGeometry(port,allowed){
+  return Object.freeze({revision:()=>allowed()?port.revision():null,isCurrent:view=>allowed()&&port.isCurrent(view),
+    viewFor(node){if(!allowed())return null;const view=port.viewFor(node);return allowed()?view:null;},
+    sampleAt(view,utc){if(!allowed())return null;const value=port.sampleAt(view,utc);return allowed()?value:null;},
+    verifySample:(view,value,utc)=>allowed()&&port.verifySample(view,value,utc)&&allowed(),
+  });
+}
 export const NODE_COMMUNICATION_METADATA=metadata;
 export function isNodeCommunicationState(value,{node,utc}={}){
   try{
@@ -102,7 +122,28 @@ function* prepareNodeSampleBuffer(request,response,{expectedHashes={}}={}){
       geodetic:{longitude:row.longitude_deg,latitude:row.latitude_deg,altitude:row.height_km,velocity:Math.hypot(...row.inertial_velocity_km_s)},sunlit:row.sunlit};
     return isNodeCommunicationState(result,{node,utc:display.utc})?result:null;
   }
-  return Object.freeze({geometryFor,communicationStateFor,nodeIds:()=>[...entries.keys()],definitionHashes:()=>Object.fromEntries([...entries].map(([id,entry])=>[id,entry.hash]))});
+  // These registered display packets are derived immutable projections, never
+  // mutable runtime state. The public geometryFor above retains fresh copies.
+  const receiptRevision=Object.freeze({}),views=new Map(),registeredViews=new WeakMap(),registeredPackets=new WeakMap();
+  const displayGeometry=Object.freeze({revision:()=>receiptRevision,isCurrent:view=>registeredViews.has(view),
+    viewFor(node){
+      const entry=entries.get(node?.id);if(!entry)return null;
+      try{if(identity(node)!==entry.key)return null;}catch{return null;}
+      if(views.has(node.id))return views.get(node.id);
+      const view=freezeProjection({...metadata,node_id:node.id,definition_key:entry.key,node_definition:structuredClone(entry.definition),definition_hash:entry.hash,receipt_revision:receiptRevision});
+      views.set(node.id,view);registeredViews.set(view,{entry,cache:new Map()});return view;
+    },
+    sampleAt(view,utc){
+      const own=registeredViews.get(view);if(!own||typeof utc!=='string')return null;
+      if(own.cache.has(utc)){const value=own.cache.get(utc);own.cache.delete(utc);own.cache.set(utc,value);return value;}
+      const copy=geometryFor(own.entry.definition,{utc});
+      const value=copy?freezeProjection({...copy,node_definition:view.node_definition}):null;
+      if(value)registeredPackets.set(value,{view,utc});
+      own.cache.set(utc,value);if(own.cache.size>2)own.cache.delete(own.cache.keys().next().value);return value;
+    },
+    verifySample(view,value,utc){const own=registeredPackets.get(value);return registeredViews.has(view)&&!!own&&own.view===view&&own.utc===utc&&value.row?.utc===utc;},
+  });
+  return Object.freeze({geometryFor,communicationStateFor,displayGeometry,nodeIds:()=>[...entries.keys()],definitionHashes:()=>Object.fromEntries([...entries].map(([id,entry])=>[id,entry.hash]))});
 }
 
 export function createNodeSampleBuffer(request,response,options){
@@ -269,7 +310,11 @@ export function createNodeTimeline({api,requestId,yieldControl,onChange=()=>{},o
   function communicationStateFor(node,display){if(disposed)return null;return buffers.get(node?.id)?.communicationStateFor(node,display)??null;}
   function cancel(){requireOpen();invalidate(true);emit();}
   function destroy(){if(disposed)return;invalidate(true);disposed=true;definitions=[];hashes={};}
-  return Object.freeze({setDefinitions,calculate,geometryFor,communicationStateFor,snapshot,cancel,destroy});
+  const cohortRevisions=new WeakMap();
+  const displayGeometry=bindDisplayGeometryOwner({revision:()=>{
+    if(disposed||!buffers.size)return null;let token=cohortRevisions.get(buffers);if(!token){token=Object.freeze({});cohortRevisions.set(buffers,token);}return token;
+  },bufferForNode:id=>disposed?null:buffers.get(id)});
+  return Object.freeze({setDefinitions,calculate,geometryFor,communicationStateFor,displayGeometry,snapshot,cancel,destroy});
 }
 
 // One application queue for source-native display work. No clock or animation scheduler.
@@ -406,5 +451,6 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
   function retry(){requireOpen();samples.cancel();tracks.cancel();invalidateCommunication();inputError='';return schedule();}
   function clear(){requireOpen();utc=null;direction=1;inputError='';samples.cancel();tracks.cancel();invalidateCommunication();emit();}
   function destroy(){if(disposed)return;disposed=true;utc=null;invalidateCommunication();definitions=[];samples.destroy();tracks.destroy();}
-  return Object.freeze({setDefinitions,observe,retry,clear,snapshot,requestCommunicationStates,geometryFor:(node,display={utc})=>disposed||inputError?null:samples.geometryFor(node,display),communicationStateFor:(node,display={utc})=>disposed||inputError?null:samples.communicationStateFor(node,display),pathFor:node=>disposed||inputError?null:tracks.pathFor(node),pathRevisionFor:node=>disposed||inputError?null:tracks.pathRevisionFor(node),destroy});
+  const displayGeometry=guardDisplayGeometry(samples.displayGeometry,()=>!disposed&&!inputError);
+  return Object.freeze({setDefinitions,observe,retry,clear,snapshot,requestCommunicationStates,displayGeometry,geometryFor:(node,display={utc})=>disposed||inputError?null:samples.geometryFor(node,display),communicationStateFor:(node,display={utc})=>disposed||inputError?null:samples.communicationStateFor(node,display),pathFor:node=>disposed||inputError?null:tracks.pathFor(node),pathRevisionFor:node=>disposed||inputError?null:tracks.pathRevisionFor(node),destroy});
 }

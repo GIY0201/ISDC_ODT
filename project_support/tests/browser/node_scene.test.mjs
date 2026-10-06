@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {NodeScene,LINK_COLORS} from '../../../digital_twin/visualization/node_scene.js';
 import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
+import {createNodeSampleBuffer} from '../../../user_application/web/scripts/nodes/node_timeline.js';
 const golden=JSON.parse(await readFile(new URL('../fixtures/original_node_scene.json',import.meta.url),'utf8'));
 const markers=JSON.parse(await readFile(new URL('../fixtures/original_node_markers.json',import.meta.url),'utf8'));
 const codec=createUtcCodec(LEAP_SHA256),utc=codec.advance('2026-10-04T00:00:00Z',0),hash='a'.repeat(64);
@@ -13,7 +14,7 @@ class Collection{constructor(){this.items=[];}add(v){this.items.push(v);return v
 const plain=v=>JSON.parse(JSON.stringify(v));
 const definition=id=>({schema:1,id,catalog_number:900000+Number(id),orbit:{epoch:1791062400000,altitude_km:550,inclination:53}});
 const description=id=>({url:'/models/'+id+'.glb',scale:2,minimumPixelSize:12,orientation:{heading:90}});
-function fixture({load,geometry,path,palette,verifyLinkSnapshot,pathRevisionFor,animationNow=()=>2000}={}){
+function fixture({load,geometry,path,palette,verifyLinkSnapshot,pathRevisionFor,displayGeometry=null,animationNow=()=>2000}={}){
  const loads=[],statuses=[],primitives=new Collection(),sources=new Collection();let display=utc,morph=false,tracks=true;
  const C={Cartesian3,Color,CustomDataSource:class{constructor(){this.entities=new Collection();}},CallbackProperty:class{constructor(getter){this.getter=getter;}},ArcType:{NONE:'none'},SceneMode:{MORPHING:0,SCENE3D:3},Matrix3:class{static fromHeadingPitchRoll(hpr){return {hpr};}static multiply(a,b){a.trim=b;return a;}},Matrix4:class{static fromRotationTranslation(rotation,translation){return {rotation,translation};}},HeadingPitchRoll:class{constructor(h,p,r){Object.assign(this,{h,p,r});}},Math:{toRadians:v=>v*Math.PI/180},Ellipsoid:{WGS84:{}},Transforms:{rotationMatrixFromPositionVelocity:(position,velocity)=>({position,velocity}),eastNorthUpToFixedFrame:position=>({enu:position})},ImageBasedLighting:class{constructor(options){this.options=options;}},Model:{async fromGltfAsync(options){loads.push(options);return load?load(options):{options,show:false,destroyed:false,destroy(){this.destroyed=true;}};}}};
  Object.assign(C,{PointPrimitiveCollection:Collection,LabelCollection:Collection,Cartesian2:class{constructor(x,y){Object.assign(this,{x,y});}},NearFarScalar:class{constructor(near,nearValue,far,farValue){Object.assign(this,{near,nearValue,far,farValue});}},LabelStyle:{FILL_AND_OUTLINE:'fill_outline'}});
@@ -23,7 +24,7 @@ function fixture({load,geometry,path,palette,verifyLinkSnapshot,pathRevisionFor,
  const meta={model_profile:'SOURCE_KEPLER_J2_V1',frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',source_commit:golden.source_commit,quality:'engineering_assumption'};
  const geometryFor=(node,{utc:stamp})=>{const row={utc:stamp,status:'valid',error_code:null,position_m:[Number(node.id)+codec.difference(stamp,utc)*10,10,550000]};const value={...meta,node_id:node.id,node_definition:structuredClone(node),definition_hash:hash,row};return geometry?geometry(value):value;};
  const pathFor=node=>{const value={...meta,node_id:node.id,node_definition:structuredClone(node),definition_hash:hash,center_utc:utc,visible:true,positions_m:golden.paths['1'].positions.map(p=>[p.x+Number(node.id)-1,p.y,p.z])};return path?path(value):value;};
- const scene=new NodeScene({viewer,cesium:C,verifyLinkSnapshot,pathRevisionFor,animationNow,timeSource:()=>display,advanceUtc:codec.advance,geometryFor,pathFor,palette:palette??(()=>markers.palettes.dark),tracksVisible:()=>tracks,isTransitioning:()=>morph,onStatus:v=>statuses.push(v)});
+ const scene=new NodeScene({viewer,cesium:C,verifyLinkSnapshot,pathRevisionFor,displayGeometry,animationNow,timeSource:()=>display,advanceUtc:codec.advance,geometryFor,pathFor,palette:palette??(()=>markers.palettes.dark),tracksVisible:()=>tracks,isTransitioning:()=>morph,onStatus:v=>statuses.push(v)});
  return {scene,loads,statuses,viewer,set display(v){display=v;},set morph(v){morph=v;},set tracks(v){tracks=v;}};
 }
 const entries=(count=2)=>Array.from({length:count},(_,i)=>({id:String(i+1),definition:definition(String(i+1)),model:description(String(i+1)),orbit_regime:'LEO'}));
@@ -141,6 +142,36 @@ test('a later native buffer replacement at the same UTC is freshly validated and
  await f.scene.setNodes(entries());f.scene.setLinks(linkSnapshot());f.scene.syncFrame(utc,3000);const original=plain(f.scene.points.get('1').position);
  generation++;f.scene.syncFrame(utc,3016);assert.equal(f.scene.points.get('1').position.x,original.x+1000);assert.equal(f.scene.links.get('pair').line.positions[0].x,original.x+1000);assert.equal(f.scene.frameMemo,null);
  bad=true;f.scene.syncFrame(utc,3032);assert.ok([...f.scene.points.values()].every(p=>!p.show));assert.ok([...f.scene.models.values()].every(m=>!m.model.show));assert.equal(f.scene.links.get('pair').line.show,false);assert.equal(f.scene.links.get('pair').line.material.uniforms.time,3016/1000*1.4);f.scene.destroy();
+});
+
+function nativeDisplayPort(offset=0){
+ const nodes=entries(),request={request_id:'display-view',nodes:nodes.map(n=>n.definition),start_utc:utc,count:3,step_seconds:1};
+ const response={schema_version:1,request_id:request.request_id,status:'valid',model_profile:'SOURCE_KEPLER_J2_V1',frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',source_commit:golden.source_commit,quality:'engineering_assumption',nodes:request.nodes.map(n=>({node_id:n.id,definition_hash:hash,rows:Array.from({length:3},(_,i)=>({utc:codec.advance(utc,i),status:'valid',error_code:null,position_m:[Number(n.id)+i*10+offset,10,550000],inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550}))}))};
+ return createNodeSampleBuffer(request,response).displayGeometry;
+}
+
+test('registered native display views preserve renderer poses and reject forged views or packets without using the public copy callback',async()=>{
+ const owner=nativeDisplayPort();assert.ok(owner);let fallback=0;const f=fixture({displayGeometry:owner,geometry:()=>{fallback++;throw Error('public copy callback should not run');},verifyLinkSnapshot:()=>true});await f.scene.setNodes(entries());f.scene.setLinks(linkSnapshot());f.scene.syncFrame(utc,3000);
+ assert.equal(fallback,0);assert.equal(f.scene.points.get('1').show,true);assert.deepEqual(plain(f.scene.models.get('1').model.modelMatrix),golden.models['1']);assert.equal(f.scene.links.get('pair').line.show,true);f.scene.destroy();
+ for(const forged of ['view','packet']){const port={...owner,...(forged==='view'?{viewFor:node=>Object.freeze({...owner.viewFor(node)})}:{sampleAt:(view,at)=>structuredClone(owner.sampleAt(view,at))})};const g=fixture({displayGeometry:port,geometry:()=>{throw Error('no fallback');}});await g.scene.setNodes(entries());g.scene.syncFrame(utc,3000);assert.ok([...g.scene.points.values()].every(p=>!p.show));assert.ok([...g.scene.models.values()].every(m=>!m.model.show));g.scene.destroy();}
+});
+
+test('same-UTC native cohort replacement during an owner callback hides the entire cached frame and the next frame adopts fresh views',async()=>{
+ let owner=nativeDisplayPort(),armed=false;assert.ok(owner);const newer=nativeDisplayPort(1000);
+ const port={revision:()=>owner.revision(),viewFor:node=>owner.viewFor(node),isCurrent:view=>owner.isCurrent(view),verifySample:(...args)=>owner.verifySample(...args),sampleAt(view,at){const value=owner.sampleAt(view,at);if(armed&&view.node_id==='2'){armed=false;owner=newer;}return value;}};
+ const f=fixture({displayGeometry:port,geometry:()=>{throw Error('no fallback');},verifyLinkSnapshot:()=>true});await f.scene.setNodes(entries());f.scene.setLinks(linkSnapshot());armed=true;f.scene.syncFrame(utc,3000);
+ assert.ok([...f.scene.points.values()].every(p=>!p.show));assert.ok([...f.scene.models.values()].every(m=>!m.model.show));assert.ok([...f.scene.links.values()].every(l=>!l.line.show));assert.equal(f.scene.frameMemo,null);
+ f.scene.syncFrame(utc,3016);assert.equal(f.scene.points.get('1').position.x,1001);assert.equal(f.scene.points.get('1').show,true);assert.equal(f.scene.links.get('pair').line.positions[0].x,1001);f.scene.destroy();
+});
+
+test('readonly projection owner callbacks remain fenced against UTC morph scope viewer disposal and thrown revocation',async()=>{
+ for(const operation of ['viewFor','isCurrent','sampleAt','verifySample','revision'])for(const change of ['time','morph','scope','viewer','dispose','throw']){
+  let owner=nativeDisplayPort(),armed=false,f;const port=Object.fromEntries(['revision','viewFor','isCurrent','sampleAt','verifySample'].map(name=>[name,(...args)=>{
+   const value=owner[name](...args);if(armed&&name===operation){armed=false;if(change==='time')f.display=codec.advance(utc,1);else if(change==='morph')f.morph=true;else if(change==='scope')void f.scene.setNodes([{...entries(1)[0],definition:{...definition('1'),name:'edited'}}]);else if(change==='viewer')f.scene.viewerProvider={scene:{primitives:new Collection(),mode:3}};else if(change==='dispose')f.scene.destroy();else{owner=nativeDisplayPort(2000);throw Error('revoked during callback');}}return value;
+  }]));
+  f=fixture({displayGeometry:port,geometry:()=>{throw Error('no public fallback');},verifyLinkSnapshot:()=>true});await f.scene.setNodes(entries());f.scene.setLinks(linkSnapshot());owner=nativeDisplayPort(1000);armed=true;f.scene.syncFrame(utc,3000);
+  assert.equal(armed,false,operation+' must be exercised');assert.ok([...f.scene.points.values()].every(p=>!p.show),operation+'/'+change+' points');assert.ok([...f.scene.models.values()].every(m=>!m.model.show),operation+'/'+change+' models');assert.ok([...f.scene.links.values()].every(l=>!l.line.show),operation+'/'+change+' links');assert.equal(f.scene.frameMemo,null);f.scene.destroy();
+ }
 });
 test('time, definition scope, morph, viewer or destruction change in a geometry callback cannot publish a mixed frame',async()=>{
  for(const change of ['time','scope','morph','viewer','destroy']){

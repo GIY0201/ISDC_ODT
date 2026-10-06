@@ -239,6 +239,15 @@ test('mounted node renderer receives common theme, palette and queued morph stat
  mode.phase='ready';viewObserver(f.globe.viewState());assert.equal(scene.options.isTransitioning(),false);f.workspace.destroy();
 });
 
+test('mounted renderer receives the existing native-owner readonly port and disposal revokes its borrowed packets',async()=>{
+ const f=fixture({native:true});await f.workspace.start();f.workspace.show('satellite');const scene=f.attach(),port=scene.options.displayGeometry;assert.ok(port);assert.equal(port.revision(),null);
+ f.options.store.add({name:'readonly source'});const node=f.options.store.drafts[0],codec=createUtcCodec(LEAP_SHA256),utc=codec.advance('2026-10-04T22:01:12Z',0);f.context({key:'fixture',utc});
+ for(let i=0;i<100&&!port.revision();i++)await new Promise(resolve=>setTimeout(resolve,2));
+ const view=port.viewFor(node),packet=port.sampleAt(view,utc);assert.ok(packet);assert.equal(port.verifySample(view,packet,utc),true);
+ const copy=scene.options.geometryFor(node,{utc});copy.row.position_m[0]=0;assert.equal(packet.row.position_m[0],7000000);assert.equal(f.calls.filter(c=>c[0]==='http').every(c=>c[2]==='GET'),true);
+ f.workspace.destroy();assert.equal(port.revision(),null);assert.equal(port.isCurrent(view),false);assert.equal(port.sampleAt(view,utc),null);assert.equal(port.viewFor(node),null);
+});
+
 test('source node panel camera callbacks route to shared owner and reject callbacks after disposal',async()=>{
  const f=fixture();f.globe.cameraState=()=>({ready:true,zoom:42});
  f.globe.zoomBy=value=>f.calls.push(['wheel',value]);f.globe.setZoom=value=>f.calls.push(['zoom',value]);f.globe.home=()=>f.calls.push(['home']);

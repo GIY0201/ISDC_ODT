@@ -81,6 +81,24 @@ test('pending fixed prefetch keeps old complete geometry until commit; repeated 
  finish();await work;await pending;assert.equal(s.timeline.snapshot().samples.startUtc,codec.advance(start,300));assert.equal(s.max,1);s.timeline.destroy();
 });
 
+test('display projection cohort follows actual accepted buffers and revokes old packets on replacement retry clear and disposal',async()=>{
+ let finish,delay=false;const s=setup((p,kind)=>delay&&kind==='samples'?new Promise(resolve=>{finish=()=>resolve(receipt(p,kind));}):receipt(p,kind));await s.timeline.observe(start);
+ const port=s.timeline.displayGeometry;assert.ok(port);const node=defs()[0],view=port.viewFor(node),revision=port.revision(),packet=port.sampleAt(view,start);
+ assert.ok(packet);assert.equal(port.isCurrent(view),true);assert.equal(port.verifySample(view,packet,start),true);
+ delay=true;const work=s.timeline.observe(codec.advance(start,300));await until(()=>finish);assert.equal(port.revision(),revision);assert.equal(port.isCurrent(view),true,'pending prefetch retains the original accepted buffer');
+ finish();delay=false;await work;assert.notEqual(port.revision(),revision);assert.equal(port.isCurrent(view),false);assert.equal(port.sampleAt(view,start),null);assert.equal(port.verifySample(view,packet,start),false);
+ const next=port.viewFor(node);assert.ok(next);assert.equal(port.isCurrent(Object.freeze({...next})),false);
+ const retry=s.timeline.retry();assert.equal(port.isCurrent(next),false);await retry;const restored=port.viewFor(node);assert.ok(restored);s.timeline.clear();assert.equal(port.revision(),null);assert.equal(port.isCurrent(restored),false);
+ await s.timeline.observe(start);const current=port.viewFor(node);assert.ok(current);s.timeline.destroy();assert.equal(port.revision(),null);assert.equal(port.isCurrent(current),false);assert.equal(port.viewFor(node),null);
+});
+
+test('native projection rejects dirty definitions and preserves partial errors without extrapolation or invalid interpolation',async()=>{
+ const s=setup((p,kind)=>{const value=receipt(p,kind);if(kind==='samples'){const row=value.nodes[0].rows[1];for(const key of Object.keys(row))if(!['utc','status','error_code'].includes(key))row[key]=null;row.status='error';row.error_code='native_error';value.status='partial';}return value;});await s.timeline.observe(start);
+ const port=s.timeline.displayGeometry;assert.ok(port);const node=defs()[0],view=port.viewFor(node);assert.equal(port.viewFor({...node,orbit:{...node.orbit,altitude_km:551}}),null);
+ const error=port.sampleAt(view,codec.advance(start,1));assert.equal(error.row.status,'error');assert.equal(port.verifySample(view,error,error.row.utc),true);assert.equal(port.sampleAt(view,codec.advance(start,.5)),null);
+ assert.equal(port.sampleAt(view,codec.advance(start,-1)),null);await s.timeline.observe('invalid');assert.equal(port.revision(),null);assert.equal(port.isCurrent(view),false);assert.equal(port.viewFor(node),null);s.timeline.destroy();
+});
+
 test('shared display exposes stable track revisions without queries and invalidates on clear/disposal',async()=>{
  const s=setup();await s.timeline.observe(start);const node=defs()[0],token=s.timeline.pathRevisionFor(node);assert.ok(token);
  for(let i=0;i<20;i++){assert.equal(s.timeline.pathRevisionFor(node),token);await s.timeline.observe(start);}assert.equal(s.calls.length,2);
