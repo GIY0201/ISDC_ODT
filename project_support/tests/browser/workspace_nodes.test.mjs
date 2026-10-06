@@ -7,6 +7,9 @@ import * as oisl from '../../../digital_twin/simulation/browser/oisl.js';
 import {NODE_COMMUNICATION_METADATA} from '../../../user_application/web/scripts/nodes/node_timeline.js';
 import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
 import {fixture as actualWorkspaceFixture} from './workspace_fixture.mjs';
+import * as stationModel from '../../../digital_twin/model_library/browser/ground_stations.js';
+import {createGroundLinkModel} from '../../../digital_twin/simulation/browser/ground_links.js';
+import {createNetworkSnapshotModel} from '../../../digital_twin/simulation/browser/network_snapshot.js';
 
 for(const [width,height] of [[1280,720],[1920,1080]])test(`accepted receipt with denied local persistence preserves drafts and identical reviewed retry ${width}x${height}`,async()=>{
  const records=new Map(),posts=[];let deny=false,server={revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]};
@@ -130,7 +133,7 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 source node
  }finally{f.dispose();}
 });
 
-function fixture({native=false,solar=null,view=null,storage=null,storageGetter=null,fetchOverride=null,onHover=()=>{}}={}){
+function fixture({native=false,solar=null,view=null,storage=null,storageGetter=null,fetchOverride=null,onHover=()=>{},networkInputs=null}={}){
  let id=0,context=null,displayListener,rendererFactory,panelOptions,interaction,renderer,removeCount=0;const calls=[],sections=new Map();
  const host={innerWidth:1280,innerHeight:720,localStorage:storage,crypto:{randomUUID:()=>`test-${++id}`},setTimeout,clearTimeout,addEventListener(){},removeEventListener(){},confirm:()=>true};
  if(storageGetter)Object.defineProperty(host,'localStorage',{get:storageGetter});
@@ -145,9 +148,49 @@ function fixture({native=false,solar=null,view=null,storage=null,storageGetter=n
  const codec=createUtcCodec(LEAP_SHA256),row=utc=>({utc,status:'valid',error_code:null,position_m:[7000000,2,3],inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550});
  const api={nodeSamples:async p=>{calls.push(['samples']);if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>row(codec.advance(p.start_utc,i)))}))};},nodeTrack:async p=>{if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>{const period=Math.round(orbitElements(node.orbit).period/60*1000)/1000;return{node_id:node.id,definition_hash:'a'.repeat(64),period_minutes:period,path_visible:true,rows:Array.from({length:121},(_,i)=>row(codec.advance(new Date(Math.trunc(Date.parse(p.center_utc)+(i-60)*period*60000/120)).toISOString(),0)))};})};}};
  if(view)Object.assign(globe,view);
- const workspace=createWorkspaceNodes({api,globe,solar,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now:()=>1791151272000,resolveModel:()=>({key:'flat',url:'/flat.glb'}),models:()=>[],fetchImpl,onHover});
+ const network=networkInputs?{...networkInputs,model:createNetworkSnapshotModel({library,oisl,groundLinks:createGroundLinkModel({library,stationModel})}),validateStation:stationModel.validateStation}:null;
+ const workspace=createWorkspaceNodes({api,globe,solar,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now:()=>1791151272000,resolveModel:()=>({key:'flat',url:'/flat.glb'}),models:()=>[],fetchImpl,onHover,networkInputs:network});
  return{workspace,host,globe,calls,buttons,sections,context(value){context=value;displayListener(value);},get options(){return panelOptions;},get interaction(){return interaction;},get renderer(){return renderer;},attach(){return renderer=rendererFactory({},{});},get removeCount(){return removeCount;}};
 }
+
+test('existing workspace owns network join and verifies copied ground-only source results without transport or deployment',async()=>{
+ const stations=stationModel.DEFAULT_STATION_KEYS.map(preset=>stationModel.createStation({preset}));const events=[];
+ const f=fixture({networkInputs:{readStations:()=>stations,readFaults:()=>[],onChange:value=>events.push(value)}});
+ await f.workspace.start();f.context({utc:'2026-10-04T22:01:12.000000000Z'});
+ assert.equal(f.workspace.networkSnapshot().status,'unavailable');
+ const result=await f.workspace.updateNetwork();assert.equal(result.status,'valid');
+ assert.equal(result.network.nodes.length,3);assert.equal(result.network.links.length,3);
+ assert.equal(f.workspace.verifyNetworkSnapshot(result),true);
+ result.network.nodes[0].name='tampered';assert.equal(f.workspace.verifyNetworkSnapshot(result),false);
+ assert.equal(f.calls.some(c=>c[0]==='samples'),false);assert.equal(f.calls.filter(c=>c[0]==='http').every(c=>c[2]==='GET'),true);
+ const accepted=f.workspace.networkSnapshot();stations[0].dish_m=11;
+ assert.equal(f.workspace.verifyNetworkSnapshot(accepted),false);assert.equal(f.workspace.networkSnapshot().status,'unavailable');
+ assert.equal((await f.workspace.updateNetwork()).status,'valid');assert.ok(events.length);
+ f.context({utc:'2026-10-04T22:01:12.000000000Z'});
+ assert.equal(f.workspace.networkSnapshot().status,'valid','repeated common-context event with unchanged UTC retains accepted proof');
+ f.context(null);assert.equal(f.workspace.networkSnapshot().status,'error');
+ f.workspace.destroy();assert.equal(await f.workspace.updateNetwork(),null);assert.equal(f.workspace.verifyNetworkSnapshot(accepted),false);
+});
+
+test('failed ground or SIM input reader revokes workspace network proof and rejects stale roster use',async()=>{
+ let failed=false;const stations=stationModel.DEFAULT_STATION_KEYS.map(preset=>stationModel.createStation({preset}));
+ const f=fixture({networkInputs:{readStations:()=>{if(failed)throw Error('지상국 불러오기 실패');return stations;},readFaults:()=>[]}});
+ await f.workspace.start();f.context({utc:'2026-10-04T22:01:12.000000000Z'});
+ const accepted=await f.workspace.updateNetwork();assert.equal(accepted.status,'valid');
+ failed=true;assert.equal(f.workspace.verifyNetworkSnapshot(accepted),false);
+ assert.match((await f.workspace.updateNetwork()).error,/지상국 불러오기 실패/);
+ failed=false;assert.equal((await f.workspace.updateNetwork()).status,'valid');f.workspace.destroy();
+});
+
+test('network join cannot create an independent node store, UTC authority or renderer',async()=>{
+ const f=fixture({networkInputs:{readStations:()=>[],readFaults:()=>[]}});await f.workspace.start();
+ f.workspace.show('satellite');f.options.store.add({name:'native required'});f.context({utc:'2026-10-04T22:01:12.000000000Z'});
+ const before=f.workspace.sceneSnapshot().drafts;
+ const result=await f.workspace.updateNetwork();assert.equal(result.status,'error');assert.equal(result.network,null);
+ assert.deepEqual(f.workspace.sceneSnapshot().drafts,before);assert.equal(f.workspace.snapshot().display.utc,'2026-10-04T22:01:12.000000000Z');
+ assert.equal(f.calls.some(c=>c[0]==='focus'),false);assert.equal(f.calls.filter(c=>c[0]==='http').every(c=>c[2]==='GET'),true);
+ f.workspace.destroy();
+});
 
 test('mounted native node hover publishes copied current geometry without queries and clears unknown/disposed cases',async()=>{
  const seen=[],f=fixture({native:true,onHover:value=>seen.push(value)});await f.workspace.start();f.workspace.show('satellite');f.options.store.add({name:'Native node'});f.attach();const node=f.options.store.selected;

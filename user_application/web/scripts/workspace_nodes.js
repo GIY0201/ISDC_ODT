@@ -3,12 +3,13 @@ import {createConstellationStore,DRAFT_KEY} from './nodes/constellation.js';
 import {createNodeDisplayTimeline} from './nodes/node_timeline.js';
 import {createNodeOpticalTimeline} from './nodes/optical_timeline.js';
 import {createNodeLinkResolver} from './nodes/links.js';
+import {createNodeNetworkTimeline} from './nodes/network_timeline.js';
 import {createDataDeployment} from './nodes/data_deployment.js';
 import {createNodeEditorTools} from './nodes/editor.js';
 import {createUtcCodec,LEAP_SHA256} from './orbit_utc.js';
 
 // Application composition only. Native buffers, source store and shared globe retain ownership.
-export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now,resolveModel,models,fetchImpl,clockActions={},readClock=()=>({}),onHover=()=>{}}={}){
+export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now,resolveModel,models,fetchImpl,clockActions={},readClock=()=>({}),onHover=()=>{},networkInputs=null}={}){
  const codec=createUtcCodec(LEAP_SHA256),advanceUtc=codec.advance;
  let dead=false,started=false,root=null,panel=null,scene=null,display=null,deployment=null,activeSelection=false,selectedSignature=null,definitionsSignature=null,error='';
  let tracks=true,links=true,modelsVisible=true;const readiness=new Map(),removers=[];
@@ -23,6 +24,13 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  // HTTP source track grids use the source three-decimal-minute n0 period.
  const timeline=createNodeDisplayTimeline({api,periodFor:node=>Math.round(orbitElements(node.orbit)?.period/60*1000)/1000,requestId:id,yieldControl:()=>new Promise(resolve=>host.setTimeout(resolve,0)),onChange:()=>{if(dead)return;refreshPose();scene?.update(display?.utc??null);refreshPanel();},onError:report});
  const optical=createNodeOpticalTimeline({resolver:createNodeLinkResolver({library,oisl}),requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>store.drafts,readDisplay,advanceUtc,onChange:value=>{if(dead)return;scene?.setLinks(value);refreshPanel();}});
+ // Communication consumers use these existing owners; no mutable owner escapes this port.
+ const network=networkInputs===null?null:createNodeNetworkTimeline({model:networkInputs.model,optical,
+  requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>{
+   if(!started||!store.loaded)throw Error('노드 설정 불러오기 미완료');return store.drafts;
+  },readDisplay,readStations:networkInputs.readStations,readFaults:networkInputs.readFaults,
+  validateNode:library.validateNode,validateStation:networkInputs.validateStation,advanceUtc,
+  onChange:value=>{if(!dead)networkInputs.onChange?.(value);}});
  const geometryFor=(node,at)=>timeline.geometryFor(node,at);
  const modelFor=node=>resolveModel(library.nodeCatalogItem(node));
  function refreshPose(){
@@ -42,7 +50,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  }
  function syncDefinitions(){
   if(dead||!started||!store.loaded)return;const nodes=store.drafts,signature=JSON.stringify(nodes);
-  if(signature!==definitionsSignature){definitionsSignature=signature;timeline.setDefinitions(nodes);optical.pruneHistories(new Set(nodes.map(n=>n.id)));refreshModels();if(display?.utc)void optical.update();}
+  if(signature!==definitionsSignature){definitionsSignature=signature;timeline.setDefinitions(nodes);optical.pruneHistories(new Set(nodes.map(n=>n.id)));network?.clear();refreshModels();if(display?.utc)void optical.update();}
   scene?.select(activeSelection?store.selectedId:null);refreshPose();refreshPanel();
  }
  function refreshModels(){
@@ -75,7 +83,8 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  deployment=createDataDeployment({constellation:store,fetchImpl,createId:id,setTimer:host.setTimeout.bind(host),clearTimer:host.clearTimeout.bind(host),onChange:refreshPanel});
  const removeStore=store.subscribe(()=>syncDefinitions());
  const removeDisplay=globe.observeDisplayContext(value=>{
-  if(dead)return;display=value?structuredClone(value):null;
+  if(dead)return;const previousUtc=display?.utc??null;display=value?structuredClone(value):null;
+  if(previousUtc!==(display?.utc??null))network?.clear();
   if(display?.utc){void timeline.observe(display.utc);void optical.update();}else{timeline.clear();optical.resetHistories();}
   refreshPose();refreshPanel();
  });
@@ -131,6 +140,10 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  return Object.freeze({
   async start(){if(dead||started)return;started=true;return retryRestore();},retryRestore,
   show,refresh:refreshPanel,refreshModels,sceneSnapshot,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
-  destroy(){if(dead)return;dead=true;try{onHover(null);}catch{/* Scoped presentation cleanup. */}for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
+  updateNetwork:()=>dead?Promise.resolve(null):network?.update()??Promise.resolve(null),
+  networkSnapshot:()=>dead?null:network?.snapshot()??null,
+  verifyNetworkSnapshot:value=>!dead&&network?.verifySnapshot(value)===true,
+  clearNetwork:()=>{if(!dead)network?.clear();},
+  destroy(){if(dead)return;dead=true;try{onHover(null);}catch{/* Scoped presentation cleanup. */}for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();network?.destroy();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
  });
 }

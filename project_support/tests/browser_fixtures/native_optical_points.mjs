@@ -14,6 +14,8 @@ import {createNodeLibrary} from '../../../digital_twin/model_library/browser/sat
 import {orbitElements,catalogElements} from '../../../digital_twin/simulation/browser/node_orbit_definition.js';
 import * as oisl from '../../../digital_twin/simulation/browser/oisl.js';
 import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
+import {createWorkspaceNodes} from '../../../user_application/web/scripts/workspace_nodes.js';
+import {DRAFT_KEY} from '../../../user_application/web/scripts/nodes/constellation.js';
 const wire=JSON.parse(await readFile(process.argv[2],'utf8'));
 const original=JSON.parse(gunzipSync(await readFile(new URL('../fixtures/original_node_link_resolution.json.gz',import.meta.url))));
 const steps=original.cases.find(c=>c.id==='dense-two-plane:0').rows;
@@ -69,4 +71,31 @@ for(const receipt of wire){
  }
 }
 poseLayer.dispose();assert.equal(selectedNodePoses,60);
-process.stdout.write(JSON.stringify({native_rows:60,prime_steps_seconds:[-120,-60,0],maxNumericError,maxTimeErrorMs,source_semantics_equal:true,verified_snapshot:true,selected_node_poses:selectedNodePoses,network_snapshot_verified:true,network_records_match_source:true,network_current_native_rows:nodes.length,network_links:networkLinks})+'\n');
+// Reuse those actual captured native bytes through the real workspace owner boundary.
+// This checks owner composition, not a mounted DOM/Cesium scene or another Rust execution.
+let displayCallback,workspacePointReads=0;
+const draftBytes=JSON.stringify({schema:1,nodes,sequence:0,selectedId:null,revision:0});
+const noListener=()=>()=>{};
+const workspace=createWorkspaceNodes({
+ api:{nodeSamples:async request=>{
+  if(request.count!==1)throw Error('This bounded receipt covers communication points only');
+  const captured=wire.find(entry=>entry.request.start_utc===request.start_utc);assert.ok(captured);
+  assert.deepEqual({...request,request_id:captured.request.request_id},captured.request);
+  workspacePointReads++;return {...structuredClone(captured.response),request_id:request.request_id};
+ },nodeTrack:async()=>{throw Error('No display track receipt in this bounded communication test');}},
+ globe:{observeDisplayContext:fn=>{displayCallback=fn;return()=>{};},bindNodeRenderer:noListener,
+  observeNodeRenderer:noListener,bindNodeInteraction:noListener,clearSatelliteModel(){},nodeRendererState:()=>({phase:'unavailable'})},
+ library,orbitElements,catalogElements,oisl,Scene:class{},tools:{},document:{},
+ host:{localStorage:{getItem:key=>key===DRAFT_KEY?draftBytes:null,setItem(){throw Error('readonly fixture');}},
+  crypto:{randomUUID:()=> 'workspace-native'},setTimeout,clearTimeout,addEventListener(){},removeEventListener(){}},
+ now:()=>Date.parse(utc),resolveModel:()=>null,models:()=>[],
+ fetchImpl:async(_url,options)=>{assert.equal(options.method,'GET');return{ok:true,json:async()=>({revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]})};},
+ networkInputs:{model:networkModel,readStations:()=>stations,readFaults:()=>[],validateStation:stationModel.validateStation},
+});
+await workspace.start();assert.deepEqual(workspace.sceneSnapshot().drafts,nodes);
+displayCallback({utc});const workspaceNetwork=await workspace.updateNetwork();
+assert.equal(workspaceNetwork.status,'valid');assert.equal(workspace.verifyNetworkSnapshot(workspaceNetwork),true);
+assert.deepEqual(workspaceNetwork.network,sourceNetwork);assert.equal(workspacePointReads,4);
+assert.deepEqual(workspace.sceneSnapshot().drafts,nodes);assert.equal(workspace.sceneSnapshot().server.revision,0);
+workspace.destroy();assert.equal(workspace.verifyNetworkSnapshot(workspaceNetwork),false);
+process.stdout.write(JSON.stringify({native_rows:60,prime_steps_seconds:[-120,-60,0],maxNumericError,maxTimeErrorMs,source_semantics_equal:true,verified_snapshot:true,selected_node_poses:selectedNodePoses,network_snapshot_verified:true,network_records_match_source:true,network_current_native_rows:nodes.length,network_links:networkLinks,workspace_network_verified:true,workspace_point_receipt_reuses:workspacePointReads})+'\n');
