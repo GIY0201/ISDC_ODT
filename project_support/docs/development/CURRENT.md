@@ -1,3 +1,8 @@
+## 2026-10-06 N003 / T077 통신 계산 입력 부분 연결
+- 변경: 기존native31열 r0:3/LVLH12:21을sample/track DTO에사본·오류null로노출. readonly communicationStateFor는정확한UTC/현재정의/hash/source frame/unit/basis만제공하고공용owner로전달. 표시용보간값·새궤도계산·사설clock/HTTP/축재구성없음. source norm(v)속도표시만기존벡터에서보존.
+- 검증: DTO누락PythonRED/JS3missingmethodRED;source20state전체vector/basis/geodetic/copies와fractional/error/잘못된축/changeddefinitionfailclosed. query→실제JSbuffer/공용ownerreadonly 구성시험. targetPython55PASS2.01s/Node30PASS1452.6804ms. 최종Python645PASS8기존warnings163.79s(session83838exit0)/Node559PASS3084.8885ms/syntax/stageddiff PASS. validation/n003_communication_inputs.md.
+- 남음: T077원본oisl.js+nodes/links.js 계산·history/commonexactUTC·snapshot검증→T148/T151조립/T152실제검증/T153리뷰. 전체T079/T076/T075–84/Terra/all50/N001/T137인증/T032/장비·RF·HIL/다운로드 유지. N003 DTO누락만해결; 통신성공/실제native·GPU·8891검증아님. 실제서버/native0.2.0/사용자화면/원격PR·병합변경없음.
+
 ## 2026-10-06 T150 배치 브라우저 클라이언트 구성요소 완료
 - 변경: 원본직렬요청/15s제한/minimal장비 projection/signature/같은명령재시도/409조회후명시재적용 이식. GET-only복원/실제T145store ephemeral receipt 검증/보낸fullsnapshot보존/저장실패retry/관찰자사본·종료·늦은응답차단.
 - 검증: missingmodule RED,12PASS2FAIL timeout·dispose보완 후target15PASS131.369ms. 원본client 두14095bytes/SHAd1f1c545… 동일 및제품wire/events/state exact. 실제JS client/store→Python ASGI/runtime/module IPC1PASS0.46s; lost-success reply retry/외부변경409/명시재적용/회수. 최종Python643PASS8기존warnings161.11s(session89311exit0)/Node555PASS3138.1009ms/syntax/stageddiff PASS. validation/t150_data_client.md.

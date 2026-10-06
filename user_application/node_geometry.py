@@ -69,7 +69,9 @@ class NodeGeometryQuery:
                 successes+=error is None
                 rows.append({'utc':result.utc[slot],'status':'valid' if error is None else 'error',
                     'error_code':error,'position_m':None if raw is None else list(result.fixed_position_m(slot)),
+                    'inertial_position_km':None if raw is None else list(raw[0:3]),
                     'inertial_velocity_km_s':None if raw is None else list(raw[3:6]),
+                    'lvlh_basis':None if raw is None else {'x':list(raw[12:15]),'y':list(raw[15:18]),'z':list(raw[18:21])},
                     'mean_anomaly_deg':None if raw is None else raw[22],
                     'raan_deg':None if raw is None else raw[24],
                     'argp_deg':None if raw is None else raw[25],

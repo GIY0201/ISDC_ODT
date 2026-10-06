@@ -14,6 +14,55 @@ from foundation.orbit_time import parse_utc
 
 FIXTURE=json.loads((Path(__file__).parent/'fixtures/original_satellite_nodes.json').read_text(encoding='utf-8'))
 
+
+def test_source_oisl_inputs_are_existing_native_vectors_and_null_on_error():
+ import struct
+ cases=[case for case in FIXTURE['cases'] if case['id'].startswith('state:')]
+ assert len(cases)==20
+ for case in cases:
+  source=case['expected']
+  def calculate(prepared,grids):
+   value=batch(prepared,grids);row=[0.0]*NODE_ROW_WIDTH;row[27]=1
+   row[0:3]=source['inertial']['r'];row[3:6]=source['inertial']['v']
+   row[12:15]=source['basis']['x'];row[15:18]=source['basis']['y'];row[18:21]=source['basis']['z']
+   return replace(value,_buffer=struct.pack('<'+'d'*NODE_ROW_WIDTH*len(value.utc),*(row*len(value.utc))))
+  query=NodeGeometryQuery(calculate=calculate)
+  result=asyncio.run(query.samples([definition()],'2026-10-04T22:01:12Z',1,1,'optical'))
+  row=result['nodes'][0]['rows'][0]
+  assert row['inertial_position_km']==source['inertial']['r'] and row['lvlh_basis']==source['basis']
+  row['lvlh_basis']['x'][0]=999;row['inertial_position_km'][0]=999
+  again=asyncio.run(query.track([definition()],'2026-10-04T22:01:12Z','optical-track'))
+  assert again['nodes'][0]['rows'][0]['lvlh_basis']==source['basis']
+  assert again['nodes'][0]['rows'][0]['inertial_position_km']==source['inertial']['r']
+ result=asyncio.run(NodeGeometryQuery(calculate=batch).samples([definition()],'2016-12-31T23:59:59Z',3,1,'leap'))
+ error=result['nodes'][0]['rows'][1]
+ assert error['inertial_position_km'] is None and error['lvlh_basis'] is None
+
+
+def test_python_native_communication_fields_reach_actual_browser_buffer(tmp_path):
+ import struct
+ import subprocess
+ source=next(case['expected'] for case in FIXTURE['cases'] if case['id'].startswith('state:'))
+ def calculate(prepared,grids):
+  result=batch(prepared,grids);row=[0.0]*NODE_ROW_WIDTH
+  row[0:3]=source['inertial']['r'];row[3:6]=source['inertial']['v'];row[6:9]=source['fixed']['r']
+  row[12:15]=source['basis']['x'];row[15:18]=source['basis']['y'];row[18:21]=source['basis']['z'];row[27]=1
+  return replace(result,_buffer=struct.pack('<'+'d'*NODE_ROW_WIDTH,*row))
+ nodes=[definition()];request={'request_id':'ipc-optical','nodes':nodes,'start_utc':'2026-10-04T22:01:12.000000000Z','count':1,'step_seconds':1}
+ response=asyncio.run(NodeGeometryQuery(calculate=calculate).samples(nodes,request['start_utc'],1,1,request['request_id']))
+ payload=tmp_path/'communication.json';payload.write_text(json.dumps({'request':request,'response':response,'expected':source}),encoding='utf-8')
+ script="""
+ import {readFileSync} from 'node:fs';
+ import assert from 'node:assert/strict';
+ import {createNodeSampleBuffer} from './user_application/web/scripts/nodes/node_timeline.js';
+ const f=JSON.parse(readFileSync(process.argv[1],'utf8'));
+ const state=createNodeSampleBuffer(f.request,f.response).communicationStateFor(f.request.nodes[0],{utc:f.request.start_utc});
+ assert.deepEqual(state.inertial,f.expected.inertial);assert.deepEqual(state.basis,f.expected.basis);
+ assert.equal(state.interpolated,false);assert.equal(state.quality,'engineering_assumption');
+ """
+ result=subprocess.run(['node','--input-type=module','-e',script,str(payload)],cwd=Path(__file__).resolve().parents[2],capture_output=True,text=True,timeout=30)
+ assert result.returncode==0,result.stdout+result.stderr
+
 def test_original_static_period_and_invalid_domains():
  count=0
  for case in FIXTURE['cases']:

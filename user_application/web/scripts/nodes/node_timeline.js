@@ -69,7 +69,22 @@ function* prepareNodeSampleBuffer(request,response,{expectedHashes={}}={}){
       return {...metadata,node_id:node.id,node_definition:structuredClone(entry.definition),definition_hash:entry.hash,row:structuredClone(row),observation_utc:observed,interpolated:display.utc!==observed};
     }catch{return null;}
   }
-  return Object.freeze({geometryFor,nodeIds:()=>[...entries.keys()],definitionHashes:()=>Object.fromEntries([...entries].map(([id,entry])=>[id,entry.hash]))});
+  function communicationStateFor(node,display){
+    const value=geometryFor(node,display);
+    if(!value||value.interpolated||!valid(value.row))return null;
+    const row=value.row,basis=row.lvlh_basis;
+    if(!vector(row.inertial_position_km)||Math.hypot(...row.inertial_position_km)===0
+      ||!vector(row.inertial_velocity_km_s)||Math.hypot(...row.inertial_velocity_km_s)===0
+      ||!basis||!['x','y','z'].every(axis=>vector(basis[axis])&&Math.abs(Math.hypot(...basis[axis])-1)<=1e-7))return null;
+    const dot=(a,b)=>a.reduce((sum,v,i)=>sum+v*b[i],0);
+    if(Math.abs(dot(basis.x,basis.y))>1e-7||Math.abs(dot(basis.x,basis.z))>1e-7||Math.abs(dot(basis.y,basis.z))>1e-7)return null;
+    const cross=[basis.x[1]*basis.y[2]-basis.x[2]*basis.y[1],basis.x[2]*basis.y[0]-basis.x[0]*basis.y[2],basis.x[0]*basis.y[1]-basis.x[1]*basis.y[0]];
+    if(cross.some((v,i)=>Math.abs(v-basis.z[i])>1e-7))return null;
+    return {...metadata,node_id:node.id,node_definition:structuredClone(value.node_definition),definition_hash:value.definition_hash,
+      utc:display.utc,interpolated:false,inertial:{r:[...row.inertial_position_km],v:[...row.inertial_velocity_km_s]},basis:structuredClone(basis),
+      geodetic:{longitude:row.longitude_deg,latitude:row.latitude_deg,altitude:row.height_km,velocity:Math.hypot(...row.inertial_velocity_km_s)},sunlit:row.sunlit};
+  }
+  return Object.freeze({geometryFor,communicationStateFor,nodeIds:()=>[...entries.keys()],definitionHashes:()=>Object.fromEntries([...entries].map(([id,entry])=>[id,entry.hash]))});
 }
 
 export function createNodeSampleBuffer(request,response,options){
@@ -229,9 +244,10 @@ export function createNodeTimeline({api,requestId,yieldControl,onChange=()=>{},o
     task.promise=run();return task.promise;
   }
   function geometryFor(node,display){if(disposed)return null;return buffers.get(node?.id)?.geometryFor(node,display)??null;}
+  function communicationStateFor(node,display){if(disposed)return null;return buffers.get(node?.id)?.communicationStateFor(node,display)??null;}
   function cancel(){requireOpen();invalidate(true);emit();}
   function destroy(){if(disposed)return;invalidate(true);disposed=true;definitions=[];hashes={};}
-  return Object.freeze({setDefinitions,calculate,geometryFor,snapshot,cancel,destroy});
+  return Object.freeze({setDefinitions,calculate,geometryFor,communicationStateFor,snapshot,cancel,destroy});
 }
 
 // One application queue for source-native display work. No clock or animation scheduler.
@@ -283,5 +299,5 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
   function retry(){requireOpen();samples.cancel();tracks.cancel();inputError='';return schedule();}
   function clear(){requireOpen();utc=null;direction=1;inputError='';samples.cancel();tracks.cancel();emit();}
   function destroy(){if(disposed)return;disposed=true;utc=null;samples.destroy();tracks.destroy();}
-  return Object.freeze({setDefinitions,observe,retry,clear,snapshot,geometryFor:(node,display={utc})=>disposed||inputError?null:samples.geometryFor(node,display),pathFor:node=>disposed||inputError?null:tracks.pathFor(node),pathRevisionFor:node=>disposed||inputError?null:tracks.pathRevisionFor(node),destroy});
+  return Object.freeze({setDefinitions,observe,retry,clear,snapshot,geometryFor:(node,display={utc})=>disposed||inputError?null:samples.geometryFor(node,display),communicationStateFor:(node,display={utc})=>disposed||inputError?null:samples.communicationStateFor(node,display),pathFor:node=>disposed||inputError?null:tracks.pathFor(node),pathRevisionFor:node=>disposed||inputError?null:tracks.pathRevisionFor(node),destroy});
 }

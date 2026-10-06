@@ -15,6 +15,19 @@ function setup(action=(p,kind)=>receipt(p,kind)){
  timeline.setDefinitions(defs());return {timeline,calls,get max(){return max;}};
 }
 const until=async predicate=>{for(let i=0;i<100&&!predicate();i++)await new Promise(resolve=>setImmediate(resolve));assert.ok(predicate());};
+test('communication state follows the same readonly buffers and exact UTC through the shared owner',async()=>{
+ const s=setup((p,kind)=>{
+  const value=receipt(p,kind);
+  for(const node of value.nodes)for(const row of node.rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}
+  return value;
+ });
+ await s.timeline.observe(start);const before=s.calls.length;
+ const state=s.timeline.communicationStateFor(defs()[0]);assert.deepEqual(state.inertial.r,[7000,0,0]);
+ state.basis.x[0]=999;assert.deepEqual(s.timeline.communicationStateFor(defs()[0]).basis.x,[0,1,0]);
+ assert.equal(s.timeline.communicationStateFor(defs()[0],{utc:codec.advance(start,.5)}),null);
+ assert.equal(s.calls.length,before);s.timeline.clear();assert.equal(s.timeline.communicationStateFor(defs()[0]),null);
+ s.timeline.destroy();assert.equal(s.timeline.communicationStateFor(defs()[0],{utc:start}),null);
+});
 test('one shared UTC drives serial sample then track requests; read and paused frames stay request-free',async()=>{
  const s=setup();assert.equal(s.calls.length,0);await s.timeline.observe(start);assert.deepEqual(s.calls.map(c=>c.kind),['samples','track']);assert.equal(s.max,1);
  assert.ok(s.timeline.geometryFor(defs()[0]));assert.equal(s.timeline.pathFor(defs()[0]).positions_m.length,121);
