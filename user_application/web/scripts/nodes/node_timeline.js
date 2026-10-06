@@ -254,14 +254,63 @@ export function createNodeTimeline({api,requestId,yieldControl,onChange=()=>{},o
 export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,onChange=()=>{},onError=()=>{}}={}){
   const samples=createNodeTimeline({api,requestId,yieldControl}),tracks=createNodeTrackTimeline({api,periodFor,requestId,yieldControl});
   let disposed=false,utc=null,direction=1,nodeCount=0,runner=null,activeKind=null,inputError='';
+  let definitions=[],communicationGeneration=0,communicationSequence=0,activeCommunication=null;
+  const communicationJobs=[];
   const requireOpen=()=>{if(disposed)throw new Error('node display timeline disposed');};
-  const snapshot=()=>{const sample=samples.snapshot(),track=tracks.snapshot();return {utc,direction,pending:runner!==null,activeKind,error:inputError||sample.error||track.error,samples:sample,tracks:track};};
+  const snapshot=()=>{const sample=samples.snapshot(),track=tracks.snapshot();return {utc,direction,pending:runner!==null,activeKind,error:inputError||sample.error||track.error,samples:sample,tracks:track,communicationPending:communicationJobs.length+(activeCommunication?1:0)};};
   const emit=()=>{if(disposed)return;try{onChange(snapshot());}catch(e){try{onError(e instanceof Error?e.message:String(e));}catch{/* Display observers do not own calculations. */}}};
+  function settleCommunication(job,value,error){
+    if(job.settled)return;job.settled=true;job.signal?.removeEventListener('abort',job.abort);
+    if(error)job.reject(error);else job.resolve(value);
+  }
+  function invalidateCommunication(){
+    communicationGeneration++;
+    for(const job of [...communicationJobs.splice(0),...(activeCommunication?[activeCommunication]:[])]){
+      job.controller.abort();settleCommunication(job,null,new Error('native communication request invalidated'));
+    }
+  }
+  async function serveCommunication(job){
+    if(job.settled)return;
+    activeCommunication=job;activeKind='communication';emit();
+    const current=()=>!disposed&&!job.controller.signal.aborted&&job.generation===communicationGeneration&&job.scope===identity(definitions);
+    try{
+      if(!current())throw new Error('native communication request invalidated');
+      let states=job.nodes.map(node=>[node.id,samples.communicationStateFor(node,{utc:job.utc})]);
+      if(states.some(([,state])=>!state)){
+        const base=requestId();if(typeof base!=='string'||!base.trim())throw new Error('node request identity required');
+        const request={request_id:`${base}-communication-${job.generation}-${++communicationSequence}`,nodes:structuredClone(job.nodes),start_utc:job.utc,count:1,step_seconds:1};
+        if(request.request_id.length>128)throw new Error('node request identity exceeds128');
+        const known=samples.snapshot().definitionHashes;
+        const response=await api.nodeSamples(structuredClone(request),{signal:job.controller.signal});
+        if(!current())throw new Error('native communication request invalidated');
+        const buffer=await createNodeSampleBufferAsync(request,response,{expectedHashes:known,yieldControl,signal:job.controller.signal});
+        if(!current())throw new Error('native communication request invalidated');
+        states=job.nodes.map(node=>[node.id,buffer.communicationStateFor(node,{utc:job.utc})]);
+      }
+      if(states.some(([,state])=>!state))throw new Error('native communication states unavailable');
+      if(!current())throw new Error('native communication request invalidated');
+      settleCommunication(job,{utc:job.utc,node_definitions:structuredClone(job.nodes),states:structuredClone(states)});
+    }catch(error){settleCommunication(job,null,error instanceof Error?error:new Error(String(error)));}
+    finally{activeCommunication=null;activeKind=null;emit();}
+  }
+  function requestCommunicationStates(value,{signal}={}){
+    requireOpen();let canonical;
+    try{canonical=codec.advance(value,0);if(signal?.aborted)throw signal.reason??new Error('native communication request aborted');}
+    catch(error){return Promise.reject(error);}
+    if(!definitions.length)return Promise.resolve({utc:canonical,node_definitions:[],states:[]});
+    return new Promise((resolve,reject)=>{
+      const job={utc:canonical,nodes:structuredClone(definitions),scope:identity(definitions),generation:communicationGeneration,controller:new AbortController(),signal,resolve,reject,settled:false};
+      job.abort=()=>{job.controller.abort();settleCommunication(job,null,signal.reason??new Error('native communication request aborted'));};
+      signal?.addEventListener('abort',job.abort,{once:true});communicationJobs.push(job);void schedule();
+    });
+  }
   function schedule(){
-    if(disposed||!utc||!nodeCount||inputError)return Promise.resolve();
+    if(disposed||(!utc&&!communicationJobs.length)||!nodeCount)return Promise.resolve();
     if(runner)return runner;
     async function run(){
-      while(!disposed&&utc&&nodeCount&&!inputError){
+      while(!disposed&&(utc||communicationJobs.length)&&nodeCount){
+        if(communicationJobs.length){await serveCommunication(communicationJobs.shift());continue;}
+        if(!utc||inputError)break;
         const sample=samples.snapshot();if(sample.error)break;
         let target=null,background=false;
         if(!sample.startUtc)target=direction<0?codec.advance(utc,-600):utc;
@@ -281,23 +330,23 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
         break;
       }
     }
-    runner=Promise.resolve().then(run).catch(e=>{if(!disposed){inputError=e instanceof Error?e.message:String(e);samples.cancel();tracks.cancel();}}).finally(()=>{runner=null;activeKind=null;emit();});
+    runner=Promise.resolve().then(run).catch(e=>{if(!disposed){inputError=e instanceof Error?e.message:String(e);samples.cancel();tracks.cancel();invalidateCommunication();}}).finally(()=>{runner=null;activeKind=null;emit();if(communicationJobs.length)void schedule();});
     return runner;
   }
   function setDefinitions(nodes){
     requireOpen();const changed=samples.setDefinitions(nodes);tracks.setDefinitions(nodes);nodeCount=nodes.length;
-    if(changed){inputError='';emit();void schedule();}return changed;
+    if(changed){invalidateCommunication();definitions=structuredClone(nodes);inputError='';emit();void schedule();}return changed;
   }
   function observe(value,{seek=false}={}){
     requireOpen();let canonical;
-    try{canonical=codec.advance(value,0);}catch(e){samples.cancel();tracks.cancel();utc=null;inputError=e instanceof Error?e.message:String(e);emit();return Promise.resolve();}
+    try{canonical=codec.advance(value,0);}catch(e){samples.cancel();tracks.cancel();invalidateCommunication();utc=null;inputError=e instanceof Error?e.message:String(e);emit();return Promise.resolve();}
     if(utc){const delta=codec.difference(canonical,utc);if(delta)direction=Math.sign(delta);}
     utc=canonical;
-    if(seek){samples.cancel();tracks.cancel();inputError='';}
+    if(seek){samples.cancel();tracks.cancel();invalidateCommunication();inputError='';}
     return schedule();
   }
-  function retry(){requireOpen();samples.cancel();tracks.cancel();inputError='';return schedule();}
-  function clear(){requireOpen();utc=null;direction=1;inputError='';samples.cancel();tracks.cancel();emit();}
-  function destroy(){if(disposed)return;disposed=true;utc=null;samples.destroy();tracks.destroy();}
-  return Object.freeze({setDefinitions,observe,retry,clear,snapshot,geometryFor:(node,display={utc})=>disposed||inputError?null:samples.geometryFor(node,display),communicationStateFor:(node,display={utc})=>disposed||inputError?null:samples.communicationStateFor(node,display),pathFor:node=>disposed||inputError?null:tracks.pathFor(node),pathRevisionFor:node=>disposed||inputError?null:tracks.pathRevisionFor(node),destroy});
+  function retry(){requireOpen();samples.cancel();tracks.cancel();invalidateCommunication();inputError='';return schedule();}
+  function clear(){requireOpen();utc=null;direction=1;inputError='';samples.cancel();tracks.cancel();invalidateCommunication();emit();}
+  function destroy(){if(disposed)return;disposed=true;utc=null;invalidateCommunication();definitions=[];samples.destroy();tracks.destroy();}
+  return Object.freeze({setDefinitions,observe,retry,clear,snapshot,requestCommunicationStates,geometryFor:(node,display={utc})=>disposed||inputError?null:samples.geometryFor(node,display),communicationStateFor:(node,display={utc})=>disposed||inputError?null:samples.communicationStateFor(node,display),pathFor:node=>disposed||inputError?null:tracks.pathFor(node),pathRevisionFor:node=>disposed||inputError?null:tracks.pathRevisionFor(node),destroy});
 }

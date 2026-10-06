@@ -138,19 +138,58 @@ _,errors=native.propagate_nodes(json.dumps([orbit]*240),list(range(240)),[epoch]
 assert errors==[None]*240
 _,errors=native.propagate_nodes(json.dumps([orbit]),[0],[8.64e15+1])
 assert errors==['unsupported_node_time']
-print(json.dumps({'python':sys.version,'native_file':native.__file__,'profile':native.calculation_profile,'row':row,'version':native.__version__,'catalog_export':True,'official_states':old_states,'omm_scalar_batch':True,'node_cases':len(source_cases),'node_max_error':max_errors,'node_boundary_rows':50000,'node_profile':native.node_calculation_profile}))
+optical=__import__('gzip').decompress(pathlib.Path(sys.argv[6]).read_bytes())
+optical=json.loads(optical)
+prime=next(case for case in optical['cases'] if case['id']=='dense-two-plane:0')
+native_points=[]
+for step in prime['rows']:
+    inputs=step['input'];nodes=inputs['nodes'];at=inputs['date']
+    packed,errors=native.propagate_nodes(json.dumps([node['orbit'] for node in nodes]),list(range(len(nodes))),[at]*len(nodes))
+    assert errors==[None]*len(nodes)
+    native_points.append({'date':at,'nodes':nodes,'packed':__import__('base64').b64encode(packed).decode(),'errors':errors})
+node_metadata={key:getattr(native,key) for key in ['node_calculation_profile','node_frame','node_inertial_frame','node_time_model','NODE_ROW_WIDTH','MAX_NODE_DEFINITIONS','MAX_NODE_ROWS','MAX_NODE_SAMPLES']}
+print(json.dumps({'python':sys.version,'native_file':native.__file__,'profile':native.calculation_profile,'row':row,'version':native.__version__,'catalog_export':True,'official_states':old_states,'omm_scalar_batch':True,'node_cases':len(source_cases),'node_max_error':max_errors,'node_boundary_rows':50000,'node_profile':native.node_calculation_profile,'native_points':native_points,'node_metadata':node_metadata}))
 """
     tle = {key: case[key] for key in ("line1", "line2")}
     sample = {key: expected[key] for key in ("time", "position", "velocity")}
     result = subprocess.run([str(python), "-I", "-c", code, json.dumps(tle), json.dumps(sample),
         str(ROOT / "project_support/tests/fixtures/original_satellite_nodes.json"),
         str(ROOT / "project_support/tests/fixtures/original_node_native_offsets.json"),
-        str(ROOT / "project_support/tests/fixtures/orbit/sgp4_test_cases.toml")],
+        str(ROOT / "project_support/tests/fixtures/orbit/sgp4_test_cases.toml"),
+        str(ROOT / "project_support/tests/fixtures/original_node_link_resolution.json.gz")],
                             cwd=tmp_path, check=True, capture_output=True, text=True, timeout=30)
     receipt = json.loads(result.stdout)
     assert receipt["profile"] == "WGS72_AFSPC"
     receipt["wheel"] = str(product_wheel())
     receipt["wheel_sha256"] = hashlib.sha256(product_wheel().read_bytes()).hexdigest()
+    # Preserve actual clean-venv Rust bytes through the production adapter/query and JS decoder.
+    import asyncio
+    from communication.native.node_adapter import propagate_node_grids
+    from user_application.node_geometry import NodeGeometryQuery
+    from foundation.orbit_time import parse_utc, format_utc_batch
+    class NativePointPort:
+        def __init__(self, point):
+            self.point = point
+            for key, value in receipt['node_metadata'].items():
+                setattr(self, key, value)
+        def propagate_nodes(self, definitions, indices, times):
+            assert json.loads(definitions) == [node['orbit'] for node in self.point['nodes']]
+            assert indices == list(range(len(self.point['nodes'])))
+            assert times == [self.point['date']] * len(indices)
+            return base64.b64decode(self.point['packed']), self.point['errors'][:]
+    wire = []
+    for point in receipt.pop('native_points'):
+        port = NativePointPort(point)
+        query = NodeGeometryQuery(calculate=lambda prepared, grids: propagate_node_grids(prepared, grids, native_port=port))
+        stamp = __import__('datetime').datetime.fromtimestamp(point['date']/1000, __import__('datetime').timezone.utc).isoformat()
+        utc = format_utc_batch((parse_utc(stamp),))[0]
+        request = {'request_id':'native-prime','nodes':point['nodes'],'start_utc':utc,'count':1,'step_seconds':1}
+        response = asyncio.run(query.samples(request['nodes'],utc,1,1,request['request_id']))
+        wire.append({'request':request,'response':response})
+    payload = tmp_path/'native_optical_points.json'
+    payload.write_text(json.dumps(wire),encoding='utf-8')
+    optical_result = subprocess.run(['node',str(ROOT/'project_support/tests/browser_fixtures/native_optical_points.mjs'),str(payload)],cwd=ROOT,check=True,capture_output=True,text=True,timeout=30)
+    receipt['native_optical_points'] = json.loads(optical_result.stdout)
     destination = ROOT / "data/workspace/validation/install" / uuid.uuid4().hex
     destination.mkdir(parents=True)
     (destination / "isolated_call.json").write_text(json.dumps(receipt, indent=2), encoding="utf-8")
