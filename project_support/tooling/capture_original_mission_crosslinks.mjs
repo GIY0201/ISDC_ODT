@@ -1,0 +1,30 @@
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import {spawnSync} from 'node:child_process';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+const [rootArg,output]=process.argv.slice(2);
+if(!rootArg||!output)throw Error('readonly source-browser path and fixture destination required');
+const revision=spawnSync('git',['-c','safe.directory='+path.resolve(rootArg,'../../..').replaceAll('\\','/'),'-C',rootArg,'rev-parse','HEAD'],{encoding:'utf8'});
+assert.equal(revision.status,0,revision.stderr);assert.equal(revision.stdout.trim(),'1a1e00297a0301637455b0ef2cf48b2e74576b07');
+const read=name=>fs.readFileSync(path.join(rootArg,name),'utf8').replace(/\r\n/g,'\n');
+const windows=read('mission_windows.js'),optical=read('oisl.js');
+const extract=(source,start,end)=>source.slice(source.indexOf(start),source.indexOf(end)).trim();
+const scan=extract(windows,'export function scanIntervals','function passWindows');
+const ecef=extract(windows,'export function ecefFromGeodetic','// Minimum elevation');
+const crosslink=extract(windows,'export function crosslinkWindows','// Committed tasks');
+const los=extract(optical,'export function lineOfSightClear','// Direction to a target');
+const start=Date.parse('2026-10-04T22:01:12Z');
+const originalScan=new Function('DEFAULT_STEP_MS',scan.replaceAll('export ','')+';return scanIntervals;')(30000);
+const refinedScan=(predicate,start,end,step)=>originalScan(predicate,start,end,step,{refineMs:1000});
+const factory=()=>new Function('scanIntervals','nodeStateAt','DEFAULT_STEP_MS','DEFAULT_LOS_MARGIN_KM','EARTH_A_KM','EARTH_E2','RADIANS','dot','subtract','norm',ecef.replaceAll('export ','')+los.replaceAll('export ','')+crosslink.replaceAll('export ','')+';return {lineOfSightClear,crosslinkWindows};');
+// Explicit refinement tolerance equals the native producer; other source bodies remain unchanged.
+const source=factory()(refinedScan,()=>({fixed:{r:[7000,0,0]}}),30000,100,6378.137,(1/298.257223563)*(2-1/298.257223563),Math.PI/180,(a,b)=>a.reduce((v,x,i)=>v+x*b[i],0),(a,b)=>a.map((x,i)=>x-b[i]),a=>Math.hypot(...a));
+const vectors={parabolic:t=>[7000,100+(t-90)**2,0],full:t=>[7000,500,0],blocked:t=>[-7000,0,0],same:t=>[7000,0,0]};
+const cases=Object.entries(vectors).map(([name,at])=>{
+ const external=date=>{const [x,y,z]=at((date-start)/1000);return {latitude:0,longitude:Math.atan2(y,x)*180/Math.PI,altitude:Math.hypot(x,y)-6378.137};};
+ return {name,expected:source.crosslinkWindows({id:'N-1',orbit:{}},external,start,180/3600,1000,{stepMs:30000,externalId:'25544'})};
+});
+const losCases=[[[7000,0,0],[7000,100,0]],[[7000,0,0],[-7000,0,0]],[[7000,0,0],[7000,0,0]],[[6478.137,0,0],[6478.137,10,0]]].map(([a,b])=>({a,b,expected:source.lineOfSightClear(a,b)}));
+const value={source_commit:revision.stdout.trim(),function_hashes:Object.fromEntries(Object.entries({scan,ecef,crosslink,los}).map(([name,body])=>[name,crypto.createHash('sha256').update(body).digest('hex')])),refine_ms:1000,start_utc:new Date(start).toISOString(),duration_seconds:180,cases,los_cases:losCases};
+fs.writeFileSync(output,JSON.stringify(value,null,2));console.log(JSON.stringify(cases.map(({name,expected})=>({name,count:expected.length}))));
