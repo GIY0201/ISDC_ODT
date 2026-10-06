@@ -8,7 +8,7 @@ import {createNodeEditorTools} from './nodes/editor.js';
 import {createUtcCodec,LEAP_SHA256} from './orbit_utc.js';
 
 // Application composition only. Native buffers, source store and shared globe retain ownership.
-export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now,resolveModel,models,fetchImpl,clockActions={},readClock=()=>({})}={}){
+export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now,resolveModel,models,fetchImpl,clockActions={},readClock=()=>({}),onHover=()=>{}}={}){
  const codec=createUtcCodec(LEAP_SHA256),advanceUtc=codec.advance;
  let dead=false,started=false,root=null,panel=null,scene=null,display=null,deployment=null,activeSelection=false,selectedSignature=null,definitionsSignature=null,error='';
  let tracks=true,links=true,modelsVisible=true;const readiness=new Map(),removers=[];
@@ -87,7 +87,12 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
    return primitive?.show===true&&[scene.points?.get(id),scene.labels?.get(id),scene.models?.get(id)?.model].some(value=>value!==undefined&&value===primitive);
   },
   onSelect:id=>{if(!pickGeometry(id))return;try{store.select(id);select();}catch(value){report(value);}},
-  onHover:id=>{if(!dead)scene?.setHovered(id&&pickGeometry(id)?id:null);},
+  onHover:(id,screen)=>{
+   if(dead)return;const geometry=id&&pickGeometry(id),validId=geometry?id:null;
+   if(scene?.hoveredId!==validId)scene?.setHovered(validId);
+   const node=validId&&store.find(validId);
+   onHover(node&&screen&&[screen.x,screen.y].every(Number.isFinite)?structuredClone({kind:'source_node',id:validId,item:library.nodeCatalogItem(node),node_geometry:geometry,screen}):null);
+  },
  });
  const external=event=>{if(!dead&&event.key===DRAFT_KEY)store.receiveExternalDraft(event.newValue);};host.addEventListener('storage',external);
  function show(view){
@@ -115,6 +120,6 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  return Object.freeze({
   async start(){if(dead||started)return;started=true;return retryRestore();},retryRestore,
   show,refresh:refreshPanel,refreshModels,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
-  destroy(){if(dead)return;dead=true;for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
+  destroy(){if(dead)return;dead=true;try{onHover(null);}catch{/* Scoped presentation cleanup. */}for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
  });
 }

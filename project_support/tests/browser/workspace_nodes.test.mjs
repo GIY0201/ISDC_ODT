@@ -8,7 +8,24 @@ import {NODE_COMMUNICATION_METADATA} from '../../../user_application/web/scripts
 import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
 import {fixture as actualWorkspaceFixture} from './workspace_fixture.mjs';
 
-function fixture({native=false,solar=null,view=null,storage=null,storageGetter=null,fetchOverride=null}={}){
+for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 source node hover uses one card and expires with owned geometry ${width}x${height}`,async()=>{
+ const codec=createUtcCodec(LEAP_SHA256);let samples=0;
+ const f=actualWorkspaceFixture(width,height,{hash:'#satellite',setTimeout,clearTimeout,nodeSamples:async p=>{samples++;return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>({utc:codec.advance(p.start_utc,i),status:'valid',error_code:null,position_m:[7000000,2,3],inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550}))}))};}});
+ try{
+  await new Promise(resolve=>setTimeout(resolve,10));await f.get('node-add').dispatch('click');let point;
+  for(let i=0;i<60;i++){await new Promise(resolve=>setTimeout(resolve,5));f.viewers[0].scene.preRender.raise();point=f.viewers[0].primitives.flatMap(p=>p.items??[]).find(p=>p.id?.nodeId&&p.show);if(point)break;}
+  assert.ok(point,'accepted current source geometry must reach the actual renderer');
+  f.viewers[0].scene.pick=()=>({id:point.id,primitive:point});const before=samples;
+  f.pickHandlers[0].move({endPosition:{x:100,y:120}});
+  const cards=f.get('stored-orbit-globe').children.filter(c=>c.className==='satellite-hover-card');assert.equal(cards.length,1);const card=cards[0];assert.equal(card.hidden,false);
+  assert.match(card.children[1].textContent,/550\.000 km/);assert.doesNotMatch(card.children[1].textContent,/NORAD/);assert.match(card.children[2].textContent,/GMST\/UTC 근사/);assert.match(card.children[2].textContent,/2020-07-12T21:16:01/);
+  assert.ok(Number.isFinite(parseFloat(card.style.left)));assert.equal(samples,before);assert.equal(f.viewers.length,1);assert.equal(f.pickHandlers.length,1);
+  point.show=false;f.viewers[0].scene.mode=0;f.viewers[0].scene.preRender.raise();assert.equal(card.hidden,true);
+  await f.win.dispatch('pagehide',{persisted:false});
+ }finally{f.dispose();}
+});
+
+function fixture({native=false,solar=null,view=null,storage=null,storageGetter=null,fetchOverride=null,onHover=()=>{}}={}){
  let id=0,context=null,displayListener,rendererFactory,panelOptions,interaction,renderer,removeCount=0;const calls=[],sections=new Map();
  const host={innerWidth:1280,innerHeight:720,localStorage:storage,crypto:{randomUUID:()=>`test-${++id}`},setTimeout,clearTimeout,addEventListener(){},removeEventListener(){},confirm:()=>true};
  if(storageGetter)Object.defineProperty(host,'localStorage',{get:storageGetter});
@@ -23,9 +40,17 @@ function fixture({native=false,solar=null,view=null,storage=null,storageGetter=n
  const codec=createUtcCodec(LEAP_SHA256),row=utc=>({utc,status:'valid',error_code:null,position_m:[7000000,2,3],inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550});
  const api={nodeSamples:async p=>{calls.push(['samples']);if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>row(codec.advance(p.start_utc,i)))}))};},nodeTrack:async p=>{if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>{const period=orbitElements(node.orbit).period/60;return{node_id:node.id,definition_hash:'a'.repeat(64),period_minutes:period,path_visible:true,rows:Array.from({length:121},(_,i)=>row(codec.advance(new Date(Math.trunc(Date.parse(p.center_utc)+(i-60)*period*60000/120)).toISOString(),0)))};})};}};
  if(view)Object.assign(globe,view);
- const workspace=createWorkspaceNodes({api,globe,solar,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now:()=>1791151272000,resolveModel:()=>({key:'flat',url:'/flat.glb'}),models:()=>[],fetchImpl});
+ const workspace=createWorkspaceNodes({api,globe,solar,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now:()=>1791151272000,resolveModel:()=>({key:'flat',url:'/flat.glb'}),models:()=>[],fetchImpl,onHover});
  return{workspace,host,globe,calls,buttons,sections,context(value){context=value;displayListener(value);},get options(){return panelOptions;},get interaction(){return interaction;},get renderer(){return renderer;},attach(){return renderer=rendererFactory({},{});},get removeCount(){return removeCount;}};
 }
+
+test('mounted native node hover publishes copied current geometry without queries and clears unknown/disposed cases',async()=>{
+ const seen=[],f=fixture({native:true,onHover:value=>seen.push(value)});await f.workspace.start();f.workspace.show('satellite');f.options.store.add({name:'Native node'});f.attach();const node=f.options.store.selected;
+ f.context({utc:'2026-10-04T22:01:12.000000000Z'});for(let i=0;i<40&&!f.interaction.owns(node.id,f.renderer.points.get(node.id));i++)await new Promise(resolve=>setTimeout(resolve,5));
+ const count=f.calls.filter(c=>c[0]==='samples').length;f.interaction.onHover(node.id,{x:10,y:20});const p=seen.at(-1);assert.equal(p.kind,'source_node');assert.equal(p.item.OBJECT_NAME,node.name);assert.equal(p.node_geometry.row.utc,'2026-10-04T22:01:12.000000000Z');assert.equal(p.node_geometry.frame,'EARTH_FIXED_GMST_UTC_APPROX');assert.equal(f.calls.filter(c=>c[0]==='samples').length,count);
+ p.node_geometry.row.position_m[0]=0;f.interaction.onHover(node.id,{x:10,y:20});assert.equal(seen.at(-1).node_geometry.row.position_m[0],7000000);
+ f.context(null);f.interaction.onHover(node.id,{x:10,y:20});assert.equal(seen.at(-1),null);f.workspace.destroy();assert.equal(seen.at(-1),null);const n=seen.length;f.interaction.onHover(node.id,{x:10,y:20});assert.equal(seen.length,n);
+});
 
 test('damaged draft restore mounts an error without replacing bytes and explicit retry recovers read-only',async()=>{
  let raw='broken',writes=0;const f=fixture({storage:{getItem:key=>key==='spacetwin-nodes-draft-v1'?raw:null,setItem(){writes++;}}});

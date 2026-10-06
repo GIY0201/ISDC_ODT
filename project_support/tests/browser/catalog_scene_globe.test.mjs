@@ -24,6 +24,14 @@ test('native node picking shares one handler, requires owned primitive, and neve
  globe.setNodeInteraction(null);globe.viewer.picked={id:{catalogNumber:1}};handlers[0].pick({position:{}});assert.deepEqual(catalog,[1]);assert.equal(hover.at(-1),null);globe.destroy();
  handlers[0].pick({position:{}});assert.equal(selected.length,1);
 });
+
+test('node hover carries copied screen position and revalidates its primitive on the shared frame path',()=>{
+ const {globe,handlers}=fixture(),events=[],primitive={show:true};let valid=true;globe.C.ScreenSpaceEventType.MOUSE_MOVE=2;
+ globe.onSatelliteHover=value=>events.push(['gp',value]);globe.setNodeInteraction({owns:(id,p)=>valid&&id==='N'&&p===primitive&&p.show,onHover:(id,screen)=>events.push(['node',id,screen])});
+ const screen={x:10,y:20};globe.viewer.picked={id:{nodeId:'N'},primitive};handlers[0].actions.get(2)({endPosition:screen});assert.deepEqual(events.at(-1),['node','N',{x:10,y:20}]);screen.x=999;
+ globe.refreshNodeHover();assert.deepEqual(events.at(-1),['node','N',{x:10,y:20}]);valid=false;globe.refreshNodeHover();assert.equal(events.at(-1)[1],null);
+ const count=events.length;globe.refreshNodeHover();assert.equal(events.length,count);globe.destroy();
+});
 test('selected source model pick requires the shared layer primitive and a currently validated native pose',async()=>{
  const {globe,handlers}=fixture(),selected=[],codec=createUtcCodec(LEAP_SHA256),definition={schema:1,id:'NODE-1'},stamp=codec.advance(utc,0);
  const sample={...NODE_COMMUNICATION_METADATA,node_id:'NODE-1',node_definition:definition,definition_hash:'a'.repeat(64),row:{utc:stamp,status:'valid',error_code:null,position_m:[7000000,0,0]}};

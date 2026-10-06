@@ -52,10 +52,11 @@ const modelPanel=createSatelliteModelPanel(globe);
 let satelliteHover=null;
 let nodeWorkspace=null;
 let nodeClock=null;
-const removeSatelliteHover=globe.observeSatelliteHover((payload,C)=>{
+function renderSatelliteHover(payload,C,kind='gp'){
   if(!satelliteHover&&payload&&C)satelliteHover=createSatelliteHover(document.getElementById('stored-orbit-globe'),C);
-  if(payload)satelliteHover?.show(payload);else satelliteHover?.clear();
-});
+  if(payload)satelliteHover?.show(payload);else satelliteHover?.clear(kind);
+}
+const removeSatelliteHover=globe.observeSatelliteHover((payload,C)=>renderSatelliteHover(payload,C));
 const stationPanel=createStationPanel(GROUND_STATIONS,stationGroups(),{select:key=>globe.selectStation(key),focus:key=>globe.focusStation(key),use:site=>{const staged=groundPanel.stageStation(site);location.hash='ground';return staged;},useCatalog:site=>{catalogTimePanel.stage(site);location.hash='satellite';}});
 globe.stations(Object.values(GROUND_STATIONS),key=>stationPanel.controller.choose(key));
 const client=createOrbitSelection(api,render);
@@ -82,7 +83,7 @@ modelSelection=createSatelliteModelSelection({api,globe,timeline:catalogTimeline
 const removeModelSelection=catalogPanel.controller.observeSelection(syncModel);
 const nodeLibrary=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>createBrowserId(window.crypto)});
 nodeClock=createNodeClockControls({readContext:()=>nodeWorkspace?.snapshot().display,stored:client,catalog:catalogTimeline,advanceUtc:createUtcCodec(LEAP_SHA256).advance,now:()=>Date.now(),runStored:command});
-nodeWorkspace=createWorkspaceNodes({api,globe,solar,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window),readClock:context=>nodeClock.read(context),clockActions:nodeClock.actions});
+nodeWorkspace=createWorkspaceNodes({api,globe,solar,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window),readClock:context=>nodeClock.read(context),clockActions:nodeClock.actions,onHover:payload=>renderSatelliteHover(payload,window.Cesium,'source_node')});
 void nodeWorkspace.start().then(()=>nodeWorkspace.show(view));
 void modelSelection.load().then(()=>nodeWorkspace.refreshModels());
 const hilPanel=createHilPanel(api,hilTopology,drawSparkline);

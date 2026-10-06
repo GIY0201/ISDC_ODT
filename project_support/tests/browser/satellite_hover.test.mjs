@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createSatelliteHover} from '../../../user_application/web/scripts/tabs/satellite_hover.js';
+import {NODE_COMMUNICATION_METADATA} from '../../../user_application/web/scripts/nodes/node_timeline.js';
 
 function fixture(width=400,height=240){
  const nodes=[];
@@ -10,6 +11,21 @@ function fixture(width=400,height=240){
  return{container,cesium,calls,listeners,nodes};
 }
 const payload=()=>({item:{OBJECT_NAME:'ISS <img onerror=attack()>',ORBIT_REGIME:'LEO'},id:25544,position:{frame:'ITRF',utc:'2026-10-05T00:00:00Z',catalog_number:25544,position_m:[1,2,3],interpolated:true},screen:{x:395,y:230}});
+const nodePayload=()=>({kind:'source_node',id:'NODE-1',item:{OBJECT_NAME:'Node <script>literal</script>',ORBIT_REGIME:'MEO'},screen:{x:395,y:230},node_geometry:{...NODE_COMMUNICATION_METADATA,node_id:'NODE-1',node_definition:{schema:1,id:'NODE-1'},definition_hash:'a'.repeat(64),row:{utc:'2026-10-05T00:00:00.000000000Z',status:'valid',error_code:null,position_m:[1,2,3],height_km:550}}});
+
+test('same card displays source native node height and explicit approximate provenance without ITRF conversion',()=>{
+ const f=fixture(),hover=createSatelliteHover(f.container,f.cesium),p=nodePayload();hover.show(p);
+ assert.equal(f.container.card.hidden,false);assert.equal(f.container.card.children[0].textContent,p.item.OBJECT_NAME);assert.match(f.container.card.children[1].textContent,/NODE-1.*MEO.*550.000 km/);assert.doesNotMatch(f.container.card.children[1].textContent,/NORAD/);
+ assert.match(f.container.card.children[2].textContent,/2026-10-05T00:00:00.000000000Z.*근사/);assert.equal(f.calls.length,0);
+ hover.clear('gp');assert.equal(f.container.card.hidden,false);hover.clear('source_node');assert.equal(f.container.card.hidden,true);
+ hover.show(payload());hover.clear('source_node');assert.equal(f.container.card.hidden,false);hover.clear('gp');assert.equal(f.container.card.hidden,true);hover.destroy();
+});
+
+test('native hover rejects wrong provenance/hash/definition/UTC/status/height rather than relabeling source metres',()=>{
+ const f=fixture(),hover=createSatelliteHover(f.container,f.cesium);
+ for(const edit of [g=>g.frame='ITRF',g=>g.quality='measured',g=>g.source_commit='other',g=>g.definition_hash='bad',g=>g.node_definition.id='other',g=>g.row.utc='bad',g=>g.row.status='error',g=>g.row.error_code='failed',g=>g.row.height_km=NaN]){const p=nodePayload();edit(p.node_geometry);hover.show(p);assert.equal(f.container.card.hidden,true);}
+ assert.equal(f.calls.length,0);
+});
 
 test('original hover facts use native picked metres and that position UTC; catalog text stays literal',()=>{
  const f=fixture(),hover=createSatelliteHover(f.container,f.cesium);hover.show(payload());

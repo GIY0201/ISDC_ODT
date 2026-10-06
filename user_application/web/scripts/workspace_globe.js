@@ -15,10 +15,10 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     const binding=nodeInteractionBinding,owner=globe;if(!owner||disposed)return;
     if(!binding){owner.setNodeInteraction?.(null);return;}
     const current=()=>!disposed&&!failed&&nodeInteractionBinding===binding&&globe===owner;
-    owner.setNodeInteraction({owns:(...args)=>current()&&binding.interaction.owns(...args)===true,onSelect:id=>{if(current())binding.interaction.onSelect?.(id);},onHover:id=>{if(current())binding.interaction.onHover?.(id);}});
+    owner.setNodeInteraction({owns:(...args)=>current()&&binding.interaction.owns(...args)===true,onSelect:id=>{if(current())binding.interaction.onSelect?.(id);},onHover:(id,screen)=>{if(current())binding.interaction.onHover?.(id,screen?{...screen}:null);}});
   }
   const nodeRendererState=()=>({phase:disposed?'unavailable':nodeBinding?.phase??'unavailable',error:nodeBinding?.error??null});
-  function notifyNodes(){for(const fn of nodeObservers){try{fn(structuredClone(nodeRendererState()));}catch{/* A display observer cannot own renderer resources. */}}}
+  function notifyNodes(){globe?.refreshNodeHover?.();for(const fn of nodeObservers){try{fn(structuredClone(nodeRendererState()));}catch{/* A display observer cannot own renderer resources. */}}}
   function detachNodes(binding=nodeBinding){
     if(!binding)return;
     const remove=binding.removeFrame,renderer=binding.renderer;binding.removeFrame=null;binding.renderer=null;
@@ -43,6 +43,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
         try{
           const phase=host.performance?.now?.();
           renderer.syncFrame(displayContext()?.utc??null,Number.isFinite(phase)?phase:0);
+          owner.refreshNodeHover?.();
           notifyCamera();
         }catch(error){binding.phase='error';binding.error=String(error?.message||error);detachNodes(binding);notifyNodes();}
       };

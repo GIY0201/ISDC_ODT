@@ -173,9 +173,16 @@ export class OrbitGlobe {
   setNodeInteraction(interaction){
     if(this.destroyed)return;
     if(interaction!==null&&typeof interaction?.owns!=='function')throw new TypeError('node primitive ownership verifier required');
-    try{this.nodeInteraction?.onHover?.(null);}catch{/* Optional interaction cannot own the Viewer. */}
+    this.clearNodeHover();
     this.nodeInteraction=interaction;
     if(interaction)this._ensurePickHandler();
+  }
+  clearNodeHover(){this.nodeHover=null;try{this.nodeInteraction?.onHover?.(null);}catch{/* Optional hover cannot own the Viewer. */}}
+  refreshNodeHover(){
+    if(this.destroyed||!this.nodeHover)return;
+    const hover=this.nodeHover,node=this._nodePick({id:{nodeId:hover.id},primitive:hover.primitive});
+    if(!node?.owned){this.clearNodeHover();return;}
+    try{this.nodeInteraction?.onHover?.(node.id,{...hover.screen});}catch{/* Presentation cannot change the scene. */}
   }
   _nodePick(picked){
     const record=picked?.id?.id??picked?.id;
@@ -183,7 +190,8 @@ export class OrbitGlobe {
     const id=record.nodeId??record.node_id;let owned=false;
     try{
       const layer=this.modelLayer,selectedModel=Boolean(picked.primitive&&picked.primitive===layer?.model&&layer.model.show&&layer.description?.pose_source?.node_definition?.id===id&&layer.nativeAt(layer.timeSource?.())?.node_id===id);
-      owned=typeof id==='string'&&id.length>0&&this.nodeInteraction?.owns(id,picked.primitive,selectedModel)===true;
+      const morph=this.viewControls.cancelMorph||this.C.SceneMode&&this.viewer.scene.mode===this.C.SceneMode.MORPHING;
+      owned=!morph&&typeof id==='string'&&id.length>0&&this.nodeInteraction?.owns(id,picked.primitive,selectedModel)===true;
     }catch{/* Stale, failed or foreign native pick is unavailable. */}
     return{id,owned};
   }
@@ -204,14 +212,14 @@ export class OrbitGlobe {
     if(C.ScreenSpaceEventType.MOUSE_MOVE!==undefined)this.stationPickHandler.setInputAction(event=>{
       if(this.destroyed)return;const picked=viewer.scene.pick(event.endPosition),id=picked?.id?.id??picked?.id;
       const node=this._nodePick(picked);
-      try{this.nodeInteraction?.onHover?.(node?.owned?node.id:null);}catch{/* Optional hover cannot change geometry. */}
-      if(node){this.hoverCatalog(null);this._clearSatelliteHover();if(this.container.style)this.container.style.cursor=node.owned?'pointer':'';if(viewer.scene.canvas.style)viewer.scene.canvas.style.cursor=node.owned?'pointer':'';return;}
+      if(node){this.hoverCatalog(null);this._clearSatelliteHover();if(node.owned){this.nodeHover={id:node.id,primitive:picked.primitive,screen:{x:event.endPosition.x,y:event.endPosition.y}};this.refreshNodeHover();}else this.clearNodeHover();if(this.container.style)this.container.style.cursor=node.owned?'pointer':'';if(viewer.scene.canvas.style)viewer.scene.canvas.style.cursor=node.owned?'pointer':'';return;}
+      this.clearNodeHover();
       this.hoverCatalog(id?.catalogNumber??(id==='stored-orbit-satellite'?this.selectedCatalog:null));
       this.hoverPick={id:typeof id==='object'?{catalogNumber:id?.catalogNumber,satelliteId:id?.satelliteId}:id,screen:{x:event.endPosition.x,y:event.endPosition.y}};
       this._refreshSatelliteHover();
       if(this.hoveredCatalog===null&&this.stationIds.has(id)&&viewer.scene.canvas.style)viewer.scene.canvas.style.cursor='pointer';
     },C.ScreenSpaceEventType.MOUSE_MOVE);
-    this.leaveCatalog=()=>{this.hoverCatalog(null);this._clearSatelliteHover();try{this.nodeInteraction?.onHover?.(null);}catch{/* Optional hover. */}};this.container.addEventListener?.('mouseleave',this.leaveCatalog);
+    this.leaveCatalog=()=>{this.hoverCatalog(null);this._clearSatelliteHover();this.clearNodeHover();};this.container.addEventListener?.('mouseleave',this.leaveCatalog);
   }
   setGroundPoint(point){
     if(this.destroyed)return;
