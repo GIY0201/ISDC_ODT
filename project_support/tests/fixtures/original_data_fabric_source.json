@@ -1,0 +1,29 @@
+{
+  "commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "files": [
+    {
+      "source": "operations_software/data_fabric/link_metrics.py",
+      "source_sha256": "6597a349d981e0f74b27f3587ca64412e0abf0d85c5a0f98c8b0b9ebe7da2ff6",
+      "target": "digital_twin/simulation/data_fabric/link_metrics.py",
+      "normalized_target_sha256": "aa1824fb8f6fa8e13d72dace4c9f2455126831f83950b5613c9608efd64943fe"
+    },
+    {
+      "source": "operations_software/data_fabric/routing.py",
+      "source_sha256": "107b39e9e5f8382ae72fb9302e17a385ce8ef4b8d148b9c6e3443e00d41ebb00",
+      "target": "digital_twin/simulation/data_fabric/routing.py",
+      "normalized_target_sha256": "183e75f0fbd9586b39d15827a85c0cf4eacbd962d17cd74c893095513f7922a5"
+    },
+    {
+      "source": "operations_software/data_fabric/bundles.py",
+      "source_sha256": "273d32efdd487155485f106e75b01b0286be3316a95c0596852c6b4c70ef1ad6",
+      "target": "digital_twin/simulation/data_fabric/bundles.py",
+      "normalized_target_sha256": "03dce64e26d981480f8137e1e13ec0610d7f0da3daebb2437b12523e633e7741"
+    },
+    {
+      "source": "operations_software/data_fabric/stand_in.py",
+      "source_sha256": "6933d0144c76ac5e9fe3d26088426e702ce8e5a9302ebadc7cf2da856ee6f5d1",
+      "target": "digital_twin/runtime/data_fabric/stand_in.py",
+      "normalized_target_sha256": "e0e2c8a47f6598a39d3a0f33211e0ee9c05410d679efcda886fcc82db67e7965"
+    }
+  ]
+}
