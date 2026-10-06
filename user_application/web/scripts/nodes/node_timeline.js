@@ -29,6 +29,18 @@ function definitionKeyFor(node,ids,catalogs){
   }else if(typeof epoch!=='number'||!Number.isFinite(epoch)||Math.abs(epoch)>8.64e15)throw new Error('invalid node definition epoch');
   return key;
 }
+export const NODE_COMMUNICATION_METADATA=metadata;
+export function isNodeCommunicationState(value,{node,utc}={}){
+  try{
+    if(!value||Object.entries(metadata).some(([key,expected])=>value[key]!==expected)||value.node_id!==node.id||identity(value.node_definition)!==identity(node)||value.utc!==utc||codec.advance(utc,0)!==utc||value.interpolated!==false||!(/^[a-f0-9]{64}$/.test(value.definition_hash)))return false;
+    const r=value.inertial?.r,v=value.inertial?.v,basis=value.basis;
+    if(!vector(r)||!vector(v)||!(Math.hypot(...r)>0)||!(Math.hypot(...v)>0)||!basis||!['x','y','z'].every(axis=>vector(basis[axis])&&Math.abs(Math.hypot(...basis[axis])-1)<=1e-7))return false;
+    const dot=(a,b)=>a.reduce((sum,item,i)=>sum+item*b[i],0);
+    if(Math.abs(dot(basis.x,basis.y))>1e-7||Math.abs(dot(basis.x,basis.z))>1e-7||Math.abs(dot(basis.y,basis.z))>1e-7)return false;
+    const cross=[basis.x[1]*basis.y[2]-basis.x[2]*basis.y[1],basis.x[2]*basis.y[0]-basis.x[0]*basis.y[2],basis.x[0]*basis.y[1]-basis.x[1]*basis.y[0]];
+    return cross.every((item,i)=>Math.abs(item-basis.z[i])<=1e-7)&&typeof value.sunlit==='boolean'&&['longitude','latitude','altitude','velocity'].every(key=>Number.isFinite(value.geodetic?.[key]))&&value.geodetic.velocity===Math.hypot(...v);
+  }catch{return false;}
+}
 const interpolate=(a,b,fraction)=>{
   const linear=(left,right)=>left+(right-left)*fraction;
   const turn=(left,right,origin=0)=>{const delta=((right-left+180)%360+360)%360-180;return ((left+delta*fraction-origin)%360+360)%360+origin;};
@@ -73,16 +85,11 @@ function* prepareNodeSampleBuffer(request,response,{expectedHashes={}}={}){
     const value=geometryFor(node,display);
     if(!value||value.interpolated||!valid(value.row))return null;
     const row=value.row,basis=row.lvlh_basis;
-    if(!vector(row.inertial_position_km)||Math.hypot(...row.inertial_position_km)===0
-      ||!vector(row.inertial_velocity_km_s)||Math.hypot(...row.inertial_velocity_km_s)===0
-      ||!basis||!['x','y','z'].every(axis=>vector(basis[axis])&&Math.abs(Math.hypot(...basis[axis])-1)<=1e-7))return null;
-    const dot=(a,b)=>a.reduce((sum,v,i)=>sum+v*b[i],0);
-    if(Math.abs(dot(basis.x,basis.y))>1e-7||Math.abs(dot(basis.x,basis.z))>1e-7||Math.abs(dot(basis.y,basis.z))>1e-7)return null;
-    const cross=[basis.x[1]*basis.y[2]-basis.x[2]*basis.y[1],basis.x[2]*basis.y[0]-basis.x[0]*basis.y[2],basis.x[0]*basis.y[1]-basis.x[1]*basis.y[0]];
-    if(cross.some((v,i)=>Math.abs(v-basis.z[i])>1e-7))return null;
-    return {...metadata,node_id:node.id,node_definition:structuredClone(value.node_definition),definition_hash:value.definition_hash,
+    if(!vector(row.inertial_position_km)||!vector(row.inertial_velocity_km_s))return null;
+    const result={...metadata,node_id:node.id,node_definition:structuredClone(value.node_definition),definition_hash:value.definition_hash,
       utc:display.utc,interpolated:false,inertial:{r:[...row.inertial_position_km],v:[...row.inertial_velocity_km_s]},basis:structuredClone(basis),
       geodetic:{longitude:row.longitude_deg,latitude:row.latitude_deg,altitude:row.height_km,velocity:Math.hypot(...row.inertial_velocity_km_s)},sunlit:row.sunlit};
+    return isNodeCommunicationState(result,{node,utc:display.utc})?result:null;
   }
   return Object.freeze({geometryFor,communicationStateFor,nodeIds:()=>[...entries.keys()],definitionHashes:()=>Object.fromEntries([...entries].map(([id,entry])=>[id,entry.hash]))});
 }

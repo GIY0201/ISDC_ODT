@@ -3,10 +3,12 @@ import {readFile} from 'node:fs/promises';
 import {gunzipSync} from 'node:zlib';
 import assert from 'node:assert/strict';
 import {createNodeDisplayTimeline} from '../../../user_application/web/scripts/nodes/node_timeline.js';
+import {createNodeOpticalTimeline} from '../../../user_application/web/scripts/nodes/optical_timeline.js';
 import {createNodeLinkResolver,linkSummary} from '../../../user_application/web/scripts/nodes/links.js';
 import {createNodeLibrary} from '../../../digital_twin/model_library/browser/satellite_nodes.js';
 import {orbitElements,catalogElements} from '../../../digital_twin/simulation/browser/node_orbit_definition.js';
 import * as oisl from '../../../digital_twin/simulation/browser/oisl.js';
+import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
 const wire=JSON.parse(await readFile(process.argv[2],'utf8'));
 const original=JSON.parse(gunzipSync(await readFile(new URL('../fixtures/original_node_link_resolution.json.gz',import.meta.url))));
 const steps=original.cases.find(c=>c.id==='dense-two-plane:0').rows;
@@ -16,7 +18,7 @@ const timeline=createNodeDisplayTimeline({api:{nodeSamples:async payload=>{
   return {...structuredClone(row.response),request_id:payload.request_id};
 },nodeTrack:()=>{throw Error('communication points cannot query display tracks');}},periodFor:()=>95,requestId:()=> 'native-optical',yieldControl:async()=>{}});
 const library=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>{throw Error('no equipment creation');}});
-const {resolveLinks}=createNodeLinkResolver({library,oisl});
+const resolver=createNodeLinkResolver({library,oisl});
 function compare(actual,expected,path='result'){
  if(typeof expected==='number'){
   assert.equal(typeof actual,'number');assert.ok(Number.isFinite(actual));
@@ -31,11 +33,11 @@ function compare(actual,expected,path='result'){
  }
  assert.deepEqual(actual,expected);
 }
-timeline.setDefinitions(wire[0].request.nodes);let histories=new Map();
-for(let i=0;i<wire.length;i++){
- const value=await timeline.requestCommunicationStates(wire[i].request.start_utc);
- const result=resolveLinks(value.node_definitions,new Map(value.states),histories,steps[i].input.date);histories=result.histories;
- compare({terminals:result.terminals,pairs:result.pairs,histories:[...histories],summary:linkSummary(result.pairs)},steps[i].expected);
-}
-assert.equal(calls,3);assert.equal(timeline.snapshot().utc,null);timeline.destroy();
-process.stdout.write(JSON.stringify({native_rows:60,prime_steps_seconds:[-120,-60,0],maxNumericError,maxTimeErrorMs,source_semantics_equal:true})+'\n');
+const nodes=wire[0].request.nodes,utc=wire.at(-1).request.start_utc;timeline.setDefinitions(nodes);
+const optical=createNodeOpticalTimeline({resolver,requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>nodes,readDisplay:()=>({utc}),advanceUtc:createUtcCodec(LEAP_SHA256).advance});
+const value=await optical.update();assert.equal(value.status,'valid');
+compare({terminals:value.terminals,pairs:value.pairs,histories:optical.historyEntries(),summary:linkSummary(value.pairs)},steps.at(-1).expected);
+assert.equal(optical.verifyLinkSnapshot(value,{nodes,utc}),true);
+const altered=structuredClone(value);altered.pairs[0].state='idle';assert.equal(optical.verifyLinkSnapshot(altered,{nodes,utc}),false);
+assert.equal(calls,3);assert.equal(timeline.snapshot().utc,null);optical.destroy();timeline.destroy();
+process.stdout.write(JSON.stringify({native_rows:60,prime_steps_seconds:[-120,-60,0],maxNumericError,maxTimeErrorMs,source_semantics_equal:true,verified_snapshot:true})+'\n');
