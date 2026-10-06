@@ -8,7 +8,7 @@ from communication.native.node_adapter import prepare_node_definitions, propagat
 from digital_twin.contracts.satellite_nodes import (NativeNodeBatch, NODE_PROFILE, NODE_FRAME,
     NODE_INERTIAL_FRAME, NODE_TIME_MODEL, NODE_ROW_WIDTH, MAX_NODE_ROWS, MAX_NODE_SAMPLES, SOURCE_COMMIT)
 from digital_twin.simulation.node_geometry import node_period_minutes, node_track_grid
-from foundation.orbit_time import parse_utc, UtcInstant, format_utc_batch
+from foundation.orbit_time import parse_utc, parse_utc_batch, UtcInstant, format_utc_batch
 
 
 class NodeGeometryQuery:
@@ -34,6 +34,18 @@ class NodeGeometryQuery:
             grid=tuple(UtcInstant(float(a),float(b)) for a,b in zip(times.jd1,times.jd2))
             return self._assemble(prepared,[grid]*len(snapshot),request_id)
         return await self.execute(calculate)
+
+    async def points(self,nodes,utc,request_id):
+        """Exact planning/refinement points over the existing native lane; no clock/cache."""
+        if not isinstance(utc,(list,tuple)) or not 1<=len(utc)<=MAX_NODE_SAMPLES:
+            raise ValueError('planning point limit1..601')
+        grid=parse_utc_batch(utc)
+        if any((right.jd1-left.jd1)+(right.jd2-left.jd2)<=0 for left,right in zip(grid,grid[1:])):
+            raise ValueError('planning UTC points must be strictly increasing')
+        snapshot,prepared=self._prepare(nodes,request_id)
+        if len(prepared)*len(grid)>MAX_NODE_ROWS:raise ValueError('node batch limits exceeded')
+        # Capture immutable definitions/grid before yielding; reuse decoding and shared executor.
+        return await self.execute(lambda:self._assemble(prepared,[grid]*len(snapshot),request_id))
 
     async def track(self,nodes,center_utc,request_id):
         snapshot,prepared=self._prepare(nodes,request_id)
