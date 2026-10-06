@@ -20,7 +20,8 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  let storage=null;const storagePort={getItem:key=>host.localStorage.getItem(key),setItem:(key,value)=>host.localStorage.setItem(key,value)};
  try{if(host.localStorage)storage=storagePort;}catch{storage=storagePort;}
  const store=createConstellationStore({library,storage,now,verifyAcceptance:(...args)=>deployment?.verifyAcceptance(...args)===true});
- const timeline=createNodeDisplayTimeline({api,periodFor:node=>orbitElements(node.orbit)?.period/60,requestId:id,yieldControl:()=>new Promise(resolve=>host.setTimeout(resolve,0)),onChange:()=>{if(dead)return;refreshPose();scene?.update(display?.utc??null);refreshPanel();},onError:report});
+ // HTTP source track grids use the source three-decimal-minute n0 period.
+ const timeline=createNodeDisplayTimeline({api,periodFor:node=>Math.round(orbitElements(node.orbit)?.period/60*1000)/1000,requestId:id,yieldControl:()=>new Promise(resolve=>host.setTimeout(resolve,0)),onChange:()=>{if(dead)return;refreshPose();scene?.update(display?.utc??null);refreshPanel();},onError:report});
  const optical=createNodeOpticalTimeline({resolver:createNodeLinkResolver({library,oisl}),requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>store.drafts,readDisplay,advanceUtc,onChange:value=>{if(dead)return;scene?.setLinks(value);refreshPanel();}});
  const geometryFor=(node,at)=>timeline.geometryFor(node,at);
  const modelFor=node=>resolveModel(library.nodeCatalogItem(node));

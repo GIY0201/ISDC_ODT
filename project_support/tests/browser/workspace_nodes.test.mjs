@@ -143,7 +143,7 @@ function fixture({native=false,solar=null,view=null,storage=null,storageGetter=n
  const tools={workPanelMarkup:()=>'<panel>',createNodeWorkPanel(options){panelOptions=options;return{refresh(){},destroy(){calls.push(['panel-destroy']);}};}};
  const fetchImpl=async(url,options)=>{calls.push(['http',url,options.method]);if(fetchOverride)return fetchOverride(url,options);return{ok:true,json:async()=>({revision:0,run_id:'run',scope_id:'run:unconfigured',deployment_id:null,nodes:[]})};};
  const codec=createUtcCodec(LEAP_SHA256),row=utc=>({utc,status:'valid',error_code:null,position_m:[7000000,2,3],inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550});
- const api={nodeSamples:async p=>{calls.push(['samples']);if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>row(codec.advance(p.start_utc,i)))}))};},nodeTrack:async p=>{if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>{const period=orbitElements(node.orbit).period/60;return{node_id:node.id,definition_hash:'a'.repeat(64),period_minutes:period,path_visible:true,rows:Array.from({length:121},(_,i)=>row(codec.advance(new Date(Math.trunc(Date.parse(p.center_utc)+(i-60)*period*60000/120)).toISOString(),0)))};})};}};
+ const api={nodeSamples:async p=>{calls.push(['samples']);if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>row(codec.advance(p.start_utc,i)))}))};},nodeTrack:async p=>{if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>{const period=Math.round(orbitElements(node.orbit).period/60*1000)/1000;return{node_id:node.id,definition_hash:'a'.repeat(64),period_minutes:period,path_visible:true,rows:Array.from({length:121},(_,i)=>row(codec.advance(new Date(Math.trunc(Date.parse(p.center_utc)+(i-60)*period*60000/120)).toISOString(),0)))};})};}};
  if(view)Object.assign(globe,view);
  const workspace=createWorkspaceNodes({api,globe,solar,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now:()=>1791151272000,resolveModel:()=>({key:'flat',url:'/flat.glb'}),models:()=>[],fetchImpl,onHover});
  return{workspace,host,globe,calls,buttons,sections,context(value){context=value;displayListener(value);},get options(){return panelOptions;},get interaction(){return interaction;},get renderer(){return renderer;},attach(){return renderer=rendererFactory({},{});},get removeCount(){return removeCount;}};
@@ -271,4 +271,14 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 damaged res
   const drafts=JSON.parse(raw);for(const equipment of drafts.nodes[0].equipment)assert.match(equipment.id,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
   await f.win.dispatch('pagehide',{persisted:false});assert.equal(retry.listeners.get('click').size,0);
  }finally{f.dispose();}
+});
+
+// Actual HTTP track contract rounds the source n0 period to three decimal minutes.
+test('mounted workspace accepts server-rounded source period and retains all121 track vertices',async()=>{
+ const f=fixture({native:true});await f.workspace.start();f.workspace.show('satellite');f.options.store.add({name:'Rounded period'});const scene=f.attach(),node=f.options.store.selected;
+ f.context({utc:'2026-10-04T22:01:12.000000000Z'});
+ for(let i=0;i<120&&f.workspace.snapshot().timeline.pending;i++)await new Promise(resolve=>setTimeout(resolve,5));
+ assert.equal(f.workspace.snapshot().timeline.error,'');
+ const path=scene.options.pathFor(node);assert.ok(path);assert.equal(path.period_minutes,95.65);assert.equal(path.positions_m.length,121);assert.equal(path.visible,true);
+ f.workspace.destroy();
 });

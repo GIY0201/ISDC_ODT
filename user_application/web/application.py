@@ -100,6 +100,16 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
     app.state.queries = TwinQueries(communication, calculate_link_budget, calculate_route, contact_plan, evaluate, load_iss_receive_profile)
     app.add_middleware(GZipMiddleware, minimum_size=1_000, compresslevel=5)
 
+    @app.middleware("http")
+    async def revalidate_workspace_assets(request, call_next):
+        response = await call_next(request)
+        path = request.url.path
+        mutable_static = path.startswith("/static/") and path.endswith((".js", ".css", ".json"))
+        html = response.headers.get("content-type", "").startswith("text/html")
+        if request.method in {"GET", "HEAD"} and (mutable_static or html):
+            response.headers["Cache-Control"] = "no-cache"
+        return response
+
     @app.exception_handler(ValueError)
     async def value_error_handler(_, exc: ValueError):
         return JSONResponse(status_code=400, content={'detail': str(exc)})
