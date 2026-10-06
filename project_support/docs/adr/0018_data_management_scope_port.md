@@ -21,3 +21,39 @@
 
 
 2026-10-06 T150 browser deployment client: source Promise queue/15s timeout/minimal storage projection/signature/pending retry/409 refresh/events reused through injected transport/IDs/store/owner. Startup now GET-only per approved restore contract, preserving restored local records as unconfirmed. Strict T149 receipt validation and captured full sent-snapshot acceptance bridge use an ephemeral exact receipt/store verifier; no saved receipt may authorize later arbitrary local deploy. Persistence failure retains identical pending command and marks syncRequired, while accepted server result stays visible. dispose/timeout/late-reply and isolated observer-copy guards are explicit integration repairs. Source class normal wire/state trace matches; actual JS library/store→Python ASGI/runtime/embedded-module IPC confirms lost-success reply retry/409/explicit reapply/recall. Actual application/browser mounting remains T151/T152. Evidence validation/t150_data_client.md.
+
+
+2026-10-07 T079 V6 operation gates and observable lifecycle: pinned source
+user_application/web/scripts/tabs/data_management.js renderControls/runAction uses
+canOperate for verify/heal/rebalance/purge and service, and canConfigure for
+replication policy. The reused deploymentView distinguishes accepted available
+storage from storage containing objects. V6 now applies that distinction in both
+button presentation and handler authorization; existing explicit set_filter policy
+uses the configuration gate. Empty accepted catalogues may configure policy but
+cannot run object operations/service. Query errors remain until a successful fresh
+query; dispatching a disabled control cannot erase them. Existing class, object,
+destination, scope, revision, isolated receipt and context guards remain.
+
+The source POLL_MS=3000 active-view cadence and immediate readonly active query are
+restored through the existing host timer, API and panel busy lease. A timer never
+starts a module command and does not overlap another query/command. Leaving or
+reconstructing the data view invalidates the query generation and cancels its wait;
+disposal clears the timer and late hidden/disposed responses cannot publish.
+Selections and dirty policy/service/filter form values remain intact. Job progress
+renders the original job.progress fraction as a progress bar and percentage;
+missing, nonfinite or outside [0,1] values remain unknown rather than derived from
+an ETA or a second clock. Focused RED/GREEN covers empty catalogue operation/policy
+gates, programmatic error dispatch, stale deployment, active 3s readonly polling,
+command/query serialization, form preservation and hidden/disposed late replies.
+Actual fixed-8891 UI acceptance remains a separate evidence step.
+
+
+2026-10-07 command intent capture: the operation handler captures kind, action,
+selected object, class, replication coefficient, filter JSON and service destination
+before its first asynchronous deployment read. It validates and constructs the
+entire body from that captured intent and the current accepted report, then checks
+the current scope/revision before sending. Edits while waiting remain editable
+for the next command and cannot silently replace or mix fields in this command.
+Deferred deployment RED/GREEN cases cover policy coefficient/class, filter JSON,
+service destination/class and selected-object changes, with the original captured
+body sent only after the existing authority check succeeds.
