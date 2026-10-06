@@ -3,3 +3,6 @@ project_support/docs/ui/v6_source/* -text whitespace=cr-at-eol
 digital_twin/model_library/packages/satellite_display/v1/original_manifest.json -text
 digital_twin/model_library/packages/satellite_display/v1/*.glb -text
 digital_twin/model_library/packages/satellite_display/v1/*.jpg -text
+
+# Preserve the reused shader source receipt on every checkout.
+digital_twin/visualization/link_flow.js -text whitespace=cr-at-eol

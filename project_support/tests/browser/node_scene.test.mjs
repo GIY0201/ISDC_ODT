@@ -13,15 +13,17 @@ class Collection{constructor(){this.items=[];}add(v){this.items.push(v);return v
 const plain=v=>JSON.parse(JSON.stringify(v));
 const definition=id=>({schema:1,id,catalog_number:900000+Number(id),orbit:{epoch:1791062400000,altitude_km:550,inclination:53}});
 const description=id=>({url:'/models/'+id+'.glb',scale:2,minimumPixelSize:12,orientation:{heading:90}});
-function fixture({load,geometry,path,palette}={}){
+function fixture({load,geometry,path,palette,verifyLinkSnapshot,animationNow=()=>2000}={}){
  const loads=[],statuses=[],primitives=new Collection(),sources=new Collection();let display=utc,morph=false,tracks=true;
  const C={Cartesian3,Color,CustomDataSource:class{constructor(){this.entities=new Collection();}},CallbackProperty:class{constructor(getter){this.getter=getter;}},ArcType:{NONE:'none'},SceneMode:{MORPHING:0,SCENE3D:3},Matrix3:class{static fromHeadingPitchRoll(hpr){return {hpr};}static multiply(a,b){a.trim=b;return a;}},Matrix4:class{static fromRotationTranslation(rotation,translation){return {rotation,translation};}},HeadingPitchRoll:class{constructor(h,p,r){Object.assign(this,{h,p,r});}},Math:{toRadians:v=>v*Math.PI/180},Ellipsoid:{WGS84:{}},Transforms:{rotationMatrixFromPositionVelocity:(position,velocity)=>({position,velocity}),eastNorthUpToFixedFrame:position=>({enu:position})},ImageBasedLighting:class{constructor(options){this.options=options;}},Model:{async fromGltfAsync(options){loads.push(options);return load?load(options):{options,show:false,destroyed:false,destroy(){this.destroyed=true;}};}}};
  Object.assign(C,{PointPrimitiveCollection:Collection,LabelCollection:Collection,Cartesian2:class{constructor(x,y){Object.assign(this,{x,y});}},NearFarScalar:class{constructor(near,nearValue,far,farValue){Object.assign(this,{near,nearValue,far,farValue});}},LabelStyle:{FILL_AND_OUTLINE:'fill_outline'}});
+ class Material{constructor(options){this.options=options;this.uniforms=options.fabric.uniforms;}static fromType(type,uniforms){return {type,uniforms};}}
+ Object.assign(C,{Material,PolylineCollection:Collection});
  const viewer={scene:{primitives,mode:3},entities:new Collection(),dataSources:sources};
  const meta={model_profile:'SOURCE_KEPLER_J2_V1',frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',source_commit:golden.source_commit,quality:'engineering_assumption'};
  const geometryFor=(node,{utc:stamp})=>{const row={utc:stamp,status:'valid',error_code:null,position_m:[Number(node.id)+codec.difference(stamp,utc)*10,10,550000]};const value={...meta,node_id:node.id,node_definition:structuredClone(node),definition_hash:hash,row};return geometry?geometry(value):value;};
  const pathFor=node=>{const value={...meta,node_id:node.id,node_definition:structuredClone(node),definition_hash:hash,center_utc:utc,visible:true,positions_m:golden.paths['1'].positions.map(p=>[p.x+Number(node.id)-1,p.y,p.z])};return path?path(value):value;};
- const scene=new NodeScene({viewer,cesium:C,timeSource:()=>display,advanceUtc:codec.advance,geometryFor,pathFor,palette:palette??(()=>markers.palettes.dark),tracksVisible:()=>tracks,isTransitioning:()=>morph,onStatus:v=>statuses.push(v)});
+ const scene=new NodeScene({viewer,cesium:C,verifyLinkSnapshot,animationNow,timeSource:()=>display,advanceUtc:codec.advance,geometryFor,pathFor,palette:palette??(()=>markers.palettes.dark),tracksVisible:()=>tracks,isTransitioning:()=>morph,onStatus:v=>statuses.push(v)});
  return {scene,loads,statuses,viewer,set display(v){display=v;},set morph(v){morph=v;},set tracks(v){tracks=v;}};
 }
 const entries=(count=2)=>Array.from({length:count},(_,i)=>({id:String(i+1),definition:definition(String(i+1)),model:description(String(i+1)),orbit_regime:'LEO'}));
@@ -90,4 +92,54 @@ test('late glTF render failure keeps the native point and cannot re-show the fai
 });
 test('owned ready/error listeners are removed on disposal and captured late callbacks become inert',async()=>{
  const ready=event(),error=event(),model={show:false,readyEvent:ready,errorEvent:error,destroy(){}};const f=fixture({load:()=>model});await f.scene.setNodes(entries(1));assert.equal(ready.listeners.size,1);ready.raise();assert.equal(f.statuses.at(-1).status,'model_ready');const old=[...error.listeners][0];f.scene.destroy();const count=f.statuses.length;old(Error('late'));assert.equal(f.statuses.length,count);assert.equal(error.listeners.size,0);
+});
+
+const linksGolden=JSON.parse(await readFile(new URL('../fixtures/original_node_links.json',import.meta.url),'utf8'));
+const linkSnapshot=(nodes=entries(),state='locked')=>({status:'valid',utc,source_commit:golden.source_commit,quality:'engineering_assumption',node_definitions:nodes.map(n=>structuredClone(n.definition)),terminals:[],pairs:[{key:'pair',a:'1',b:'2',state}]});
+test('original OISL material state styles and phase match executed source; explicit verifier is component-only',async()=>{
+ const f=fixture({verifyLinkSnapshot:()=>true});await f.scene.setNodes(entries());
+ for(const state of Object.keys(LINK_COLORS)){
+  assert.equal(f.scene.setLinks(linkSnapshot(entries(),state)),true);const e=f.scene.links.get('pair'),g=linksGolden.states[state];
+  assert.equal(e.line.width,g.width);assert.equal(e.line.show,g.show);assert.deepEqual(plain(e.line.material),g.material);
+  if(e.line.show)assert.deepEqual(plain(e.line.positions),[{x:1,y:10,z:550000},{x:2,y:10,z:550000}]);
+ }
+ f.scene.setLinks(linkSnapshot());const material=f.scene.links.get('pair').line.material;f.scene.animateLinkFlow(5000);assert.equal(material.uniforms.time,linksGolden.phase);
+ const next=linkSnapshot();next.pairs[0].a='2';next.pairs[0].b='1';f.scene.setLinks(next);assert.equal(f.scene.links.get('pair').line.material,material);
+ f.scene.setLinksVisible(false);f.scene.animateLinkFlow(7000);assert.equal(material.uniforms.time,linksGolden.hiddenPhase);f.scene.destroy();
+});
+test('link receipts fail closed for absent verifier, wrong UTC roster source quality or malformed pairs',async()=>{
+ const bad=[s=>({...s,status:'unknown'}),s=>({...s,utc:codec.advance(utc,1)}),s=>({...s,source_commit:'foreign'}),s=>({...s,quality:'measured'}),s=>({...s,node_definitions:s.node_definitions.slice(1)}),s=>({...s,terminals:null}),s=>({...s,pairs:[...s.pairs,...s.pairs]}),s=>({...s,pairs:[{key:'x',a:'1',b:'1',state:'locked'}]}),s=>({...s,pairs:[{key:'x',a:'1',b:'foreign',state:'locked'}]}),s=>({...s,pairs:[{key:'x',a:'1',b:'2',state:'invented'}]})];
+ for(const verifier of [undefined,()=>false,()=>{throw Error('unavailable');}]){const f=fixture({verifyLinkSnapshot:verifier});await f.scene.setNodes(entries());assert.equal(f.scene.setLinks(linkSnapshot()),false);assert.equal(f.scene.links.size,0);f.scene.destroy();}
+ for(const mutate of bad){const f=fixture({verifyLinkSnapshot:()=>true});await f.scene.setNodes(entries());assert.equal(f.scene.setLinks(linkSnapshot()),true);assert.equal(f.scene.setLinks(mutate(linkSnapshot())),false);assert.equal(f.scene.links.size,0);f.scene.destroy();}
+});
+test('stale links hide and freeze flow; new matching snapshot reuses material; morph resumes current links',async()=>{
+ const f=fixture({verifyLinkSnapshot:()=>true});await f.scene.setNodes(entries());f.scene.setLinks(linkSnapshot());const line=f.scene.links.get('pair').line,material=line.material;
+ f.display=codec.advance(utc,1);f.scene.syncFrame(f.scene.timeSource());f.scene.animateLinkFlow(5000);assert.equal(line.show,false);assert.equal(material.uniforms.time,2.8);
+ const fresh=linkSnapshot();fresh.utc=f.scene.timeSource();f.scene.setLinks(fresh);assert.equal(line.show,true);assert.equal(line.material,material);
+ f.morph=true;f.scene.syncFrame(f.scene.timeSource(),6000);assert.equal(line.show,false);f.morph=false;f.scene.syncFrame(f.scene.timeSource(),7000);assert.equal(line.show,true);assert.equal(material.uniforms.time,7000/1000*1.4);f.scene.destroy();
+});
+test('copied verified receipts cannot be mutated by caller or verifier; edited scope invalidates immediately',async()=>{
+ const f=fixture({verifyLinkSnapshot:(candidate,context)=>{candidate.pairs[0].state='blocked';context.nodes[0].orbit.altitude_km=999;return true;}});await f.scene.setNodes(entries());const receipt=linkSnapshot();assert.equal(f.scene.setLinks(receipt),true);receipt.pairs[0].state='blocked';f.scene.syncFrame(utc);assert.equal(f.scene.links.get('pair').line.show,true);
+ const changed=entries();changed[0].definition.orbit.altitude_km=600;await f.scene.setNodes(changed);assert.equal(f.scene.links.size,0);f.scene.destroy();
+});
+test('missing native endpoint hides link without phase advance and scoped cleanup preserves foreign primitives',async()=>{
+ let missing=false;const f=fixture({verifyLinkSnapshot:()=>true,geometry:g=>missing&&g.node_id==='2'?null:g});const foreign={};f.viewer.scene.primitives.add(foreign);await f.scene.setNodes(entries());f.scene.setLinks(linkSnapshot());const line=f.scene.links.get('pair').line;missing=true;f.scene.syncFrame(utc,5000);assert.equal(line.show,false);assert.equal(line.material.uniforms.time,2.8);
+ f.scene.destroy();assert.deepEqual(f.viewer.scene.primitives.items,[foreign]);assert.equal(f.scene.setLinks(linkSnapshot()),false);
+});
+
+test('same endpoint duplicate keys are rejected and removed pairs release only their owned line',async()=>{
+ const f=fixture({verifyLinkSnapshot:()=>true});await f.scene.setNodes(entries(3));const snapshot=linkSnapshot(entries(3));snapshot.pairs.push({key:'second',a:'2',b:'3',state:'one_way'});assert.equal(f.scene.setLinks(snapshot),true);
+ const line=f.scene.links.get('second').line,single=linkSnapshot(entries(3));assert.equal(f.scene.setLinks(single),true);assert.equal(f.scene.linkPolylines.items.includes(line),false);
+ single.pairs.push({key:'reverse',a:'2',b:'1',state:'locked'});assert.equal(f.scene.setLinks(single),false);assert.equal(f.scene.links.size,0);f.scene.destroy();
+});
+test('nonfinite render phase and wrong frame UTC never animate or draw current links',async()=>{
+ const f=fixture({verifyLinkSnapshot:()=>true});await f.scene.setNodes(entries());f.scene.setLinks(linkSnapshot());const line=f.scene.links.get('pair').line;
+ f.scene.syncFrame(codec.advance(utc,1),5000);assert.equal(line.show,false);assert.equal(line.material.uniforms.time,2.8);
+ f.scene.syncFrame(utc,NaN);assert.equal(line.show,true);assert.equal(line.material.uniforms.time,2.8);f.scene.destroy();
+});
+test('verifier that changes live UTC cannot accept a captured old snapshot',async()=>{
+ let f;f=fixture({verifyLinkSnapshot:()=>{f.display=codec.advance(utc,1);return true;}});await f.scene.setNodes(entries());assert.equal(f.scene.setLinks(linkSnapshot()),false);assert.equal(f.scene.links.size,0);f.scene.destroy();
+});
+test('render shader is preserved byte-for-byte from the pinned original source',async()=>{
+ const {createHash}=await import('node:crypto');const bytes=await readFile(new URL('../../../digital_twin/visualization/link_flow.js',import.meta.url));assert.equal(createHash('sha256').update(bytes).digest('hex'),linksGolden.source_hashes['digital_twin/visualization/link_flow.js']);
 });

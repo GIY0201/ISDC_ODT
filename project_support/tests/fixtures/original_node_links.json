@@ -1,0 +1,226 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_hashes": {
+    "digital_twin/visualization/node_scene.js": "0a64617def9394bf25414321a30c66f210957bb4d61c494df7c9197359e6f9c6",
+    "digital_twin/visualization/link_flow.js": "e20347895e3aa3913bb711bc856c547060d163c3c4624e7db8e7b7f8762c3b24"
+  },
+  "harness": "Executed original class with Cesium doubles; qualitative material/component evidence only",
+  "states": {
+    "locked": {
+      "width": 2,
+      "show": true,
+      "positions": [
+        {
+          "x": 1,
+          "y": 10,
+          "z": 550000
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "z": 550000
+        }
+      ],
+      "material": {
+        "options": {
+          "translucent": true,
+          "fabric": {
+            "type": "SpaceTwinLinkFlow",
+            "source": "\nuniform vec4 color;\nuniform vec4 downColor;\nuniform vec4 upColor;\nuniform float spacing;\nuniform float time;\nin float v_polylineAngle;\n\nmat2 rotate(float rad) {\n  float c = cos(rad);\n  float s = sin(rad);\n  return mat2(c, s, -s, c);\n}\n\nczm_material czm_getMaterial(czm_materialInput materialInput) {\n  czm_material material = czm_getDefaultMaterial(materialInput);\n  float s = materialInput.st.s;\n  float t = materialInput.st.t;\n  float across = 1.0 - abs(2.0 * t - 1.0);\n  vec2 pos = rotate(v_polylineAngle) * gl_FragCoord.xy;\n  vec2 axis = vec2(cos(v_polylineAngle), -sin(v_polylineAngle));\n  float ds = dFdx(s) * axis.x + dFdy(s) * axis.y;\n  float towardStation = ds >= 0.0 ? 1.0 : -1.0;\n  float u = pos.x * towardStation / (spacing * czm_pixelRatio);\n  float down = pow(fract(u - time), 6.0);\n  float up = pow(fract(0.5 - u - time * 0.8), 6.0);\n  vec3 rgb = mix(color.rgb, downColor.rgb, down);\n  float alpha = max(color.a, down * downColor.a);\n  rgb = mix(rgb, upColor.rgb, up);\n  alpha = max(alpha, up * upColor.a);\n  material.diffuse = rgb;\n  material.emission = rgb * (0.35 + 0.65 * max(down, up));\n  material.alpha = alpha * (0.4 + 0.6 * across);\n  return material;\n}\n",
+            "uniforms": {
+              "color": {
+                "css": "#3ddc84",
+                "alpha": 0.55
+              },
+              "downColor": {
+                "css": "#e5fff2",
+                "alpha": 1
+              },
+              "upColor": {
+                "css": "#8beaff",
+                "alpha": 1
+              },
+              "spacing": 96,
+              "time": 2.8
+            }
+          }
+        },
+        "uniforms": {
+          "color": {
+            "css": "#3ddc84",
+            "alpha": 0.55
+          },
+          "downColor": {
+            "css": "#e5fff2",
+            "alpha": 1
+          },
+          "upColor": {
+            "css": "#8beaff",
+            "alpha": 1
+          },
+          "spacing": 96,
+          "time": 2.8
+        }
+      }
+    },
+    "one_way": {
+      "width": 2,
+      "show": true,
+      "positions": [
+        {
+          "x": 1,
+          "y": 10,
+          "z": 550000
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "z": 550000
+        }
+      ],
+      "material": {
+        "type": "Color",
+        "uniforms": {
+          "color": {
+            "css": "#4ac4ee",
+            "alpha": 0.75
+          }
+        }
+      }
+    },
+    "acquiring": {
+      "width": 2,
+      "show": true,
+      "positions": [
+        {
+          "x": 1,
+          "y": 10,
+          "z": 550000
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "z": 550000
+        }
+      ],
+      "material": {
+        "type": "PolylineDash",
+        "uniforms": {
+          "color": {
+            "css": "#ffc357",
+            "alpha": 0.9
+          },
+          "dashLength": 12
+        }
+      }
+    },
+    "slewing": {
+      "width": 2,
+      "show": true,
+      "positions": [
+        {
+          "x": 1,
+          "y": 10,
+          "z": 550000
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "z": 550000
+        }
+      ],
+      "material": {
+        "type": "PolylineDash",
+        "uniforms": {
+          "color": {
+            "css": "#ffa040",
+            "alpha": 0.9
+          },
+          "dashLength": 12
+        }
+      }
+    },
+    "blocked": {
+      "width": 2,
+      "show": false,
+      "positions": [
+        {
+          "x": 1,
+          "y": 10,
+          "z": 550000
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "z": 550000
+        }
+      ],
+      "material": {
+        "type": "Color",
+        "uniforms": {
+          "color": {
+            "css": "#ff6b6b",
+            "alpha": 0.75
+          }
+        }
+      }
+    },
+    "idle": {
+      "width": 2,
+      "show": false,
+      "positions": [
+        {
+          "x": 1,
+          "y": 10,
+          "z": 550000
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "z": 550000
+        }
+      ],
+      "material": {
+        "type": "Color",
+        "uniforms": {
+          "color": {
+            "css": "#8ea4b8",
+            "alpha": 0.75
+          }
+        }
+      }
+    },
+    "none": {
+      "width": 2,
+      "show": false,
+      "positions": [
+        {
+          "x": 1,
+          "y": 10,
+          "z": 550000
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "z": 550000
+        }
+      ],
+      "material": {
+        "type": "Color",
+        "uniforms": {
+          "color": {
+            "css": "#8ea4b8",
+            "alpha": 0.75
+          }
+        }
+      }
+    }
+  },
+  "phase": 7,
+  "sameMaterial": true,
+  "hiddenPhase": 7,
+  "missingPhase": 7,
+  "missingShow": false,
+  "removed": 0,
+  "remaining": 0
+}

@@ -1,5 +1,11 @@
 # 현재 개발 기록
 
+## 2026-10-06 T148 검증 결과 기반 통신선 표시 부분 이식
+- 변경: 원본7상태 colors/width2/dash12/flow spacing96/rate1.4/shader bytes 재사용. currentUTC/full roster/source/quality/copied T077 verifier strict true 수락; 기본미확인/실패 clear. stale/morph/숨김/native오류 freeze, 같은상태 material 유지, own primitive cleanup. render-phase callback은 정성적 효과이며 통신량·SIM clock 아님.
+- 검증: 원본클래스 두5617bytes/SHA6ebca8ac… 동일. RED16PASS5FAIL→target25PASS541.7998ms. 최종Node533PASS2983.1631ms/전체Python546PASS8기존warnings154.07s(session42056exit0)/syntax/diffcheck. validation/t148_node_links.md.
+- 남음: T148unchecked path revision 효율화/남은scope cases. 시험 true verifier는 실제T077/N003 수락증거아님. T079/T149–153/fullT076/T075–84/Terra/all50/N001/N003/T137인증/T032/장비·RF·HIL/다운로드/AeroDT 유지. 8891/native설치/사용자화면/원격PR·병합 변경 없음.
+
+
 ## 2026-10-06 T147 분할 요청·전체 수락 부분 구현
 - 변경: createNodeTimeline에 명시 정의/공용UTC를 전달, 240기 83/83/74순차요청. generation/고유requestID/knownhash/UTC검사·실제abort, 모든묶음검증후단일교체. 백그라운드중이전완료buffer만유지·중복요청억제, 명시seek/정의변경/종료/부분실패/역순응답차단. sync/async버퍼 동일validator·노드별 주입executor, 조회는HTTP/clock/storage/deploy 없음.
 - 검증: missingexport RED→target11PASS1546.0412ms; 240×601/3requests/240executor calls/마지막묶음대기·두번째실패·취소·과거UTC·observer 보존. 최종Node478PASS2681.996ms/전체Python545PASS8기존warnings149.83s(session12194exit0)/syntax. validation/t147_node_requests.md. 즉시Promise test executor는 실제render yield·게임성능 증거 아님.
