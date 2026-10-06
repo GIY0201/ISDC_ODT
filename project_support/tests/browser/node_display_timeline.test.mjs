@@ -147,3 +147,48 @@ test('exact communication batch joins all240 accepted nodes in request order wit
   for(const index of [0,82,83,165,166,239])assert.deepEqual(states.states[index][1],s.timeline.communicationStateFor(nodes[index],{utc:start}));states.states[239][1].inertial.r[0]=0;states.node_definitions[239].name='mutated';const again=await s.timeline.requestCommunicationStates(start);assert.equal(again.states[239][1].inertial.r[0],7000);assert.equal(again.node_definitions[239].name,'node');assert.equal(s.calls.length,count);
  }finally{s.timeline.destroy();}
 });
+
+test('aborted queued 240-node exact requests do not copy private definitions per job',async()=>{
+ let finish;const s=setup((p,kind)=>new Promise(resolve=>{finish=()=>resolve(receipt(p,kind));})),nodes=Array.from({length:240},(_,i)=>({...defs()[0],id:'N-'+i,catalog_number:900001+i}));
+ const clone=globalThis.structuredClone;let cohorts=0;
+ try{s.timeline.setDefinitions(nodes);const first=s.timeline.requestCommunicationStates(start).catch(error=>error);await until(()=>finish);
+  globalThis.structuredClone=value=>{if(Array.isArray(value)&&value.length===240&&value[0]?.schema===1)cohorts++;return clone(value);};
+  const jobs=[];for(let i=1;i<=8;i++){const controller=new AbortController(),work=s.timeline.requestCommunicationStates(codec.advance(start,i),{signal:controller.signal});jobs.push(assert.rejects(work,/cancel queued/));controller.abort(Error('cancel queued'));}
+  await Promise.all(jobs);assert.equal(cohorts,0,'queued jobs borrow the validated immutable private cohort before abort');
+  globalThis.structuredClone=clone;finish();assert.match((await first).message,/states unavailable/);assert.equal(s.calls.length,1);
+ }finally{globalThis.structuredClone=clone;s.timeline.destroy();}
+});
+
+test('fresh 240-node exact receipt is cached privately with one public result copy and preserves full isolation',async()=>{
+ const s=setup((p,kind)=>{const value=receipt(p,kind);for(const node of value.nodes)for(const row of node.rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}return value;}),nodes=Array.from({length:240},(_,i)=>({...defs()[0],id:'N-'+i,catalog_number:900001+i,notes:`complete-${i}`}));
+ const clone=globalThis.structuredClone;let cohorts=0,wholeResults=0,stateCopies=0;
+ try{s.timeline.setDefinitions(nodes);await s.timeline.observe(start);
+  globalThis.structuredClone=value=>{if(Array.isArray(value)&&value.length===240&&value[0]?.schema===1)cohorts++;if(value?.node_definitions?.length===240&&value?.states?.length===240)wholeResults++;if(Array.isArray(value)&&value.length===240&&Array.isArray(value[0])&&value[0][1]?.inertial)stateCopies++;return clone(value);};
+  const result=await s.timeline.requestCommunicationStates(start);
+  assert.equal(cohorts,0,'accepted job/result borrow the private fully validated definitions');assert.equal(wholeResults,1,'one complete public result copy');assert.equal(stateCopies,0,'accepted split batches are already independently copied');
+  assert.deepEqual(result.node_definitions,nodes);assert.deepEqual(result.states.map(([id])=>id),nodes.map(node=>node.id));
+  result.node_definitions[239].orbit.altitude_km=1;result.states[239][1].node_definition.notes='foreign';result.states[0][1].basis.x[0]=99;nodes[0].notes='caller mutation';
+  const cached=await s.timeline.requestCommunicationStates(start);assert.equal(cached.node_definitions[239].orbit.altitude_km,550);assert.equal(cached.states[239][1].node_definition.notes,'complete-239');assert.equal(cached.states[0][1].basis.x[0],0);assert.equal(cached.node_definitions[0].notes,'complete-0');
+  const freshUtc=codec.advance(start,.5),fresh=await s.timeline.requestCommunicationStates(freshUtc);assert.equal(fresh.utc,freshUtc);assert.equal(fresh.states.length,240);assert.equal(fresh.states[239][1].utc,freshUtc);assert.equal(s.calls.at(-1).p.count,1);
+ }finally{globalThis.structuredClone=clone;s.timeline.destroy();}
+});
+
+test('exact point cache remains bounded to eight UTCs and rechecks newly accepted native hashes',async()=>{
+ let hash=H;const responses=[];const s=setup((p,kind)=>{const value=receipt(p,kind);for(const node of value.nodes){node.definition_hash=hash;for(const row of node.rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}}responses.push(value);return value;});
+ try{
+  for(let i=0;i<9;i++)await s.timeline.requestCommunicationStates(codec.advance(start,i*.5));assert.equal(s.calls.length,9);
+  const first=await s.timeline.requestCommunicationStates(start);assert.equal(s.calls.length,10,'ninth exact point evicts the original UTC');
+  responses.at(-1).nodes[0].rows[0].inertial_position_km[0]=123;first.states[0][1].inertial.r[0]=456;assert.equal((await s.timeline.requestCommunicationStates(start)).states[0][1].inertial.r[0],7000);
+  hash='b'.repeat(64);await s.timeline.observe(start);assert.equal(s.timeline.snapshot().samples.definitionHashes['N-1'],hash);
+  await assert.rejects(s.timeline.requestCommunicationStates(start),/definition hash mismatch/);
+  const fresh=await s.timeline.requestCommunicationStates(codec.advance(start,.25));assert.equal(fresh.states[0][1].definition_hash,hash);
+ }finally{s.timeline.destroy();}
+});
+
+test('fresh exact native errors and inconsistent hashes never enter private cached receipts',async()=>{
+ for(const failure of ['hash','row']){
+  let invalid=true;const s=setup((p,kind)=>{const value=receipt(p,kind);for(const node of value.nodes)for(const row of node.rows){row.inertial_position_km=[7000,0,0];row.lvlh_basis={x:[0,1,0],y:[0,0,1],z:[1,0,0]};}
+   if(p.count===1&&invalid){if(failure==='hash')value.nodes[0].definition_hash='b'.repeat(64);else {value.status='error';const row=value.nodes[0].rows[0];for(const key of Object.keys(row))if(!['utc','status','error_code'].includes(key))row[key]=null;row.status='error';row.error_code='native_failure';}}return value;});
+  try{await s.timeline.observe(start);const at=codec.advance(start,.5);await assert.rejects(s.timeline.requestCommunicationStates(at),failure==='hash'?/hash mismatch/:/states unavailable/);invalid=false;const recovered=await s.timeline.requestCommunicationStates(at);assert.equal(recovered.states[0][1].definition_hash,H);assert.equal(recovered.states[0][1].inertial.r[0],7000);assert.equal(s.calls.filter(c=>c.p.count===1).length,2);}finally{s.timeline.destroy();}
+ }
+});

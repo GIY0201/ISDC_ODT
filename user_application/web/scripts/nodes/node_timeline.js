@@ -438,7 +438,7 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
       let states=samples.communicationStatesFor(job.nodes,{utc:job.utc});
       if(!states){
         const base=requestId();if(typeof base!=='string'||!base.trim())throw new Error('node request identity required');
-        const request={request_id:`${base}-communication-${job.generation}-${++communicationSequence}`,nodes:structuredClone(job.nodes),start_utc:job.utc,count:1,step_seconds:1};
+        const request={request_id:`${base}-communication-${job.generation}-${++communicationSequence}`,nodes:job.nodes,start_utc:job.utc,count:1,step_seconds:1};
         if(request.request_id.length>128)throw new Error('node request identity exceeds128');
         const response=await api.nodeSamples(structuredClone(request),{signal:job.controller.signal});
         if(!current())throw new Error('native communication request invalidated');
@@ -448,10 +448,13 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
       }
       if(!states||states.some(([,state])=>!state))throw new Error('native communication states unavailable');
       if(!current())throw new Error('native communication request invalidated');
-      const result={utc:job.utc,node_definitions:structuredClone(job.nodes),states:structuredClone(states)};
-      communicationPoints.set(job.utc,{generation:job.generation,scope:job.scope,result:structuredClone(result)});
+      // Both batch paths return fresh owned states; the complete definitions were
+      // privately captured and deeply frozen at setDefinitions. Freeze the cache
+      // once without recopying either cohort, then copy only at the public boundary.
+      const result=freezeProjection({utc:job.utc,node_definitions:job.nodes,states},new WeakSet([job.nodes]));
+      communicationPoints.set(job.utc,{generation:job.generation,scope:job.scope,result});
       if(communicationPoints.size>communicationPointLimit)communicationPoints.delete(communicationPoints.keys().next().value);
-      settleCommunication(job,result);
+      settleCommunication(job,structuredClone(result));
     }catch(error){settleCommunication(job,null,error instanceof Error?error:new Error(String(error)));}
     finally{activeCommunication=null;activeKind=null;emit({kind:'communication'});}
   }
@@ -461,7 +464,7 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
     catch(error){return Promise.reject(error);}
     if(!definitions.length)return Promise.resolve({utc:canonical,node_definitions:[],states:[]});
     return new Promise((resolve,reject)=>{
-      const job={utc:canonical,nodes:structuredClone(definitions),scope:definitionScope,generation:communicationGeneration,controller:new AbortController(),signal,resolve,reject,settled:false};
+      const job={utc:canonical,nodes:definitions,scope:definitionScope,generation:communicationGeneration,controller:new AbortController(),signal,resolve,reject,settled:false};
       job.abort=()=>{job.controller.abort();settleCommunication(job,null,signal.reason??new Error('native communication request aborted'));};
       signal?.addEventListener('abort',job.abort,{once:true});communicationJobs.push(job);validationWaiter?.resolve?.();void schedule();
     });
@@ -497,7 +500,7 @@ export function createNodeDisplayTimeline({api,periodFor,requestId,yieldControl,
   }
   function setDefinitions(nodes){
     requireOpen();const changed=samples.setDefinitions(nodes);tracks.setDefinitions(nodes);nodeCount=nodes.length;
-    if(changed){invalidateCommunication();definitions=structuredClone(nodes);definitionScope=identity(definitions);inputError='';emit();void schedule();}return changed;
+    if(changed){invalidateCommunication();definitions=freezeProjection(structuredClone(nodes));definitionScope=identity(definitions);inputError='';emit();void schedule();}return changed;
   }
   function observe(value,{seek=false}={}){
     requireOpen();let canonical;
