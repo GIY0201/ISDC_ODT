@@ -15,3 +15,10 @@ def queries_of(connection: HTTPConnection) -> TwinQueries:
 
 def catalog_of(connection: HTTPConnection) -> CatalogReader:
     return connection.app.state.catalog
+
+
+from digital_twin.contracts.data_fabric import DataFabricLink
+
+
+def data_fabric_of(connection: HTTPConnection) -> DataFabricLink:
+    return connection.app.state.data_fabric

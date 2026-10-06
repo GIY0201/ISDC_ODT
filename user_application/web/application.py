@@ -25,7 +25,7 @@ from user_application.bootstrap import create_runtime
 from user_application.configs.paths import APP_NAME, APP_VERSION, WEB_DIR, VISUALIZATION_DIR, CLIENT_DIR, CATALOG_CACHE_DIR
 
 
-def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None,solar_geometry_query=None,node_geometry_query=None,data_management=None,data_management_bridge=None) -> FastAPI:
+def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None,solar_geometry_query=None,node_geometry_query=None,data_management=None,data_management_bridge=None,data_fabric=None) -> FastAPI:
     from communication.native.orbit_execution import BoundedOrbitExecutor
     from digital_twin.runtime.orbit import OrbitRuntime
     from digital_twin.contracts.orbit import GroundPoint
@@ -93,6 +93,10 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
     app.state.data_management_bridge = data_management_bridge if data_management_bridge is not None else DataManagementBridge(now=lambda:datetime.now(timezone.utc).isoformat())
     app.include_router(node_geometry_http.router)
     app.include_router(data_deployment_http.router)
+    from digital_twin.runtime.data_fabric.exchange import DataFabricExchange
+    from communication.http import data_fabric as data_fabric_http
+    app.state.data_fabric = data_fabric if data_fabric is not None else DataFabricExchange()
+    app.include_router(data_fabric_http.router)
     app.state.orbit_inputs = tuple(records.values())
     app.state.orbit_load_error = None
     app.state.orbit_provenance = {"eop_sha256":getattr(eop_provider,"eop_sha256",None),"leap_sha256":getattr(eop_provider,"leap_sha256",None)}
@@ -118,7 +122,7 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
     from fastapi.exception_handlers import request_validation_exception_handler
     @app.exception_handler(RequestValidationError)
     async def validation_error_handler(request,exc):
-        if request.url.path.startswith(('/api/orbit/','/api/solar/')):
+        if request.url.path.startswith(('/api/orbit/','/api/solar/','/api/data-fabric/')):
             # NaN/Inf in the original request cannot be echoed into strict JSON.
             return JSONResponse(status_code=422,content={'detail':[{'type':error['type'],'loc':error['loc'],'msg':error['msg']} for error in exc.errors()]})
         return await request_validation_exception_handler(request,exc)
