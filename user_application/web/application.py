@@ -10,6 +10,8 @@ from communication.external.celestrak import CelesTrakSource
 from communication.http import system, catalog, runtime, rf_network, missions, hil, reports, telemetry
 from communication.http import catalog_geometry as catalog_geometry_http
 from communication.http import solar_geometry as solar_geometry_http
+from communication.http import node_geometry as node_geometry_http
+from communication.http import data_deployment as data_deployment_http
 from communication.http import orbit as orbit_http
 from data.catalog.access import Catalog
 from data.catalog.cache import CatalogCache
@@ -23,13 +25,17 @@ from user_application.bootstrap import create_runtime
 from user_application.configs.paths import APP_NAME, APP_VERSION, WEB_DIR, VISUALIZATION_DIR, CLIENT_DIR, CATALOG_CACHE_DIR
 
 
-def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None,solar_geometry_query=None) -> FastAPI:
+def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None,solar_geometry_query=None,node_geometry_query=None,data_management=None,data_management_bridge=None) -> FastAPI:
     from communication.native.orbit_execution import BoundedOrbitExecutor
     from digital_twin.runtime.orbit import OrbitRuntime
     from digital_twin.contracts.orbit import GroundPoint
     from user_application.configs import orbit as orbit_config
     from user_application.orbit_calculation import create_orbit_calculation
     from user_application.solar_geometry import SolarGeometryQuery
+    from user_application.node_geometry import NodeGeometryQuery
+    from digital_twin.runtime.data_management.scopes import ScopedDataManagement
+    from communication.data_management_delivery import DataManagementBridge
+    from datetime import datetime, timezone
     records={record.input_id:record for record in orbit_inputs}
     if len(records)!=len(orbit_inputs):raise ValueError('duplicate orbit inputs')
     executor=BoundedOrbitExecutor(workers=orbit_config.CALCULATION_WORKERS,waiting_requests=orbit_config.CALCULATION_WAITING_REQUESTS)
@@ -79,6 +85,14 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
     app.include_router(solar_geometry_http.router)
     app.state.runtime = state
     app.state.orbit_executor = executor
+    # Node/GP/solar calculations share the existing bounded native executor.
+    # Source engineering nodes are readonly; only explicit deployment commands
+    # activate the source isolated-v1 simulated data module for this app instance.
+    app.state.node_geometry_query = node_geometry_query if node_geometry_query is not None else NodeGeometryQuery(execute=executor.run)
+    app.state.data_management = data_management if data_management is not None else ScopedDataManagement()
+    app.state.data_management_bridge = data_management_bridge if data_management_bridge is not None else DataManagementBridge(now=lambda:datetime.now(timezone.utc).isoformat())
+    app.include_router(node_geometry_http.router)
+    app.include_router(data_deployment_http.router)
     app.state.orbit_inputs = tuple(records.values())
     app.state.orbit_load_error = None
     app.state.orbit_provenance = {"eop_sha256":getattr(eop_provider,"eop_sha256",None),"leap_sha256":getattr(eop_provider,"leap_sha256",None)}

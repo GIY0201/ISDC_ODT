@@ -163,9 +163,9 @@ print(json.dumps({'python':sys.version,'native_file':native.__file__,'profile':n
     receipt["wheel"] = str(product_wheel())
     receipt["wheel_sha256"] = hashlib.sha256(product_wheel().read_bytes()).hexdigest()
     # Preserve actual clean-venv Rust bytes through the production adapter/query and JS decoder.
-    import asyncio
+    from fastapi.testclient import TestClient
     from communication.native.node_adapter import propagate_node_grids
-    from user_application.node_geometry import NodeGeometryQuery
+    from user_application.web.application import create_app
     from foundation.orbit_time import parse_utc, format_utc_batch
     class NativePointPort:
         def __init__(self, point):
@@ -180,16 +180,28 @@ print(json.dumps({'python':sys.version,'native_file':native.__file__,'profile':n
     wire = []
     for point in receipt.pop('native_points'):
         port = NativePointPort(point)
-        query = NodeGeometryQuery(calculate=lambda prepared, grids: propagate_node_grids(prepared, grids, native_port=port))
+        app = create_app()
+        query = app.state.node_geometry_query
+        assert query.execute.__self__ is app.state.orbit_executor
+        query.calculate = lambda prepared, grids: propagate_node_grids(prepared, grids, native_port=port)
         stamp = __import__('datetime').datetime.fromtimestamp(point['date']/1000, __import__('datetime').timezone.utc).isoformat()
         utc = format_utc_batch((parse_utc(stamp),))[0]
         request = {'request_id':'native-prime','nodes':point['nodes'],'start_utc':utc,'count':1,'step_seconds':1}
-        response = asyncio.run(query.samples(request['nodes'],utc,1,1,request['request_id']))
+        with TestClient(app) as client:
+            assert client.post('/api/runtime/control', json={'action':'pause'}).status_code == 200
+            before = app.state.runtime.status()
+            response = client.post('/api/nodes/samples', json=request)
+            assert response.status_code == 200, response.text
+            response = response.json()
+            assert app.state.runtime.status() == before
+            assert client.get('/api/data-management/deployment').json()['revision'] == 0
+            assert app.state.data_management._scopes == {}
         wire.append({'request':request,'response':response})
     payload = tmp_path/'native_optical_points.json'
     payload.write_text(json.dumps(wire),encoding='utf-8')
     optical_result = subprocess.run(['node',str(ROOT/'project_support/tests/browser_fixtures/native_optical_points.mjs'),str(payload)],cwd=ROOT,check=True,capture_output=True,text=True,timeout=30)
     receipt['native_optical_points'] = json.loads(optical_result.stdout)
+    receipt['native_application_requests'] = len(wire)
     destination = ROOT / "data/workspace/validation/install" / uuid.uuid4().hex
     destination.mkdir(parents=True)
     (destination / "isolated_call.json").write_text(json.dumps(receipt, indent=2), encoding="utf-8")

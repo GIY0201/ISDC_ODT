@@ -144,6 +144,9 @@ def test_scene_http_is_readonly_strict_and_preserves_conflicts(scene_query):
     q=scene_query
     payload=dict(group='active',query='',orbit='all',utc=OMM['EPOCH']+'Z',client_request_id='http-scene')
     with TestClient(create_app(catalog_geometry_query=q)) as client:
+        # Isolate query side effects from the runtime's normal 200ms SIM tick.
+        # Retain exact whole-state equality instead of dropping time/sequence fields.
+        assert client.post('/api/runtime/control',json={'action':'pause'}).status_code==200
         before=client.get('/api/orbit/state').json();sim=client.get('/api/bootstrap').json()['runtime']
         reply=client.post('/api/catalog/scene',json=payload)
         assert reply.status_code==200,reply.text
