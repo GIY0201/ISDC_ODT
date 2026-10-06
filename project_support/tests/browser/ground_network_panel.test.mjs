@@ -58,3 +58,14 @@ test('ground pending fields survive actual V6 screen reconstruction without savi
   assert.equal(records.get('spacetwin-ground-stations-v1'),bytes);assert.equal(f.counts().commands,0);
  }finally{f.dispose();}
 });
+
+for(const [width,height] of [[1280,720],[1920,1080]])test(`V6 fabric actions require verified input and never automatically send ${width}x${height}`,async()=>{
+ const f=fixture(width,height,{hash:'#ground'});
+ try{
+  assert.ok(f.get('ground-node-fabric-send'));assert.equal(f.get('ground-node-fabric-send').disabled,true);
+  assert.ok(f.get('ground-node-fabric-refresh'));assert.ok(f.get('ground-node-fabric-route'));
+  assert.equal(f.get('ground-node-fabric-route').disabled,true);assert.match(f.get('ground-node-fabric-status').textContent,/미확인|미전송/);
+  const before=f.snapshot();await f.get('ground-node-fabric-send').dispatch('click');assert.deepEqual(f.snapshot(),before);assert.equal(f.counts().commands,0);
+  await f.win.dispatch('pagehide',{persisted:false});
+ }finally{f.dispose();}
+});

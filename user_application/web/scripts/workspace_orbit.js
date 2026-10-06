@@ -3,6 +3,8 @@ import {createWorkspaceSolar} from './workspace_solar.js?v=t135-r1';
 import {createWorkspaceNodes} from './workspace_nodes.js?v=t151-r1';
 import {createGroundSegmentStore} from './communication/ground_segment.js';
 import {createGroundNetworkPanel} from './tabs/ground_network.js';
+import {createFabricExchange} from './tabs/fabric_exchange.js';
+import {createDataFabricClient} from '/static/communication/data_fabric.js';
 import * as sourceStationModel from '/static/model_library/ground_stations.js';
 import {createGroundLinkModel} from '/static/simulation/ground_links.js';
 import {createNetworkSnapshotModel} from '/static/simulation/network_snapshot.js';
@@ -98,14 +100,15 @@ void nodeWorkspace.start().then(()=>nodeWorkspace.show(view));
 void modelSelection.load().then(()=>nodeWorkspace.refreshModels());
 const hilPanel=createHilPanel(api,hilTopology,drawSparkline);
 const simPanel=createSimPanel(api,telemetrySocket,values=>missionPanel.controller.receiveMissions(values),{frame:value=>{kpiPanel.receive(value);hilPanel.receive(value);},status:value=>{kpiPanel.connection(value);hilPanel.connection(value);}});
-groundNetworkPanel=createGroundNetworkPanel({store:sourceGround,model:sourceStationModel,network:nodeWorkspace,document,host:window,refreshRuntime:async()=>{await simPanel.controller.load();const state=simPanel.controller.snapshot();if(!state.runtime||state.error)throw Error(state.error||'SIM 상태 미확인');}});
+const fabric=createFabricExchange({client:createDataFabricClient({fetchImpl:window.fetch.bind(window),storage:{getItem:key=>window.localStorage.getItem(key)},protocol:window.location?.protocol||'http:'}),network:nodeWorkspace,clientId:createBrowserId(window.crypto),onChange:()=>groundNetworkPanel?.update()});
+groundNetworkPanel=createGroundNetworkPanel({store:sourceGround,model:sourceStationModel,network:nodeWorkspace,fabric,document,host:window,refreshRuntime:async()=>{await simPanel.controller.load();const state=simPanel.controller.snapshot();if(!state.runtime||state.error)throw Error(state.error||'SIM 상태 미확인');}});
 const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   displayUtc=utc;displayElevation=row?`${row.elevation_deg.toFixed(4)}°`:'자료 준비 중 / 위치 미표시';globe.update(error?{...snapshot,status:'error',error}:snapshot,row,utc);
   const clock=document.getElementById('orbit-display-utc');if(clock)clock.textContent=utc||'미선택';
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();nodeClock?.destroy();groundNetworkPanel?.destroy();sourceGround.destroy();nodeWorkspace?.destroy();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();nodeClock?.destroy();groundNetworkPanel?.destroy();fabric.destroy();sourceGround.destroy();nodeWorkspace?.destroy();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   groundNetworkPanel?.update();

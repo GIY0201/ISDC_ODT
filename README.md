@@ -32,3 +32,5 @@ node --test project_support/tests/browser/*.test.mjs
 V6 지상국·통신 창의 RF 계산기는 선배 프로토타입의 기존 RF-Friis-v1 API를 사용합니다. 11개 조건을 직접 입력하면 8개 결과와 가정을 표시합니다. 이번 연결은 Python304/Node95 및 실제 두해상도 UI 검증을 통과했습니다. 근거는 `project_support/specs/001-v6-function-integration/validation/t036_rf_workspace.md`이며 실제 통신 조건 조사·적용과 프레임 기준은 계속 남습니다.
 
 ISS APRS 수신의 공식 주파수 부분 조건을 불러오고 적용할 수 있습니다. 출처와 공지 시점/확인 UTC를 표시하며 장비가 필요한 조건은 사용자 가정 또는 미확인입니다. 실제 수신 검증은 남아 있습니다. 근거: `project_support/specs/001-v6-function-integration/validation/t040_iss_receive_profile.md` (Python313/Node103 및 실제 두해상도 UI).
+
+V6 지상국·통신 창에 노드 통신망의 명시적 전송, 모듈 상태 조회, 모의 경로와 DTN 결과 표시를 연결했습니다. 선배의 ICD-02 계산과 클라이언트를 재사용하며 검증된 현재 입력만 전송합니다. JavaScript758/Python684 시험은 통과했지만 실제 브라우저의 버튼 실행과 native 통신망 결과 수용 검증은 아직 미완료입니다. 근거: `project_support/specs/001-v6-function-integration/validation/t077_fabric_workspace.md`.

@@ -39,6 +39,8 @@ import {NodeScene} from '../../../digital_twin/visualization/node_scene.js';
 import {createSatelliteNodePanelTools} from '../../../user_application/web/scripts/tabs/satellite_nodes.js';
 import {createGroundSegmentStore} from '../../../user_application/web/scripts/communication/ground_segment.js';
 import {createGroundNetworkPanel} from '../../../user_application/web/scripts/tabs/ground_network.js';
+import {createFabricExchange} from '../../../user_application/web/scripts/tabs/fabric_exchange.js';
+import {createDataFabricClient} from '../../../communication/browser/data_fabric.js';
 import * as sourceStationModel from '../../../digital_twin/model_library/browser/ground_stations.js';
 import {createGroundLinkModel} from '../../../digital_twin/simulation/browser/ground_links.js';
 import {createNetworkSnapshotModel} from '../../../digital_twin/simulation/browser/network_snapshot.js';
@@ -130,7 +132,7 @@ export function fixture(width=1280,height=720,options={}){
   Object.assign(context,{createWorkspaceSolar:args=>createWorkspaceSolar({...args,host:win,createDisplay:()=>({setStyle(){},clear(){},update(){},destroy(){}})}),createSatelliteHover,createSatelliteModelPanel,createSatelliteModelSelection,createModelResolver,validateSatelliteManifest,createGlobeViewPanel,createCatalogTrack,createCatalogPasses,createCatalogPassPanel,createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
   // Imported ground UI uses the same adapted document as the VM assembly.
   Object.assign(context,{createBrowserId,createWorkspaceNodes,createNodeLibrary,orbitElements,catalogElements,nodeOisl,NodeScene,createSatelliteNodePanelTools,createNodeClockControls,createUtcCodec,LEAP_SHA256});
-  Object.assign(context,{createGroundSegmentStore,createGroundNetworkPanel,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
+  Object.assign(context,{createGroundSegmentStore,createGroundNetworkPanel,createFabricExchange,createDataFabricClient,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
   globalThis.document=doc;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}
