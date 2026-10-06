@@ -60,9 +60,12 @@ class RuntimeState:
         if self._task is not None:raise ValueError('resume requires stopped development runtime')
         json.dumps(candidate,allow_nan=False)
         status=candidate['runtime'];deployment=candidate['deployment']
-        if (status.get('mode')!='SIM' or status.get('active_faults')!=[] or deployment.get('nodes')!=[]
-            or deployment.get('revision')!=0 or deployment.get('deployment_id') is not None
-            or deployment.get('run_id')!=status.get('run_id') or deployment.get('scope_id')!=str(status.get('run_id'))+':unconfigured'):
+        revision=deployment.get('revision');identifier=deployment.get('deployment_id')
+        scope='unconfigured' if identifier is None else 'deployment:'+str(identifier)
+        if (type(revision) is not int or revision<0 or (revision==0)!=(identifier is None)
+            or (identifier is not None and (not isinstance(identifier,str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,100}',identifier)))
+            or status.get('mode')!='SIM' or status.get('active_faults')!=[] or deployment.get('nodes')!=[]
+            or deployment.get('run_id')!=status.get('run_id') or deployment.get('scope_id')!=str(status.get('run_id'))+':'+scope):
             raise ValueError('only unconfigured SIM without active faults can resume')
         if not isinstance(status.get('run_id'),str) or not re.fullmatch(r'RUN-[A-F0-9]{12}',status['run_id']):raise ValueError('invalid captured run id')
         if status.get('scenario_id') not in {s['id'] for s in self.scenarios}:raise ValueError('captured scenario is not registered')
@@ -83,6 +86,8 @@ class RuntimeState:
         # All validation precedes the single owner replacement; no synthetic startup event.
         for key in ('running','speed','elapsed_seconds','scenario_id','sequence','run_id','mode','scenario_version','random_seed','recording','data_quality'):setattr(self,key,status[key])
         self.started_at=started;self.faults=[];self._missions.items=candidate['missions'];self.devices=candidate['devices'];self.events=deque(events,maxlen=200)
+        self._data_deployment={k:deepcopy(deployment[k]) for k in ('deployment_id','revision','nodes')}
+        self._deployment_ids={identifier} if identifier is not None else set()
         self._data_scope_started_s=self.elapsed_seconds;self._mission_context=None;self._refresh_telemetry()
 
     @property
@@ -106,7 +111,11 @@ class RuntimeState:
 
     def _data_context(self, deployment: dict | None = None, start_s: float | None = None) -> dict:
         accepted = deployment or self.data_deployment()
-        return {"deployment": deepcopy(accepted), "runtime": self.status(),
+        # Public display status is rounded to milliseconds. Delivery timestamps
+        # must retain the owner's precision, including the deployment boundary.
+        status = self.status()
+        status["elapsed_seconds"] = self.elapsed_seconds
+        return {"deployment": deepcopy(accepted), "runtime": status,
                 "started_s": self._data_scope_started_s if start_s is None else start_s,
                 "inputs": deployment_inputs(accepted, deepcopy(self.faults)), "products": deployment_products}
 

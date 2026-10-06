@@ -12,6 +12,23 @@ from threading import RLock
 from .stand_in import OrchestrationStandIn
 
 
+def _same_json(left, right):
+    """Compare JSON values across browser/Python numeric serialization.
+
+    JSON has one number kind: 4 and 4.0 carry the same value. Booleans,
+    missing keys, array order and every nonnumeric field remain distinct.
+    """
+    if type(left) in (int, float) and type(right) in (int, float):
+        return left == right
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(_same_json(left[k], right[k]) for k in left)
+    if isinstance(left, list):
+        return len(left) == len(right) and all(_same_json(a, b) for a, b in zip(left, right))
+    return left == right
+
+
 class MissionPlanningExchange:
     implementation = OrchestrationStandIn.implementation
     version = OrchestrationStandIn.version
@@ -112,7 +129,7 @@ class MissionPlanningExchange:
                 if request.get("decision") == "commit":
                     if mission_id in self._module.status()["committed"]:
                         raise MissionPlanningConflict("mission already held; retry original command")
-                    if not accepted["feasible"] or json.dumps(request.get("tasks"), sort_keys=True) != json.dumps(accepted["tasks"], sort_keys=True):
+                    if not accepted["feasible"] or not _same_json(request.get("tasks"), accepted["tasks"]):
                         raise MissionPlanningConflict("infeasible or changed plan tasks")
                     self._check_overlaps(mission_id, request["tasks"])
                 elif request.get("decision") == "abort":

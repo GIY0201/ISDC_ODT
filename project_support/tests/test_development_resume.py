@@ -21,3 +21,14 @@ def test_resume_refuses_nonempty_roster_active_fault_or_invalid_state_atomically
   if change=='mode':value['runtime']['mode']='LIVE'
   with pytest.raises(ValueError):r.resume_unconfigured_development(value)
   assert capture(r)==before
+
+def test_empty_recalled_deployment_retains_revision_scope_and_owner_copies():
+ a=create_runtime();a._data_deployment={'deployment_id':'recalled-validation','revision':2,'nodes':[]}
+ value=capture(a);b=create_runtime();b.resume_unconfigured_development(value)
+ assert b.data_deployment()==a.data_deployment()
+ assert b._deployment_ids=={'recalled-validation'}
+ value['deployment']['revision']=99;assert b.data_deployment()['revision']==2
+ for field,replacement in [('revision',True),('revision',0),('deployment_id','bad:id'),('scope_id','foreign')]:
+  invalid=capture(a);invalid['deployment'][field]=replacement;before=capture(b)
+  with pytest.raises(ValueError):b.resume_unconfigured_development(invalid)
+  assert capture(b)==before

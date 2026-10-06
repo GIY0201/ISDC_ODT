@@ -118,7 +118,7 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`restored source defin
 
 for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 source node hover uses one card and expires with owned geometry ${width}x${height}`,async()=>{
  const codec=createUtcCodec(LEAP_SHA256);let samples=0;
- const f=actualWorkspaceFixture(width,height,{hash:'#satellite',setTimeout,clearTimeout,nodeSamples:async p=>{samples++;return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>({utc:codec.advance(p.start_utc,i),status:'valid',error_code:null,position_m:[7000000,2,3],inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550}))}))};}});
+ const f=actualWorkspaceFixture(width,height,{hash:'#satellite',setTimeout,clearTimeout,nodeSamples:async p=>{samples++;return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>({utc:codec.advance(p.start_utc,i),status:'valid',error_code:null,position_m:[7000000,2,3],inertial_position_km:[7000,0,0],lvlh_basis:{x:[1,0,0],y:[0,1,0],z:[0,0,1]},inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550}))}))};}});
  try{
   await new Promise(resolve=>setTimeout(resolve,10));await f.get('node-add').dispatch('click');let point;
   for(let i=0;i<60;i++){await new Promise(resolve=>setTimeout(resolve,5));f.viewers[0].scene.preRender.raise();point=f.viewers[0].primitives.flatMap(p=>p.items??[]).find(p=>p.id?.nodeId&&p.show);if(point)break;}
@@ -133,7 +133,7 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 source node
  }finally{f.dispose();}
 });
 
-function fixture({native=false,solar=null,view=null,storage=null,storageGetter=null,fetchOverride=null,onHover=()=>{},networkInputs=null}={}){
+function fixture({native=false,solar=null,view=null,storage=null,storageGetter=null,fetchOverride=null,onHover=()=>{},networkInputs=null,readClock=()=>({})}={}){
  let id=0,context=null,displayListener,rendererFactory,panelOptions,interaction,renderer,removeCount=0;const calls=[],sections=new Map();
  const host={innerWidth:1280,innerHeight:720,localStorage:storage,crypto:{randomUUID:()=>`test-${++id}`},setTimeout,clearTimeout,addEventListener(){},removeEventListener(){},confirm:()=>true};
  if(storageGetter)Object.defineProperty(host,'localStorage',{get:storageGetter});
@@ -145,11 +145,11 @@ function fixture({native=false,solar=null,view=null,storage=null,storageGetter=n
  const library=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>`EQ-${++id}`});
  const tools={workPanelMarkup:()=>'<panel>',createNodeWorkPanel(options){panelOptions=options;return{refresh(){},destroy(){calls.push(['panel-destroy']);}};}};
  const fetchImpl=async(url,options)=>{calls.push(['http',url,options.method]);if(fetchOverride)return fetchOverride(url,options);return{ok:true,json:async()=>({revision:0,run_id:'run',scope_id:'run:unconfigured',deployment_id:null,nodes:[]})};};
- const codec=createUtcCodec(LEAP_SHA256),row=utc=>({utc,status:'valid',error_code:null,position_m:[7000000,2,3],inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550});
+ const codec=createUtcCodec(LEAP_SHA256),row=utc=>({utc,status:'valid',error_code:null,position_m:[7000000,2,3],inertial_position_km:[7000,0,0],lvlh_basis:{x:[1,0,0],y:[0,1,0],z:[0,0,1]},inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550});
  const api={nodeSamples:async p=>{calls.push(['samples']);if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>row(codec.advance(p.start_utc,i)))}))};},nodeTrack:async p=>{if(!native)throw Error('test unavailable');return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>{const period=Math.round(orbitElements(node.orbit).period/60*1000)/1000;return{node_id:node.id,definition_hash:'a'.repeat(64),period_minutes:period,path_visible:true,rows:Array.from({length:121},(_,i)=>row(codec.advance(new Date(Math.trunc(Date.parse(p.center_utc)+(i-60)*period*60000/120)).toISOString(),0)))};})};}};
  if(view)Object.assign(globe,view);
  const network=networkInputs?{...networkInputs,model:createNetworkSnapshotModel({library,oisl,groundLinks:createGroundLinkModel({library,stationModel})}),validateStation:stationModel.validateStation}:null;
- const workspace=createWorkspaceNodes({api,globe,solar,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now:()=>1791151272000,resolveModel:()=>({key:'flat',url:'/flat.glb'}),models:()=>[],fetchImpl,onHover,networkInputs:network});
+ const workspace=createWorkspaceNodes({api,globe,solar,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now:()=>1791151272000,resolveModel:()=>({key:'flat',url:'/flat.glb'}),models:()=>[],fetchImpl,onHover,networkInputs:network,readClock});
  return{workspace,host,globe,calls,buttons,sections,context(value){context=value;displayListener(value);},get options(){return panelOptions;},get interaction(){return interaction;},get renderer(){return renderer;},attach(){return renderer=rendererFactory({},{});},get removeCount(){return removeCount;}};
 }
 
@@ -324,4 +324,27 @@ test('mounted workspace accepts server-rounded source period and retains all121 
  assert.equal(f.workspace.snapshot().timeline.error,'');
  const path=scene.options.pathFor(node);assert.ok(path);assert.equal(path.period_minutes,95.65);assert.equal(path.positions_m.length,121);assert.equal(path.visible,true);
  f.workspace.destroy();
+});
+
+test('actual node owner exposes only accepted paused mission inputs and existing optical proof',async()=>{
+ let running=false,server={revision:0,run_id:'run',scope_id:'run:unconfigured',deployment_id:null,nodes:[]};
+ const f=fixture({native:true,readClock:()=>({running}),fetchOverride:async(url,options)=>{if(options.method==='POST'){const p=JSON.parse(options.body);server={...p,revision:server.revision+1,run_id:'run',scope_id:`run:deployment:${p.deployment_id}`};delete server.expected_revision;}return{ok:true,json:async()=>structuredClone(server)};}});
+ try{
+  assert.equal(typeof f.workspace.missionInputs,'function');
+  assert.throws(()=>f.workspace.missionInputs(),/배치|불러/);
+  await f.workspace.start();f.workspace.show('satellite');f.options.store.add({name:'Mission source'});
+  assert.throws(()=>f.workspace.missionInputs(),/배치/);
+  await f.buttons.get('nodes-deploy').fn();for(let i=0;i<60&&f.workspace.snapshot().deployment.busy;i++)await new Promise(resolve=>setTimeout(resolve,2));
+  assert.throws(()=>f.workspace.missionInputs(),/UTC/);
+  f.context({utc:'2020-07-12T21:16:01.000416000Z'});
+  const c=f.workspace.missionInputs();assert.equal(c.nodes[0].name,'Mission source');assert.equal(c.deployment.revision,1);
+  const proof=await f.workspace.updateMissionLinks();assert.equal(proof.status,'valid',proof.error);
+  assert.equal(f.workspace.verifyMissionLinks(proof,{nodes:c.nodes,utc:c.utc}),true);
+  assert.equal(f.workspace.verifyMissionLinks(proof,{nodes:[],utc:c.utc}),false);
+  c.nodes[0].name='foreign';c.deployment.nodes.length=0;assert.equal(f.workspace.missionInputs().nodes[0].name,'Mission source');
+  running=true;assert.throws(()=>f.workspace.missionInputs(),/정지/);running=false;
+  f.options.store.update(c.nodes[0].id,{name:'Edited'});assert.throws(()=>f.workspace.missionInputs(),/배치/);
+  assert.equal(typeof f.workspace.updateMissionLinks,'function');assert.equal(f.workspace.verifyMissionLinks(null),false);
+  f.workspace.destroy();assert.throws(()=>f.workspace.missionInputs(),/배치|불러/);
+ }finally{f.workspace.destroy();}
 });

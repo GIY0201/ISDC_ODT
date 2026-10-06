@@ -236,3 +236,22 @@ def test_original_deployment_state_machine_trace_preserved():
     from project_support.tooling.capture_original_node_deployment import trace
     expected=json.loads((Path(__file__).parent/'fixtures/original_node_deployment.json').read_text(encoding='utf-8'))
     assert asyncio.run(trace(RuntimeState))==expected['trace']
+
+
+@pytest.mark.parametrize('elapsed',[17500.12349,17500.12351])
+def test_deployment_and_followup_keep_internal_sim_precision(elapsed):
+    async def run():
+        runtime=create_runtime();runtime.elapsed_seconds=elapsed
+        module=ScopedDataManagement();bridge=DataManagementBridge(now=lambda:'t')
+        async def activate(context):
+            assert context['started_s']==context['runtime']['elapsed_seconds']==elapsed
+            return bridge.sync(module,context)
+        accepted=await runtime.apply_data_deployment(command(),activate)
+        assert accepted['revision']==1
+        assert runtime.status()['elapsed_seconds']==round(elapsed,3)
+        runtime.elapsed_seconds=elapsed+0.00001
+        async def consume(context):return bridge.sync(module,context)
+        _,receipt=await runtime.with_data_deployment(consume)
+        assert receipt['sim_elapsed_s']==runtime.elapsed_seconds
+        assert receipt['products']==0
+    asyncio.run(run())

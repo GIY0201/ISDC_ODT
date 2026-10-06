@@ -140,6 +140,15 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  return Object.freeze({
   async start(){if(dead||started)return;started=true;return retryRestore();},retryRestore,
   show,refresh:refreshPanel,refreshModels,sceneSnapshot,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
+  missionInputs(){
+   const state=deployment.state;
+   if(dead||!started||!store.loaded||!store.deploymentConfirmed||store.deployed.length===0||store.error||state.server===null||state.syncRequired||state.busy||store.isDirty())throw Error('위성 설정을 불러오고 현재 초안을 서버에 배치하세요.');
+   const clock=readDisplay();if(!clock.utc)throw Error('공용 표시 UTC를 먼저 선택하세요.');
+   if(clock.running!==false)throw Error('임무 계산 전에 분석 시계를 정지하세요.');
+   return structuredClone({nodes:store.deployed,utc:clock.utc,deployment:state.server});
+  },
+  updateMissionLinks:()=>dead?Promise.reject(Error('위성 작업 창이 종료되었습니다.')):optical.update(),
+  verifyMissionLinks:(...args)=>!dead&&optical.verifyLinkSnapshot(...args)===true,
   updateNetwork:()=>dead?Promise.resolve(null):network?.update()??Promise.resolve(null),
   networkSnapshot:()=>dead?null:network?.snapshot()??null,
   verifyNetworkSnapshot:value=>!dead&&network?.verifySnapshot(value)===true,

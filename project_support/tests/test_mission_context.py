@@ -126,6 +126,14 @@ def test_actual_factory_installed_native_and_original_source_feasible_plan_commi
   reply=c.post('/api/orchestration/plan',json=body_plan,headers=headers);assert reply.status_code==200,reply.text
   plan=reply.json();assert plan['feasible'] and len(plan['tasks'])==3
   decision={'time':plan['time'],'mission_id':plan['mission_id'],'decision':'commit','version':1,'tasks':plan['tasks']}
+  # Browser JSON.stringify sends integral floats as JSON integers. Preserve all
+  # values and fields while reproducing that transport representation.
+  def browser_numbers(value):
+   if type(value) is float and value.is_integer():return int(value)
+   if isinstance(value,list):return [browser_numbers(v) for v in value]
+   if isinstance(value,dict):return {k:browser_numbers(v) for k,v in value.items()}
+   return value
+  decision=browser_numbers(decision)
   headers.pop('X-ISDC-Orchestration-Mission-Version');headers.update({'X-ISDC-Orchestration-Sequence':'1','X-ISDC-Orchestration-Request-Id':'native-life:2','X-ISDC-Orchestration-Plan-Sequence':str(plan['plan_sequence'])})
   bad=deepcopy(decision);bad['tasks'][0]['volume_mb']=999
   assert c.post('/api/orchestration/commit',json=bad,headers=headers).status_code==409
