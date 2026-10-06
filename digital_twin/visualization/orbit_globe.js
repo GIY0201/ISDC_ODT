@@ -37,6 +37,7 @@ export class OrbitGlobe {
   zoomBy(delta){return this.cameraState().ready?this.cameraMotion.zoomBy(delta):false;}
   setZoom(value){return this.cameraState().ready?this.cameraMotion.setZoom(value):false;}
   home(){return this.cameraState().ready?this.cameraMotion.home():false;}
+  palette(theme=this.viewControls.theme){if(this.destroyed)return{};const value=PALETTES[theme]??PALETTES.dark;return {...value,fallback:value.LEO,hover:theme==='light'?'#1c2833':'#ffffff',pathOutline:value.outline};}
   retrySatelliteModel(){return this.destroyed?Promise.resolve(null):this.modelLayer?.retry()??Promise.resolve(null);}
   clearSatelliteModel(){if(!this.destroyed){this.cameraMotion.cancel();this.modelLayer?.clear();}}
   update(sample){

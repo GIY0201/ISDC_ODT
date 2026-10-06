@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
 import {OrbitGlobe} from '../../../digital_twin/visualization/orbit_globe.js';
 
 function fixture(){
@@ -19,6 +20,12 @@ test('ITRF metres are fixed-frame coordinates and clock uses the exact injected 
   const viewer=viewers[0];assert.deepEqual({...viewer.items[0].position.value},{x:sample.position_m[0],y:sample.position_m[1],z:sample.position_m[2]});
   assert.equal(viewer.items[0].position.frame,'fixed');assert.equal(viewer.clock.currentTime,sample.utc);assert.equal(viewer.clock.shouldAnimate,false);
   sample.position_m[0]=0;assert.equal(viewer.items[0].position.value.x,6202527.7);
+});
+
+test('shared node palette is a copy of source colors for both themes',async()=>{
+ const {globe}=fixture(),source=JSON.parse(await readFile(new URL('../fixtures/original_node_markers.json',import.meta.url),'utf8'));
+ for(const theme of ['dark','light']){const copy=globe.palette(theme);for(const key of ['LEO','MEO','GEO','HEO','fallback','selected','hover','pathOutline'])assert.equal(copy[key],source.palettes[theme][key]);copy.LEO='changed';assert.equal(globe.palette(theme).LEO,source.palettes[theme].LEO);}
+ globe.destroy();assert.deepEqual(globe.palette('dark'),{});
 });
 
 test('camera UI routes through the existing owner and queued scene morph rejects all commands',()=>{

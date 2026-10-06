@@ -81,7 +81,7 @@ modelSelection=createSatelliteModelSelection({api,globe,timeline:catalogTimeline
 const removeModelSelection=catalogPanel.controller.observeSelection(syncModel);
 const nodeLibrary=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>crypto.randomUUID()});
 nodeClock=createNodeClockControls({readContext:()=>nodeWorkspace?.snapshot().display,stored:client,catalog:catalogTimeline,advanceUtc:createUtcCodec(LEAP_SHA256).advance,now:()=>Date.now(),runStored:command});
-nodeWorkspace=createWorkspaceNodes({api,globe,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window),readClock:context=>nodeClock.read(context),clockActions:nodeClock.actions});
+nodeWorkspace=createWorkspaceNodes({api,globe,solar,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window),readClock:context=>nodeClock.read(context),clockActions:nodeClock.actions});
 void nodeWorkspace.start().then(()=>nodeWorkspace.show(view));
 void modelSelection.load().then(()=>nodeWorkspace.refreshModels());
 const hilPanel=createHilPanel(api,hilTopology,drawSparkline);

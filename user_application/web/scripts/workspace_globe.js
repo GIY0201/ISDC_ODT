@@ -149,6 +149,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   if(host.Cesium)boot();else host.addEventListener('load',boot,{once:true});
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
+    palette(theme){return !disposed&&!failed?globe?.palette?.(theme)??{}:{};},
     cameraState,
     observeCamera(fn){if(disposed)return()=>{};cameraObservers.add(fn);fn({...cameraState()});return()=>cameraObservers.delete(fn);},
     zoomBy(value){return !disposed&&!failed?globe?.zoomBy?.(value)??false:false;},
