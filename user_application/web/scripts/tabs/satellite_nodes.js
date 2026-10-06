@@ -30,7 +30,7 @@ function formationSummaryText(formationParams) {
 function createFormationPanel({root=null,store,now,createFormationId,timers,onError=()=>{},onChange=()=>{},initialParams=FORMATION_DEFAULTS}={}) {
   if(!store||typeof now!=='function'||typeof createFormationId!=='function'||typeof timers?.set!=='function'||typeof timers?.clear!=='function')throw new TypeError('formation_dependencies_required');
   let params=library.normalizeFormationParams(initialParams),activeFormationId=null,live=false,destroyed=false,timer=null,version=0;
-  const owned=[],fields=[],invalidInputs=new Set();
+  const owned=[],fields=[],invalidInputs=new Set(),pendingInputs=new Map();
   const snapshot=()=>structuredClone({params,activeFormationId,live});
   const requireOpen=()=>{if(destroyed)throw new Error('formation_panel_disposed');};
   const report=error=>{onError(error instanceof Error?error.message:String(error));return false;};
@@ -50,9 +50,9 @@ function createFormationPanel({root=null,store,now,createFormationId,timers,onEr
     const host=get('#formation-controls');host?.querySelectorAll('.ns-slider').forEach(label=>{
       const [range,number]=label.querySelectorAll('input');if(!range||!number)return;
       if(label.dataset.control==='phasing')range.max=String(Math.max(0,params.planes-1));
-      if(!invalidInputs.has(label.dataset.control)){range.value=String(Math.min(Number(range.max),params[label.dataset.control]));number.value=String(params[label.dataset.control]);}
+      if(!invalidInputs.has(label.dataset.control)&&!pendingInputs.has(label.dataset.control)){range.value=String(Math.min(Number(range.max),params[label.dataset.control]));number.value=String(params[label.dataset.control]);}
     });
-    for(const [id,key]of [['formation-prefix','prefix'],['formation-bus','bus'],['formation-links','link_policy']]){const field=get(`#${id}`);if(field&&!invalidInputs.has(key))field.value=params[key];}
+    for(const [id,key]of [['formation-prefix','prefix'],['formation-bus','bus'],['formation-links','link_policy']]){const field=get(`#${id}`);if(field&&!invalidInputs.has(key)&&!pendingInputs.has(key))field.value=params[key];}
     root?.querySelectorAll('[data-formation-preset]').forEach(button=>{button.setAttribute('aria-pressed',String(button.dataset.formationPreset===params.preset));button.dataset.tip=FORMATION_PRESETS[button.dataset.formationPreset]?.note||'';});
     const checkbox=get('#formation-live');if(checkbox)checkbox.checked=live;hints();
   }
@@ -61,28 +61,31 @@ function createFormationPanel({root=null,store,now,createFormationId,timers,onEr
     for(const remove of fields.splice(0))remove();
     const host=get('#formation-controls');if(host){host.innerHTML=formationControlsMarkup(params);host.querySelectorAll('.ns-slider').forEach(label=>{
       const key=label.dataset.control,[range,number]=label.querySelectorAll('input');
-      bind(range,'input',()=>change(key,range.value),fields);bind(number,'change',()=>change(key,number.value),fields);
+      bind(range,'input',()=>change(key,range.value),fields);bind(number,'input',()=>stage(key,number.value),fields);bind(number,'change',()=>change(key,number.value),fields);
     });}publish();
   }
   function schedule(){
-    cancel();if(invalidInputs.size||!live||!activeFormationId||!store.drafts.some(node=>node.formation?.id===activeFormationId))return;
+    cancel();if(invalidInputs.size||pendingInputs.size||!live||!activeFormationId||!store.drafts.some(node=>node.formation?.id===activeFormationId))return;
     const current=version,id=activeFormationId;
     timer=timers.set(()=>{if(destroyed||current!==version||!live||activeFormationId!==id)return;timer=null;generate(id);},120);
   }
+  function stage(key,value){cancel();pendingInputs.set(key,value);}
+  function commitInputs(){let valid=true;for(const [key,value]of [...pendingInputs])if(!change(key,value))valid=false;cancel();return valid;}
   function change(key,value){
-    requireOpen();const control=FORMATION_CONTROLS.find(control=>control.key===key);
+    requireOpen();pendingInputs.delete(key);const control=FORMATION_CONTROLS.find(control=>control.key===key);
     if(control){if(!controlEnabled(control,params)||(typeof value!=='number'&&typeof value!=='string')||(typeof value==='string'&&!value.trim())||!Number.isFinite(Number(value)))return invalid(key,'유효한 편대 숫자를 입력하세요.');value=Number(value);}
     else if(key==='preset'){if(!Object.hasOwn(FORMATION_PRESETS,value))return invalid(key,'편대 프리셋을 확인하세요.');}
     else if(key==='bus'){if(!Object.hasOwn(BUS_PRESETS,value))return invalid(key,'버스 프리셋을 확인하세요.');}
     else if(key==='link_policy'){if(!Object.hasOwn(LINK_POLICIES,value))return invalid(key,'링크 정책을 확인하세요.');}
     else if(key==='prefix'){if(typeof value!=='string')return invalid(key,'편대 이름을 확인하세요.');}
     else return invalid(key,'알 수 없는 편대 입력입니다.');
-    invalidInputs.delete(key);if(key==='preset')invalidInputs.clear();
+    invalidInputs.delete(key);if(key==='preset'){invalidInputs.clear();pendingInputs.clear();}
     params=library.normalizeFormationParams({...params,[key]:value,...(key==='preset'&&value==='walker_star'?{raan_spread:180}:{})});
     if(key==='preset')render();else publish();schedule();return true;
   }
   function generate(formationId=null){
     requireOpen();cancel();
+    if(!commitInputs())return [];
     try{
       if(invalidInputs.size)throw new Error('잘못된 편대 입력을 수정한 뒤 생성하세요.');
       const epoch=now();if(typeof epoch!=='number'||!Number.isFinite(epoch)||!Number.isFinite(new Date(epoch).getTime()))throw new Error('편대 정의 UTC 시각을 확인하세요.');
@@ -100,7 +103,7 @@ function createFormationPanel({root=null,store,now,createFormationId,timers,onEr
   function adopt(node){
     requireOpen();const id=node?.formation?.id??null;
     if(id===activeFormationId)return;
-    cancel();invalidInputs.clear();activeFormationId=id;
+    cancel();invalidInputs.clear();pendingInputs.clear();activeFormationId=id;
     if(node?.formation?.params)params=library.normalizeFormationParams(node.formation.params);render();
   }
   function remove(){
@@ -113,11 +116,11 @@ function createFormationPanel({root=null,store,now,createFormationId,timers,onEr
     if(bus)bus.innerHTML=Object.entries(BUS_PRESETS).map(([key,spec])=>`<option value="${key}">${esc(spec.label)}</option>`).join('');
     if(links)links.innerHTML=Object.entries(LINK_POLICIES).map(([key,policy])=>`<option value="${key}">${esc(policy.label)}</option>`).join('');
     root.querySelectorAll('[data-formation-preset]').forEach(button=>bind(button,'click',()=>change('preset',button.dataset.formationPreset)));
-    for(const [id,key]of [['formation-prefix','prefix'],['formation-bus','bus'],['formation-links','link_policy']]){const field=get(`#${id}`);bind(field,'change',()=>change(key,field.value));}
+    for(const [id,key]of [['formation-prefix','prefix'],['formation-bus','bus'],['formation-links','link_policy']]){const field=get(`#${id}`);if(key==='prefix')bind(field,'input',()=>stage(key,field.value));bind(field,'change',()=>change(key,field.value));}
     const checkbox=get('#formation-live');bind(checkbox,'change',()=>setLive(checkbox.checked));
     bind(get('#formation-generate'),'click',()=>generate());bind(get('#formation-remove'),'click',()=>remove());render();
   }
-  function parametersForCreate(){requireOpen();if(invalidInputs.size)throw new Error('잘못된 편대 입력을 수정한 뒤 생성하세요.');return structuredClone(params);}
+  function parametersForCreate(){requireOpen();if(!commitInputs()||invalidInputs.size)throw new Error('잘못된 편대 입력을 수정한 뒤 생성하세요.');return structuredClone(params);}
   return Object.freeze({change,generate,setLive,adopt,remove,destroy,snapshot,parametersForCreate});
 }
 function utcLabel(value,seconds=true){
