@@ -22,3 +22,10 @@ from digital_twin.contracts.data_fabric import DataFabricLink
 
 def data_fabric_of(connection: HTTPConnection) -> DataFabricLink:
     return connection.app.state.data_fabric
+
+
+from digital_twin.contracts.orchestration import OrchestrationLink
+
+
+def orchestration_of(connection: HTTPConnection) -> OrchestrationLink:
+    return connection.app.state.orchestration

@@ -12,6 +12,12 @@
       "source_sha256": "d80b26ae2fbf28084a5774a17357a8b083b2e4400ec23041b245f7d2022c3de0",
       "normalized_source_sha256": "004e71211d3b099414a6602d12678f022c3c90358f774ae12e9cc6ed8b8623cc",
       "port_sha256": "29c746549e9d01334bd77b2849b6de368ecec3609ad8aa8450f13547f38663bd"
+    },
+    "communication/http/orchestration_schemas.py": {
+      "source_path": "communication/http/orchestration_schemas.py",
+      "source_sha256": "cf791b03fc489049eff6b2b0043cfe7eda86b3fba535f8fc97cc5fb0dde96125",
+      "normalized_source_sha256": "f1f31aaeb5bd660864b4d8fb6a6a59a05cabb5ad531d8742d0173e86d04fe270",
+      "port_sha256": "f1f31aaeb5bd660864b4d8fb6a6a59a05cabb5ad531d8742d0173e86d04fe270"
     }
   }
 }
