@@ -25,7 +25,7 @@ from user_application.bootstrap import create_runtime
 from user_application.configs.paths import APP_NAME, APP_VERSION, WEB_DIR, VISUALIZATION_DIR, CLIENT_DIR, CATALOG_CACHE_DIR
 
 
-def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None,solar_geometry_query=None,node_geometry_query=None,data_management=None,data_management_bridge=None,data_fabric=None,mission_window_query=None,orchestration=None,mission_context_query=None) -> FastAPI:
+def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None,solar_geometry_query=None,node_geometry_query=None,data_management=None,data_management_bridge=None,data_fabric=None,mission_window_query=None,orchestration=None,mission_context_query=None,security=None) -> FastAPI:
     from communication.native.orbit_execution import BoundedOrbitExecutor
     from digital_twin.runtime.orbit import OrbitRuntime
     from digital_twin.contracts.orbit import GroundPoint
@@ -76,6 +76,9 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
                 await state.shutdown()
             finally:
                 await executor.close()
+                if security is None:
+                    close=getattr(app.state.security,'close',None)
+                    if callable(close):close()
 
     app = FastAPI(title=APP_NAME, version=APP_VERSION, lifespan=lifespan)
     app.state.catalog_geometry_query=catalog_geometry_query
@@ -84,6 +87,21 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
     app.state.solar_geometry_query=solar_geometry_query if solar_geometry_query is not None else (SolarGeometryQuery(eop_provider,executor.run) if eop_provider is not None else None)
     app.include_router(solar_geometry_http.router)
     app.state.runtime = state
+    from digital_twin.runtime.security import SecurityStandIn
+    from communication.external.security import RemoteSecurity
+    from communication.http import security as security_http
+    from user_application.configs.security import AUTHENTICATION_THRESHOLD, SECURITY_URL_ENV
+    import os
+    security_url=os.environ.get(SECURITY_URL_ENV,'').strip()
+    app.state.security=security if security is not None else (RemoteSecurity(security_url) if security_url else SecurityStandIn(authentication_threshold=AUTHENTICATION_THRESHOLD))
+    app.state.security_bridge=security_http.SecurityBridge()
+    app.include_router(security_http.router)
+    from communication.http import integration as integration_http
+    app.include_router(integration_http.router)
+    from communication.http import scenarios as scenarios_http
+    from user_application.configs.scenarios import scenario_summaries,scenario_definition
+    app.state.scenario_library={'summaries':scenario_summaries,'definition':scenario_definition}
+    app.include_router(scenarios_http.router)
     app.state.orbit_executor = executor
     # Node/GP/solar calculations share the existing bounded native executor.
     # Source engineering nodes are readonly; only explicit deployment commands
@@ -97,6 +115,8 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
     app.state.mission_window_query=mission_window_query if mission_window_query is not None else MissionWindowQuery(app.state.node_geometry_query,lambda:app.state.catalog_geometry_query)
     app.include_router(mission_windows_http.router)
     app.include_router(data_deployment_http.router)
+    from communication.http import data_management as data_management_http
+    app.include_router(data_management_http.router)
     from digital_twin.runtime.mission_planning.exchange import MissionPlanningExchange
     from communication.http import orchestration as orchestration_http
     from communication.http import mission_context as mission_context_http
@@ -151,6 +171,7 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
         ('/static/assets', WEB_DIR / 'assets'),
         ('/static/visualization', VISUALIZATION_DIR),
         ('/static/model_library', VISUALIZATION_DIR.parent / 'model_library' / 'browser'),
+        ('/static/scenario_verification', VISUALIZATION_DIR.parent / 'verification' / 'browser'),
         ('/static/satellite_display', VISUALIZATION_DIR.parent / 'model_library' / 'packages' / 'satellite_display' / 'v1'),
         ('/static/simulation', VISUALIZATION_DIR.parent / 'simulation' / 'browser'),
         ('/static/communication', CLIENT_DIR),

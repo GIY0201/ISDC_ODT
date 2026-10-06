@@ -1038,3 +1038,21 @@ T078/N010/N011과 전체 T075–T084는 미완료 유지. 실제8891 새 factory
 최종 실화면 확인: 새8891 factory의 원본 계획 v2가 feasible3-task로 계산됐고 Chrome에서 commit 수락, 서버 held tasks3개를 확인했다. 이어 abort 수락/서버 committed 빈 명부, 검증용 배치 회수 revision4/빈 노드를 확인했다. 캡처 t078_final_live_committed.json / t078_final_live_cleanup.json / t078_source_mission_chrome.jpg. 사용자 원래 SIM missions/devices/events/run과 GP UTC는 서버 전환 캡처로 보존 대조했다. 검증용 Chrome 초안과 aborted 요청은 검증용 이름으로 남겼다.
 
 최종 fullPython824PASS8existingERFAwarnings210.27s(exit0), fullNode840PASS4873.2648ms(exit0). 실제 compute lifecycle만 이 증거로 수락하며 나머지4종 전체 live lifecycle, 전체 T075–T084/N010/N011/T078, 다중 창/성능/모듈 복원 및 실제 통신 장비 검증은 미완료다. 고정8891 서버는 계속 실행한다. 같은 브랜치의 로컬 커밋으로 남기며 remote push/merge는 수행하지 않는다.
+
+## 2026-10-07 시한 해석 정정 및 전체 이식 계속
+
+사용자가 요청한 10월7일01:00은 전체 선배 기능 이식의 완료 시한이다. 이를 작업 중단 시각으로 해석해 goal을 paused로 기록한 것은 에이전트의 오류이며 사용자 중단 요청이 아니다. 시한을 넘겼으며 전체 이식은 미완료다. 사용자의 직접 정정으로 작업을 계속한다. 최초 목적 R003/F002, T075–T084 전체 범위와 확정 사항·검증·미완료 기록을 보존한다. 부분 연결/시험 통과를 전체 완료로 바꾸지 않는다. 고정8891/독립 제품/AerODT 계층/원본 재사용/같은 브랜치/사용자 데이터 보존을 유지한다.
+
+## 2026-10-07 07:00 목표와 현재 검증
+
+사용자가 오전7시 완료 가능 여부를 물었고, 남은 원본 전체 기능·검증 완료 목표로 계속 진행한다. 시한 도달은 중단 지시가 아니다. delivery_plan_20261007.md는 완료/잔여 범위와 의존성을 보존하며 확답 없이 실행 목표를 기록한다.
+
+데이터 ICD-01 HTTP/V6 카탈로그·정책·명령·서비스, 보안 ICD-08 source 규칙/이력/선택적 remote adapter, 원본17링크·8ICD 설정과 probe, 원본40노드 PoC 정의/assembly/runner/KPI를 실제 factory와 V6에 조립했다. 정상 임무 route도 기존 다섯 서비스 패널을 사용한다. 관련 source/golden/실제 accepted deployment/module lifecycle 검증을 추가했다. T079/T080/T081/T083 전체 실화면·조건 검증은 아직 미완료다.
+
+fullPython913PASS8existingERFAwarnings222.40s(exit0), fullNode924PASS5293.9401ms(exit0)는 각 실행 당시 코드 증거다. 이후 원본 데이터 상세/정책/추세와 시나리오 다중 승인 보완으로 전체 검사를 다시 수행 중이다. 전체Node에서 새 시나리오를 사용하지 않은 초기화가 idle storage를 쓰는 regression을 발견·수정했고 기존 저장 보존 assertion은 유지했다. 신규 상대 import/port를 격리 fixture에 반영했으며 기존 orbit 선택 assertion을 바꾸지 않았다.
+
+실제8891 Chrome: data 빈 수락 배치의 명령 비활성/unknown, security 인증률 SIM 판정·모듈 위치·전환 이력·UTC 표시를 확인했다. 수신 UTC numeric Date 오류를 수정했다. settings 조회는 실제 내장 모듈과 원본 스텁/미확인을 구분했다. 새 settings/security/composer에서 기존 SIM connection owner를 시작하고 status를 설정 패널에 전달하여 L09 텔레메트리 수신을 실화면에서 확인했다. 다른 socket/state owner는 만들지 않았다.
+
+T084는 실제 Chrome JSON2549bytes/CSV216bytes가 저장되고 같은 요청의 HTTP 원시 응답과 SHA가 일치하여 개별 gap을 닫았다. CSV의 BOM/CRLF와 원본 단위, JSON의 생성시각/run/SIM 출처를 보존했다. 첫 고수준 download event timeout을 실제 파일 미저장으로 오해하지 않고 디스크 파일로 검증했다. 상세 validation/t084_chrome_file_bytes.md. 전체 제품/RF/HIL/시나리오 완료 판정이 아니다.
+
+원본 PoC preview는 실제 API에서 4면×10기, 지상국3곳, 중계/관측/업데이트3임무와 정상→장애→전달→우회→복구 단계를 보여준다. 실제 SIM UTC/native 연결과 원본 plan-all-before-commit 순서에서 마지막 native 승인만 유지하던 오류를 보완 중이다. 같은 RuntimeState의 bounded64 과거 불변 승인 증거, 최신 물리 입력/배치/장애/UTC/모듈 instance guard를 유지하며 기존 source scheduler 순서를 바꾸지 않는다. 관련54focusedPASS 후 full regression/실제40노드 실행은 다음 검증이다. GP 위치를 SIM 시각으로 재라벨링하지 않고 기존 Viewer에 별도 검증된 display source를 명시적으로 선택한다.

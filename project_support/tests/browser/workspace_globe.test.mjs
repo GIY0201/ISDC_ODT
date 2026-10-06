@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 
 test('solar UTC priority uses valid catalog then stored then scene and renderer disposal belongs to one globe',async()=>{
  let removed=0,destroyed=0,attached=0;globalThis.SolarGlobe=class{constructor(){this.viewer={scene:{renderError:{addEventListener:()=>()=>{}}}};}update(){return false;}setGroundPoint(){}setViewStyle(){}setViewImagery(){}setCatalogScene(){}destroy(){destroyed++;}};
- const code=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.SolarGlobe;');
+ const code=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href)).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.SolarGlobe;');
  const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
  const host={Cesium:{},setTimeout:()=>1,clearTimeout(){},addEventListener(){},removeEventListener(){}};
  const ui=createWorkspaceGlobe({dataset:{}},{},{addEventListener(){},removeEventListener(){}},host),seen=[],remove=ui.observeDisplayContext(v=>seen.push(v));
@@ -28,7 +28,7 @@ test('shared globe gates UTC/revision/hash, clears during requests, and disposes
     setViewStyle(){}setViewImagery(){return Promise.resolve(true);}setViewMode(){return Promise.resolve(true);}
     focus(){}destroy(){this.destroyCount=(this.destroyCount||0)+1;}
   };
-  const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.TestGlobe;');
+  const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href)).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.TestGlobe;');
   const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
   const host={Cesium:{SingleTileImageryProvider:{fromUrl:()=>new Promise(()=>{})}},setTimeout:()=>1,clearTimeout(){},addEventListener(){},removeEventListener(){}};
   const container={dataset:{}},status={},button={addEventListener(){},removeEventListener(){}};
@@ -45,7 +45,7 @@ test('shared globe gates UTC/revision/hash, clears during requests, and disposes
   }finally{delete globalThis.TestGlobe;}
 });
 test('missing Cesium reports unavailable without a synthetic marker',async()=>{
-  const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace(/import \{OrbitGlobe\} from [^;]+;/,'class OrbitGlobe {constructor(){throw new Error("must not construct");}}');
+  const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href)).replace(/import \{OrbitGlobe\} from [^;]+;/,'class OrbitGlobe {constructor(){throw new Error("must not construct");}}');
   const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
   let load;
   const host={setTimeout:()=>1,clearTimeout(){},addEventListener:(name,fn)=>{load=fn;},removeEventListener(){}};

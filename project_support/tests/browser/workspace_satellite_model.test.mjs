@@ -13,7 +13,7 @@ async function fixture(){
   clearSatelliteModel(){calls.push(['clear']);this.modelLayer.tracking=false;}
   setViewMode(){return Promise.resolve(true);}setViewStyle(){}setViewImagery(){return Promise.resolve(true);}update(){return false;}setGroundPoint(){}destroy(){calls.push(['destroy']);}
  };
- const code=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.ModelRenderer;');
+ const code=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href)).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.ModelRenderer;');
  const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(code+'\n//'+sequence++).toString('base64')}`);
  const container={dataset:{}},status={},button={addEventListener(){},removeEventListener(){}};
  const host={setTimeout:()=>1,clearTimeout(){},addEventListener:(k,fn)=>listeners.set(k,fn),removeEventListener:k=>listeners.delete(k)};

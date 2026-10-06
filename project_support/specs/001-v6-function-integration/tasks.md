@@ -161,7 +161,7 @@ Dependency T070→T071→T072→T073→T074. W08/F001/F002/F004~6/T032/W06 저�
 - [ ] T081 [HIGH] 기존PoC정의/runner/공유SIM시계/단계동작/KPI결과를 재사용하여 run/composer/compare에 연결; C002~6후의존성/명시실행/중복명령·복원·GPUTC분리 회귀검증 — FR-008, FR-015; plan: W05/W08 run/composer/compare (partial; C007). 근거: legacy_function_audit.md.
 - [ ] T082 [HIGH] 기존확인된source/selected IDs/SIM상태/임무/통신/데이터 결과를 주입하는 화면간계약을작성하고 예시와실값을구분해 공유맥락·인계·실패·원격초안·Viewer1 검증; source없는시설모델은발명하지않음 — FR-008; plan: W08 all V6 screens (partial; C009). 근거: legacy_function_audit.md.
 - [ ] T083 [MEDIUM] 기존모듈설정/ICD목록/probe를 communication외부경계에가두어 설정흐름에 연결; TCPconnect/UDP주소해석/내장생존 의미구분, 임의엔드포인트자동probe없이명시조회·오류 회귀검증 — FR-008; plan: W08/W09 settings (missing; C008). 근거: legacy_function_audit.md.
-- [ ] T084 [MEDIUM] 기존CSV/JSON다운로드를 실제브라우저에서 끝까지 확인하고 저장한파일bytes/단위/출처를 서버응답과대조; 완료확인불가면미확인유지 — SC-014; T066/plan: W06 (partial; C010). 근거: legacy_function_audit.md.
+- [x] T084 [MEDIUM] 기존CSV/JSON다운로드를 실제브라우저에서 끝까지 확인하고 저장한파일bytes/단위/출처를 서버응답과대조; 완료확인불가면미확인유지 — SC-014; T066/plan: W06. 실제 Chrome 두 파일/동일 HTTP 원시 응답 SHA 일치; 근거: validation/t084_chrome_file_bytes.md, legacy_function_audit.md.
 
 위 목록은 구현 완료가 아닌 확인된 gap이다. 기존T001~T074 및 보류T032를 고치거나 다시번호붙이지않는다. 각묶음은 원본golden→상세계약/spec/plan/tasks→V6조립→전체회귀/실제두해상도→Draft리뷰로 세분화 후 진행한다. 추천 첫범위 T075 위성카탈로그↔공용지구, 이어 T076 위성노드. T077은노드/지상국계약,T078은노드/통신,T079는배치/데이터모듈,T080은보안계약,T081은이들모듈후,T082는완료기능부터순차,T083·T084는독립가능. 새구현은이번대조작업에서시작하지않는다.
 

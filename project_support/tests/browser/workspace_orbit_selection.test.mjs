@@ -16,6 +16,14 @@ test('empty UI choice restores server selection without clearing its result or s
     // Model composition has dedicated real-assembly tests; this fixture isolates
     // the unchanged stored-orbit select handler and its no-command assertion.
     .replace(/import \{createMissionServices\} from [^;]+;/,'const createMissionServices=()=>({destroy(){}});')
+    .replace(/import \{createSourceDataPanel\} from [^;]+;/,'const createSourceDataPanel=()=>({show(){},destroy(){}});')
+    .replace(/import \{createSourceSecurityPanel\} from [^;]+;/,'const createSourceSecurityPanel=()=>({show(){},updateTelemetry(){},updateSocket(){},destroy(){}});')
+    .replace(/import \{createSourceSettingsPanel\} from [^;]+;/,'const createSourceSettingsPanel=()=>({show(){},destroy(){}});')
+    .replace(/import \* as dataViewModel from [^;]+;/,'const dataViewModel={};')
+    .replace(/import \{createWorkspaceScenario\} from [^;]+;/,'const createWorkspaceScenario=()=>({runner:{},destroy(){}});')
+    .replace(/import \{createSourceScenarioPanel\} from [^;]+;/,'const createSourceScenarioPanel=()=>({show(){},destroy(){}});')
+    .replace(/import \{createScenarioAssembly\} from [^;]+;/,'const createScenarioAssembly=()=>({});')
+    .replace(/import \* as scenarioKpi from [^;]+;/,'const scenarioKpi={};')
     .replace(/import \{createSourceMissionPanel\} from [^;]+;/,'const createSourceMissionPanel=()=>({show(){},update(){},destroy(){}});')
     .replace(/import \{createMissionTypes\} from [^;]+;/,'const createMissionTypes=()=>({});')
     .replace(/import \{createMissionConstraints\} from [^;]+;/,'const createMissionConstraints=()=>({});')
@@ -68,7 +76,7 @@ test('empty UI choice restores server selection without clearing its result or s
     .replace(/import \{createOrbitSelection\} from [^;]+;/,'const createOrbitSelection=()=>globalThis.testOrbitClient;')
     .replace(/import \{createWorkspacePlayback\} from [^;]+;/,'const createWorkspacePlayback=()=>({update(){},destroy(){}});')
     .replace(/import \{createSatelliteHover\} from [^;]+;/,'const createSatelliteHover=()=>({show(){},clear(){},destroy(){}});')
-    .replace(/import \{createWorkspaceGlobe\} from [^;]+;/,'const createWorkspaceGlobe=()=>({observeSatelliteHover(){return()=>{};},update(){},catalog(){},stations(){},selectStation(){},focusStation(){},destroy(){}});');
+    .replace(/import \{createWorkspaceGlobe\} from [^;]+;/,'const createWorkspaceGlobe=()=>({observeSatelliteHover(){return()=>{};},bindScenarioRuntime(){return()=>{};},update(){},catalog(){},stations(){},selectStation(){},focusStation(){},destroy(){}});');
   try {
     const ui=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
     ui.showWorkspaceOrbit('satellite');

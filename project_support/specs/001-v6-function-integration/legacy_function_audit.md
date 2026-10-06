@@ -34,7 +34,7 @@
 | C007 | partial | HIGH | PoC 시나리오 단계 실행·KPI | 단순 SIM control/scenario select/fault만연결; scenario catalogue2+advance1 API 및40기초기화/장애·복구/서비스·임무배정/KPI구간비교 runner 없음 | T081 |
 | C009 | partial | HIGH | V6 공용 맥락·화면 간 인계 | 패널 일부연결; wall/normal/scene/composer/initial/exception의 SAT-A/M-204/D-731/SCN및기한·사건·기록카드는예시로남음 | T082 |
 | C008 | missing | MEDIUM | 모듈 연결 설정·ICD 점검 | integration/probe1 API와내외부연결 topology/transport/endpoint/heartbeat/timeout/ICD목록 없음; HIL구성도와다른기능 | T083 |
-| C010 | partial | MEDIUM | 내보내기 디스크 저장 완료 검증 | 원본bytes/미리보기는검증됐지만 브라우저download완료가timeout이라 디스크저장완료 미확인 | T084 |
+| C010 | verified 2026-10-07 | MEDIUM | 내보내기 디스크 저장 완료 검증 | Chrome 실제 JSON/CSV 디스크 파일과 동일 HTTP 원시 응답 bytes/SHA 일치; 단위·SIM 출처 제한 보존. validation/t084_chrome_file_bytes.md | T084 |
 
 ## 소스 근거와 계약 진입점
 

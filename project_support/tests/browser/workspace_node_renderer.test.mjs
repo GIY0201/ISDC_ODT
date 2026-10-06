@@ -15,7 +15,7 @@ async function fixture({boot=true,displayUtc='2020-07-12T21:16:01Z'}={}){
   destroy(){this.destroyed=true;}
  };
  const source=await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8');
- const code=source.replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.NodeBoundGlobe;')+`\n// fixture ${++serial}`;
+ const code=source.replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href)).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.NodeBoundGlobe;')+`\n// fixture ${++serial}`;
  const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
  const host={...(boot?{Cesium:{}}:{}),performance:{now:()=>now},setTimeout:()=>1,clearTimeout(){},addEventListener:(name,fn)=>{if(name==='load')loads.push(fn);},removeEventListener(){}};
  const ui=createWorkspaceGlobe({dataset:{}},{},{addEventListener(){},removeEventListener(){}},host);

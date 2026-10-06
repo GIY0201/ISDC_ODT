@@ -55,6 +55,20 @@ async function missionWindowRequest(payload,{signal,contextHash}={}) {
 }
 
 export const api = {
+  securityDashboard: async ({signal}={}) => {
+    const response=await fetch('/api/security/dashboard',{cache:'no-store',signal});
+    const body=await response.json();
+    if(!response.ok){const error=new Error(body?.module?.detail||body?.detail||`보안 모듈 조회 실패 (${response.status})`);error.report=body;throw error;}
+    return body;
+  },
+  integrationProbe: (payload,{signal}={}) => request('/api/integration/probe',{method:'POST',headers:jsonHeaders,body:JSON.stringify(payload),signal}),
+  scenarios: ({signal}={}) => request('/api/scenarios',{signal}),
+  scenarioAdvance: (seconds,{signal}={}) => request('/api/scenario/advance',{method:'POST',headers:jsonHeaders,body:JSON.stringify({seconds}),signal}),
+  scenario: (id,{signal}={}) => request(`/api/scenarios/${encodeURIComponent(id)}`,{signal}),
+  dataDeploymentState: ({signal}={}) => request('/api/data-management/deployment',{signal}),
+  dataManagementDashboard: ({limit=200,after=0,...filters}={}, {signal}={}) => request(`/api/data-management/dashboard?${new URLSearchParams({limit,after,...Object.fromEntries(Object.entries(filters).filter(([,v])=>v!==''&&v!=null))})}`,{signal}),
+  dataManagementAction: (payload,{signal}={}) => request('/api/data-management/console/action',{method:'POST',headers:jsonHeaders,body:JSON.stringify(payload),signal}),
+  dataManagementRequest: (payload,{signal}={}) => request('/api/data-management/console/request',{method:'POST',headers:jsonHeaders,body:JSON.stringify(payload),signal}),
   nodeMissionContext: async (payload,{signal}={})=>{try{return await nodeRequest('/api/nodes/mission-context',payload,{signal});}catch(error){if(signal?.aborted)signal.throwIfAborted();throw error;}},
   nodeMissionWindows: missionWindowRequest,
   nodeSamples: (payload,options={}) => nodeRequest('/api/nodes/samples',payload,options),

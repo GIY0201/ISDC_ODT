@@ -48,6 +48,14 @@ import {createNetworkSnapshotModel} from '../../../digital_twin/simulation/brows
 // Execute the real window handlers and orbit assembly. Only DOM layout, HTTP,
 // Cesium and scheduling are adapters; expected bounds are acceptance criteria.
 import {createMissionServices} from '../../../user_application/web/scripts/missions/mission_services.js';
+import {createSourceDataPanel} from '../../../user_application/web/scripts/tabs/source_data.js';
+import {createSourceSecurityPanel} from '../../../user_application/web/scripts/tabs/source_security.js';
+import {createSourceSettingsPanel} from '../../../user_application/web/scripts/tabs/source_settings.js';
+import {createWorkspaceScenario} from '../../../user_application/web/scripts/scenario/workspace_adapter.js';
+import {createSourceScenarioPanel} from '../../../user_application/web/scripts/tabs/source_scenarios.js';
+import {createScenarioAssembly} from '../../../digital_twin/model_library/browser/scenario_assembly.js';
+import * as scenarioKpi from '../../../digital_twin/verification/browser/scenario_kpi.js';
+import * as dataViewModel from '../../../user_application/web/scripts/data_management/view_model.js';
 import {createSourceMissionPanel} from '../../../user_application/web/scripts/tabs/source_missions.js';
 import {createMissionTypes} from '../../../digital_twin/model_library/browser/mission_types.js';
 import {createMissionConstraints} from '../../../digital_twin/simulation/browser/mission_constraints.js';
@@ -57,7 +65,7 @@ const {createOrchestrationClient}=await import(`data:text/javascript;base64,${Bu
 const web=new URL('../../../user_application/web/scripts/',import.meta.url);
 const windowSource=(await readFile(new URL('workspace.js',web),'utf8')).replace(/^import .*;\r?\n/,'');
 const orbitSource=(await readFile(new URL('workspace_orbit.js',web),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/export function /g,'function ');
-const globeSource=(await readFile(new URL('workspace_globe.js',web),'utf8')).replace(/'\/static\/visualization\/orbit_globe\.js(?:\?[^']*)?'/,JSON.stringify(new URL('../../../digital_twin/visualization/orbit_globe.js',import.meta.url).href));
+const globeSource=(await readFile(new URL('workspace_globe.js',web),'utf8')).replace(/'\/static\/visualization\/orbit_globe\.js(?:\?[^']*)?'/,JSON.stringify(new URL('../../../digital_twin/visualization/orbit_globe.js',import.meta.url).href)).replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href));
 const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(globeSource).toString('base64')}`);
 const solarSource=(await readFile(new URL('workspace_solar.js',web),'utf8')).replace("'/static/visualization/solar_display.js'",JSON.stringify(new URL('../../../digital_twin/visualization/solar_display.js',import.meta.url).href)).replace("'./solar_timeline.js'",JSON.stringify(new URL('../../../user_application/web/scripts/solar_timeline.js',import.meta.url).href));
 const {createWorkspaceSolar}=await import(`data:text/javascript;base64,${Buffer.from(solarSource).toString('base64')}`);
@@ -117,7 +125,7 @@ export function fixture(width=1280,height=720,options={}){
   const state={revision:4,input_id:'tle',input_hash:'hash',current_utc:'2020-07-12T21:16:01.000416000Z',ground_point:{latitude_deg:33.4996,longitude_deg:126.5312,ellipsoid_height_m:0,virtual:true,ellipsoid:'WGS84'},minimum_elevation_deg:10,playing:false,play_rate:1,leap_sha256:LEAP_SHA256,eop_sha256:'eop',frame:'ITRF',profile:'WGS72_AFSPC'};
   const snapshot={inputs:[{input_id:'tle',satellite_id:'25544',format:'TLE',epoch_utc:state.current_utc,raw_sha256:'hash'}],state,result:{client_request_id:'buffer',leap_sha256:LEAP_SHA256,revision:4,input_id:'tle',input_hash:'hash',frame:'ITRF',rows:[{utc:state.current_utc,status:'valid',position_m:[1,2,3],elevation_deg:10}]},status:'ready',error:'',receivedAtMs:0};
   const client={destroy:()=>{clientDestroyed++;},snapshot:()=>structuredClone(snapshot),load:()=>jobs.push(()=>context.render()),samples:async()=>{queries++;},setGround:async(point,angle)=>{commands++;if(options.setGround)await options.setGround(point,angle);Object.assign(state,{ground_point:structuredClone(point),minimum_elevation_deg:angle,playing:false,revision:state.revision+1});snapshot.result=null;context.render();},refresh:async()=>{}};
-  const api={orbitVisibility:async p=>{queries++;return {...p,revision:p.selection_revision,query_start_utc:p.start_utc,query_end_utc:p.end_utc,input_hash:state.input_hash,eop_sha256:state.eop_sha256,leap_sha256:state.leap_sha256,frame:state.frame,profile:state.profile,communication_status:'unknown',status:'none',intervals:[],contacts:[],errors:[],stale:false};}};
+  const api={securityDashboard:options.securityDashboard??(async()=>{throw Error('security fixture unavailable');}),orbitVisibility:async p=>{queries++;return {...p,revision:p.selection_revision,query_start_utc:p.start_utc,query_end_utc:p.end_utc,input_hash:state.input_hash,eop_sha256:state.eop_sha256,leap_sha256:state.leap_sha256,frame:state.frame,profile:state.profile,communication_status:'unknown',status:'none',intervals:[],contacts:[],errors:[],stale:false};}};
   api.issReceiveProfile=options.rfProfileRequest??(async()=>{throw new Error('Profile transport not supplied by fixture');});
   api.satelliteModelManifest=options.satelliteModelManifest??(async()=>{throw new Error('Model manifest transport not supplied by fixture');});
   api.nodeSamples=options.nodeSamples??(async()=>{throw Error('Native node transport not supplied by fixture');});
@@ -139,7 +147,7 @@ export function fixture(width=1280,height=720,options={}){
   Object.assign(context,{createWorkspaceSolar:args=>createWorkspaceSolar({...args,host:win,createDisplay:()=>({setStyle(){},clear(){},update(){},destroy(){}})}),createSatelliteHover,createSatelliteModelPanel,createSatelliteModelSelection,createModelResolver,validateSatelliteManifest,createGlobeViewPanel,createCatalogTrack,createCatalogPasses,createCatalogPassPanel,createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
   // Imported ground UI uses the same adapted document as the VM assembly.
   Object.assign(context,{createBrowserId,createWorkspaceNodes,createNodeLibrary,orbitElements,catalogElements,nodeOisl,NodeScene,createSatelliteNodePanelTools,createNodeClockControls,createUtcCodec,LEAP_SHA256});
-  Object.assign(context,{createMissionServices,createSourceMissionPanel,createMissionTypes,createMissionConstraints,createOrchestrationClient,layoutTimeline,timelineMarkup,createGroundSegmentStore,createGroundNetworkPanel,createFabricExchange,createDataFabricClient,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
+  Object.assign(context,{createWorkspaceScenario,createSourceScenarioPanel,createScenarioAssembly,scenarioKpi,createSourceSettingsPanel,createSourceSecurityPanel,createSourceDataPanel,dataViewModel,createMissionServices,createSourceMissionPanel,createMissionTypes,createMissionConstraints,createOrchestrationClient,layoutTimeline,timelineMarkup,createGroundSegmentStore,createGroundNetworkPanel,createFabricExchange,createDataFabricClient,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
   globalThis.document=doc;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}

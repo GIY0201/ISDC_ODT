@@ -42,7 +42,7 @@ let rendererFixtureId=0;
 async function globeFixture(){
   let onError,destroyed=0,removed=0,throwFocus=false;
   const Renderer=class{constructor(){this.viewer={scene:{renderError:{addEventListener:fn=>{onError=fn;return()=>removed++;}}}};}update(value){return Boolean(value);}setViewStyle(){}setViewImagery(){return Promise.resolve(true);}setGroundPoint(){}focus(){if(throwFocus)throw new Error('context lost');}destroy(){destroyed++;}};
-  const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace(/import \{OrbitGlobe\} from [^;]+;/,`const OrbitGlobe=globalThis.RequestTestRenderer;`);
+  const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href)).replace(/import \{OrbitGlobe\} from [^;]+;/,`const OrbitGlobe=globalThis.RequestTestRenderer;`);
   globalThis.RequestTestRenderer=Renderer;
   const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(source+`
 // fixture ${++rendererFixtureId}`).toString('base64')}`);

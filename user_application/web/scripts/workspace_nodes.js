@@ -1,6 +1,6 @@
 import {createBrowserId} from './browser_identity.js';
 import {createConstellationStore,DRAFT_KEY} from './nodes/constellation.js';
-import {createNodeDisplayTimeline} from './nodes/node_timeline.js';
+import {createNodeDisplayTimeline,createNodeSampleBufferAsync,isNodeCommunicationState} from './nodes/node_timeline.js';
 import {createNodeOpticalTimeline} from './nodes/optical_timeline.js';
 import {createNodeLinkResolver} from './nodes/links.js';
 import {createNodeNetworkTimeline} from './nodes/network_timeline.js';
@@ -9,11 +9,11 @@ import {createNodeEditorTools} from './nodes/editor.js';
 import {createUtcCodec,LEAP_SHA256} from './orbit_utc.js';
 
 // Application composition only. Native buffers, source store and shared globe retain ownership.
-export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now,resolveModel,models,fetchImpl,clockActions={},readClock=()=>({}),onHover=()=>{},networkInputs=null}={}){
+export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements,catalogElements,oisl,Scene,tools,document,host,now,resolveModel,models,fetchImpl,clockActions={},readClock=()=>({}),onHover=()=>{},networkInputs=null,scenarioClock=null}={}){
  const codec=createUtcCodec(LEAP_SHA256),advanceUtc=codec.advance;
  let dead=false,started=false,root=null,panel=null,scene=null,display=null,deployment=null,activeSelection=false,selectedSignature=null,definitionsSignature=null,error='';
  let tracks=true,links=true,modelsVisible=true;const readiness=new Map(),removers=[];
- let restorePromise=null;
+ let restorePromise=null,scenarioReceipt=null;
  let reviewedRevision=null;
  const id=()=>createBrowserId(host.crypto);
  const report=value=>{if(dead)return;error=String(value?.message??value);refreshPanel();};
@@ -137,8 +137,48 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
    return dead?null:deployment.state;
   }).finally(()=>{restorePromise=null;refreshPanel();});refreshPanel();return restorePromise;
  }
+ function simUtc(){
+  const state=scenarioClock?.readRuntime?.();
+  if(!state||state.mode!=='SIM'||typeof state.run_id!=='string'||!state.run_id||typeof state.running!=='boolean'||!Number.isFinite(state.elapsed_seconds)||state.elapsed_seconds<0||!state.started_at)throw Error('실제 SIM owner 상태를 확인하세요.');
+  return codec.advance(typeof scenarioClock.utcOfRuntime==='function'?scenarioClock.utcOfRuntime(state):codec.advance(state.started_at,state.elapsed_seconds),0);
+ }
+ function scenarioReady(){
+  if(dead||!started||!store.loaded||store.error||deployment.state.server===null||deployment.state.busy||deployment.state.syncRequired||deployment.state.error)throw Error('기존 노드 초안과 서버 배치 조회를 먼저 확인하세요.');
+  if(!scenarioClock||['readRuntime','setDisplayUtc','clearDisplayUtc'].some(k=>typeof scenarioClock[k]!=='function'))throw Error('공용 SIM 표시 owner 연결이 없습니다.');
+  simUtc();
+ }
+ async function preflightSimScenario({definition,nodes}={}){
+  scenarioReady();const before=JSON.stringify(store.snapshot()),runtime=scenarioClock.readRuntime(),run=runtime.run_id;
+  if(!definition?.id||!Array.isArray(nodes)||nodes.length<1||nodes.length>240||nodes.some(n=>library.validateNode(n).length))throw Error('원본 시나리오 노드 정의를 확인하세요.');
+  const utc=simUtc(),request={request_id:id()+'-scenario-preflight',nodes:structuredClone(nodes),start_utc:utc,count:1,step_seconds:1};
+  const reply=await api.nodeSamples(request);
+  const buffer=await createNodeSampleBufferAsync(request,reply,{yieldControl:()=>new Promise(resolve=>host.setTimeout(resolve,0))});
+  if(dead||JSON.stringify(store.snapshot())!==before||scenarioClock.readRuntime().run_id!==run)throw Error('시나리오 검토 중 현재 실행 또는 초안이 바뀌었습니다.');
+  if(nodes.some(node=>!buffer.communicationStateFor(node,{utc})))throw Error('원본 시나리오 전체 노드의 native 입력을 검증하지 못했습니다.');
+  return true;
+ }
+ async function prepareSimUtc(value){
+  scenarioReady();const runtime=scenarioClock.readRuntime(),utc=codec.advance(value,0);
+  if(runtime.running!==false)throw Error('native SIM 입력 검증 전에 실제 SIM을 정지하세요.');
+  if(utc!==simUtc())throw Error('요청 UTC가 현재 실제 SIM UTC와 다릅니다.');
+  if(!store.deploymentConfirmed||store.deployed.length===0||store.isDirty()||deployment.state.server.run_id!==runtime.run_id)throw Error('현재 SIM 실행의 수락 배치 roster를 먼저 확인하세요.');
+  const definitions=store.deployed,scope=JSON.stringify(definitions),accepted=JSON.stringify(deployment.state.server);
+  if(await scenarioClock.setDisplayUtc({run_id:runtime.run_id,utc,leap_sha256:LEAP_SHA256})!==true)throw Error('공용 SIM 표시 UTC가 수락되지 않았습니다.');
+  const authoritative=typeof globe.displayContext==='function'?globe.displayContext():display;
+  if(authoritative?.key!=='sim:'+runtime.run_id||authoritative.utc!==utc)throw Error('공용 표시 owner가 현재 SIM UTC와 일치하지 않습니다.');
+  await timeline.observe(utc);const result=await timeline.requestCommunicationStates(utc);
+  if(dead||scenarioClock.readRuntime().running!==false||simUtc()!==utc||JSON.stringify(store.deployed)!==scope||JSON.stringify(deployment.state.server)!==accepted||JSON.stringify(result.node_definitions)!==scope||result.states.length!==definitions.length||result.states.some(([nodeId,state],i)=>nodeId!==definitions[i].id||!isNodeCommunicationState(state,{node:definitions[i],utc})))throw Error('native SIM 입력 수락 중 UTC 또는 배치 정의가 바뀌었습니다.');
+  await optical.update();
+  scenarioReceipt=structuredClone({run_id:runtime.run_id,utc,nodes:definitions,deployment:deployment.state.server,states:result.states});
+  return structuredClone(scenarioReceipt);
+ }
+ function verifySimUtc(receipt,value){
+  try{scenarioReady();const utc=codec.advance(value,0),runtime=scenarioClock.readRuntime();return JSON.stringify(receipt)===JSON.stringify(scenarioReceipt)&&runtime.running===false&&receipt?.run_id===runtime.run_id&&receipt.utc===utc&&utc===simUtc()&&(typeof globe.displayContext==='function'?globe.displayContext():display)?.key==='sim:'+runtime.run_id&&(typeof globe.displayContext==='function'?globe.displayContext():display)?.utc===utc&&store.deploymentConfirmed&&!store.isDirty()&&JSON.stringify(receipt.nodes)===JSON.stringify(store.deployed)&&JSON.stringify(receipt.deployment)===JSON.stringify(deployment.state.server)&&receipt.states.length===receipt.nodes.length&&receipt.states.every(([id,state],i)=>id===receipt.nodes[i].id&&isNodeCommunicationState(state,{node:receipt.nodes[i],utc}));}catch{return false;}
+ }
+ const scenarioPorts=Object.freeze({store,deployment,nodeLibrary:library,preflightSimScenario,prepareSimUtc,verifySimUtc,simUtc,releaseDisplay(){const runtime=scenarioClock?.readRuntime?.();return runtime?scenarioClock?.clearDisplayUtc?.(runtime.run_id)??false:false;}});
  return Object.freeze({
   async start(){if(dead||started)return;started=true;return retryRestore();},retryRestore,
+  scenarioPorts:()=>scenarioPorts,
   show,refresh:refreshPanel,refreshModels,sceneSnapshot,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
   missionInputs(){
    const state=deployment.state;
@@ -153,6 +193,6 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   networkSnapshot:()=>dead?null:network?.snapshot()??null,
   verifyNetworkSnapshot:value=>!dead&&network?.verifySnapshot(value)===true,
   clearNetwork:()=>{if(!dead)network?.clear();},
-  destroy(){if(dead)return;dead=true;try{onHover(null);}catch{/* Scoped presentation cleanup. */}for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();network?.destroy();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
+  destroy(){if(dead)return;dead=true;scenarioReceipt=null;try{onHover(null);}catch{/* Scoped presentation cleanup. */}for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();network?.destroy();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
  });
 }

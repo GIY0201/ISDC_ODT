@@ -1,4 +1,12 @@
 import {createMissionServices} from './missions/mission_services.js';
+import {createSourceDataPanel} from './tabs/source_data.js';
+import {createSourceSecurityPanel} from './tabs/source_security.js';
+import {createSourceSettingsPanel} from './tabs/source_settings.js';
+import {createWorkspaceScenario} from './scenario/workspace_adapter.js';
+import {createSourceScenarioPanel} from './tabs/source_scenarios.js';
+import {createScenarioAssembly} from '/static/model_library/scenario_assembly.js';
+import * as scenarioKpi from '/static/scenario_verification/scenario_kpi.js';
+import * as dataViewModel from './data_management/view_model.js';
 import {createSourceMissionPanel} from './tabs/source_missions.js';
 import {createMissionTypes} from '/static/model_library/mission_types.js';
 import {createMissionConstraints} from '/static/simulation/mission_constraints.js';
@@ -66,6 +74,13 @@ let satelliteHover=null;
 let nodeWorkspace=null;
 let groundNetworkPanel=null;
 let nodeClock=null;
+const simUtcCodec=createUtcCodec(LEAP_SHA256);
+function simRuntimeUtc(runtime){
+  const start=Date.parse(runtime?.started_at),elapsed=runtime?.elapsed_seconds;
+  if(runtime?.mode!=='SIM'||!Number.isFinite(start)||!Number.isFinite(elapsed)||elapsed<0)throw Error('실제 SIM UTC 입력이 없습니다.');
+  return simUtcCodec.advance(new Date(start+elapsed*1000).toISOString(),0);
+}
+const scenarioClockPorts={readRuntime:()=>simPanel.controller.snapshot().runtime,utcOfRuntime:simRuntimeUtc,setDisplayUtc:value=>globe.setScenarioDisplayContext(value),clearDisplayUtc:runId=>globe.clearScenarioDisplayContext(runId)};
 function renderSatelliteHover(payload,C,kind='gp'){
   if(!satelliteHover&&payload&&C)satelliteHover=createSatelliteHover(document.getElementById('stored-orbit-globe'),C);
   if(payload)satelliteHover?.show(payload);else satelliteHover?.clear(kind);
@@ -100,12 +115,15 @@ let groundStorage=null;const groundStoragePort={getItem:key=>window.localStorage
 try{if(window.localStorage)groundStorage=groundStoragePort;}catch{groundStorage=groundStoragePort;}
 const sourceGround=createGroundSegmentStore({model:sourceStationModel,storage:groundStorage});sourceGround.load();
 const sourceNetworkModel=createNetworkSnapshotModel({library:nodeLibrary,oisl:nodeOisl,groundLinks:createGroundLinkModel({library:nodeLibrary,stationModel:sourceStationModel})});
-nodeClock=createNodeClockControls({readContext:()=>nodeWorkspace?.snapshot().display,stored:client,catalog:catalogTimeline,advanceUtc:createUtcCodec(LEAP_SHA256).advance,now:()=>Date.now(),runStored:command});
-nodeWorkspace=createWorkspaceNodes({api,globe,solar,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window),readClock:context=>nodeClock.read(context),clockActions:nodeClock.actions,onHover:payload=>renderSatelliteHover(payload,window.Cesium,'source_node'),networkInputs:{model:sourceNetworkModel,validateStation:sourceStationModel.validateStation,readStations:()=>{if(!sourceGround.ready||groundNetworkPanel?.hasExternalChange())throw Error('지상국 설정을 다시 확인하세요.');return sourceGround.stations;},readFaults:()=>{const state=simPanel.controller.snapshot();if(!state.runtime||state.error)throw Error(state.error||'SIM 상태 미확인');return state.runtime.active_faults;},onChange:()=>groundNetworkPanel?.update()}});
+nodeClock=createNodeClockControls({readContext:()=>nodeWorkspace?.snapshot().display,stored:client,catalog:catalogTimeline,advanceUtc:createUtcCodec(LEAP_SHA256).advance,now:()=>Date.now(),runStored:command,scenario:scenarioClockPorts});
+nodeWorkspace=createWorkspaceNodes({api,globe,solar,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window),readClock:context=>nodeClock.read(context),clockActions:nodeClock.actions,scenarioClock:scenarioClockPorts,onHover:payload=>renderSatelliteHover(payload,window.Cesium,'source_node'),networkInputs:{model:sourceNetworkModel,validateStation:sourceStationModel.validateStation,readStations:()=>{if(!sourceGround.ready||groundNetworkPanel?.hasExternalChange())throw Error('지상국 설정을 다시 확인하세요.');return sourceGround.stations;},readFaults:()=>{const state=simPanel.controller.snapshot();if(!state.runtime||state.error)throw Error(state.error||'SIM 상태 미확인');return state.runtime.active_faults;},onChange:()=>groundNetworkPanel?.update()}});
 void nodeWorkspace.start().then(()=>nodeWorkspace.show(view));
 void modelSelection.load().then(()=>nodeWorkspace.refreshModels());
 const hilPanel=createHilPanel(api,hilTopology,drawSparkline);
-const simPanel=createSimPanel(api,telemetrySocket,values=>missionPanel.controller.receiveMissions(values),{frame:value=>{kpiPanel.receive(value);hilPanel.receive(value);},status:value=>{kpiPanel.connection(value);hilPanel.connection(value);}});
+let sourceSecurityPanel=null,sourceSettingsPanel=null;
+const simPanel=createSimPanel(api,telemetrySocket,values=>missionPanel.controller.receiveMissions(values),{frame:value=>{kpiPanel.receive(value);hilPanel.receive(value);sourceSecurityPanel?.updateTelemetry(value);},status:value=>{kpiPanel.connection(value);hilPanel.connection(value);sourceSecurityPanel?.updateSocket(value);sourceSettingsPanel?.update();}});
+sourceSecurityPanel=createSourceSecurityPanel({api,document,host:window});
+const removeScenarioRuntime=globe.bindScenarioRuntime(scenarioClockPorts.readRuntime,simRuntimeUtc);
 const fabric=createFabricExchange({client:createDataFabricClient({fetchImpl:window.fetch.bind(window),storage:{getItem:key=>window.localStorage.getItem(key)},protocol:window.location?.protocol||'http:'}),network:nodeWorkspace,clientId:createBrowserId(window.crypto),onChange:()=>groundNetworkPanel?.update()});
 groundNetworkPanel=createGroundNetworkPanel({store:sourceGround,model:sourceStationModel,network:nodeWorkspace,fabric,document,host:window,refreshRuntime:async()=>{await simPanel.controller.load();const state=simPanel.controller.snapshot();if(!state.runtime||state.error)throw Error(state.error||'SIM 상태 미확인');}});
 const missionTypes=createMissionTypes(nodeLibrary);
@@ -113,6 +131,12 @@ const missionModule=createOrchestrationClient({fetchImpl:window.fetch.bind(windo
 let sourceMissionPanel=null;const missionClientId=createBrowserId(window.crypto);let missionCounter=0;
 const missionServices=createMissionServices({api,nodes:nodeWorkspace,ground:{get ready(){return sourceGround.ready&&!groundNetworkPanel?.hasExternalChange()&&!sourceMissionPanel?.hasExternalChange();},get enabled(){return sourceGround.enabled;}},readRuntime:()=>{const s=simPanel.controller.snapshot();if(!s.runtime||s.error)throw Error(s.error||'SIM 상태 미확인');return s.runtime;},module:{...missionModule,status:async options=>{await simPanel.controller.load();return missionModule.status(options);}},readExternal:()=>{const s=catalogTimeline.snapshot();return !s.pending&&!s.error?s.selected:null;},library:nodeLibrary,groundLinks:createGroundLinkModel({library:nodeLibrary,stationModel:sourceStationModel}),model:missionTypes,constraints:createMissionConstraints({timeOf:missionTypes.timeOf}),codec:createUtcCodec(LEAP_SHA256),storage:groundStorage,nextRequestId:()=>`${missionClientId}:${++missionCounter}`,onChange:()=>sourceMissionPanel?.update()});
 sourceMissionPanel=createSourceMissionPanel({services:missionServices,model:missionTypes,layoutTimeline,timelineMarkup,document,host:window});
+const sourceDataPanel=createSourceDataPanel({api,model:dataViewModel,document,host:window,drawSparkline});
+sourceSettingsPanel=createSourceSettingsPanel({document,host:window,storage:groundStorage,probe:(body,options)=>api.integrationProbe(body,options),readSocket:()=>simPanel.controller.snapshot().connection});
+let sourceScenarioPanel=null;
+const scenarioWorkspace=createWorkspaceScenario({api,nodeWorkspace,ground:sourceGround,missionServices,fabric,simController:simPanel.controller,nodeLibrary,missionTypes,stationModel:sourceStationModel,assemblyFactory:createScenarioAssembly,kpi:scenarioKpi,storage:groundStorage,onChange:()=>sourceScenarioPanel?.update(),switchTab:tab=>openWorkspaceView({nodes:'satellite',orbit:'satellite',communication:'ground',missions:'mission',data_management:'data',security:'security'}[tab]??tab)});
+sourceScenarioPanel=createSourceScenarioPanel({runner:scenarioWorkspace.runner,comparisonRows:scenarioKpi.comparisonRows,document,host:window});
+window.addEventListener('pagehide',event=>{if(!event.persisted){sourceDataPanel.destroy();sourceSecurityPanel.destroy();sourceSettingsPanel.destroy();sourceScenarioPanel.destroy();scenarioWorkspace.destroy();removeScenarioRuntime();}});
 const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   displayUtc=utc;displayElevation=row?`${row.elevation_deg.toFixed(4)}°`:'자료 준비 중 / 위치 미표시';globe.update(error?{...snapshot,status:'error',error}:snapshot,row,utc);
   const clock=document.getElementById('orbit-display-utc');if(clock)clock.textContent=utc||'미선택';
@@ -161,7 +185,7 @@ function render(){
   panel.querySelector('#orbit-seek').addEventListener('click',()=>{const field=panel.querySelector('#orbit-utc'),utc=field.value.trim();delete field.dataset.dirty;command(()=>client.seek(utc));});
   panel.querySelector('#orbit-epoch').addEventListener('click',()=>{delete panel.querySelector('#orbit-utc').dataset.dirty;command(()=>client.seek(record.epoch_utc));});
 }
-export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);globeViewPanel.show(view);modelPanel.show(view);nodeWorkspace?.show(view);groundNetworkPanel?.show(view);sourceMissionPanel?.show(view);}
+export function showWorkspaceOrbit(currentView){view=currentView;if(['settings','security','composer'].includes(view))simPanel.controller.connect();groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);globeViewPanel.show(view);modelPanel.show(view);nodeWorkspace?.show(view);groundNetworkPanel?.show(view);sourceMissionPanel?.show(view);sourceDataPanel.show(view);sourceSecurityPanel.show(view);sourceSettingsPanel.show(view);sourceScenarioPanel.show(view);}
 client.load();
 
 export function applyWorkspaceDraft(items,remote=false){

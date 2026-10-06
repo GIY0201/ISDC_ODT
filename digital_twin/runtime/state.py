@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import uuid
-from collections import deque
+from collections import deque, OrderedDict
 from copy import deepcopy
 from datetime import datetime, timezone
 from typing import Any
@@ -44,6 +44,7 @@ class RuntimeState:
         self.current_telemetry: dict[str, Any] = {}
         self._data_deployment = {"deployment_id": None, "revision": 0, "nodes": []}
         self._mission_context = None
+        self._mission_context_proofs = OrderedDict()
         self._deployment_ids: set[str] = set()
         self._data_scope_started_s = self.elapsed_seconds
         self._refresh_telemetry()
@@ -88,7 +89,7 @@ class RuntimeState:
         self.started_at=started;self.faults=[];self._missions.items=candidate['missions'];self.devices=candidate['devices'];self.events=deque(events,maxlen=200)
         self._data_deployment={k:deepcopy(deployment[k]) for k in ('deployment_id','revision','nodes')}
         self._deployment_ids={identifier} if identifier is not None else set()
-        self._data_scope_started_s=self.elapsed_seconds;self._mission_context=None;self._refresh_telemetry()
+        self._data_scope_started_s=self.elapsed_seconds;self._clear_mission_context();self._refresh_telemetry()
 
     @property
     def missions(self) -> list[dict]:
@@ -153,12 +154,25 @@ class RuntimeState:
             self._data_deployment = {key: deepcopy(candidate[key]) for key in ("deployment_id", "revision", "nodes")}
             self._deployment_ids.add(candidate["deployment_id"])
             self._data_scope_started_s = self.elapsed_seconds
+            self._clear_mission_context()
             return self.data_deployment()
+
+    def _clear_mission_context(self) -> None:
+        self._mission_context = None
+        self._mission_context_proofs.clear()
+
+    @staticmethod
+    def _mission_physical_scope(value: dict) -> dict:
+        # Module sequence/hash describe approval metadata, not different physical inputs.
+        # Every other field, including full nodes/stations/external provenance and
+        # module instance, must remain identical for past proof reuse.
+        return {key: item for key, item in value.items() if key not in ("context_hash", "module_sequence")}
 
     def mission_context(self) -> dict | None:
         """Accepted static analysis inputs, not another running clock or position owner."""
         value = self._mission_context
         if value is None or value["deployment"] != self.data_deployment() or value["faults"] != self.status()["active_faults"]:
+            self._clear_mission_context()
             return None
         return deepcopy(value)
 
@@ -167,15 +181,27 @@ class RuntimeState:
         async with self._lock:
             if value["deployment"] != self.data_deployment() or value["faults"] != self.status()["active_faults"]:
                 raise MissionPlanningConflict("mission deployment or faults changed during native verification")
-            self._mission_context = deepcopy(value)
-            return deepcopy(value)
+            current = self.mission_context()
+            if current is None or self._mission_physical_scope(current) != self._mission_physical_scope(value):
+                self._mission_context_proofs.clear()
+            accepted = deepcopy(value)
+            # Bounded past immutable approval evidence owned by this same runtime.
+            # FIFO eviction requires explicit reapproval of the evicted proof; never fallback.
+            self._mission_context_proofs[accepted["context_hash"]] = deepcopy(accepted)
+            while len(self._mission_context_proofs) > 64:
+                self._mission_context_proofs.popitem(last=False)
+            self._mission_context = accepted
+            return deepcopy(accepted)
 
     async def with_mission_context(self, expected_hash: str, consume, *, abort=False):
         from foundation.mission_planning_errors import MissionPlanningConflict
         async with self._lock:
             accepted = self.mission_context()
-            if not abort and (accepted is None or accepted["context_hash"] != expected_hash):
-                raise MissionPlanningConflict("accepted native mission context changed or missing")
+            if not abort:
+                proof = self._mission_context_proofs.get(expected_hash)
+                if accepted is None or proof is None or self._mission_physical_scope(proof) != self._mission_physical_scope(accepted):
+                    raise MissionPlanningConflict("accepted native mission context changed or missing")
+                accepted = proof
             return await consume(deepcopy(accepted))
 
     async def with_data_deployment(self, consume):
@@ -240,6 +266,7 @@ class RuntimeState:
             elif fault.get("active", True):
                 fault["active"] = False
                 self._emit("fault.cleared", "info", f"{fault['target']} 장애 해제", fault)
+        if self.faults != active:self._clear_mission_context()
         self.faults = active
 
     async def control(self, action: str, speed: float | None = None) -> dict:
@@ -257,6 +284,7 @@ class RuntimeState:
                 self.faults.clear()
                 self.run_id = f"RUN-{uuid.uuid4().hex[:12].upper()}"
                 self.started_at = datetime.now(timezone.utc)
+                self._clear_mission_context()
             elif action == "step":
                 self.running = False
                 self.elapsed_seconds += max(self.speed, 1.0)
@@ -281,8 +309,22 @@ class RuntimeState:
             self.faults.clear()
             self.run_id = f"RUN-{uuid.uuid4().hex[:12].upper()}"
             self.started_at = datetime.now(timezone.utc)
+            self._clear_mission_context()
             self._emit("scenario.loaded", "info", f"{scenario_id} 시나리오 로드")
             return self.status()
+
+    async def advance(self, seconds: float) -> dict:
+        """Move the simulation clock forward (never backward): the scenario player's skip."""
+        if not (0 < float(seconds) <= 3600):
+            raise ValueError("시계 전진은 0초 초과 3600초 이하만 가능합니다.")
+        async with self._lock:
+            self.elapsed_seconds += float(seconds)
+            self.sequence += 1
+            self._expire_faults()
+            self._refresh_telemetry()
+            self._emit("runtime.advance", "info", f"시계 {float(seconds):g}초 전진", {"seconds": float(seconds)})
+            return self.status()
+
 
     async def inject_fault(self, request: dict) -> dict:
         async with self._lock:
@@ -294,6 +336,7 @@ class RuntimeState:
                 "expires_at": self.elapsed_seconds + request["duration_seconds"],
             }
             self.faults.append(fault)
+            self._clear_mission_context()
             self._emit("fault.injected", "warning", f"{fault['target']} · {fault['kind']}", fault)
             return deepcopy(fault)
 

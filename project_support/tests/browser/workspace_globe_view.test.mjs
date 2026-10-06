@@ -3,7 +3,7 @@ let sequence=0;
 async function fixture(){
  const renderers=[],listeners=new Map(),calls=[];
  globalThis.ViewRenderer=class{constructor(C,node,options){this.options=options;this.viewer={scene:{renderError:{addEventListener:()=>()=>{}}}};renderers.push(this);}setViewMode(mode){calls.push(['mode',mode]);return Promise.resolve(true);}setViewStyle(...value){calls.push(['style',...value]);}setViewImagery(mode){calls.push(['imagery',mode]);return Promise.resolve(true);}update(){return false;}setGroundPoint(){}destroy(){calls.push(['destroy']);}};
- const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.ViewRenderer;');
+ const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_globe.js',import.meta.url),'utf8')).replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href)).replace(/import \{OrbitGlobe\} from [^;]+;/,'const OrbitGlobe=globalThis.ViewRenderer;');
  const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(source+'\n//'+sequence++).toString('base64')}`);
  const container={dataset:{}},status={},button={addEventListener(){},removeEventListener(){}};
  const host={setTimeout:()=>1,clearTimeout(){},addEventListener:(name,fn)=>listeners.set(name,fn),removeEventListener:name=>listeners.delete(name)};
