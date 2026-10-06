@@ -8,6 +8,34 @@ import {NODE_COMMUNICATION_METADATA} from '../../../user_application/web/scripts
 import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
 import {fixture as actualWorkspaceFixture} from './workspace_fixture.mjs';
 
+for(const [width,height] of [[1280,720],[1920,1080]])test(`accepted receipt with denied local persistence preserves drafts and identical reviewed retry ${width}x${height}`,async()=>{
+ const records=new Map(),posts=[];let deny=false,server={revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]};
+ const storage={getItem:key=>records.get(key)??null,setItem(key,value){if(deny&&key==='spacetwin-nodes-deployed-v1')throw Error('denied');records.set(key,value);}};
+ const f=actualWorkspaceFixture(width,height,{hash:'#scene',storage,fetch:async(url,options)=>{if(options.method==='GET')return{ok:true,json:async()=>structuredClone(server)};const p=JSON.parse(options.body);posts.push(p);server={revision:1,run_id:'fixture',scope_id:`fixture:deployment:${p.deployment_id}`,deployment_id:p.deployment_id,nodes:p.nodes};return{ok:true,json:async()=>structuredClone(server)};}});
+ try{
+  await new Promise(resolve=>setTimeout(resolve,10));await f.get('node-add').dispatch('click');const drafts=f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),before=new Map(records);deny=true;await f.get('nodes-deploy').dispatch('click');
+  for(let i=0;i<60&&f.evaluate('nodeWorkspace.snapshot().deployment.busy');i++)await new Promise(resolve=>setTimeout(resolve,2));
+  assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),drafts);assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().deployed'),[]);assert.deepEqual(records,before);assert.match(f.get('deploy-state').textContent,/저장/);assert.equal(f.get('nodes-reapply').disabled,false);
+  deny=false;await f.get('nodes-reapply').dispatch('click');for(let i=0;i<60&&f.evaluate('nodeWorkspace.snapshot().deployment.busy');i++)await new Promise(resolve=>setTimeout(resolve,2));
+  assert.deepEqual(posts[1],posts[0]);assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().deployed'),drafts);assert.equal(f.evaluate('nodeWorkspace.sceneSnapshot().deployment_confirmed'),true);await f.win.dispatch('pagehide',{persisted:false});
+ }finally{f.dispose();}
+});
+
+for(const failure of ['timeout','dispose'])test(`actual V6 ${failure} rejects a transport ignoring abort and its late accepted receipt`,async()=>{
+ const records=new Map(),timers=new Map(),posts=[];let sequence=0,resolveReply,signal;
+ const storage={getItem:key=>records.get(key)??null,setItem:(key,value)=>records.set(key,value)};
+ const empty={revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]};
+ const response=p=>({ok:true,json:async()=>({revision:1,run_id:'fixture',scope_id:`fixture:deployment:${p.deployment_id}`,deployment_id:p.deployment_id,nodes:p.nodes})});
+ const f=actualWorkspaceFixture(1280,720,{hash:'#satellite',storage,setTimeout:(fn,ms)=>{const id=++sequence;if(ms===15000)timers.set(id,fn);return id;},clearTimeout:id=>timers.delete(id),fetch:async(url,options)=>{if(options.method==='GET')return{ok:true,json:async()=>empty};const p=JSON.parse(options.body);posts.push(p);if(posts.length===1){signal=options.signal;return new Promise(resolve=>resolveReply=()=>resolve(response(p)));}return response(p);}});
+ try{
+  await new Promise(resolve=>setTimeout(resolve,10));await f.get('node-add').dispatch('click');const before=new Map(records),drafts=f.evaluate('nodeWorkspace.sceneSnapshot().drafts');await f.get('nodes-deploy').dispatch('click');for(let i=0;i<30&&!resolveReply;i++)await Promise.resolve();assert.ok(resolveReply);
+  if(failure==='timeout'){assert.equal(timers.size,1);[...timers.values()][0]();}else await f.win.dispatch('pagehide',{persisted:false});assert.equal(signal.aborted,true);resolveReply();for(let i=0;i<30;i++)await Promise.resolve();assert.deepEqual(records,before);assert.equal(timers.size,0);
+  if(failure==='timeout'){
+   assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),drafts);assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().deployed'),[]);assert.match(f.get('deploy-state').textContent,/시간 제한/);await f.get('nodes-deploy').dispatch('click');for(let i=0;i<30&&f.evaluate('nodeWorkspace.snapshot().deployment.busy');i++)await Promise.resolve();assert.deepEqual(posts[1],posts[0]);assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().deployed'),drafts);await f.win.dispatch('pagehide',{persisted:false});
+  }else assert.equal(f.evaluate('nodeWorkspace.sceneSnapshot()'),null);
+ }finally{f.dispose();}
+});
+
 test('actual conflicting server-only deployment can be explicitly recalled without creating a draft',async()=>{
  const server={revision:1,run_id:'fixture',scope_id:'fixture:deployment:other',deployment_id:'other',nodes:[{id:'NODE-1',name:'Server-only',mode:'nominal',equipment:[]}]};let posts=0;
  const f=actualWorkspaceFixture(1280,720,{hash:'#scene',fetch:async(url,options)=>{if(options.method==='GET')return{ok:true,json:async()=>server};posts++;const p=JSON.parse(options.body);assert.equal(p.expected_revision,1);assert.deepEqual(p.nodes,[]);return{ok:true,json:async()=>({revision:2,run_id:'fixture',scope_id:`fixture:deployment:${p.deployment_id}`,deployment_id:p.deployment_id,nodes:[]})};}});
