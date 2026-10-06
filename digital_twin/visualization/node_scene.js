@@ -11,7 +11,7 @@ export class NodeScene{
   constructor({viewer,cesium,timeSource,advanceUtc,geometryFor,pathFor,palette=()=>({}),tracksVisible=()=>true,isTransitioning=()=>false,onStatus=()=>{}}={}){
     if(typeof advanceUtc!=='function'||typeof geometryFor!=='function'||typeof pathFor!=='function')throw new TypeError('node scene native display dependencies required');
     Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,advanceUtc,geometryFor,pathFor,palette,tracksVisible,isTransitioning,onStatus});
-    this.models=new Map();this.descriptions=new Map();this.paths=new Map();this.selectedId=null;this.theme='dark';this.loadToken=0;this.modelsVisible=true;this.disposed=false;this.dataSource=null;this.dataSourceOwner=null;
+    this.models=new Map();this.descriptions=new Map();this.paths=new Map();this.points=new Map();this.labels=new Map();this.selectedId=null;this.hoveredId=null;this.visibleIds=null;this.sdcMode=false;this.theme='dark';this.loadToken=0;this.modelsVisible=true;this.disposed=false;this.dataSource=null;this.dataSourceOwner=null;this.markerOwner=null;this.pointCollection=null;this.labelCollection=null;
   }
   get viewer(){return typeof this.viewerProvider==='function'?this.viewerProvider():this.viewerProvider;}
   get cesium(){return typeof this.cesiumProvider==='function'?this.cesiumProvider():this.cesiumProvider;}
@@ -39,22 +39,62 @@ export class NodeScene{
     for(const id of [...this.models.keys()])if(!next.has(id))this.removeModel(id);
     for(const id of [...this.paths.keys()])if(!next.has(id))this.removePath(id);
     if(this.selectedId&&!next.has(this.selectedId))this.selectedId=null;
+    if(this.hoveredId&&!next.has(this.hoveredId))this.hoveredId=null;
+    this.reconcileMarkers();this.placePoints(this.timeSource?.());
     const loading=this.loadModels(),token=this.loadToken;await loading;if(!this.disposed&&token===this.loadToken)this.update(this.timeSource?.());
   }
+  reconcileMarkers(){
+    const C=this.cesium,viewer=this.viewer;if(!C?.PointPrimitiveCollection||!C.LabelCollection||!viewer?.scene?.primitives)return;
+    if(!this.pointCollection){this.markerOwner=viewer;this.pointCollection=viewer.scene.primitives.add(new C.PointPrimitiveCollection());this.labelCollection=viewer.scene.primitives.add(new C.LabelCollection());}
+    for(const id of [...this.points.keys()])if(!this.descriptions.has(id))this.removeMarker(id);
+    for(const [id,entry]of this.descriptions){
+      let point=this.points.get(id);if(!point){point=this.pointCollection.add({show:false,position:new C.Cartesian3(),pixelSize:this.basePointSize(),color:C.Color.fromCssColorString('#ff9f43'),outlineColor:C.Color.TRANSPARENT,outlineWidth:0,scaleByDistance:new C.NearFarScalar(1e6,1.35,5e8,.58),disableDepthTestDistance:0,id:{satelliteId:id,nodeId:id}});this.points.set(id,point);}
+      let label=this.labels.get(id);if(!label){label=this.labelCollection.add({position:point.position,text:'',font:'600 12px Segoe UI',fillColor:C.Color.WHITE,outlineColor:C.Color.fromCssColorString('#061528'),outlineWidth:3,style:C.LabelStyle.FILL_AND_OUTLINE,pixelOffset:new C.Cartesian2(0,-18),scaleByDistance:new C.NearFarScalar(1e6,1,8e7,.38),disableDepthTestDistance:0,show:false,id:{satelliteId:id,nodeId:id}});this.labels.set(id,label);}
+      label.text=String(entry.display_name??entry.definition.name??id);
+    }
+    this.refreshMarkerStyles();
+  }
+  basePointSize(){return this.descriptions.size>200?4.5:6.5;}
+  refreshMarkerStyles(){
+    const C=this.cesium;if(!C?.Color)return;const palette=this.palette(this.theme)||{};
+    for(const [id,point]of this.points){const entry=this.descriptions.get(id);if(!entry)continue;const selected=id===this.selectedId,hovered=id===this.hoveredId,base=this.basePointSize();
+      point.pixelSize=selected?Math.max(8,base*2.6):hovered?Math.max(7,base*2.2):base;
+      const css=selected?(palette.selected||(this.theme==='light'?'#d35400':'#efff62')):hovered?(palette.hover||(this.theme==='light'?'#1c2833':'#ffffff')):palette[String(entry.orbit_regime||'').toUpperCase()]||palette.fallback||(this.theme==='light'?'#c9651a':'#ff9f43');
+      const age=Number(entry.epoch_age_hours),baseAlpha=Number.isFinite(age)&&age>72 ? .68 : .98;
+      const alpha=this.sdcMode?1:baseAlpha*(this.selectedId&&this.selectedId!==id ? .65 : 1);
+      point.color=C.Color.fromCssColorString(css).withAlpha(selected||hovered?1:alpha);point.outlineWidth=0;
+      const label=this.labels.get(id);if(label)label.fillColor=selected?C.Color.fromCssColorString(palette.selected||(this.theme==='light'?'#d35400':'#efff62')):C.Color.WHITE;
+    }
+  }
+  placePoints(utc){
+    const C=this.cesium;if(!C?.Cartesian3)return;
+    for(const [id,point]of this.points){const label=this.labels.get(id),g=this.geometryAt(id,utc),visible=!!g&&(this.visibleIds===null||this.visibleIds.has(id)||id===this.selectedId);point.show=visible;if(label)label.show=visible;if(!g)continue;
+      const position=new C.Cartesian3(...g.row.position_m);point.position=position;if(label)label.position=position;
+    }
+  }
+  removeMarker(id){const point=this.points.get(id),label=this.labels.get(id);if(point)this.pointCollection?.remove(point);if(label)this.labelCollection?.remove(label);this.points.delete(id);this.labels.delete(id);}
+  setSdcMode(enabled){if(this.disposed)return;this.sdcMode=Boolean(enabled);this.refreshMarkerStyles();}
+  setHovered(id){if(this.disposed)return;this.hoveredId=id!=null&&this.descriptions.has(String(id))?String(id):null;this.refreshMarkerStyles();}
+  setVisibleNodes(ids=null){if(this.disposed)return;if(ids!==null&&!Array.isArray(ids))throw new TypeError('node visibility IDs must be an array or null');this.visibleIds=ids===null?null:new Set(ids.map(String));this.placePoints(this.timeSource?.());}
   modelKey(id){const d=this.descriptions.get(id)?.model;return d?.url?`${d.url}|${Number(d.scale)>0?d.scale:1}`:null;}
   async loadModels(){
     const C=this.cesium,viewer=this.viewer,token=++this.loadToken;if(!C?.Model?.fromGltfAsync||!viewer?.scene?.primitives)return;
     let count=this.models.size;
     for(const [id,entry]of this.descriptions){
       if(this.disposed||token!==this.loadToken)return;
-      const d=entry.model,key=this.modelKey(id),existing=this.models.get(id);if(existing?.key===key)continue;if(existing){this.removeModel(id);count--;}
+      const d=entry.model,key=this.modelKey(id),existing=this.models.get(id);if(existing?.key===key&&!existing.failed)continue;if(existing){this.removeModel(id);count--;}
       if(!key||count>=MAX_MODELS)continue;count++;let model;
       try{model=await C.Model.fromGltfAsync({url:d.url,id:{satelliteId:id},scale:Number(d.scale)>0?Number(d.scale):1,minimumPixelSize:Number(d.minimumPixelSize)||12,allowPicking:true,show:false,imageBasedLighting:this.ambientLighting(C)});}catch(e){this.status(id,'model_unavailable',String(e.message||e));continue;}
       if(this.disposed||token!==this.loadToken||viewer!==this.viewer||!this.descriptions.has(id)||this.modelKey(id)!==key){model.destroy?.();continue;}
-      this.models.set(id,{model:viewer.scene.primitives.add(model),owner:viewer,key,orientation:structuredClone(d.orientation||{})});this.status(id,'model_loaded');
+      const installed={model:viewer.scene.primitives.add(model),owner:viewer,key,orientation:structuredClone(d.orientation||{}),failed:false,removers:[]};this.models.set(id,installed);
+      const current=()=>!this.disposed&&this.models.get(id)===installed&&this.viewer===viewer;
+      const listen=(event,callback)=>{if(typeof event?.addEventListener!=='function')return;const remove=event.addEventListener(callback);if(typeof remove==='function')installed.removers.push(remove);else if(typeof event.removeEventListener==='function')installed.removers.push(()=>event.removeEventListener(callback));};
+      listen(model.readyEvent,()=>{if(current()&&!installed.failed)this.status(id,'model_ready');});
+      listen(model.errorEvent,error=>{if(!current())return;installed.failed=true;model.show=false;this.status(id,'model_unavailable',String(error?.message||error));});
+      this.status(id,'model_loaded');
     }
   }
-  removeModel(id){const entry=this.models.get(id);if(!entry)return;try{entry.owner.scene.primitives.remove(entry.model);}catch{/* Owner already removed. */}this.models.delete(id);}
+  removeModel(id){const entry=this.models.get(id);if(!entry)return;this.models.delete(id);for(const remove of entry.removers||[])try{remove();}catch{/* A disposed event cannot retain ownership. */}try{entry.owner.scene.primitives.remove(entry.model);}catch{/* Owner already removed. */}}
   bodyMatrix(C,id,here,utc,orientation,hash){
     let ahead;try{ahead=this.cartesianAt(id,this.advanceUtc(utc,1),hash);}catch{ahead=null;}
     let rotation=null;if(ahead){const velocity=C.Cartesian3.subtract(ahead,here,new C.Cartesian3());if(C.Cartesian3.magnitude(velocity)>1){C.Cartesian3.normalize(velocity,velocity);rotation=C.Transforms.rotationMatrixFromPositionVelocity(here,velocity,C.Ellipsoid.WGS84,new C.Matrix3());}}
@@ -65,7 +105,7 @@ export class NodeScene{
   }
   placeModels(utc){
     const C=this.cesium;if(!C)return;const morph=this.isTransitioning()||C.SceneMode&&this.viewer?.scene?.mode===C.SceneMode.MORPHING;
-    for(const [id,entry]of this.models){const g=!morph&&id!==this.selectedId&&this.modelsVisible?this.geometryAt(id,utc):null;if(!g){entry.model.show=false;continue;}const here=new C.Cartesian3(...g.row.position_m);entry.model.modelMatrix=this.bodyMatrix(C,id,here,utc,entry.orientation,g.definition_hash);entry.model.show=true;}
+    for(const [id,entry]of this.models){const g=!entry.failed&&!morph&&id!==this.selectedId&&this.modelsVisible?this.geometryAt(id,utc):null;if(!g){entry.model.show=false;continue;}const here=new C.Cartesian3(...g.row.position_m);entry.model.modelMatrix=this.bodyMatrix(C,id,here,utc,entry.orientation,g.definition_hash);entry.model.show=true;}
   }
   pathColor(C,id){const palette=this.palette(this.theme)||{},regime=this.descriptions.get(id)?.orbit_regime;return C.Color.fromCssColorString(palette[String(regime||'').toUpperCase()]||palette.fallback||'#ff9f43').withAlpha(PATH_ALPHA[this.theme]);}
   rebuildPaths(){
@@ -79,11 +119,11 @@ export class NodeScene{
     }
   }
   removePath(id){const entry=this.paths.get(id);if(!entry)return;try{this.dataSource?.entities.remove(entry.entity);}catch{/* Owned entity already gone. */}this.paths.delete(id);}
-  select(id){if(this.disposed)return;this.selectedId=id==null?null:String(id);this.placeModels(this.timeSource?.());for(const [key,p]of this.paths)p.entity.show=p.positions.length>1&&key!==this.selectedId&&this.tracksVisible()!==false;}
+  select(id){if(this.disposed)return;this.selectedId=id==null?null:String(id);this.refreshMarkerStyles();this.placePoints(this.timeSource?.());this.placeModels(this.timeSource?.());for(const [key,p]of this.paths)p.entity.show=p.positions.length>1&&key!==this.selectedId&&this.tracksVisible()!==false;}
   setModelsVisible(visible){this.modelsVisible=visible!==false;this.placeModels(this.timeSource?.());return this.modelsVisible;}
-  setTheme(theme){this.theme=theme==='light'?'light':'dark';const C=this.cesium;if(C?.Color)for(const [id,p]of this.paths)p.entity.polyline.material=this.pathColor(C,id);}
-  update(utc=this.timeSource?.()){if(this.disposed)return;this.placeModels(utc);this.rebuildPaths();}
-  syncFrame(utc){if(!this.disposed)this.placeModels(utc);}
-  clear(){this.loadToken++;for(const id of [...this.models.keys()])this.removeModel(id);for(const id of [...this.paths.keys()])this.removePath(id);this.descriptions.clear();this.selectedId=null;}
+  setTheme(theme){this.theme=theme==='light'?'light':'dark';this.refreshMarkerStyles();const C=this.cesium;if(C?.Color)for(const [id,p]of this.paths)p.entity.polyline.material=this.pathColor(C,id);}
+  update(utc=this.timeSource?.()){if(this.disposed)return;this.placePoints(utc);this.placeModels(utc);this.rebuildPaths();}
+  syncFrame(utc){if(!this.disposed){this.placePoints(utc);this.placeModels(utc);}}
+  clear(){this.loadToken++;for(const id of [...this.models.keys()])this.removeModel(id);for(const id of [...this.paths.keys()])this.removePath(id);for(const id of [...this.points.keys()])this.removeMarker(id);if(this.markerOwner){if(this.pointCollection)this.markerOwner.scene.primitives.remove(this.pointCollection);if(this.labelCollection)this.markerOwner.scene.primitives.remove(this.labelCollection);}this.pointCollection=null;this.labelCollection=null;this.markerOwner=null;this.descriptions.clear();this.selectedId=null;this.hoveredId=null;}
   destroy(){if(this.disposed)return;this.clear();this.disposed=true;if(this.dataSource){this.dataSourceOwner?.dataSources?.remove?.(this.dataSource,true);this.dataSource=null;this.dataSourceOwner=null;}}
 }

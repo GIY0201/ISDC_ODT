@@ -4,21 +4,24 @@ import {readFile} from 'node:fs/promises';
 import {NodeScene,LINK_COLORS} from '../../../digital_twin/visualization/node_scene.js';
 import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
 const golden=JSON.parse(await readFile(new URL('../fixtures/original_node_scene.json',import.meta.url),'utf8'));
+const markers=JSON.parse(await readFile(new URL('../fixtures/original_node_markers.json',import.meta.url),'utf8'));
 const codec=createUtcCodec(LEAP_SHA256),utc=codec.advance('2026-10-04T00:00:00Z',0),hash='a'.repeat(64);
 class Cartesian3{constructor(x=0,y=0,z=0){Object.assign(this,{x,y,z});}static subtract(a,b,r){Object.assign(r,{x:a.x-b.x,y:a.y-b.y,z:a.z-b.z});return r;}static magnitude(v){return Math.hypot(v.x,v.y,v.z);}static normalize(v,r){const m=this.magnitude(v);Object.assign(r,{x:v.x/m,y:v.y/m,z:v.z/m});return r;}}
 class Color{constructor(css,alpha=1){Object.assign(this,{css,alpha});}static fromCssColorString(css){return new Color(css);}withAlpha(alpha){return new Color(this.css,alpha);}}
+Color.WHITE=new Color('white');Color.TRANSPARENT=new Color('transparent',0);
 class Collection{constructor(){this.items=[];}add(v){this.items.push(v);return v;}remove(v){const i=this.items.indexOf(v);if(i<0)return false;this.items.splice(i,1);v.destroy?.();return true;}}
 const plain=v=>JSON.parse(JSON.stringify(v));
 const definition=id=>({schema:1,id,catalog_number:900000+Number(id),orbit:{epoch:1791062400000,altitude_km:550,inclination:53}});
 const description=id=>({url:'/models/'+id+'.glb',scale:2,minimumPixelSize:12,orientation:{heading:90}});
-function fixture({load,geometry,path}={}){
+function fixture({load,geometry,path,palette}={}){
  const loads=[],statuses=[],primitives=new Collection(),sources=new Collection();let display=utc,morph=false,tracks=true;
  const C={Cartesian3,Color,CustomDataSource:class{constructor(){this.entities=new Collection();}},CallbackProperty:class{constructor(getter){this.getter=getter;}},ArcType:{NONE:'none'},SceneMode:{MORPHING:0,SCENE3D:3},Matrix3:class{static fromHeadingPitchRoll(hpr){return {hpr};}static multiply(a,b){a.trim=b;return a;}},Matrix4:class{static fromRotationTranslation(rotation,translation){return {rotation,translation};}},HeadingPitchRoll:class{constructor(h,p,r){Object.assign(this,{h,p,r});}},Math:{toRadians:v=>v*Math.PI/180},Ellipsoid:{WGS84:{}},Transforms:{rotationMatrixFromPositionVelocity:(position,velocity)=>({position,velocity}),eastNorthUpToFixedFrame:position=>({enu:position})},ImageBasedLighting:class{constructor(options){this.options=options;}},Model:{async fromGltfAsync(options){loads.push(options);return load?load(options):{options,show:false,destroyed:false,destroy(){this.destroyed=true;}};}}};
+ Object.assign(C,{PointPrimitiveCollection:Collection,LabelCollection:Collection,Cartesian2:class{constructor(x,y){Object.assign(this,{x,y});}},NearFarScalar:class{constructor(near,nearValue,far,farValue){Object.assign(this,{near,nearValue,far,farValue});}},LabelStyle:{FILL_AND_OUTLINE:'fill_outline'}});
  const viewer={scene:{primitives,mode:3},entities:new Collection(),dataSources:sources};
  const meta={model_profile:'SOURCE_KEPLER_J2_V1',frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',source_commit:golden.source_commit,quality:'engineering_assumption'};
  const geometryFor=(node,{utc:stamp})=>{const row={utc:stamp,status:'valid',error_code:null,position_m:[Number(node.id)+codec.difference(stamp,utc)*10,10,550000]};const value={...meta,node_id:node.id,node_definition:structuredClone(node),definition_hash:hash,row};return geometry?geometry(value):value;};
  const pathFor=node=>{const value={...meta,node_id:node.id,node_definition:structuredClone(node),definition_hash:hash,center_utc:utc,visible:true,positions_m:golden.paths['1'].positions.map(p=>[p.x+Number(node.id)-1,p.y,p.z])};return path?path(value):value;};
- const scene=new NodeScene({viewer,cesium:C,timeSource:()=>display,advanceUtc:codec.advance,geometryFor,pathFor,palette:()=>({LEO:'#ff9f43',fallback:'#ff9f43'}),tracksVisible:()=>tracks,isTransitioning:()=>morph,onStatus:v=>statuses.push(v)});
+ const scene=new NodeScene({viewer,cesium:C,timeSource:()=>display,advanceUtc:codec.advance,geometryFor,pathFor,palette:palette??(()=>markers.palettes.dark),tracksVisible:()=>tracks,isTransitioning:()=>morph,onStatus:v=>statuses.push(v)});
  return {scene,loads,statuses,viewer,set display(v){display=v;},set morph(v){morph=v;},set tracks(v){tracks=v;}};
 }
 const entries=(count=2)=>Array.from({length:count},(_,i)=>({id:String(i+1),definition:definition(String(i+1)),model:description(String(i+1)),orbit_regime:'LEO'}));
@@ -62,4 +65,29 @@ test('model load rejection retains valid native paths and reports availability w
 test('caller input copies, selection and shared track visibility preserve source scope',async()=>{
  const f=fixture(),nodes=entries(1);await f.scene.setNodes(nodes);nodes[0].definition.orbit.altitude_km=1000;nodes[0].model.url='/bad.glb';assert.equal(f.scene.descriptions.get('1').definition.orbit.altitude_km,550);assert.equal(f.loads.length,1);
  f.tracks=false;f.scene.select(null);assert.equal(f.scene.paths.get('1').entity.show,false);f.tracks=true;f.scene.select(null);assert.equal(f.scene.paths.get('1').entity.show,true);f.scene.destroy();
+});
+test('32 original marker style cases preserve density sizes colors alpha and distance scaling',async()=>{
+ for(const c of markers.cases){const f=fixture({palette:theme=>markers.palettes[theme]}),nodes=entries(c.count).map(e=>({...e,definition:{...e.definition,name:'node '+e.id},model:null}));await f.scene.setNodes(nodes);f.scene.setTheme(c.theme);f.scene.setSdcMode(c.sdcMode);f.scene.select(c.selected);
+  for(const [id,expected]of Object.entries(c.points)){const point={...plain(f.scene.points.get(id))};delete point.position;delete point.show;delete point.id;assert.deepEqual(point,expected.point,JSON.stringify(c));
+   const label=plain(f.scene.labels.get(id));for(const key of ['text','font','outlineColor','outlineWidth','style','pixelOffset','scaleByDistance','disableDepthTestDistance'])assert.deepEqual(label[key],expected.label[key]);assert.equal(label.show,expected.labelWithPosition);
+  }f.scene.destroy();
+ }
+});
+test('source hover and filtered-selection exception apply only to owned native points',async()=>{
+ const f=fixture();await f.scene.setNodes(entries(2));f.scene.setHovered('1');const p=f.scene.points.get('1');assert.equal(p.pixelSize,markers.hover.pixelSize);assert.deepEqual(plain(p.color),markers.hover.color);
+ f.scene.setVisibleNodes([]);assert.equal(f.scene.labels.get('1').show,markers.filtered);f.scene.select('1');assert.equal(f.scene.labels.get('1').show,markers.selectedFilterException);assert.equal(f.scene.points.get('2').show,false);f.scene.destroy();
+});
+test('native points and labels appear before model loading finishes and survive asset rejection',async()=>{
+ let reject;const f=fixture({load:()=>new Promise((_,fail)=>{reject=fail;})});const work=f.scene.setNodes(entries(1));assert.ok(reject);assert.equal(f.scene.points.get('1').show,true);assert.equal(f.scene.labels.get('1').show,true);assert.deepEqual(plain(f.scene.points.get('1').position),{x:1,y:10,z:550000});reject(Error('asset unavailable'));await work;assert.equal(f.scene.models.size,0);assert.equal(f.scene.points.get('1').show,true);f.scene.destroy();
+});
+test('failed or stale native rows hide points and labels and marker cleanup preserves foreign primitives',async()=>{
+ let valid=true;const f=fixture({geometry:g=>valid?g:null});const foreign={};f.viewer.scene.primitives.add(foreign);await f.scene.setNodes(entries(1));valid=false;f.scene.syncFrame(utc);assert.equal(f.scene.points.get('1').show,false);assert.equal(f.scene.labels.get('1').show,false);f.scene.destroy();assert.deepEqual(f.viewer.scene.primitives.items,[foreign]);
+});
+function event(){const listeners=new Set();return {listeners,addEventListener(fn){listeners.add(fn);return ()=>listeners.delete(fn);},raise(value){for(const fn of [...listeners])fn(value);}};}
+test('late glTF render failure keeps the native point and cannot re-show the failed model on later frames',async()=>{
+ const ready=event(),error=event(),model={show:false,readyEvent:ready,errorEvent:error,destroy(){}};const f=fixture({load:()=>model});await f.scene.setNodes(entries(1));assert.equal(error.listeners.size,1);
+ error.raise(Error('GPU asset error'));assert.equal(model.show,false);assert.equal(f.scene.points.get('1').show,true);assert.equal(f.statuses.at(-1).status,'model_unavailable');ready.raise();f.scene.setModelsVisible(true);f.scene.syncFrame(utc);assert.equal(model.show,false);f.scene.destroy();assert.equal(ready.listeners.size,0);assert.equal(error.listeners.size,0);
+});
+test('owned ready/error listeners are removed on disposal and captured late callbacks become inert',async()=>{
+ const ready=event(),error=event(),model={show:false,readyEvent:ready,errorEvent:error,destroy(){}};const f=fixture({load:()=>model});await f.scene.setNodes(entries(1));assert.equal(ready.listeners.size,1);ready.raise();assert.equal(f.statuses.at(-1).status,'model_ready');const old=[...error.listeners][0];f.scene.destroy();const count=f.statuses.length;old(Error('late'));assert.equal(f.statuses.length,count);assert.equal(error.listeners.size,0);
 });

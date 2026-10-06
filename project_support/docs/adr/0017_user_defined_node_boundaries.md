@@ -19,3 +19,6 @@ Consequences: original equations/presets/formation/power values remain directly 
 
 
 2026-10-06 T148 async display fencing: source model/path drawing/options/lighting/trim/cap preserved; same-ID definition edits now invalidate old paths immediately and delayed setNodes completion cannot create data-source resources after clear/disposal. These are intentional stale-result rejection improvements for the declared native full-definition contract, separate from source dynamics. RED6PASS2FAIL and repair/source execution goldens recorded in validation/t148_node_models_paths.md. Rendering remains unmounted in the actual workspace pending T151.
+
+
+2026-10-06 T148 node marker adaptation: original globe point/label rendering rules now live in the scoped NodeScene native overlay because the shared GP catalogue retains its independent precise-GP records. Marker pick IDs keep satelliteId and add nodeId for later source-specific routing; runtime/wire schemas are unchanged. Node markers become visible from already validated native buffers before asynchronous model loading. Failed models are latched hidden with owned ready/error listener cleanup, without invalidating native geometry or claiming actual GPU readiness. Source execution goldens and RED tests in validation/t148_node_markers.md.

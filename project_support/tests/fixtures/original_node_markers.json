@@ -1,0 +1,2989 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_hashes": {
+    "digital_twin/visualization/globe.js": "b4a10eef5adee593f4f9d42b95be641771fe786bc3206632a83a8f9358a6e608"
+  },
+  "harness": "Original source methods against Cesium doubles; no physical/GPU claims",
+  "cases": [
+    {
+      "count": 1,
+      "theme": "dark",
+      "selected": null,
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 1,
+      "theme": "dark",
+      "selected": null,
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 1,
+      "theme": "dark",
+      "selected": "1",
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 16.900000000000002,
+            "color": {
+              "css": "#efff62",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 1,
+      "theme": "dark",
+      "selected": "1",
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 16.900000000000002,
+            "color": {
+              "css": "#efff62",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 1,
+      "theme": "light",
+      "selected": null,
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 1,
+      "theme": "light",
+      "selected": null,
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 1,
+      "theme": "light",
+      "selected": "1",
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 16.900000000000002,
+            "color": {
+              "css": "#d35400",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 1,
+      "theme": "light",
+      "selected": "1",
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 16.900000000000002,
+            "color": {
+              "css": "#d35400",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 200,
+      "theme": "dark",
+      "selected": null,
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 200,
+      "theme": "dark",
+      "selected": null,
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 200,
+      "theme": "dark",
+      "selected": "1",
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 16.900000000000002,
+            "color": {
+              "css": "#efff62",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 0.637
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 200,
+      "theme": "dark",
+      "selected": "1",
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 16.900000000000002,
+            "color": {
+              "css": "#efff62",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 200,
+      "theme": "light",
+      "selected": null,
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 200,
+      "theme": "light",
+      "selected": null,
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 200,
+      "theme": "light",
+      "selected": "1",
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 16.900000000000002,
+            "color": {
+              "css": "#d35400",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 0.637
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 200,
+      "theme": "light",
+      "selected": "1",
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 16.900000000000002,
+            "color": {
+              "css": "#d35400",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 6.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 201,
+      "theme": "dark",
+      "selected": null,
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 201,
+      "theme": "dark",
+      "selected": null,
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 201,
+      "theme": "dark",
+      "selected": "1",
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 11.700000000000001,
+            "color": {
+              "css": "#efff62",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 0.637
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 201,
+      "theme": "dark",
+      "selected": "1",
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 11.700000000000001,
+            "color": {
+              "css": "#efff62",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 201,
+      "theme": "light",
+      "selected": null,
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 201,
+      "theme": "light",
+      "selected": null,
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 201,
+      "theme": "light",
+      "selected": "1",
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 11.700000000000001,
+            "color": {
+              "css": "#d35400",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 0.637
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 201,
+      "theme": "light",
+      "selected": "1",
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 11.700000000000001,
+            "color": {
+              "css": "#d35400",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 240,
+      "theme": "dark",
+      "selected": null,
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 240,
+      "theme": "dark",
+      "selected": null,
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 240,
+      "theme": "dark",
+      "selected": "1",
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 11.700000000000001,
+            "color": {
+              "css": "#efff62",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 0.637
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 240,
+      "theme": "dark",
+      "selected": "1",
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 11.700000000000001,
+            "color": {
+              "css": "#efff62",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#ff9f43",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 240,
+      "theme": "light",
+      "selected": null,
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 0.98
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 240,
+      "theme": "light",
+      "selected": null,
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 240,
+      "theme": "light",
+      "selected": "1",
+      "sdcMode": false,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 11.700000000000001,
+            "color": {
+              "css": "#d35400",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 0.637
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    },
+    {
+      "count": 240,
+      "theme": "light",
+      "selected": "1",
+      "sdcMode": true,
+      "points": {
+        "1": {
+          "point": {
+            "pixelSize": 11.700000000000001,
+            "color": {
+              "css": "#d35400",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 1",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        },
+        "2": {
+          "point": {
+            "pixelSize": 4.5,
+            "color": {
+              "css": "#c9651a",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "transparent",
+              "alpha": 0
+            },
+            "outlineWidth": 0,
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1.35,
+              "far": 500000000,
+              "farValue": 0.58
+            },
+            "disableDepthTestDistance": 0
+          },
+          "label": {
+            "text": "node 2",
+            "font": "600 12px Segoe UI",
+            "fillColor": {
+              "css": "white",
+              "alpha": 1
+            },
+            "outlineColor": {
+              "css": "#061528",
+              "alpha": 1
+            },
+            "outlineWidth": 3,
+            "style": "fill_outline",
+            "pixelOffset": {
+              "x": 0,
+              "y": -18
+            },
+            "scaleByDistance": {
+              "near": 1000000,
+              "nearValue": 1,
+              "far": 80000000,
+              "farValue": 0.38
+            },
+            "disableDepthTestDistance": 0
+          },
+          "labelWithPosition": true,
+          "labelWithoutPosition": false
+        }
+      }
+    }
+  ],
+  "hover": {
+    "pixelSize": 14.3,
+    "color": {
+      "css": "#ffffff",
+      "alpha": 1
+    },
+    "outlineWidth": 0
+  },
+  "palettes": {
+    "dark": {
+      "LEO": "#ff9f43",
+      "MEO": "#e6ed55",
+      "GEO": "#5ee277",
+      "HEO": "#53c8ff",
+      "fallback": "#ff9f43",
+      "selected": "#efff62",
+      "hover": "#ffffff",
+      "pathOutline": "#061528",
+      "globeBase": "#07111d",
+      "globeBasePlain": "#173955"
+    },
+    "light": {
+      "LEO": "#c9651a",
+      "MEO": "#8f8a12",
+      "GEO": "#1f8a55",
+      "HEO": "#1f7fa8",
+      "fallback": "#c9651a",
+      "selected": "#d35400",
+      "hover": "#1c2833",
+      "pathOutline": "#ffffff",
+      "globeBase": "#c9d6e3",
+      "globeBasePlain": "#c9d6e3"
+    }
+  },
+  "filtered": false,
+  "selectedFilterException": true
+}

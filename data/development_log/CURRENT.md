@@ -668,3 +668,8 @@ Actualowned31524/3780 CIMconfirmed (standarddenied/read-onlyescalation), freshly
 - 변경: 원본NodeScene 모델옵션/방향근사/선택숨김/64cap/121점스타일을 native좌표와기존Viewer로이식. 입력·UTC·출처fence와전용datasource정리, 같은ID편집·늦은load후clear 재생성방지. 새시계·전파 없음.
 - 검증: 원본실행capture2회24720bytes/SHA4c88f447… 일치, missingmodule RED와6PASS2FAIL수정. Node518PASS3099.9937ms/Python546PASS8기존warnings152.91s/session92911exit0/syntax. validation/t148_node_models_paths.md. 원본Cesiumdouble기준은실제GPU증거아님.
 - 남음: T148점·이름표/통신선과T077검증주입/모델ready-error정리/path효율;T079/T149–153/fullT075–84/T032/장비/다운로드. 실제8891/native/browser/remotePR/병합변경없음.
+
+## 2026-10-06 T148 원본 점·이름표와 모델이벤트 부분 이식
+- 변경: 원본32가지스타일기준으로 native점·이름표/선택·호버·필터예외·SDC불투명도 이식. 모델로드전에표시하고좌표실패시숨김;nodeId픽태그추가. model ready/error 이벤트정리와실패후재표시방지.
+- 검증: 원본77745bytes/SHA9d578551… 반복일치. marker10PASS4FAIL/event14PASS2FAIL RED수정. 최종Node524PASS2866.0291ms/Python546PASS8기존warnings152.74s/session82501exit0/syntax. validation/t148_node_markers.md. 주입event는실제GPU증거아님.
+- 남음: T148통신선/flow와T077검증주입/path효율·잔여scope, T079/T149–153/fullT075–84/T032/장비/다운로드. 실제8891/native/browser/remotePR/병합변경없음.
