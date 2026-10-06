@@ -1,3 +1,8 @@
+## 2026-10-06 T149 배치 수락 구성요소 완료
+- 변경: 원본strict schema/RuntimeState 배치 버전·idempotency·candidate scope·async잠금/GET–POST 이식. 실제module가 수락한 scope/명부/시간/no-backfill receipt 검증 후만 배치commit. 입력명령 사본과candidate ID보존; 실패·취소/초기화·시나리오 범위 분리.
+- 검증: missingroute RED→target49PASS1기존warning18.32s; 원본four-method state trace 두10764bytes/SHAda127f4626… 동일 및제품 exact, schema fullAST동일. 최종Python642PASS8기존warnings160.97s(session43194exit0)/Node540PASS3144.5469ms/architecture/stageddiff PASS. validation/t149_node_deployment.md. ASGI 구성요소·실제내장module 증거이며8891브라우저/전체원본app 증거아님.
+- 남음: T150원본browser client→T151조립/native설치/owned8891재시작→T152실제검증→T153리뷰. 전체T079/T076/T075–84/T148T077producer/N001/N003/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드 유지. 실제서버/native/사용자화면/원격PR·병합 변경없음.
+
 ## 2026-10-06 T079 / T149 전달 수락 및 원격 어댑터 부분 이식
 - 변경: 원본 Protocol/오류와 HTTP 어댑터 재사용. isolated-v1 범위·명부·시간·제품ref 수락 확인 후 전달cursor 반영, source6h clock catch-up/2000chunk/부분실패 retry 보존. 역행시간은 쓰기 전 차단, shared/injected HTTP client 소유권 보존.
 - 검증: initial missingmodule RED 및 malformedref/역행catalogue reset19PASS2FAIL 후수정. target22PASS0.49s; 원본HTTP class 두capture5522bytes/SHAcb1e8bc0… 동일 및wire full 비교. 최종Python618PASS8기존warnings159.84s(session66449exit0)/Node540PASS3004.0646ms/syntax/stageddiff PASS. validation/t149_data_delivery.md.

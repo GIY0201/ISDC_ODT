@@ -1,0 +1,435 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_hashes": {
+    "digital_twin/runtime/state.py": "8ced51056e8dc9fd86a3fc57c898ea41d6e512a53530fdab55448421c8de9b5b",
+    "communication/http/data_deployment_schemas.py": "09e8d4d7e3d5093643346033be7475f56271349260ff2322c4280330ffd92100"
+  },
+  "evidence": "Original four deployment methods on current core scaffold with source-verified module; not whole app/live TCP",
+  "methods": [
+    "data_deployment",
+    "_data_context",
+    "apply_data_deployment",
+    "with_data_deployment"
+  ],
+  "trace": [
+    {
+      "operation": "initial",
+      "deployment": {
+        "deployment_id": null,
+        "revision": 0,
+        "nodes": [],
+        "run_id": "RUN-SOURCE",
+        "scope_id": "RUN-SOURCE:unconfigured"
+      }
+    },
+    {
+      "operation": "apply",
+      "command": {
+        "deployment_id": "a",
+        "expected_revision": 0,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  이름 A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "deployment": {
+        "deployment_id": "a",
+        "revision": 1,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  이름 A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ],
+        "run_id": "RUN-SOURCE",
+        "scope_id": "RUN-SOURCE:deployment:a"
+      },
+      "module_nodes": {
+        "sequence": 1,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  이름 A  ",
+            "kind": "onboard",
+            "available": true,
+            "reason": null,
+            "capacity_gb": 2000.0,
+            "used_gb": 0.0,
+            "used_ratio": 0.0,
+            "free_gb": 2000.0,
+            "objects": 0,
+            "replicas": {
+              "verified": 0,
+              "syncing": 0,
+              "stale": 0,
+              "unreachable": 0,
+              "corrupt": 0,
+              "lost": 0
+            },
+            "state": "ok"
+          }
+        ],
+        "scope_id": "RUN-SOURCE:deployment:a",
+        "scope_contract": "isolated-v1"
+      }
+    },
+    {
+      "operation": "apply",
+      "command": {
+        "deployment_id": "a",
+        "expected_revision": 0,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  이름 A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "deployment": {
+        "deployment_id": "a",
+        "revision": 1,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  이름 A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ],
+        "run_id": "RUN-SOURCE",
+        "scope_id": "RUN-SOURCE:deployment:a"
+      },
+      "module_nodes": {
+        "sequence": 1,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  이름 A  ",
+            "kind": "onboard",
+            "available": true,
+            "reason": null,
+            "capacity_gb": 2000.0,
+            "used_gb": 0.0,
+            "used_ratio": 0.0,
+            "free_gb": 2000.0,
+            "objects": 0,
+            "replicas": {
+              "verified": 0,
+              "syncing": 0,
+              "stale": 0,
+              "unreachable": 0,
+              "corrupt": 0,
+              "lost": 0
+            },
+            "state": "ok"
+          }
+        ],
+        "scope_id": "RUN-SOURCE:deployment:a",
+        "scope_contract": "isolated-v1"
+      }
+    },
+    {
+      "operation": "conflict",
+      "command": {
+        "deployment_id": "a",
+        "expected_revision": 1,
+        "nodes": [
+          {
+            "id": "B",
+            "name": "  이름 B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "deployment": {
+        "deployment_id": "a",
+        "revision": 1,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  이름 A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ],
+        "run_id": "RUN-SOURCE",
+        "scope_id": "RUN-SOURCE:deployment:a"
+      }
+    },
+    {
+      "operation": "conflict",
+      "command": {
+        "deployment_id": "b",
+        "expected_revision": 0,
+        "nodes": [
+          {
+            "id": "B",
+            "name": "  이름 B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "deployment": {
+        "deployment_id": "a",
+        "revision": 1,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  이름 A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ],
+        "run_id": "RUN-SOURCE",
+        "scope_id": "RUN-SOURCE:deployment:a"
+      }
+    },
+    {
+      "operation": "apply",
+      "command": {
+        "deployment_id": "b",
+        "expected_revision": 1,
+        "nodes": [
+          {
+            "id": "B",
+            "name": "  이름 B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      },
+      "deployment": {
+        "deployment_id": "b",
+        "revision": 2,
+        "nodes": [
+          {
+            "id": "B",
+            "name": "  이름 B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ],
+        "run_id": "RUN-SOURCE",
+        "scope_id": "RUN-SOURCE:deployment:b"
+      },
+      "module_nodes": {
+        "sequence": 1,
+        "nodes": [
+          {
+            "id": "B",
+            "name": "  이름 B  ",
+            "kind": "onboard",
+            "available": true,
+            "reason": null,
+            "capacity_gb": 2000.0,
+            "used_gb": 0.0,
+            "used_ratio": 0.0,
+            "free_gb": 2000.0,
+            "objects": 0,
+            "replicas": {
+              "verified": 0,
+              "syncing": 0,
+              "stale": 0,
+              "unreachable": 0,
+              "corrupt": 0,
+              "lost": 0
+            },
+            "state": "ok"
+          }
+        ],
+        "scope_id": "RUN-SOURCE:deployment:b",
+        "scope_contract": "isolated-v1"
+      }
+    },
+    {
+      "operation": "reset_exchange",
+      "result": {
+        "deployment": {
+          "deployment_id": "b",
+          "revision": 2,
+          "nodes": [
+            {
+              "id": "B",
+              "name": "  이름 B  ",
+              "mode": "nominal",
+              "equipment": [
+                {
+                  "id": "store",
+                  "catalog": "dtn_store",
+                  "enabled": true
+                }
+              ]
+            }
+          ],
+          "run_id": "RUN-RESET",
+          "scope_id": "RUN-RESET:deployment:b"
+        },
+        "started_s": 0.0,
+        "sync": {
+          "time": "2026-10-06T00:00:00Z",
+          "sim_elapsed_s": 0.0,
+          "scope_id": "RUN-RESET:deployment:b",
+          "nodes": 1,
+          "node_roster": [
+            {
+              "id": "B",
+              "name": "  이름 B  ",
+              "kind": "onboard",
+              "capacity_gb": 2000.0,
+              "available": true,
+              "reason": null
+            }
+          ],
+          "products": 0,
+          "ingest": null
+        },
+        "module_nodes": {
+          "sequence": 1,
+          "nodes": [
+            {
+              "id": "B",
+              "name": "  이름 B  ",
+              "kind": "onboard",
+              "available": true,
+              "reason": null,
+              "capacity_gb": 2000.0,
+              "used_gb": 0.0,
+              "used_ratio": 0.0,
+              "free_gb": 2000.0,
+              "objects": 0,
+              "replicas": {
+                "verified": 0,
+                "syncing": 0,
+                "stale": 0,
+                "unreachable": 0,
+                "corrupt": 0,
+                "lost": 0
+              },
+              "state": "ok"
+            }
+          ],
+          "scope_id": "RUN-RESET:deployment:b",
+          "scope_contract": "isolated-v1"
+        },
+        "objects": {
+          "sequence": 1,
+          "total": 0,
+          "items": [],
+          "scope_id": "RUN-RESET:deployment:b",
+          "scope_contract": "isolated-v1"
+        }
+      }
+    },
+    {
+      "operation": "recall",
+      "deployment": {
+        "deployment_id": "recall",
+        "revision": 3,
+        "nodes": [],
+        "run_id": "RUN-RESET",
+        "scope_id": "RUN-RESET:deployment:recall"
+      }
+    },
+    {
+      "operation": "retained_first_scope",
+      "module_nodes": {
+        "sequence": 1,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  이름 A  ",
+            "kind": "onboard",
+            "available": true,
+            "reason": null,
+            "capacity_gb": 2000.0,
+            "used_gb": 0.0,
+            "used_ratio": 0.0,
+            "free_gb": 2000.0,
+            "objects": 0,
+            "replicas": {
+              "verified": 0,
+              "syncing": 0,
+              "stale": 0,
+              "unreachable": 0,
+              "corrupt": 0,
+              "lost": 0
+            },
+            "state": "ok"
+          }
+        ],
+        "scope_id": "RUN-SOURCE:deployment:a",
+        "scope_contract": "isolated-v1"
+      }
+    }
+  ]
+}

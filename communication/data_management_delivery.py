@@ -95,5 +95,5 @@ class DataManagementBridge:
                 ingest['accepted'].extend(deepcopy(accepted))
                 ingest['rejected'].extend(deepcopy(rejected))
             self.last_scope, self.last_elapsed = scope, elapsed
-            self.last_sync = {**stamp, 'nodes': len(expected), 'products': len(products), 'ingest': ingest}
+            self.last_sync = {**stamp, 'nodes': len(expected), 'node_roster': deepcopy(inputs['nodes']), 'products': len(products), 'ingest': ingest}
             return scoped, deepcopy(self.last_sync)
