@@ -1,0 +1,625 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "source_hashes": {
+    "user_application/web/scripts/nodes/data_deployment.js": "3774b247d3fe3fb1048ea583b2f2ac1547e3c488f3e2b64d97b46a5900b438b4"
+  },
+  "evidence": "Original client executed with deterministic injected transport/presentation harness; no live HTTP/store authority claim",
+  "requests": [
+    {
+      "url": "/api/data-management/deployment",
+      "method": "GET",
+      "cache": "no-store",
+      "headers": null,
+      "body": null
+    },
+    {
+      "url": "/api/data-management/deployment",
+      "method": "POST",
+      "cache": "no-store",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "deployment_id": "DEP-1",
+        "expected_revision": 0,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "url": "/api/data-management/deployment",
+      "method": "POST",
+      "cache": "no-store",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "deployment_id": "DEP-1",
+        "expected_revision": 1,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "url": "/api/data-management/deployment",
+      "method": "POST",
+      "cache": "no-store",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "deployment_id": "DEP-2",
+        "expected_revision": 1,
+        "nodes": [
+          {
+            "id": "B",
+            "name": "  B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "url": "/api/data-management/deployment",
+      "method": "POST",
+      "cache": "no-store",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "deployment_id": "DEP-2",
+        "expected_revision": 1,
+        "nodes": [
+          {
+            "id": "B",
+            "name": "  B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "url": "/api/data-management/deployment",
+      "method": "POST",
+      "cache": "no-store",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "deployment_id": "DEP-3",
+        "expected_revision": 2,
+        "nodes": []
+      }
+    }
+  ],
+  "events": [
+    {
+      "type": "data:deployment",
+      "data": {
+        "deployment_id": null,
+        "revision": 0,
+        "nodes": [],
+        "run_id": "RUN-1",
+        "scope_id": "RUN-1:unconfigured"
+      }
+    },
+    {
+      "type": "nodes:deployed",
+      "data": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ],
+        "items": [
+          {
+            "id": "A"
+          }
+        ]
+      }
+    },
+    {
+      "type": "data:deployment",
+      "data": {
+        "deployment_id": "DEP-1",
+        "revision": 1,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ],
+        "run_id": "RUN-1",
+        "scope_id": "RUN-1:deployment:DEP-1"
+      }
+    },
+    {
+      "type": "nodes:deployed",
+      "data": {
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ],
+        "items": [
+          {
+            "id": "A"
+          }
+        ]
+      }
+    },
+    {
+      "type": "data:deployment",
+      "data": {
+        "deployment_id": "DEP-1",
+        "revision": 1,
+        "nodes": [
+          {
+            "id": "A",
+            "name": "  A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ],
+        "run_id": "RUN-1",
+        "scope_id": "RUN-1:deployment:DEP-1"
+      }
+    },
+    {
+      "type": "nodes:deployed",
+      "data": {
+        "nodes": [
+          {
+            "id": "B",
+            "name": "  B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ],
+        "items": [
+          {
+            "id": "B"
+          }
+        ]
+      }
+    },
+    {
+      "type": "data:deployment",
+      "data": {
+        "deployment_id": "DEP-2",
+        "revision": 2,
+        "nodes": [
+          {
+            "id": "B",
+            "name": "  B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true
+              }
+            ]
+          }
+        ],
+        "run_id": "RUN-1",
+        "scope_id": "RUN-1:deployment:DEP-2"
+      }
+    },
+    {
+      "type": "nodes:deployed",
+      "data": {
+        "nodes": [],
+        "items": []
+      }
+    },
+    {
+      "type": "data:deployment",
+      "data": {
+        "deployment_id": "DEP-3",
+        "revision": 3,
+        "nodes": [],
+        "run_id": "RUN-1",
+        "scope_id": "RUN-1:deployment:DEP-3"
+      }
+    }
+  ],
+  "rows": [
+    {
+      "operation": "initialize",
+      "state": {
+        "server": {
+          "deployment_id": null,
+          "revision": 0,
+          "nodes": [],
+          "run_id": "RUN-1",
+          "scope_id": "RUN-1:unconfigured"
+        },
+        "error": null,
+        "syncRequired": false,
+        "busy": false,
+        "deployed": [],
+        "drafts": []
+      }
+    },
+    {
+      "operation": "deploy",
+      "state": {
+        "server": {
+          "deployment_id": "DEP-1",
+          "revision": 1,
+          "nodes": [
+            {
+              "id": "A",
+              "name": "  A  ",
+              "mode": "nominal",
+              "equipment": [
+                {
+                  "id": "store",
+                  "catalog": "dtn_store",
+                  "enabled": true
+                }
+              ]
+            }
+          ],
+          "run_id": "RUN-1",
+          "scope_id": "RUN-1:deployment:DEP-1"
+        },
+        "error": null,
+        "syncRequired": false,
+        "busy": false,
+        "deployed": [
+          {
+            "id": "A",
+            "name": "  A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ],
+        "drafts": [
+          {
+            "id": "A",
+            "name": "  A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ]
+      }
+    },
+    {
+      "operation": "idempotent",
+      "state": {
+        "server": {
+          "deployment_id": "DEP-1",
+          "revision": 1,
+          "nodes": [
+            {
+              "id": "A",
+              "name": "  A  ",
+              "mode": "nominal",
+              "equipment": [
+                {
+                  "id": "store",
+                  "catalog": "dtn_store",
+                  "enabled": true
+                }
+              ]
+            }
+          ],
+          "run_id": "RUN-1",
+          "scope_id": "RUN-1:deployment:DEP-1"
+        },
+        "error": null,
+        "syncRequired": false,
+        "busy": false,
+        "deployed": [
+          {
+            "id": "A",
+            "name": "  A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ],
+        "drafts": [
+          {
+            "id": "A",
+            "name": "  A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ]
+      }
+    },
+    {
+      "operation": "offline",
+      "error": "offline",
+      "state": {
+        "server": {
+          "deployment_id": "DEP-1",
+          "revision": 1,
+          "nodes": [
+            {
+              "id": "A",
+              "name": "  A  ",
+              "mode": "nominal",
+              "equipment": [
+                {
+                  "id": "store",
+                  "catalog": "dtn_store",
+                  "enabled": true
+                }
+              ]
+            }
+          ],
+          "run_id": "RUN-1",
+          "scope_id": "RUN-1:deployment:DEP-1"
+        },
+        "error": "offline",
+        "syncRequired": false,
+        "busy": false,
+        "deployed": [
+          {
+            "id": "A",
+            "name": "  A  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ],
+        "drafts": [
+          {
+            "id": "B",
+            "name": "  B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ]
+      }
+    },
+    {
+      "operation": "retry",
+      "state": {
+        "server": {
+          "deployment_id": "DEP-2",
+          "revision": 2,
+          "nodes": [
+            {
+              "id": "B",
+              "name": "  B  ",
+              "mode": "nominal",
+              "equipment": [
+                {
+                  "id": "store",
+                  "catalog": "dtn_store",
+                  "enabled": true
+                }
+              ]
+            }
+          ],
+          "run_id": "RUN-1",
+          "scope_id": "RUN-1:deployment:DEP-2"
+        },
+        "error": null,
+        "syncRequired": false,
+        "busy": false,
+        "deployed": [
+          {
+            "id": "B",
+            "name": "  B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ],
+        "drafts": [
+          {
+            "id": "B",
+            "name": "  B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ]
+      }
+    },
+    {
+      "operation": "recall",
+      "state": {
+        "server": {
+          "deployment_id": "DEP-3",
+          "revision": 3,
+          "nodes": [],
+          "run_id": "RUN-1",
+          "scope_id": "RUN-1:deployment:DEP-3"
+        },
+        "error": null,
+        "syncRequired": false,
+        "busy": false,
+        "deployed": [],
+        "drafts": [
+          {
+            "id": "B",
+            "name": "  B  ",
+            "mode": "nominal",
+            "equipment": [
+              {
+                "id": "store",
+                "catalog": "dtn_store",
+                "enabled": true,
+                "role": "auto"
+              }
+            ],
+            "orbit": {
+              "altitude_km": 550
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

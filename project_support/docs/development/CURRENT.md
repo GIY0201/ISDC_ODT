@@ -1,3 +1,8 @@
+## 2026-10-06 T150 배치 브라우저 클라이언트 구성요소 완료
+- 변경: 원본직렬요청/15s제한/minimal장비 projection/signature/같은명령재시도/409조회후명시재적용 이식. GET-only복원/실제T145store ephemeral receipt 검증/보낸fullsnapshot보존/저장실패retry/관찰자사본·종료·늦은응답차단.
+- 검증: missingmodule RED,12PASS2FAIL timeout·dispose보완 후target15PASS131.369ms. 원본client 두14095bytes/SHAd1f1c545… 동일 및제품wire/events/state exact. 실제JS client/store→Python ASGI/runtime/module IPC1PASS0.46s; lost-success reply retry/외부변경409/명시재적용/회수. 최종Python643PASS8기존warnings161.11s(session89311exit0)/Node555PASS3138.1009ms/syntax/stageddiff PASS. validation/t150_data_client.md.
+- 남음: T148필수T077검증계산 producer/N003→T151조립/native설치/owned8891재시작→T152실제브라우저→T153리뷰. 전체T079/T076/T075–84/N001/Terra/all50/T137인증/T032/장비·RF·HIL/다운로드 유지. IPC/주입타이머는실제TCP·UI·성능증거아님. 실제서버/native/사용자화면/원격PR·병합 변경없음.
+
 ## 2026-10-06 T149 배치 수락 구성요소 완료
 - 변경: 원본strict schema/RuntimeState 배치 버전·idempotency·candidate scope·async잠금/GET–POST 이식. 실제module가 수락한 scope/명부/시간/no-backfill receipt 검증 후만 배치commit. 입력명령 사본과candidate ID보존; 실패·취소/초기화·시나리오 범위 분리.
 - 검증: missingroute RED→target49PASS1기존warning18.32s; 원본four-method state trace 두10764bytes/SHAda127f4626… 동일 및제품 exact, schema fullAST동일. 최종Python642PASS8기존warnings160.97s(session43194exit0)/Node540PASS3144.5469ms/architecture/stageddiff PASS. validation/t149_node_deployment.md. ASGI 구성요소·실제내장module 증거이며8891브라우저/전체원본app 증거아님.
