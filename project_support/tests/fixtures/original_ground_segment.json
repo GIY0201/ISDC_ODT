@@ -1,0 +1,1305 @@
+{
+  "source_commit": "1a1e00297a0301637455b0ef2cf48b2e74576b07",
+  "trace": [
+    {
+      "action": "load",
+      "result": null,
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        }
+      ],
+      "selectedId": null,
+      "enabled": [
+        "GS-DAEJEON",
+        "GS-JEJU",
+        "GS-SVALBARD"
+      ],
+      "presets": [
+        "seoul",
+        "tromso",
+        "fairbanks",
+        "inuvik",
+        "singapore",
+        "hawaii",
+        "atacama",
+        "punta_arenas",
+        "hobart"
+      ],
+      "saved": []
+    },
+    {
+      "action": "preset",
+      "result": {
+        "schema": 1,
+        "id": "GS-FAIRBANKS",
+        "preset": "fairbanks",
+        "name": "페어뱅크스",
+        "region": "미국 알래스카",
+        "latitude": 64.8378,
+        "longitude": -147.7164,
+        "altitude_km": 0.14,
+        "dish_m": 11,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-FAIRBANKS",
+          "preset": "fairbanks",
+          "name": "페어뱅크스",
+          "region": "미국 알래스카",
+          "latitude": 64.8378,
+          "longitude": -147.7164,
+          "altitude_km": 0.14,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        }
+      ],
+      "selectedId": "GS-FAIRBANKS",
+      "enabled": [
+        "GS-DAEJEON",
+        "GS-JEJU",
+        "GS-SVALBARD",
+        "GS-FAIRBANKS"
+      ],
+      "presets": [
+        "seoul",
+        "tromso",
+        "inuvik",
+        "singapore",
+        "hawaii",
+        "atacama",
+        "punta_arenas",
+        "hobart"
+      ],
+      "saved": [
+        [
+          "spacetwin-ground-stations-v1",
+          "{\"schema\":1,\"sequence\":1,\"selectedId\":\"GS-FAIRBANKS\",\"stations\":[{\"schema\":1,\"id\":\"GS-DAEJEON\",\"preset\":\"daejeon\",\"name\":\"대전\",\"region\":\"대한민국\",\"latitude\":36.3742,\"longitude\":127.3567,\"altitude_km\":0.07,\"dish_m\":13,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-JEJU\",\"preset\":\"jeju\",\"name\":\"제주\",\"region\":\"대한민국\",\"latitude\":33.4996,\"longitude\":126.5312,\"altitude_km\":0.03,\"dish_m\":7.3,\"bands\":[\"S\",\"X\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-SVALBARD\",\"preset\":\"svalbard\",\"name\":\"스발바르\",\"region\":\"노르웨이\",\"latitude\":78.2298,\"longitude\":15.4078,\"altitude_km\":0.45,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":3,\"enabled\":true},{\"schema\":1,\"id\":\"GS-FAIRBANKS\",\"preset\":\"fairbanks\",\"name\":\"페어뱅크스\",\"region\":\"미국 알래스카\",\"latitude\":64.8378,\"longitude\":-147.7164,\"altitude_km\":0.14,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true}]}"
+        ]
+      ]
+    },
+    {
+      "action": "custom",
+      "result": {
+        "schema": 1,
+        "id": "GS-SITE_2",
+        "preset": null,
+        "name": "고흥",
+        "region": "대한민국",
+        "latitude": 34.6,
+        "longitude": 127.2,
+        "altitude_km": 0.04,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X",
+          "Ka"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-FAIRBANKS",
+          "preset": "fairbanks",
+          "name": "페어뱅크스",
+          "region": "미국 알래스카",
+          "latitude": 64.8378,
+          "longitude": -147.7164,
+          "altitude_km": 0.14,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SITE_2",
+          "preset": null,
+          "name": "고흥",
+          "region": "대한민국",
+          "latitude": 34.6,
+          "longitude": 127.2,
+          "altitude_km": 0.04,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        }
+      ],
+      "selectedId": "GS-SITE_2",
+      "enabled": [
+        "GS-DAEJEON",
+        "GS-JEJU",
+        "GS-SVALBARD",
+        "GS-FAIRBANKS",
+        "GS-SITE_2"
+      ],
+      "presets": [
+        "seoul",
+        "tromso",
+        "inuvik",
+        "singapore",
+        "hawaii",
+        "atacama",
+        "punta_arenas",
+        "hobart"
+      ],
+      "saved": [
+        [
+          "spacetwin-ground-stations-v1",
+          "{\"schema\":1,\"sequence\":2,\"selectedId\":\"GS-SITE_2\",\"stations\":[{\"schema\":1,\"id\":\"GS-DAEJEON\",\"preset\":\"daejeon\",\"name\":\"대전\",\"region\":\"대한민국\",\"latitude\":36.3742,\"longitude\":127.3567,\"altitude_km\":0.07,\"dish_m\":13,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-JEJU\",\"preset\":\"jeju\",\"name\":\"제주\",\"region\":\"대한민국\",\"latitude\":33.4996,\"longitude\":126.5312,\"altitude_km\":0.03,\"dish_m\":7.3,\"bands\":[\"S\",\"X\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-SVALBARD\",\"preset\":\"svalbard\",\"name\":\"스발바르\",\"region\":\"노르웨이\",\"latitude\":78.2298,\"longitude\":15.4078,\"altitude_km\":0.45,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":3,\"enabled\":true},{\"schema\":1,\"id\":\"GS-FAIRBANKS\",\"preset\":\"fairbanks\",\"name\":\"페어뱅크스\",\"region\":\"미국 알래스카\",\"latitude\":64.8378,\"longitude\":-147.7164,\"altitude_km\":0.14,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-SITE_2\",\"preset\":null,\"name\":\"고흥\",\"region\":\"대한민국\",\"latitude\":34.6,\"longitude\":127.2,\"altitude_km\":0.04,\"dish_m\":7.3,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true}]}"
+        ]
+      ]
+    },
+    {
+      "action": "invalid",
+      "result": [
+        "위도는 -90~90°여야 합니다."
+      ],
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-FAIRBANKS",
+          "preset": "fairbanks",
+          "name": "페어뱅크스",
+          "region": "미국 알래스카",
+          "latitude": 64.8378,
+          "longitude": -147.7164,
+          "altitude_km": 0.14,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SITE_2",
+          "preset": null,
+          "name": "고흥",
+          "region": "대한민국",
+          "latitude": 34.6,
+          "longitude": 127.2,
+          "altitude_km": 0.04,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        }
+      ],
+      "selectedId": "GS-SITE_2",
+      "enabled": [
+        "GS-DAEJEON",
+        "GS-JEJU",
+        "GS-SVALBARD",
+        "GS-FAIRBANKS",
+        "GS-SITE_2"
+      ],
+      "presets": [
+        "seoul",
+        "tromso",
+        "inuvik",
+        "singapore",
+        "hawaii",
+        "atacama",
+        "punta_arenas",
+        "hobart"
+      ],
+      "saved": [
+        [
+          "spacetwin-ground-stations-v1",
+          "{\"schema\":1,\"sequence\":2,\"selectedId\":\"GS-SITE_2\",\"stations\":[{\"schema\":1,\"id\":\"GS-DAEJEON\",\"preset\":\"daejeon\",\"name\":\"대전\",\"region\":\"대한민국\",\"latitude\":36.3742,\"longitude\":127.3567,\"altitude_km\":0.07,\"dish_m\":13,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-JEJU\",\"preset\":\"jeju\",\"name\":\"제주\",\"region\":\"대한민국\",\"latitude\":33.4996,\"longitude\":126.5312,\"altitude_km\":0.03,\"dish_m\":7.3,\"bands\":[\"S\",\"X\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-SVALBARD\",\"preset\":\"svalbard\",\"name\":\"스발바르\",\"region\":\"노르웨이\",\"latitude\":78.2298,\"longitude\":15.4078,\"altitude_km\":0.45,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":3,\"enabled\":true},{\"schema\":1,\"id\":\"GS-FAIRBANKS\",\"preset\":\"fairbanks\",\"name\":\"페어뱅크스\",\"region\":\"미국 알래스카\",\"latitude\":64.8378,\"longitude\":-147.7164,\"altitude_km\":0.14,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-SITE_2\",\"preset\":null,\"name\":\"고흥\",\"region\":\"대한민국\",\"latitude\":34.6,\"longitude\":127.2,\"altitude_km\":0.04,\"dish_m\":7.3,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true}]}"
+        ]
+      ]
+    },
+    {
+      "action": "update",
+      "result": [],
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-FAIRBANKS",
+          "preset": "fairbanks",
+          "name": "페어뱅크스",
+          "region": "미국 알래스카",
+          "latitude": 64.8378,
+          "longitude": -147.7164,
+          "altitude_km": 0.14,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SITE_2",
+          "preset": null,
+          "name": "고흥 편집",
+          "region": "대한민국",
+          "latitude": 34.6,
+          "longitude": 127.2,
+          "altitude_km": 0.04,
+          "dish_m": 7.3,
+          "bands": [
+            "X"
+          ],
+          "min_elevation_deg": 7,
+          "enabled": true
+        }
+      ],
+      "selectedId": "GS-SITE_2",
+      "enabled": [
+        "GS-DAEJEON",
+        "GS-JEJU",
+        "GS-SVALBARD",
+        "GS-FAIRBANKS",
+        "GS-SITE_2"
+      ],
+      "presets": [
+        "seoul",
+        "tromso",
+        "inuvik",
+        "singapore",
+        "hawaii",
+        "atacama",
+        "punta_arenas",
+        "hobart"
+      ],
+      "saved": [
+        [
+          "spacetwin-ground-stations-v1",
+          "{\"schema\":1,\"sequence\":2,\"selectedId\":\"GS-SITE_2\",\"stations\":[{\"schema\":1,\"id\":\"GS-DAEJEON\",\"preset\":\"daejeon\",\"name\":\"대전\",\"region\":\"대한민국\",\"latitude\":36.3742,\"longitude\":127.3567,\"altitude_km\":0.07,\"dish_m\":13,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-JEJU\",\"preset\":\"jeju\",\"name\":\"제주\",\"region\":\"대한민국\",\"latitude\":33.4996,\"longitude\":126.5312,\"altitude_km\":0.03,\"dish_m\":7.3,\"bands\":[\"S\",\"X\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-SVALBARD\",\"preset\":\"svalbard\",\"name\":\"스발바르\",\"region\":\"노르웨이\",\"latitude\":78.2298,\"longitude\":15.4078,\"altitude_km\":0.45,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":3,\"enabled\":true},{\"schema\":1,\"id\":\"GS-FAIRBANKS\",\"preset\":\"fairbanks\",\"name\":\"페어뱅크스\",\"region\":\"미국 알래스카\",\"latitude\":64.8378,\"longitude\":-147.7164,\"altitude_km\":0.14,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-SITE_2\",\"preset\":null,\"name\":\"고흥 편집\",\"region\":\"대한민국\",\"latitude\":34.6,\"longitude\":127.2,\"altitude_km\":0.04,\"dish_m\":7.3,\"bands\":[\"X\"],\"min_elevation_deg\":7,\"enabled\":true}]}"
+        ]
+      ]
+    },
+    {
+      "action": "disable",
+      "result": true,
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": false
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-FAIRBANKS",
+          "preset": "fairbanks",
+          "name": "페어뱅크스",
+          "region": "미국 알래스카",
+          "latitude": 64.8378,
+          "longitude": -147.7164,
+          "altitude_km": 0.14,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SITE_2",
+          "preset": null,
+          "name": "고흥 편집",
+          "region": "대한민국",
+          "latitude": 34.6,
+          "longitude": 127.2,
+          "altitude_km": 0.04,
+          "dish_m": 7.3,
+          "bands": [
+            "X"
+          ],
+          "min_elevation_deg": 7,
+          "enabled": true
+        }
+      ],
+      "selectedId": "GS-SITE_2",
+      "enabled": [
+        "GS-DAEJEON",
+        "GS-SVALBARD",
+        "GS-FAIRBANKS",
+        "GS-SITE_2"
+      ],
+      "presets": [
+        "seoul",
+        "tromso",
+        "inuvik",
+        "singapore",
+        "hawaii",
+        "atacama",
+        "punta_arenas",
+        "hobart"
+      ],
+      "saved": [
+        [
+          "spacetwin-ground-stations-v1",
+          "{\"schema\":1,\"sequence\":2,\"selectedId\":\"GS-SITE_2\",\"stations\":[{\"schema\":1,\"id\":\"GS-DAEJEON\",\"preset\":\"daejeon\",\"name\":\"대전\",\"region\":\"대한민국\",\"latitude\":36.3742,\"longitude\":127.3567,\"altitude_km\":0.07,\"dish_m\":13,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-JEJU\",\"preset\":\"jeju\",\"name\":\"제주\",\"region\":\"대한민국\",\"latitude\":33.4996,\"longitude\":126.5312,\"altitude_km\":0.03,\"dish_m\":7.3,\"bands\":[\"S\",\"X\"],\"min_elevation_deg\":5,\"enabled\":false},{\"schema\":1,\"id\":\"GS-SVALBARD\",\"preset\":\"svalbard\",\"name\":\"스발바르\",\"region\":\"노르웨이\",\"latitude\":78.2298,\"longitude\":15.4078,\"altitude_km\":0.45,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":3,\"enabled\":true},{\"schema\":1,\"id\":\"GS-FAIRBANKS\",\"preset\":\"fairbanks\",\"name\":\"페어뱅크스\",\"region\":\"미국 알래스카\",\"latitude\":64.8378,\"longitude\":-147.7164,\"altitude_km\":0.14,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-SITE_2\",\"preset\":null,\"name\":\"고흥 편집\",\"region\":\"대한민국\",\"latitude\":34.6,\"longitude\":127.2,\"altitude_km\":0.04,\"dish_m\":7.3,\"bands\":[\"X\"],\"min_elevation_deg\":7,\"enabled\":true}]}"
+        ]
+      ]
+    },
+    {
+      "action": "select",
+      "result": "GS-SITE_2",
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": false
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-FAIRBANKS",
+          "preset": "fairbanks",
+          "name": "페어뱅크스",
+          "region": "미국 알래스카",
+          "latitude": 64.8378,
+          "longitude": -147.7164,
+          "altitude_km": 0.14,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SITE_2",
+          "preset": null,
+          "name": "고흥 편집",
+          "region": "대한민국",
+          "latitude": 34.6,
+          "longitude": 127.2,
+          "altitude_km": 0.04,
+          "dish_m": 7.3,
+          "bands": [
+            "X"
+          ],
+          "min_elevation_deg": 7,
+          "enabled": true
+        }
+      ],
+      "selectedId": "GS-SITE_2",
+      "enabled": [
+        "GS-DAEJEON",
+        "GS-SVALBARD",
+        "GS-FAIRBANKS",
+        "GS-SITE_2"
+      ],
+      "presets": [
+        "seoul",
+        "tromso",
+        "inuvik",
+        "singapore",
+        "hawaii",
+        "atacama",
+        "punta_arenas",
+        "hobart"
+      ],
+      "saved": [
+        [
+          "spacetwin-ground-stations-v1",
+          "{\"schema\":1,\"sequence\":2,\"selectedId\":\"GS-SITE_2\",\"stations\":[{\"schema\":1,\"id\":\"GS-DAEJEON\",\"preset\":\"daejeon\",\"name\":\"대전\",\"region\":\"대한민국\",\"latitude\":36.3742,\"longitude\":127.3567,\"altitude_km\":0.07,\"dish_m\":13,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-JEJU\",\"preset\":\"jeju\",\"name\":\"제주\",\"region\":\"대한민국\",\"latitude\":33.4996,\"longitude\":126.5312,\"altitude_km\":0.03,\"dish_m\":7.3,\"bands\":[\"S\",\"X\"],\"min_elevation_deg\":5,\"enabled\":false},{\"schema\":1,\"id\":\"GS-SVALBARD\",\"preset\":\"svalbard\",\"name\":\"스발바르\",\"region\":\"노르웨이\",\"latitude\":78.2298,\"longitude\":15.4078,\"altitude_km\":0.45,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":3,\"enabled\":true},{\"schema\":1,\"id\":\"GS-FAIRBANKS\",\"preset\":\"fairbanks\",\"name\":\"페어뱅크스\",\"region\":\"미국 알래스카\",\"latitude\":64.8378,\"longitude\":-147.7164,\"altitude_km\":0.14,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-SITE_2\",\"preset\":null,\"name\":\"고흥 편집\",\"region\":\"대한민국\",\"latitude\":34.6,\"longitude\":127.2,\"altitude_km\":0.04,\"dish_m\":7.3,\"bands\":[\"X\"],\"min_elevation_deg\":7,\"enabled\":true}]}"
+        ]
+      ]
+    },
+    {
+      "action": "restore",
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": false
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-FAIRBANKS",
+          "preset": "fairbanks",
+          "name": "페어뱅크스",
+          "region": "미국 알래스카",
+          "latitude": 64.8378,
+          "longitude": -147.7164,
+          "altitude_km": 0.14,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SITE_2",
+          "preset": null,
+          "name": "고흥 편집",
+          "region": "대한민국",
+          "latitude": 34.6,
+          "longitude": 127.2,
+          "altitude_km": 0.04,
+          "dish_m": 7.3,
+          "bands": [
+            "X"
+          ],
+          "min_elevation_deg": 7,
+          "enabled": true
+        }
+      ],
+      "selectedId": "GS-SITE_2"
+    },
+    {
+      "action": "remove",
+      "result": true,
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": false
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-FAIRBANKS",
+          "preset": "fairbanks",
+          "name": "페어뱅크스",
+          "region": "미국 알래스카",
+          "latitude": 64.8378,
+          "longitude": -147.7164,
+          "altitude_km": 0.14,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        }
+      ],
+      "selectedId": null,
+      "enabled": [
+        "GS-DAEJEON",
+        "GS-SVALBARD",
+        "GS-FAIRBANKS"
+      ],
+      "presets": [
+        "seoul",
+        "tromso",
+        "inuvik",
+        "singapore",
+        "hawaii",
+        "atacama",
+        "punta_arenas",
+        "hobart"
+      ],
+      "saved": [
+        [
+          "spacetwin-ground-stations-v1",
+          "{\"schema\":1,\"sequence\":2,\"selectedId\":null,\"stations\":[{\"schema\":1,\"id\":\"GS-DAEJEON\",\"preset\":\"daejeon\",\"name\":\"대전\",\"region\":\"대한민국\",\"latitude\":36.3742,\"longitude\":127.3567,\"altitude_km\":0.07,\"dish_m\":13,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-JEJU\",\"preset\":\"jeju\",\"name\":\"제주\",\"region\":\"대한민국\",\"latitude\":33.4996,\"longitude\":126.5312,\"altitude_km\":0.03,\"dish_m\":7.3,\"bands\":[\"S\",\"X\"],\"min_elevation_deg\":5,\"enabled\":false},{\"schema\":1,\"id\":\"GS-SVALBARD\",\"preset\":\"svalbard\",\"name\":\"스발바르\",\"region\":\"노르웨이\",\"latitude\":78.2298,\"longitude\":15.4078,\"altitude_km\":0.45,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":3,\"enabled\":true},{\"schema\":1,\"id\":\"GS-FAIRBANKS\",\"preset\":\"fairbanks\",\"name\":\"페어뱅크스\",\"region\":\"미국 알래스카\",\"latitude\":64.8378,\"longitude\":-147.7164,\"altitude_km\":0.14,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true}]}"
+        ]
+      ]
+    },
+    {
+      "action": "remove-again",
+      "result": false,
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": false
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-FAIRBANKS",
+          "preset": "fairbanks",
+          "name": "페어뱅크스",
+          "region": "미국 알래스카",
+          "latitude": 64.8378,
+          "longitude": -147.7164,
+          "altitude_km": 0.14,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        }
+      ],
+      "selectedId": null,
+      "enabled": [
+        "GS-DAEJEON",
+        "GS-SVALBARD",
+        "GS-FAIRBANKS"
+      ],
+      "presets": [
+        "seoul",
+        "tromso",
+        "inuvik",
+        "singapore",
+        "hawaii",
+        "atacama",
+        "punta_arenas",
+        "hobart"
+      ],
+      "saved": [
+        [
+          "spacetwin-ground-stations-v1",
+          "{\"schema\":1,\"sequence\":2,\"selectedId\":null,\"stations\":[{\"schema\":1,\"id\":\"GS-DAEJEON\",\"preset\":\"daejeon\",\"name\":\"대전\",\"region\":\"대한민국\",\"latitude\":36.3742,\"longitude\":127.3567,\"altitude_km\":0.07,\"dish_m\":13,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-JEJU\",\"preset\":\"jeju\",\"name\":\"제주\",\"region\":\"대한민국\",\"latitude\":33.4996,\"longitude\":126.5312,\"altitude_km\":0.03,\"dish_m\":7.3,\"bands\":[\"S\",\"X\"],\"min_elevation_deg\":5,\"enabled\":false},{\"schema\":1,\"id\":\"GS-SVALBARD\",\"preset\":\"svalbard\",\"name\":\"스발바르\",\"region\":\"노르웨이\",\"latitude\":78.2298,\"longitude\":15.4078,\"altitude_km\":0.45,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":3,\"enabled\":true},{\"schema\":1,\"id\":\"GS-FAIRBANKS\",\"preset\":\"fairbanks\",\"name\":\"페어뱅크스\",\"region\":\"미국 알래스카\",\"latitude\":64.8378,\"longitude\":-147.7164,\"altitude_km\":0.14,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true}]}"
+        ]
+      ]
+    },
+    {
+      "action": "reset",
+      "result": null,
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        }
+      ],
+      "selectedId": null,
+      "enabled": [
+        "GS-DAEJEON",
+        "GS-JEJU",
+        "GS-SVALBARD"
+      ],
+      "presets": [
+        "seoul",
+        "tromso",
+        "fairbanks",
+        "inuvik",
+        "singapore",
+        "hawaii",
+        "atacama",
+        "punta_arenas",
+        "hobart"
+      ],
+      "saved": [
+        [
+          "spacetwin-ground-stations-v1",
+          "{\"schema\":1,\"sequence\":2,\"selectedId\":null,\"stations\":[{\"schema\":1,\"id\":\"GS-DAEJEON\",\"preset\":\"daejeon\",\"name\":\"대전\",\"region\":\"대한민국\",\"latitude\":36.3742,\"longitude\":127.3567,\"altitude_km\":0.07,\"dish_m\":13,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-JEJU\",\"preset\":\"jeju\",\"name\":\"제주\",\"region\":\"대한민국\",\"latitude\":33.4996,\"longitude\":126.5312,\"altitude_km\":0.03,\"dish_m\":7.3,\"bands\":[\"S\",\"X\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-SVALBARD\",\"preset\":\"svalbard\",\"name\":\"스발바르\",\"region\":\"노르웨이\",\"latitude\":78.2298,\"longitude\":15.4078,\"altitude_km\":0.45,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":3,\"enabled\":true}]}"
+        ]
+      ]
+    },
+    {
+      "action": "duplicate",
+      "result": {
+        "schema": 1,
+        "id": "GS-JEJU_2",
+        "preset": "jeju",
+        "name": "제주",
+        "region": "대한민국",
+        "latitude": 33.4996,
+        "longitude": 126.5312,
+        "altitude_km": 0.03,
+        "dish_m": 7.3,
+        "bands": [
+          "S",
+          "X"
+        ],
+        "min_elevation_deg": 5,
+        "enabled": true
+      },
+      "stations": [
+        {
+          "schema": 1,
+          "id": "GS-DAEJEON",
+          "preset": "daejeon",
+          "name": "대전",
+          "region": "대한민국",
+          "latitude": 36.3742,
+          "longitude": 127.3567,
+          "altitude_km": 0.07,
+          "dish_m": 13,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-SVALBARD",
+          "preset": "svalbard",
+          "name": "스발바르",
+          "region": "노르웨이",
+          "latitude": 78.2298,
+          "longitude": 15.4078,
+          "altitude_km": 0.45,
+          "dish_m": 11,
+          "bands": [
+            "S",
+            "X",
+            "Ka"
+          ],
+          "min_elevation_deg": 3,
+          "enabled": true
+        },
+        {
+          "schema": 1,
+          "id": "GS-JEJU_2",
+          "preset": "jeju",
+          "name": "제주",
+          "region": "대한민국",
+          "latitude": 33.4996,
+          "longitude": 126.5312,
+          "altitude_km": 0.03,
+          "dish_m": 7.3,
+          "bands": [
+            "S",
+            "X"
+          ],
+          "min_elevation_deg": 5,
+          "enabled": true
+        }
+      ],
+      "selectedId": "GS-JEJU_2",
+      "enabled": [
+        "GS-DAEJEON",
+        "GS-JEJU",
+        "GS-SVALBARD",
+        "GS-JEJU_2"
+      ],
+      "presets": [
+        "seoul",
+        "tromso",
+        "fairbanks",
+        "inuvik",
+        "singapore",
+        "hawaii",
+        "atacama",
+        "punta_arenas",
+        "hobart"
+      ],
+      "saved": [
+        [
+          "spacetwin-ground-stations-v1",
+          "{\"schema\":1,\"sequence\":3,\"selectedId\":\"GS-JEJU_2\",\"stations\":[{\"schema\":1,\"id\":\"GS-DAEJEON\",\"preset\":\"daejeon\",\"name\":\"대전\",\"region\":\"대한민국\",\"latitude\":36.3742,\"longitude\":127.3567,\"altitude_km\":0.07,\"dish_m\":13,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-JEJU\",\"preset\":\"jeju\",\"name\":\"제주\",\"region\":\"대한민국\",\"latitude\":33.4996,\"longitude\":126.5312,\"altitude_km\":0.03,\"dish_m\":7.3,\"bands\":[\"S\",\"X\"],\"min_elevation_deg\":5,\"enabled\":true},{\"schema\":1,\"id\":\"GS-SVALBARD\",\"preset\":\"svalbard\",\"name\":\"스발바르\",\"region\":\"노르웨이\",\"latitude\":78.2298,\"longitude\":15.4078,\"altitude_km\":0.45,\"dish_m\":11,\"bands\":[\"S\",\"X\",\"Ka\"],\"min_elevation_deg\":3,\"enabled\":true},{\"schema\":1,\"id\":\"GS-JEJU_2\",\"preset\":\"jeju\",\"name\":\"제주\",\"region\":\"대한민국\",\"latitude\":33.4996,\"longitude\":126.5312,\"altitude_km\":0.03,\"dish_m\":7.3,\"bands\":[\"S\",\"X\"],\"min_elevation_deg\":5,\"enabled\":true}]}"
+        ]
+      ]
+    }
+  ],
+  "events": [
+    "load",
+    "add",
+    "add",
+    "update",
+    "update",
+    "select",
+    "remove",
+    "reset",
+    "add"
+  ]
+}
