@@ -6,6 +6,41 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let choice={mode:'3d',imagery:'blue_marble',theme:'dark',emphasis:true},imagery={requestedImagery:'blue_marble',displayedImagery:null,phase:'pending',error:null},mode={phase:'ready',error:null},modeRevision=0;
   const viewObservers=new Set();
   const displayObservers=new Set();let displayKey=null,solarFactory=null,solarRenderer=null;
+  let nodeBinding=null;const nodeObservers=new Set();
+  const nodeRendererState=()=>({phase:disposed?'unavailable':nodeBinding?.phase??'unavailable',error:nodeBinding?.error??null});
+  function notifyNodes(){for(const fn of nodeObservers){try{fn(structuredClone(nodeRendererState()));}catch{/* A display observer cannot own renderer resources. */}}}
+  function detachNodes(binding=nodeBinding){
+    if(!binding)return;
+    const remove=binding.removeFrame,renderer=binding.renderer;binding.removeFrame=null;binding.renderer=null;
+    try{remove?.();}catch{/* The shared scene may already be unavailable. */}
+    try{renderer?.destroy();}catch{/* Release other owners even when optional node cleanup fails. */}
+  }
+  function attachNodes(){
+    const binding=nodeBinding,owner=globe;
+    if(!binding||binding.renderer||disposed)return;
+    if(failed){binding.phase='unavailable';notifyNodes();return;}
+    if(!owner)return;
+    let renderer;
+    try{
+      renderer=binding.factory(host.Cesium,owner.viewer);
+      if(typeof renderer?.syncFrame!=='function'||typeof renderer?.destroy!=='function')throw new TypeError('node renderer lifecycle required');
+      if(nodeBinding!==binding||disposed||failed||owner!==globe){const stale=renderer;renderer=null;try{stale.destroy();}catch{/* Stale renderer cleanup cannot own its replacement. */}return;}
+      binding.renderer=renderer;
+      const frames=owner.viewer.scene.preRender;
+      if(typeof frames?.addEventListener!=='function')throw new Error('shared node render frame unavailable');
+      const frame=()=>{
+        if(nodeBinding!==binding||binding.renderer!==renderer||disposed||failed||owner!==globe)return;
+        try{
+          const phase=host.performance?.now?.();
+          renderer.syncFrame(displayContext()?.utc??null,Number.isFinite(phase)?phase:0);
+        }catch(error){binding.phase='error';binding.error=String(error?.message||error);detachNodes(binding);notifyNodes();}
+      };
+      binding.removeFrame=frames.addEventListener(frame);binding.phase='ready';binding.error=null;notifyNodes();
+    }catch(error){
+      if(binding.renderer)detachNodes(binding);else try{renderer?.destroy?.();}catch{/* Invalid factory resource. */}
+      if(nodeBinding===binding&&!disposed){binding.phase='error';binding.error=String(error?.message||error);notifyNodes();}
+    }
+  }
   const validPosition=value=>value?.frame==='ITRF'&&value.status!=='error'&&!value.error_code&&typeof value.utc==='string'&&value.utc.endsWith('Z')&&Array.isArray(value.position_m)&&value.position_m.length===3&&value.position_m.every(Number.isFinite);
   function displayContext(){
     if(!globe||failed||disposed)return null;
@@ -66,6 +101,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   }
   function fail(){
     failed=true;focusButton.disabled=true;container.dataset.orbitVisible='false';
+    if(nodeBinding){nodeBinding.phase='unavailable';detachNodes();notifyNodes();}
     removeError?.();removeError=null;solarRenderer?.destroy();solarRenderer=null;globe?.destroy();globe=null;notifyDisplay();
     describe('지구 렌더링을 사용할 수 없습니다. 위성 창의 수치 결과를 확인하세요. 합성 위치는 표시하지 않습니다.');
     notifyView();
@@ -92,12 +128,21 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       paint();
       applyModel();
       attachSolar();
+      attachNodes();
     }catch{fail();}
   }
   const timer=host.setTimeout(boot,12000);
   if(host.Cesium)boot();else host.addEventListener('load',boot,{once:true});
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
+    nodeRendererState,
+    observeNodeRenderer(fn){if(disposed)return()=>{};nodeObservers.add(fn);try{fn(structuredClone(nodeRendererState()));}catch{/* Readonly observer. */}return()=>nodeObservers.delete(fn);},
+    bindNodeRenderer(factory){
+      if(typeof factory!=='function')throw new TypeError('node renderer factory required');
+      if(disposed)return()=>{};
+      const previous=nodeBinding,binding={factory,renderer:null,removeFrame:null,phase:'pending',error:null};nodeBinding=binding;detachNodes(previous);attachNodes();notifyNodes();
+      return()=>{if(nodeBinding!==binding)return;nodeBinding=null;detachNodes(binding);notifyNodes();};
+    },
     observeDisplayContext(fn){if(disposed)return()=>{};displayObservers.add(fn);fn(displayContext());return()=>displayObservers.delete(fn);},
     bindSolarRenderer(factory){if(disposed)return()=>{};solarFactory=factory;attachSolar();return()=>{if(solarFactory!==factory)return;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;};},
     observeSatelliteHover(fn){if(disposed)return()=>{};hoverObservers.add(fn);return()=>hoverObservers.delete(fn);},
@@ -147,6 +192,6 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       paint();
       if(!catalog&&!latest&&!sceneMetadata&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
     },
-    destroy(){if(disposed)return;disposed=true;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;displayObservers.clear();hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
+    destroy(){if(disposed)return;disposed=true;nodeObservers.clear();detachNodes();nodeBinding=null;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;displayObservers.clear();hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
   };
 }
