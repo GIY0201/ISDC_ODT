@@ -48,46 +48,7 @@ class NativeMissionWindows:
                     raise RuntimeError('required native eclipse sample unavailable')
                 states.append([not row['sunlit'] for row in node_rows])
             return states
-        windows=[];edges=[];active=[None]*len(captured);previous=[None]*len(captured)
-        offsets=[float(i*step_seconds) for i in range(int(duration//step_seconds)+1)]
-        if offsets[-1]<duration:offsets.append(duration)
-        else:offsets[-1]=duration
-        chunk=min(MAX_NODE_SAMPLES,MAX_NODE_ROWS//len(captured))
-        for begin in range(0,len(offsets),chunk):
-            points=offsets[begin:begin+chunk]
-            values=await read(list(range(len(captured))),points)
-            for i,states in enumerate(values):
-                for offset,inside in zip(points,states):
-                    prev=previous[i]
-                    if inside and (prev is None or not prev[1]):
-                        item={'index':i,'start':offset,'end':None,'in_progress':offset==0,'truncated':False}
-                        active[i]=item;windows.append(item)
-                        if len(windows)>self.max_windows:raise ValueError('window capacity exceeded; result not published')
-                        if prev is not None:edges.append({'item':item,'field':'start','inside':offset,'outside':prev[0]})
-                    elif not inside and prev is not None and prev[1]:
-                        edges.append({'item':active[i],'field':'end','inside':prev[0],'outside':offset})
-                        active[i]=None
-                    previous[i]=(offset,inside)
-        for item in active:
-            if item is not None:item['end']=duration;item['truncated']=True
-        # Original scanIntervals refinement returns the inside boundary; preserve that convention.
-        pending=edges
-        while pending:
-            by_node={}
-            for edge in pending:
-                if abs(edge['outside']-edge['inside'])<=refine_seconds:
-                    edge['item'][edge['field']]=edge['inside'];continue
-                edge['middle']=(edge['inside']+edge['outside'])/2
-                by_node.setdefault(edge['item']['index'],[]).append(edge)
-            pending=[]
-            for i,group in by_node.items():
-                mids=sorted(set(e['middle'] for e in group));known={}
-                for begin in range(0,len(mids),MAX_NODE_SAMPLES):
-                    part=mids[begin:begin+MAX_NODE_SAMPLES]
-                    states=(await read([i],part))[0];known.update(zip(part,states))
-                for edge in group:
-                    edge['inside' if known[edge['middle']] else 'outside']=edge['middle']
-                    pending.append(edge)
+        windows=await scan_native_intervals(read,len(captured),duration,step_seconds,refine_seconds,self.max_windows)
         result=[]
         for item in windows:
             identity=captured[item['index']]['id'];start=stamp(item['start']);end=stamp(item['end'])
@@ -119,3 +80,48 @@ def validate_native_window_points(report,nodes,times,request_id,hashes):
                 raise RuntimeError('required native window sample unavailable')
         rows.append(result['rows'])
     return rows
+
+
+async def scan_native_intervals(read,node_count,duration,step_seconds,refine_seconds,max_windows):
+    """Source interval scan over injected required native predicates; invocation-local only."""
+    windows=[];edges=[];active=[None]*node_count;previous=[None]*node_count
+    offsets=[float(i*step_seconds) for i in range(int(duration//step_seconds)+1)]
+    if offsets[-1]<duration:offsets.append(duration)
+    else:offsets[-1]=duration
+    chunk=min(MAX_NODE_SAMPLES,MAX_NODE_ROWS//node_count)
+    for begin in range(0,len(offsets),chunk):
+        points=offsets[begin:begin+chunk]
+        values=await read(list(range(node_count)),points)
+        for i,states in enumerate(values):
+            for offset,inside in zip(points,states):
+                prev=previous[i]
+                if inside and (prev is None or not prev[1]):
+                    item={'index':i,'start':offset,'end':None,'in_progress':offset==0,'truncated':False}
+                    active[i]=item;windows.append(item)
+                    if len(windows)>max_windows:raise ValueError('window capacity exceeded; result not published')
+                    if prev is not None:edges.append({'item':item,'field':'start','inside':offset,'outside':prev[0]})
+                elif not inside and prev is not None and prev[1]:
+                    edges.append({'item':active[i],'field':'end','inside':prev[0],'outside':offset})
+                    active[i]=None
+                previous[i]=(offset,inside)
+    for item in active:
+        if item is not None:item['end']=duration;item['truncated']=True
+    # Original scanIntervals refinement returns the inside boundary; preserve that convention.
+    pending=edges
+    while pending:
+        by_node={}
+        for edge in pending:
+            if abs(edge['outside']-edge['inside'])<=refine_seconds:
+                edge['item'][edge['field']]=edge['inside'];continue
+            edge['middle']=(edge['inside']+edge['outside'])/2
+            by_node.setdefault(edge['item']['index'],[]).append(edge)
+        pending=[]
+        for i,group in by_node.items():
+            mids=sorted(set(e['middle'] for e in group));known={}
+            for begin in range(0,len(mids),MAX_NODE_SAMPLES):
+                part=mids[begin:begin+MAX_NODE_SAMPLES]
+                states=(await read([i],part))[0];known.update(zip(part,states))
+            for edge in group:
+                edge['inside' if known[edge['middle']] else 'outside']=edge['middle']
+                pending.append(edge)
+    return windows
