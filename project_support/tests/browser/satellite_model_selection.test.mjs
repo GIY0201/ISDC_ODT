@@ -12,6 +12,12 @@ function fixture(request){
 }
 const item=(id=25544)=>({NORAD_CAT_ID:id,OBJECT_NAME:'ISS',EPOCH:'epoch-a'});
 const geometry=(id=25544,hash='a'.repeat(64))=>({catalog_number:id,normalized_gp_sha256:hash,frame:'ITRF'});
+test('node workspace shares the existing manifest resolver without changing catalog selection',async()=>{
+ const f=fixture(async()=>({schema:2,models:[{key:'node',title:'Node'}]}));assert.equal(f.c.resolve({OBJECT_NAME:'NODE'}),null);
+ await f.c.load();const before=f.calls.length;assert.equal(f.c.resolve({OBJECT_NAME:'NODE'}).key,'NODE');
+ const models=f.c.models();models[0].key='changed';assert.equal(f.c.models()[0].key,'node');assert.equal(f.calls.length,before);
+ f.c.destroy();assert.equal(f.c.resolve({OBJECT_NAME:'NODE'}),null);assert.deepEqual(f.c.models(),[]);
+});
 
 test('manifest arriving late resolves latest selection only; same target playback does not reload',async()=>{
  let release;const f=fixture(()=>new Promise(r=>release=r)),work=f.c.load();f.c.select(item(),null,geometry());f.c.select({...item(123),OBJECT_NAME:'OTHER'},null,geometry(123));release({schema:2});await work;

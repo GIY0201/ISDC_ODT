@@ -1,7 +1,7 @@
 /** Compose ordered original model matching with copied catalog inputs only.
  * Selection and display UTC remain owned by the catalog controllers. */
 export function createSatelliteModelSelection({api,globe,timeline,validateManifest,createResolver}) {
-  let dead=false,revision=0,abort=null,resolver=null,current=null,signature=null;
+  let dead=false,revision=0,abort=null,resolver=null,current=null,signature=null,loadedModels=[];
   const source={timeSource:()=>timeline.currentUtc(),sampleAt:utc=>timeline.sampleAt(utc),advanceUtc:(utc,seconds)=>timeline.advanceUtc(utc,seconds)};
   function sameEpoch(a,b){
     if(a===b)return true;
@@ -28,6 +28,8 @@ export function createSatelliteModelSelection({api,globe,timeline,validateManife
     signature=next;globe.setSatelliteModel(description,source);
   }
   return {
+    resolve(item){return dead||!resolver?null:structuredClone(resolver(structuredClone(item),{}));},
+    models(){return dead?[]:structuredClone(loadedModels);},
     select(item,profile,geometry){
       if(dead)return;
       current=item&&geometry?.frame==='ITRF'&&item.NORAD_CAT_ID===geometry.catalog_number&&
@@ -43,12 +45,13 @@ export function createSatelliteModelSelection({api,globe,timeline,validateManife
         const raw=await api.satelliteModelManifest({signal:abort.signal});
         if(dead||ticket!==revision)return;
         const manifest=validateManifest(raw);
+        loadedModels=structuredClone(manifest.models??[]);
         resolver=createResolver(manifest,'/static/satellite_display/');
         globe.modelManifestStatus({phase:'ready',error:null});apply();
       }catch(error){
         if(!dead&&ticket===revision)globe.modelManifestStatus({phase:'error',error:String(error?.message||error)});
       }
     },
-    destroy(){if(dead)return;dead=true;++revision;abort?.abort();current=null;resolver=null;signature=null;},
+    destroy(){if(dead)return;dead=true;++revision;abort?.abort();current=null;resolver=null;signature=null;loadedModels=[];},
   };
 }

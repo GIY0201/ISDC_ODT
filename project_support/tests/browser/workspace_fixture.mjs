@@ -29,6 +29,12 @@ import {createCommunicationPlanningPanel} from '../../../user_application/web/sc
 import {createRfPanel} from '../../../user_application/web/scripts/tabs/rf_link_budget.js';
 import {createWorkspacePlayback} from '../../../user_application/web/scripts/workspace_playback.js';
 import {LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
+import {createWorkspaceNodes} from '../../../user_application/web/scripts/workspace_nodes.js';
+import {createNodeLibrary} from '../../../digital_twin/model_library/browser/satellite_nodes.js';
+import {orbitElements,catalogElements} from '../../../digital_twin/simulation/browser/node_orbit_definition.js';
+import * as nodeOisl from '../../../digital_twin/simulation/browser/oisl.js';
+import {NodeScene} from '../../../digital_twin/visualization/node_scene.js';
+import {createSatelliteNodePanelTools} from '../../../user_application/web/scripts/tabs/satellite_nodes.js';
 
 // Execute the real window handlers and orbit assembly. Only DOM layout, HTTP,
 // Cesium and scheduling are adapters; expected bounds are acceptance criteria.
@@ -97,6 +103,8 @@ export function fixture(width=1280,height=720,options={}){
   const api={orbitVisibility:async p=>{queries++;return {...p,revision:p.selection_revision,query_start_utc:p.start_utc,query_end_utc:p.end_utc,input_hash:state.input_hash,eop_sha256:state.eop_sha256,leap_sha256:state.leap_sha256,frame:state.frame,profile:state.profile,communication_status:'unknown',status:'none',intervals:[],contacts:[],errors:[],stale:false};}};
   api.issReceiveProfile=options.rfProfileRequest??(async()=>{throw new Error('Profile transport not supplied by fixture');});
   api.satelliteModelManifest=options.satelliteModelManifest??(async()=>{throw new Error('Model manifest transport not supplied by fixture');});
+  api.nodeSamples=options.nodeSamples??(async()=>{throw Error('Native node transport not supplied by fixture');});
+  api.nodeTrack=options.nodeTrack??(async()=>{throw Error('Native node transport not supplied by fixture');});
   api.bootstrap=options.planningBootstrap??(async()=>{throw Error("Planning transport not supplied");});
   for(const key of ['runtimeControl','runtimeSpeed','selectScenario','injectFault','missionAction','missionTask','validateMission','replanMission'])api[key]=options[key];
   api.route=options.planningRoute;api.contacts=options.planningContacts;
@@ -108,9 +116,11 @@ export function fixture(width=1280,height=720,options={}){
   api.linkBudget=options.rfRequest??(async()=>{throw new Error('RF transport not supplied by fixture');});
   const schedule=set=>()=>{const id=++nextId;set.add(id);return id;};
   Object.assign(win,{Cesium,setTimeout:()=>++nextId,clearTimeout(){},BroadcastChannel:Channel,opener:options.opener??null,open:options.open??(()=>null),close:()=>{win.closed=true;}});
+  Object.assign(win,{innerWidth:width,innerHeight:height,crypto:{randomUUID:()=>String(++nextId)},localStorage:null,confirm:()=>false,fetch:options.fetch??(async()=>({ok:true,json:async()=>({revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]})}))});
   context=vm.createContext({document:doc,window:win,innerWidth:width,innerHeight:height,location:{hash:options.hash??'#ground',search:options.popout?'?popout=1':'',origin:'http://localhost',href:'http://localhost/#ground'},URL,URLSearchParams,structuredClone,performance:{now:()=>0},crypto:{randomUUID:()=>String(++nextId)},queueMicrotask:fn=>jobs.push(fn),api,drawMultiLine:(canvas,series)=>charts.push(structuredClone(series)),drawSparkline:(canvas,series)=>charts.push(structuredClone(series)),GROUND_STATIONS,stationGroups,createStationPanel,createCatalogTimePanel,createCatalogTimeline:(api,display,notify)=>createCatalogTimeline(api,display,notify,{now:()=>0,requestFrame:schedule(frames),cancelFrame:id=>frames.delete(id),requestId:()=>String(++nextId)}),hilTopology,createHilPanel,createCatalogPanel,createCatalogGeometry,createKpiPanel,telemetrySocket:(message,status)=>{const stream={message,status,closed:0};streams.push(stream);return()=>stream.closed++;},createSimPanel,createMissionPanel,createRadioSeriesPanel,createGroundPanel,createRfPanel,createCommunicationPlanningPanel,createOrbitRadioPanel,createWorkspaceRevisionSync:c=>createWorkspaceRevisionSync(c,win),createOrbitSelection:()=>client,createWorkspaceGlobe:(container,status,button)=>createWorkspaceGlobe(container,status,button,win),createWorkspacePlayback:(c,show)=>createWorkspacePlayback(c,show,{now:()=>0,requestFrame:schedule(frames),cancelFrame:id=>frames.delete(id),setTimer:schedule(timers),clearTimer:id=>timers.delete(id)}),BroadcastChannel:Channel});
   Object.assign(context,{createWorkspaceSolar:args=>createWorkspaceSolar({...args,host:win,createDisplay:()=>({setStyle(){},clear(){},update(){},destroy(){}})}),createSatelliteHover,createSatelliteModelPanel,createSatelliteModelSelection,createModelResolver,validateSatelliteManifest,createGlobeViewPanel,createCatalogTrack,createCatalogPasses,createCatalogPassPanel,createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
   // Imported ground UI uses the same adapted document as the VM assembly.
+  Object.assign(context,{createWorkspaceNodes,createNodeLibrary,orbitElements,catalogElements,nodeOisl,NodeScene,createSatelliteNodePanelTools});
   globalThis.document=doc;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}

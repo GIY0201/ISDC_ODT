@@ -23,3 +23,6 @@ loads and camera focus. Workspace records distinguish node ID from catalog ID.
 This additive display contract does not change orbital physics or HTTP schemas.
 Actual application selection/picking, panel composition and browser acceptance
 remain T151/T152 work; component tests do not establish live rendering success.
+
+
+2026-10-06 T151 application composition: createWorkspaceNodes mounts existing source panel/store/native display/optical owners and shared NodeScene binding in V6. Shared catalog model-manifest owner exposes copied resolve/models access without changing catalog selection. Native errors/unknown common UTC remain visible and retry is explicit, without timed JS propagation. Restore GET-only; deployment/recall enabled explicit actions through current accepted server client. Current full node definition fences old model sampler; explicit selection/focus are separate. Cleanup detaches scoped owners; no new Viewer/analysis clock/server acceptance. Full view/clock/picking/scene-composer/live8891/install/restore cases and T152 remain pending. Evidence validation/t151_workspace_nodes.md.

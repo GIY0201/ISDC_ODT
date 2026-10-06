@@ -1,4 +1,10 @@
 import {createWorkspaceSolar} from './workspace_solar.js?v=t135-r1';
+import {createWorkspaceNodes} from './workspace_nodes.js?v=t151-r1';
+import {createNodeLibrary} from '/static/model_library/satellite_nodes.js';
+import {orbitElements,catalogElements} from '/static/simulation/node_orbit_definition.js';
+import * as nodeOisl from '/static/simulation/oisl.js';
+import {NodeScene} from '/static/visualization/node_scene.js';
+import {createSatelliteNodePanelTools} from './tabs/satellite_nodes.js';
 import {createGlobeViewPanel} from './tabs/globe_view.js?v=t135-r1';
 import {createSatelliteModelPanel} from './tabs/satellite_model.js?v=t128-r1';
 import {createSatelliteHover} from './tabs/satellite_hover.js?v=t129-r1';
@@ -41,6 +47,7 @@ const solar=createWorkspaceSolar({api,globe,overlay:document.getElementById('orb
 const globeViewPanel=createGlobeViewPanel(globe,solar);
 const modelPanel=createSatelliteModelPanel(globe);
 let satelliteHover=null;
+let nodeWorkspace=null;
 const removeSatelliteHover=globe.observeSatelliteHover((payload,C)=>{
   if(!satelliteHover&&payload&&C)satelliteHover=createSatelliteHover(document.getElementById('stored-orbit-globe'),C);
   if(payload)satelliteHover?.show(payload);else satelliteHover?.clear();
@@ -69,7 +76,10 @@ catalogScenePanel=createCatalogScenePanel(catalogScene,()=>catalogTimeline.snaps
 catalogPanel=createCatalogPanel(api,catalogGeometry,{applied:p=>catalogScene.configure(p)});
 modelSelection=createSatelliteModelSelection({api,globe,timeline:catalogTimeline,validateManifest:validateSatelliteManifest,createResolver:createModelResolver});
 const removeModelSelection=catalogPanel.controller.observeSelection(syncModel);
-void modelSelection.load();
+const nodeLibrary=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>crypto.randomUUID()});
+nodeWorkspace=createWorkspaceNodes({api,globe,library:nodeLibrary,orbitElements,catalogElements,oisl:nodeOisl,Scene:NodeScene,tools:createSatelliteNodePanelTools({library:nodeLibrary}),document,host:window,now:()=>Date.now(),resolveModel:item=>modelSelection.resolve(item),models:()=>modelSelection.models(),fetchImpl:window.fetch.bind(window)});
+void nodeWorkspace.start().then(()=>nodeWorkspace.show(view));
+void modelSelection.load().then(()=>nodeWorkspace.refreshModels());
 const hilPanel=createHilPanel(api,hilTopology,drawSparkline);
 const simPanel=createSimPanel(api,telemetrySocket,values=>missionPanel.controller.receiveMissions(values),{frame:value=>{kpiPanel.receive(value);hilPanel.receive(value);},status:value=>{kpiPanel.connection(value);hilPanel.connection(value);}});
 const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
@@ -78,7 +88,7 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();nodeWorkspace?.destroy();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
 function render(){
   revisionSync.observe(client.snapshot());
@@ -117,7 +127,7 @@ function render(){
   panel.querySelector('#orbit-seek').addEventListener('click',()=>{const field=panel.querySelector('#orbit-utc'),utc=field.value.trim();delete field.dataset.dirty;command(()=>client.seek(utc));});
   panel.querySelector('#orbit-epoch').addEventListener('click',()=>{delete panel.querySelector('#orbit-utc').dataset.dirty;command(()=>client.seek(record.epoch_utc));});
 }
-export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);globeViewPanel.show(view);modelPanel.show(view);}
+export function showWorkspaceOrbit(currentView){view=currentView;groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);globeViewPanel.show(view);modelPanel.show(view);nodeWorkspace?.show(view);}
 client.load();
 
 export function applyWorkspaceDraft(items,remote=false){

@@ -10,13 +10,19 @@ test('empty UI choice restores server selection without clearing its result or s
   const data={inputs:[{input_id:'stored-tle',satellite_id:'25544',format:'TLE',epoch_utc:'2020-07-12T21:16:01Z',raw_sha256:'hash'}],state:{input_id:'stored-tle',current_utc:'2020-07-12T21:16:01Z'},result:{revision:3,status:'complete',rows:[{utc:'2020-07-12T21:16:01Z',position_m:[1,2,3],elevation_deg:10,status:'valid'}]},status:'ready',error:''};
   globalThis.document={getElementById(id){return id==='stored-orbit'?panel:{};}};
   globalThis.testOrbitClient={snapshot:()=>data,select:value=>calls.push(value),samples(){},load(){}};
-  globalThis.window={addEventListener(){}};
+  globalThis.window={addEventListener(){},fetch:async()=>{throw Error('isolated orbit handler cannot deploy');}};
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
     // Model composition has dedicated real-assembly tests; this fixture isolates
     // the unchanged stored-orbit select handler and its no-command assertion.
     .replace(/import \{createWorkspaceSolar\} from [^;]+;/,'const createWorkspaceSolar=()=>({destroy(){}});')
+    .replace(/import \{createWorkspaceNodes\} from [^;]+;/,'const createWorkspaceNodes=()=>({async start(){},show(){},refreshModels(){},destroy(){}});')
+    .replace(/import \{createNodeLibrary\} from [^;]+;/,'const createNodeLibrary=()=>({});')
+    .replace(/import \{orbitElements,catalogElements\} from [^;]+;/,'const orbitElements=()=>null,catalogElements=()=>null;')
+    .replace(/import \* as nodeOisl from [^;]+;/,'const nodeOisl={};')
+    .replace(/import \{NodeScene\} from [^;]+;/,'const NodeScene=class{};')
+    .replace(/import \{createSatelliteNodePanelTools\} from [^;]+;/,'const createSatelliteNodePanelTools=()=>({});')
     .replace(/import \{createSatelliteModelPanel\} from [^;]+;/,'const createSatelliteModelPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{createSatelliteModelSelection\} from [^;]+;/,'const createSatelliteModelSelection=()=>({select(){},load(){},destroy(){}});')
+    .replace(/import \{createSatelliteModelSelection\} from [^;]+;/,'const createSatelliteModelSelection=()=>({select(){},async load(){},destroy(){}});')
     .replace(/import \{createModelResolver,validateSatelliteManifest\} from [^;]+;/,'const createModelResolver=()=>{},validateSatelliteManifest=()=>{};')
     .replace(/import \{createGlobeViewPanel\} from [^;]+;/,'const createGlobeViewPanel=()=>({show(){},applyDraft(){},destroy(){}});')
     .replace(/import \{createCatalogTrack\} from [^;]+;/,'const createCatalogTrack=()=>({select(){},observe(){},destroy(){}});')
