@@ -1,0 +1,19 @@
+# T148 NodeScene models and native paths (partial)
+
+Source HEAD1a1e00297a0301637455b0ef2cf48b2e74576b07 checked. capture_original_node_scene.mjs verifies NodeScene/link_flow source SHA256 before executing the original class against injected Cesium/Viewer/time doubles. Two captures24720bytes/SHA4c88f4470043f526eb61b73ec892197ab218a8a44252c6ccb16eb3336e89f3d0 are identical. Committed original_node_scene.json records actual original model options/lighting/display orientation/path vectors/width/alpha/palette/selection and64model cap. Harness fromDegrees is a passthrough, so these are component/style goldens, not physical native/GPU accuracy proof.
+
+Ported NodeScene model/path component receives existing Viewer/Cesium/shared explicit UTC/advanceUTC/native geometry+path readers/palette/visibility/morph callbacks. There is no app/runtime/transport/DOM import, private Viewer, clock or propagation. Fixed native metre vectors are used directly, not reinterpreted as ITRF or converted through geodetic fields. Full definition/source/frame/profile/time/quality/id/hash/current row UTC/status/error/finite position are checked before model display. Source orientation uses a one-second forward difference of matching-definition/native-hash positions plus original heading/pitch/roll trim and ENU fallback. It is display approximation, not an attitude estimate or Earth-fixed conversion of inertial velocity.
+
+Original64model cap/scale/minimumPixelSize12/ambient0.62/9SH coefficients/selected-model suppression/visibility retained. All240 nodes can retain their121point native paths independently of model cap. Paths retain width1.3/ArcType.NONE/orbit palette/dark0.28/light0.45/selected suppression/shared track visibility. One dedicated owned data source protects paths from unrelated catalogue clears. Foreign Viewer resources are never cleared.
+
+Cancellation fixes are explicit behavior improvements required by the existing scope fences: same-ID changed definitions immediately remove old paths/hide models; delayed model completion after clear/dispose/Viewer change is discarded and destroyed. A cancelled setNodes cannot recreate an empty data source after clear. RED6PASS2FAIL then repaired. Model load rejection reports model_unavailable and retains valid paths; point fallback and later render-error events remain below.
+
+Validation:
+
+- Missing renderer module RED before product edits; initial source/native model/path6PASS145.3404ms.
+- Stale scope/empty data source6PASS2FAIL RED; target8PASS93.5234ms after repair.
+- Additional full240/cap/scoped cleanup/copy/shared-toggle/load rejection cases included in final full Node518PASS0FAIL0skip3099.9937ms. Log data/workspace/validation/ground_stations/t148_models_paths_node.log.
+- Full Python546PASS8existingwarnings152.91s; session92911 terminal exit0, explicit0.3.0 wheel/fresh short basetemp/cache. Log data/workspace/validation/ground_stations/t148_models_paths_pytest.log. Python product unchanged; final later JS-only tests covered by Node.
+- Source capture repeated, source hash checks, JS syntax and staged diff whitespace.
+
+T148 remains unchecked. Next port original globe points/name labels/selection styles and source NodeScene link/flow visuals through T077-verified snapshot injection (default reject unknown), plus model ready/error listener cleanup and efficient path revision handling. No present point fallback guarantee or OISL success/link activity is invented. Native/SI guards, model assets/frame updates/shared contexts and accepted deployment still require T079/T149–153 and actual8891tworesT152. No installednative/server8891/browser/remote PR/merge change. T075–84/Terra/all50/N001/N003/T137auth/T032/equipment/RF/HIL/download/AeroDT remain; component tests do not satisfy real game performance or whole-goal acceptance.

@@ -663,3 +663,8 @@ Actualowned31524/3780 CIMconfirmed (standarddenied/read-onlyescalation), freshly
 - 변경: 기존 두timeline을직렬조립, 최신공용UTC/300초미리받기/역방향600초조회/취소·입력변경·재시도 처리. 윤초표본오류유지와1972이전기준epoch의서버호환검증 수정. 새시계·전파 없음.
 - 검증: missingexport/윤초8PASS1FAIL/epoch12PASS1FAIL RED수정. 최종Node508PASS2798.805ms/Python546PASS8기존warnings152.69s/session72615exit0/syntax. 실제client조립240노드순차83/83/74+track, 실행중client호출최대1. validation/t147_node_display_coordinator.md.
 - 남음: T147로컬구현checked; 실제화면/JSON/frame/backend취소·busy검증은T151/T152/T032. 다음T148원본NodeScene. T079/T149–153/fullT075–84/Terra/all50/장비/다운로드 유지;8891서버/native/browser/remotePR/병합변경없음.
+
+## 2026-10-06 T148 원본 위성 모델·궤적 부분 이식
+- 변경: 원본NodeScene 모델옵션/방향근사/선택숨김/64cap/121점스타일을 native좌표와기존Viewer로이식. 입력·UTC·출처fence와전용datasource정리, 같은ID편집·늦은load후clear 재생성방지. 새시계·전파 없음.
+- 검증: 원본실행capture2회24720bytes/SHA4c88f447… 일치, missingmodule RED와6PASS2FAIL수정. Node518PASS3099.9937ms/Python546PASS8기존warnings152.91s/session92911exit0/syntax. validation/t148_node_models_paths.md. 원본Cesiumdouble기준은실제GPU증거아님.
+- 남음: T148점·이름표/통신선과T077검증주입/모델ready-error정리/path효율;T079/T149–153/fullT075–84/T032/장비/다운로드. 실제8891/native/browser/remotePR/병합변경없음.

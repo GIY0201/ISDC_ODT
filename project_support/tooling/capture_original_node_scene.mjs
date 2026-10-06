@@ -1,0 +1,21 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {createHash} from 'node:crypto';
+const [root,output]=process.argv.slice(2);if(!root||!output)throw Error('reference root and output required');
+const expected={'digital_twin/visualization/node_scene.js':'0a64617def9394bf25414321a30c66f210957bb4d61c494df7c9197359e6f9c6','digital_twin/visualization/link_flow.js':'e20347895e3aa3913bb711bc856c547060d163c3c4624e7db8e7b7f8762c3b24'};
+const texts={};for(const [path,hash]of Object.entries(expected)){const bytes=await readFile(resolve(root,path));if(createHash('sha256').update(bytes).digest('hex')!==hash)throw Error('source hash mismatch:'+path);texts[path]=bytes.toString('utf8');}
+const data=text=>'data:text/javascript;base64,'+Buffer.from(text).toString('base64');
+const source=texts['digital_twin/visualization/node_scene.js'].replace("'./link_flow.js?v=20260908-oisl-flow1'",JSON.stringify(data(texts['digital_twin/visualization/link_flow.js'])));
+const {NodeScene,LINK_COLORS}=await import(data(source));
+class Cartesian3{constructor(x=0,y=0,z=0){Object.assign(this,{x,y,z});}static fromDegrees(x,y,z){return new Cartesian3(x,y,z);}static subtract(a,b,r){Object.assign(r,{x:a.x-b.x,y:a.y-b.y,z:a.z-b.z});return r;}static magnitude(v){return Math.hypot(v.x,v.y,v.z);}static normalize(v,r){const m=this.magnitude(v);Object.assign(r,{x:v.x/m,y:v.y/m,z:v.z/m});return r;}}
+class Color{constructor(css,alpha=1){Object.assign(this,{css,alpha});}static fromCssColorString(css){return new Color(css);}withAlpha(alpha){return new Color(this.css,alpha);}}
+class Collection{constructor(){this.items=[];}add(v){this.items.push(v);return v;}remove(v){const i=this.items.indexOf(v);if(i<0)return false;this.items.splice(i,1);return true;}}
+const loads=[];
+const C={Cartesian3,Color,CustomDataSource:class{constructor(){this.entities=new Collection();}},CallbackProperty:class{constructor(getter){this.getter=getter;}},ArcType:{NONE:'none'},Matrix3:class{static fromHeadingPitchRoll(hpr){return {hpr};}static multiply(a,b){a.trim=b;return a;}},Matrix4:class{static fromRotationTranslation(rotation,translation){return {rotation,translation};}},HeadingPitchRoll:class{constructor(h,p,r){Object.assign(this,{h,p,r});}},Math:{toRadians:v=>v*Math.PI/180},Ellipsoid:{WGS84:{}},Transforms:{rotationMatrixFromPositionVelocity:(position,velocity)=>({position,velocity}),eastNorthUpToFixedFrame:position=>({enu:position})},ImageBasedLighting:class{constructor(options){this.options=options;}},Model:{async fromGltfAsync(options){loads.push(options);return {options,show:false,destroy(){}};}}};
+const globe={viewer:{scene:{primitives:new Collection()},entities:new Collection(),dataSources:new Collection()},records:new Map(['1','2'].map(id=>[id,{item:{ORBIT_REGIME:'LEO',PERIOD_MINUTES:95}}])),palette:()=>({LEO:'#ff9f43',fallback:'#ff9f43'}),tracksVisible:true,positionAt:(id,date)=>({longitude:Number(id)+date.getTime()/100,latitude:10,altitude:550})};
+const scene=new NodeScene({globe,cesium:C,timeSource:()=>new Date(0)});
+await scene.setNodes(['1','2'].map(id=>({id,model:{url:'/models/'+id+'.glb',scale:2,minimumPixelSize:12,orientation:{heading:90}}})));
+const receipt={source_commit:'1a1e00297a0301637455b0ef2cf48b2e74576b07',source_hashes:expected,harness:'Cesium doubles; fromDegrees is a coordinate passthrough, not physical propagation',colors:LINK_COLORS,loads:structuredClone(loads),models:Object.fromEntries([...scene.models].map(([id,v])=>[id,v.model.modelMatrix])),paths:Object.fromEntries([...scene.paths].map(([id,v])=>[id,{positions:v.positions,width:v.entity.polyline.width,arcType:v.entity.polyline.arcType,material:v.entity.polyline.material,show:v.entity.show}]))};
+scene.select('1');receipt.selected={model:scene.models.get('1').model.show,path:scene.paths.get('1').entity.show};scene.setTheme('light');receipt.lightAlpha=scene.paths.get('1').entity.polyline.material.alpha;
+scene.clear();loads.length=0;await scene.setNodes(Array.from({length:65},(_,i)=>({id:String(i+1),model:{url:'/models/cap.glb'}})));receipt.modelCap=loads.length;scene.clear();
+const bytes=JSON.stringify(receipt,null,2)+'\n';await writeFile(resolve(output),bytes);process.stdout.write(JSON.stringify({bytes:Buffer.byteLength(bytes),sha256:createHash('sha256').update(bytes).digest('hex')})+'\n');

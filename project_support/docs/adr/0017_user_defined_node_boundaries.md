@@ -16,3 +16,6 @@ Consequences: original equations/presets/formation/power values remain directly 
 
 
 2026-10-06 T147 compatibility repair: server source-node preparation already accepts Gregorian string epochs before1972 and +00:00, whereas the display leap codec correctly limits display times to its supported table. Browser definition validation now reuses its explicit Gregorian calendar conversion for ordinary epochs and the frozen leap codec only for known leap-second epochs. This repairs existing browser/server acceptance mismatch without changing wire schema, source dynamics or display UTC authority. Native leap epochs remain aligned unsupported_node_time errors. RED tests and direct server preparation parity recorded in validation/t147_node_display_coordinator.md.
+
+
+2026-10-06 T148 async display fencing: source model/path drawing/options/lighting/trim/cap preserved; same-ID definition edits now invalidate old paths immediately and delayed setNodes completion cannot create data-source resources after clear/disposal. These are intentional stale-result rejection improvements for the declared native full-definition contract, separate from source dynamics. RED6PASS2FAIL and repair/source execution goldens recorded in validation/t148_node_models_paths.md. Rendering remains unmounted in the actual workspace pending T151.
