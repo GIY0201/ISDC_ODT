@@ -148,7 +148,7 @@ const sourceDataPanel=createSourceDataPanel({api,model:dataViewModel,document,ho
 sourceSettingsPanel=createSourceSettingsPanel({document,host:window,storage:groundStorage,probe:(body,options)=>api.integrationProbe(body,options),readSocket:()=>simPanel.controller.snapshot().connection});
 analysisFollow=createAnalysisFollowCoordinator({stored:client,catalog:catalogTimeline,readRuntime:()=>simPanel.controller.snapshot().runtime,utcOfRuntime:simRuntimeUtc,codec:simUtcCodec});
 scenarioWorkspace=createWorkspaceScenario({clockOwners:{receivedAt:()=>simPanel.controller.displayReceipt?.()?.received_at_ms,followAll:analysisFollow.followAll,releaseAll:analysisFollow.releaseAll,followedSource:analysisFollow.followedSource,align:analysisFollow.align},api,nodeWorkspace,ground:sourceGround,missionServices,fabric,simController:simPanel.controller,nodeLibrary,missionTypes,stationModel:sourceStationModel,assemblyFactory:createScenarioAssembly,kpi:scenarioKpi,storage:groundStorage,onChange:()=>sourceScenarioPanel?.update(),switchTab:tab=>openWorkspaceView({nodes:'satellite',orbit:'satellite',communication:'ground',missions:'mission',data_management:'data',security:'security'}[tab]??tab)});
-sourceScenarioPanel=createSourceScenarioPanel({onOpenTab:tab=>openWorkspaceView({nodes:'satellite',orbit:'satellite',communication:'ground',missions:'mission',data_management:'data',security:'security',status:'operations'}[tab]??tab),runner:scenarioWorkspace.runner,comparisonRows:scenarioKpi.comparisonRows,document,host:window,onResume:()=>scenarioWorkspace.resumePreflight(),onFollow:()=>scenarioWorkspace.followAnalysis(),onRelease:()=>scenarioWorkspace.releaseAnalysis(),onStop:()=>scenarioWorkspace.stopReviewed()});
+sourceScenarioPanel=createSourceScenarioPanel({onOpenTab:tab=>openWorkspaceView({nodes:'satellite',orbit:'satellite',communication:'ground',missions:'mission',data_management:'data',security:'security',status:'operations'}[tab]??tab),runner:scenarioWorkspace.runner,comparisonRows:scenarioKpi.comparisonRows,document,host:window,onResume:()=>scenarioWorkspace.resumePreflight(),onReviewFinished:()=>scenarioWorkspace.reviewFinishedInputs(),onFollow:()=>scenarioWorkspace.followAnalysis(),onRelease:()=>scenarioWorkspace.releaseAnalysis(),onStop:()=>scenarioWorkspace.stopReviewed()});
 window.addEventListener('pagehide',event=>{if(!event.persisted){analysisFollow.destroy();sourceDataPanel.destroy();sourceSecurityPanel.destroy();sourceSettingsPanel.destroy();sourceScenarioPanel.destroy();scenarioWorkspace.destroy();removeScenarioRuntime();}});
 const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   displayUtc=utc;displayElevation=row?`${row.elevation_deg.toFixed(4)}°`:'자료 준비 중 / 위치 미표시';globe.update(error?{...snapshot,status:'error',error}:snapshot,row,utc);
@@ -208,6 +208,7 @@ export function showWorkspaceOrbit(currentView){view=currentView;if(['settings',
 client.load();
 
 export function applyWorkspaceDraft(items,remote=false){
+  sourceSettingsPanel.applyDraft(items,remote);
   modelPanel.applyDraft(items);
   globeViewPanel.applyDraft(items);
   missionPanel.applyDraft(items,remote);

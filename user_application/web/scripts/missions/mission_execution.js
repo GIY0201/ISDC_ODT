@@ -44,7 +44,7 @@ export function createMissionExecution({store,builder,client,verifyContext,hashC
     planReceipt(answer,id,g.instance_id);check(answer.mission_version===g.mission_version&&answer.time===command.body.time,'plan version/UTC changed');
     const record={id,missionKey:command.missionKey,endpoint:command.endpoint,built:clone(command.built),answer:clone(answer)};records.set(id,record);
     const isCurrent=current(record);pending=null;
-    if(isCurrent){const saved=store.setPlan(id,answer,{source:'orchestrator'});check(saved?.plan?.version===answer.mission_version,'accepted plan display version changed');}
+    if(isCurrent){const saved=store.setPlan(id,answer,{source:'orchestrator',acceptedVersion:answer.mission_version});check(saved?.plan?.version===answer.mission_version,'accepted plan display version changed');}
     state={status:isCurrent?'planned':'stale',error:null,result:{answer,current:isCurrent}};
    }else{
     check(answer.accepted===true&&answer.decision===command.body.decision&&answer.mission_version===command.body.version&&answer.plan_sequence===g.plan_sequence&&answer.held_tasks===(command.body.decision==='commit'?command.body.tasks.length:0),'accepted decision receipt changed');
@@ -70,15 +70,21 @@ export function createMissionExecution({store,builder,client,verifyContext,hashC
    emit();throw error;
   }
  }
- async function plan(id,{signal,exclude=[]}={}){
+ async function plan(id,{signal,exclude=[],reconcileVersion=false}={}){
   reserve();let prepared=false;
   try{
    const mission=store.find(id),missionKey=requestKey(mission),endpoint=signature(client.endpoint()),s=await status(signal);live();
+   if(signal?.aborted)signal.throwIfAborted();
    check(!s.committed[id],'abort accepted held mission before replanning');
-   const version=(mission.plan?.version??0)+1;
-   check(Number.isSafeInteger(version)&&version>=(s.accepted_plans[id]?.mission_version??0)+1,'stored mission version must be reconciled first');
+   const localVersion=mission.plan?.version??0;check(Number.isSafeInteger(localVersion)&&localVersion>=0,'stored mission version invalid');
+   // Explicit recovery creates a new native plan, never adopts saved tasks as authority.
+   const prior=s.accepted_plans[id],remoteVersion=reconcileVersion&&prior?planReceipt(prior,id,s.instance_id).mission_version:(prior?.mission_version??0);
+   if(reconcileVersion&&prior)check(prior.plan_sequence<=s.sequence,'accepted plan sequence exceeds module status');
+   const version=(reconcileVersion?Math.max(localVersion,remoteVersion):localVersion)+1;
+   check(Number.isSafeInteger(version)&&version>=remoteVersion+1,'stored mission version must be reconciled first');
    const g=guard(s,'', 'plan',version),built=clone(await builder.build(mission,{requestId:g.request_id,exclude,signal}));
-   g.context_hash=await hashContext(clone(built));check(hash(g.context_hash),'verified full context hash required');
+   if(signal?.aborted)signal.throwIfAborted();
+   g.context_hash=await hashContext(clone(built));if(signal?.aborted)signal.throwIfAborted();check(hash(g.context_hash),'verified full context hash required');
    const record={id,missionKey,endpoint,built};check(current(record),'mission context changed before plan request');
    const command={operation:'plan',id,missionKey,endpoint,built,body:clone(built.request),guard:g};pending=clone(command);prepared=true;
    return await transmit(command,signal);
@@ -113,5 +119,5 @@ export function createMissionExecution({store,builder,client,verifyContext,hashC
    return accept(command,clone(receipt));
   }finally{active=false;}
  }
- return Object.freeze({plan,commit:(id,options)=>decide(id,'commit',options),abort:(id,options)=>decide(id,'abort',options),retry,reconcile,snapshot,inspection:id=>records.has(id)?clone(records.get(id).built):null,destroy(){dead=true;emit();}});
+ return Object.freeze({plan,replanLatest:(id,options={})=>plan(id,{...options,reconcileVersion:true}),commit:(id,options)=>decide(id,'commit',options),abort:(id,options)=>decide(id,'abort',options),retry,reconcile,snapshot,inspection:id=>records.has(id)?clone(records.get(id).built):null,destroy(){dead=true;emit();}});
 }

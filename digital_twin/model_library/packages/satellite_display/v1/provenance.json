@@ -1617,17 +1617,631 @@
       ]
     }
   ],
-  "derivatives": [],
+  "derivatives": [
+    {
+      "schema": 1,
+      "original_sha256": "8794857595f7a7d416184fe926ecb50e11bf267dbe471d1cf2728a85e8d017fa",
+      "original_bytes": 2150600,
+      "derived_sha256": "85e3a8e05c694463e3e664a3fd702484a0fc0e5eb042fbb3acdfb2dc924dd779",
+      "derived_bytes": 2165908,
+      "textures": [
+        {
+          "image_index": 0,
+          "source_uri": "..\\Terra.fbm\\Side_Panels_TERRA.tga",
+          "png_sha256": "0f66a7a5b28f3356f20e1bbced5e4c914e7b4ca24b2486fd7030ef5c73cbc9f8",
+          "buffer_view": 48,
+          "byte_offset": 2133492,
+          "bytes": 932,
+          "source_format": "TGA",
+          "source_sha256": "e32f551b13517fd02f9806894ae5fbc1b3be4868e5cf94100b55daf14cd4bee6",
+          "width": 346,
+          "height": 313,
+          "converter": "Pillow 12.3.0",
+          "output_format": "PNG RGBA",
+          "source_url": "https://raw.githubusercontent.com/nasa/NASA-3D-Resources/2b93e26d1b8705c97b39106b62e938144268cc81/3D%20Models/Terra/Terra_vFINAL.fbx",
+          "decoded_rgba_sha256": "a678be2e867a77429699c4905fb8053572921a02fe1e740751959a98db829dab"
+        },
+        {
+          "image_index": 1,
+          "source_uri": "..\\Terra.fbm\\solarpanels.tga",
+          "png_sha256": "4c90b5e68e996a6ea1eb8a386a95b3c9c9eb17fed96828e20bd3b2ed62710187",
+          "buffer_view": 49,
+          "byte_offset": 2134424,
+          "bytes": 12635,
+          "source_format": "TGA",
+          "source_sha256": "2cc6388e08efdd942b8ffc8e31203956d6131f5eaba3f3b2189944dc0a1ed5dc",
+          "width": 266,
+          "height": 229,
+          "converter": "Pillow 12.3.0",
+          "output_format": "PNG RGBA",
+          "source_url": "https://raw.githubusercontent.com/nasa/NASA-3D-Resources/2b93e26d1b8705c97b39106b62e938144268cc81/3D%20Models/Terra/Terra_vFINAL.fbx",
+          "decoded_rgba_sha256": "46bcc28d70b6b5029c9ecd2bf3303431432cd318950d364767e6510dfe6e5358"
+        }
+      ],
+      "steps": [
+        "preserve source bytes",
+        "verify PNG signatures",
+        "append aligned PNG bufferViews",
+        "replace image URIs preserving image/material/mesh indices",
+        "validate derived active dependencies",
+        "verify pinned FBX vertex float32 bijection and same-winding topology",
+        "append exact source UVSet0 using glTF (u,1-v) convention; preserve original geometry bytes"
+      ],
+      "render_status": "unverified",
+      "original_file": "terra.glb",
+      "file": "terra_repaired.glb",
+      "source_authority_status": "official_nasa_git_history_verified",
+      "texture_source": {
+        "repository": "https://github.com/nasa/NASA-3D-Resources",
+        "commit": "2b93e26d1b8705c97b39106b62e938144268cc81",
+        "file": "3D Models/Terra/Terra_vFINAL.fbx",
+        "url": "https://raw.githubusercontent.com/nasa/NASA-3D-Resources/2b93e26d1b8705c97b39106b62e938144268cc81/3D%20Models/Terra/Terra_vFINAL.fbx",
+        "fbx_bytes": 6742320,
+        "fbx_sha256": "c912aa59e47c28ec65a78e5832c8c8c0e524d7ef75d64cf74a96244979c474ea",
+        "extraction": "FBX 6000 binary Objects/Video Content raw byte properties associated with exact Filename basenames",
+        "source_credit": "NASA/Christian A. Lopez",
+        "official_model_page": "https://science.nasa.gov/3d-resources/terra/",
+        "usage_guidelines": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+        "replacement_commit": "16ca90efa07af9b1248027c87b622998e7e579b9",
+        "replacement_date": "2024-09-17T20:00:24Z"
+      },
+      "lineage_limitation": "The official historical FBX embeds the exact filenames and matching Side Panels/Main Solar Panels Video associations referenced by the later pinned model. The 2024 update removed that FBX and added the current FBX/GLB without embedded texture bytes or texture hashes; unchanged pixels across the update cannot be independently proved. These are recovered historical source textures, not invented or manufacturer-verified current imagery.",
+      "unresolved": [],
+      "uv_restoration": {
+        "fbx_sha256": "5c469714db6aefe6134b119855bc96ce322e4fee4ee60463f63ca48b44f4fed8",
+        "fbx_bytes": 2798464,
+        "meshes": [
+          {
+            "mesh": 14,
+            "source_geometry_id": 90627632,
+            "source_model": "Terra_vFINAL [Layer15]",
+            "source_uv_set": "UVSet0",
+            "source_uv_sha256": "6f54b65f8d9070b3dc918f5395f1634175549c07fd9612acac5daf95719badf5",
+            "vertex_permutation": [
+              69,
+              70,
+              71,
+              68,
+              65,
+              66,
+              67,
+              64,
+              61,
+              62,
+              63,
+              60,
+              57,
+              58,
+              59,
+              56,
+              50,
+              49,
+              48,
+              51,
+              53,
+              52,
+              54,
+              55,
+              84,
+              87,
+              86,
+              85,
+              80,
+              83,
+              82,
+              81,
+              76,
+              79,
+              78,
+              77,
+              21,
+              22,
+              23,
+              20,
+              72,
+              75,
+              74,
+              73,
+              38,
+              40,
+              39,
+              41,
+              37,
+              36,
+              43,
+              44,
+              46,
+              47,
+              45,
+              42,
+              3,
+              0,
+              2,
+              1,
+              7,
+              4,
+              6,
+              5,
+              9,
+              10,
+              11,
+              8,
+              13,
+              14,
+              15,
+              12,
+              19,
+              16,
+              18,
+              17,
+              25,
+              26,
+              27,
+              24,
+              28,
+              30,
+              29,
+              31,
+              33,
+              34,
+              35,
+              32
+            ],
+            "vertex_count": 88,
+            "triangle_count": 86,
+            "position_float32_bijection": true,
+            "topology_same_winding": true,
+            "texcoord_sha256": "83445526c84c517bed415865e67a39c5057412eb5ce498c053cbdf85aaf5ae82",
+            "accessor": 48
+          },
+          {
+            "mesh": 16,
+            "source_geometry_id": 90620352,
+            "source_model": "Terra_vFINAL [Layer17]",
+            "source_uv_set": "UVSet0",
+            "source_uv_sha256": "9408aff1a09a48a9d9ab5f699d3fe6aec3c9a5e4e939b0e204ecc501f3a8024c",
+            "vertex_permutation": [
+              73,
+              78,
+              79,
+              72,
+              51,
+              48,
+              55,
+              52,
+              15,
+              14,
+              9,
+              10,
+              53,
+              54,
+              74,
+              77,
+              49,
+              50,
+              12,
+              8,
+              76,
+              75,
+              24,
+              28,
+              27,
+              31,
+              11,
+              13,
+              33,
+              37,
+              38,
+              34,
+              69,
+              68,
+              70,
+              71,
+              30,
+              25,
+              26,
+              29,
+              0,
+              4,
+              3,
+              5,
+              35,
+              32,
+              39,
+              36,
+              57,
+              62,
+              63,
+              56,
+              67,
+              64,
+              58,
+              61,
+              65,
+              66,
+              6,
+              1,
+              7,
+              2,
+              60,
+              59,
+              40,
+              44,
+              43,
+              47,
+              17,
+              21,
+              22,
+              18,
+              46,
+              41,
+              42,
+              45,
+              20,
+              23,
+              19,
+              16
+            ],
+            "vertex_count": 80,
+            "triangle_count": 60,
+            "position_float32_bijection": true,
+            "topology_same_winding": true,
+            "texcoord_sha256": "6dc62c7821e565bd1b3d7a19b534714011aca620b55ef94d5d4e6ec4daf17ab9",
+            "accessor": 49
+          }
+        ],
+        "conversion": "(u, v) -> (u, 1-v); no clamping; original samplers unchanged",
+        "convention_reference": "https://github.com/facebookincubator/FBX2glTF",
+        "input_sha256": "47d181000ddda78e8a9cebd39152dbc0b2bf91fd8f4eec65a50a9c5d4c46ef86",
+        "derived_sha256": "85e3a8e05c694463e3e664a3fd702484a0fc0e5eb042fbb3acdfb2dc924dd779",
+        "source_url": "https://raw.githubusercontent.com/nasa/NASA-3D-Resources/11ebb4ee043715aefbba6aeec8a61746fad67fa7/3D%20Models/Terra/Terra.fbx",
+        "source_commit": "11ebb4ee043715aefbba6aeec8a61746fad67fa7",
+        "source_file": "3D Models/Terra/Terra.fbx",
+        "texture_only_intermediate_sha256": "47d181000ddda78e8a9cebd39152dbc0b2bf91fd8f4eec65a50a9c5d4c46ef86"
+      },
+      "ledger_file": "terra_repaired_provenance.json",
+      "ledger_sha256": "efd15be06134a119772f888dd1372ae18ad54b7e873d8b53a099e8993487d444"
+    },
+    {
+      "schema": 1,
+      "file": "jason_repaired.glb",
+      "original_file": "jason.glb",
+      "original_sha256": "22139020d17a118aeedfa95b8295712b60f1ed992dcd6770b7a59bac57ea225b",
+      "original_bytes": 592740,
+      "derived_sha256": "f9b01e1684fd83fa1242bdce55793128796b3ff6164272b5fae2e656dd2821fb",
+      "derived_bytes": 592788,
+      "material_corrections": [
+        {
+          "kind": "historical_solid_material_restoration",
+          "material": 7,
+          "name": "Solar Panels_backside",
+          "removed_base_color_texture": {
+            "index": 0
+          },
+          "restored_base_color_factor": [
+            0.27450981736183167,
+            0.27450981736183167,
+            0.29019609093666077,
+            1
+          ],
+          "consumers": [
+            {
+              "mesh": 2,
+              "primitive": 0
+            }
+          ],
+          "geometry": [
+            {
+              "mesh": 2,
+              "primitive": 0,
+              "buffer_view": 7,
+              "bytes": 1830,
+              "sha256": "be0d56ee659462c346d8d6bda7568ce0821d3f2cbcdf02f1811615101d1e3dbe"
+            }
+          ],
+          "historical_glb_sha256": "ef1439afeabf031a5030bec2f2d996e336a84256af2c10454187bbb7d761eafc",
+          "binary_preserved": true,
+          "original_sha256": "22139020d17a118aeedfa95b8295712b60f1ed992dcd6770b7a59bac57ea225b",
+          "derived_sha256": "f9b01e1684fd83fa1242bdce55793128796b3ff6164272b5fae2e656dd2821fb",
+          "render_status": "unverified"
+        }
+      ],
+      "historical_source": {
+        "repository": "https://github.com/nasa/NASA-3D-Resources",
+        "commit": "12bded5e1074e6f834a352e7ab7dfde19e7a6485",
+        "glb_url": "https://raw.githubusercontent.com/nasa/NASA-3D-Resources/12bded5e1074e6f834a352e7ab7dfde19e7a6485/3D%20Models/Jason%201/Jason-1.glb",
+        "glb_sha256": "ef1439afeabf031a5030bec2f2d996e336a84256af2c10454187bbb7d761eafc",
+        "glb_bytes": 460272,
+        "fbx_url": "https://raw.githubusercontent.com/nasa/NASA-3D-Resources/12bded5e1074e6f834a352e7ab7dfde19e7a6485/3D%20Models/Jason%201/Jason-1.fbx",
+        "fbx_sha256": "02f6f458615a42b0ca2f6da483f46b4c44d4b9002e2929d34f436ab303aabc4e",
+        "fbx_bytes": 2963232
+      },
+      "fbx_material_proof": {
+        "material_id": 93737584,
+        "model_id": 93553744,
+        "geometry_id": 80466608,
+        "model_name": "Jason-1_vFINAL [Dark Grey]",
+        "diffuse_color": [
+          0.27450981736183167,
+          0.27450981736183167,
+          0.29019609093666077
+        ],
+        "opacity": 1.0,
+        "texture_connections": [],
+        "material_connections": [
+          [
+            "OO",
+            93737584,
+            93553744
+          ]
+        ],
+        "uv_layers": 0,
+        "vertex_count": 248,
+        "triangle_count": 420
+      },
+      "historical_geometry_proof": {
+        "draco_chunks": [
+          {
+            "mesh": 0,
+            "primitive": 0,
+            "sha256": "b027bfce484b8ee29120669367a705a20c41591f38fbb59ccdc25ddfcea09151",
+            "bytes": 3496
+          },
+          {
+            "mesh": 0,
+            "primitive": 1,
+            "sha256": "cbe8be9abaa6959c1b8cb44801a67e2fcec8d90cc0f6c3b46aee78b4caa3ab91",
+            "bytes": 6665
+          },
+          {
+            "mesh": 0,
+            "primitive": 2,
+            "sha256": "377d157420ccfd5a9203919e8a8aa8588d401ebc81a088006bc5fb7124a44cd2",
+            "bytes": 2508
+          },
+          {
+            "mesh": 0,
+            "primitive": 3,
+            "sha256": "c6b346d556ad59030c5488f94d49db052f25f71b7755e1cc088dfc00637b35cb",
+            "bytes": 4846
+          },
+          {
+            "mesh": 0,
+            "primitive": 4,
+            "sha256": "e812857e74e5151a79ddf8ef24a967e4268e793469349322900a10ff3323bc45",
+            "bytes": 4046
+          },
+          {
+            "mesh": 1,
+            "primitive": 0,
+            "sha256": "d44cf163a09a88137f71ae7495053ca39eaab7116a2d60fa56b0d923e6219cf9",
+            "bytes": 8922
+          },
+          {
+            "mesh": 1,
+            "primitive": 1,
+            "sha256": "9eb34e7682bd00a5936707dc565fd6b077e944ecfc8cba1dfa8dfe63e444d35e",
+            "bytes": 333
+          },
+          {
+            "mesh": 2,
+            "primitive": 0,
+            "sha256": "be0d56ee659462c346d8d6bda7568ce0821d3f2cbcdf02f1811615101d1e3dbe",
+            "bytes": 1830
+          },
+          {
+            "mesh": 3,
+            "primitive": 0,
+            "sha256": "db340df7bb4b7b930efbf2d49b041c5abc71101404b6f8e0d6e625cb504d5d93",
+            "bytes": 6073
+          },
+          {
+            "mesh": 3,
+            "primitive": 1,
+            "sha256": "2eced7331b9da10dd8dffb779e113f81d56e80f88736951a38edfd3bb8e88838",
+            "bytes": 19090
+          },
+          {
+            "mesh": 3,
+            "primitive": 2,
+            "sha256": "ac506385fb1ab5a79f4794c6c741fbd6810172e432c38a27ce6eccc454cbdf63",
+            "bytes": 14817
+          },
+          {
+            "mesh": 3,
+            "primitive": 3,
+            "sha256": "746c6174f913fd82a3f387ac8b6772aa350c95975151dcd105a46358cf3002f8",
+            "bytes": 6223
+          },
+          {
+            "mesh": 3,
+            "primitive": 4,
+            "sha256": "be1b4bd8863891ecbff907d575e7e704e7bdae65492527bf12748c3e69aff029",
+            "bytes": 15651
+          },
+          {
+            "mesh": 3,
+            "primitive": 5,
+            "sha256": "7b3f41d89d74042c531c676d9c2f10f23894b1c4237f66986353845af37abae4",
+            "bytes": 7894
+          },
+          {
+            "mesh": 3,
+            "primitive": 6,
+            "sha256": "b7ec49d22cfb1476f7f6c5f97ff39b77ba2839e53342571b45d3238f866899b0",
+            "bytes": 5240
+          },
+          {
+            "mesh": 3,
+            "primitive": 7,
+            "sha256": "fdb47d232360cbc8c6d4cfc5c42d76d5d7732ec46adc86e11976d32f81ade416",
+            "bytes": 18381
+          },
+          {
+            "mesh": 3,
+            "primitive": 8,
+            "sha256": "6e7d5fa8b9066489d77c1b6996e2813354f6b4dd139fa3e0f8b38d1773480d64",
+            "bytes": 5167
+          },
+          {
+            "mesh": 4,
+            "primitive": 0,
+            "sha256": "5eaba227ca46edf7f30adcba846aa5501af55294f352473cf81e494f8797d3c9",
+            "bytes": 1202
+          },
+          {
+            "mesh": 4,
+            "primitive": 1,
+            "sha256": "188c9cfcc34a58a6fb4b0758da7c992b770fbe805d6841647591b93fbc907d13",
+            "bytes": 390
+          },
+          {
+            "mesh": 4,
+            "primitive": 2,
+            "sha256": "d0ae2f0fd1ccead79d7ae6b3687e6d140111fd67e8302435d7e77c320b8160fb",
+            "bytes": 1029
+          },
+          {
+            "mesh": 5,
+            "primitive": 0,
+            "sha256": "198651983e26f823abd58b88798e518c0c0394d45e20cea0b030969798e10e1d",
+            "bytes": 450
+          },
+          {
+            "mesh": 6,
+            "primitive": 0,
+            "sha256": "bd4cf674d4cb4e47f2c10af236ebdaa25c3bb27d9b389b4af6c250def1d4404c",
+            "bytes": 54395
+          },
+          {
+            "mesh": 6,
+            "primitive": 1,
+            "sha256": "48f845933c521f32eadd5fc29d725b70c806d536332f95bd07e6264353352aa9",
+            "bytes": 56866
+          },
+          {
+            "mesh": 7,
+            "primitive": 0,
+            "sha256": "6f112e49a4e48f90823f84108a8b2205d7c3f58be16db81400a60875d56fca1f",
+            "bytes": 183
+          },
+          {
+            "mesh": 7,
+            "primitive": 1,
+            "sha256": "366ddf1b1b62f1787e6b398af7b0966e639aaaf3746a563d32259b747eb9a745",
+            "bytes": 183
+          },
+          {
+            "mesh": 7,
+            "primitive": 2,
+            "sha256": "75af8e68679d17444a6b426aa524623746d16c37819096024223df75a2aacb23",
+            "bytes": 183
+          },
+          {
+            "mesh": 7,
+            "primitive": 3,
+            "sha256": "492355688273b79ecd64af05d0aee910cbb625e018028b0a9e4e29000413d789",
+            "bytes": 183
+          },
+          {
+            "mesh": 7,
+            "primitive": 4,
+            "sha256": "f10eb69b432cf118cf14ca0d859e57de64039d8e79851962e70884664786a5ec",
+            "bytes": 183
+          },
+          {
+            "mesh": 7,
+            "primitive": 5,
+            "sha256": "2f4a695f2fa71473af3f886c9e964b82b0a502e4a90cc688aa349c069a048e81",
+            "bytes": 183
+          },
+          {
+            "mesh": 7,
+            "primitive": 6,
+            "sha256": "63a8b7964ed07c27fc0a45d453b6a0d38fa3541d478ab4317af36e5db363dcaf",
+            "bytes": 183
+          },
+          {
+            "mesh": 7,
+            "primitive": 7,
+            "sha256": "3233b05e46f7b057eee60c5bde4f2764dcfde23c08454909a8fa4db69a67ca7d",
+            "bytes": 183
+          },
+          {
+            "mesh": 8,
+            "primitive": 0,
+            "sha256": "68b1d6e8a2c44b187a0e26d5912c71544f6747db0750e8cd9f746453ee2423e1",
+            "bytes": 215
+          },
+          {
+            "mesh": 8,
+            "primitive": 1,
+            "sha256": "b4913c23f23303c23bfa0359d83d3b268b17fb29f198e97fe3204bbff4b2c86b",
+            "bytes": 291
+          },
+          {
+            "mesh": 9,
+            "primitive": 0,
+            "sha256": "90d464912fa1bc2a27f0090eb7e7988df51b0dd36662cb72b1a9d1a7457318d1",
+            "bytes": 1771
+          },
+          {
+            "mesh": 9,
+            "primitive": 1,
+            "sha256": "11e972f490bdd4aa93155dbc69e1496253f5730cba655d1f50c58090fed7ea99",
+            "bytes": 2384
+          },
+          {
+            "mesh": 9,
+            "primitive": 2,
+            "sha256": "6cb89ffa2d32998d6639152b3c5632c555b55228b2477666282646546fe48a46",
+            "bytes": 8819
+          },
+          {
+            "mesh": 9,
+            "primitive": 3,
+            "sha256": "ab642235e08beaa212eaca9ad332821fa59ca7fd081739e047931b4626c9b8fc",
+            "bytes": 7615
+          },
+          {
+            "mesh": 9,
+            "primitive": 4,
+            "sha256": "29446cd7b747fe8d96d1d56ebb1b7e739b32feb5a05091eb28ea87fac73e02bc",
+            "bytes": 3418
+          },
+          {
+            "mesh": 10,
+            "primitive": 0,
+            "sha256": "0244aeb5b04e264ccefda959618b63bf04e84b39d08ba5a94ef734002b6fb36c",
+            "bytes": 6750
+          }
+        ],
+        "all_accessors_identical": true,
+        "all_nodes_identical": true
+      },
+      "source_authority_status": "official_nasa_git_history_verified",
+      "lineage_limitation": "Restores the texture-free solid backside material and exact published RGBA from the official historical NASA GLB/FBX. All 39 historical/current Draco geometry chunks are byte-identical; the current GLB assigns a texture to this sole no-UV material consumer. This reviewed derivative corrects that incompatible association; it is not a byte-identical copy of the latest NASA asset or a NASA-approved modification. Other current materials, images, textures and binary geometry are unchanged.",
+      "render_status": "unverified",
+      "decision": "project_support/docs/adr/0042_source_satellite_asset_repairs.md",
+      "ledger_file": "jason_repaired_provenance.json",
+      "ledger_sha256": "ff40cc77a931b32b60c1f709a0586f5e2c5abf9f88a92d8735aaea477f61d5bd"
+    }
+  ],
   "source_guidance": {
     "nasa": "NASA source credit and educational/informational usage guidance; third-party/branding exceptions retained",
     "noaa_goesr": "Original NOAA/NASA GOES-R Program source attribution; no endorsement implied",
     "spacetwin": "Original prototype-generated representative shapes; manufacturer identity and exact dimensions are not asserted"
   },
   "render_status": "unverified",
-  "unresolved": [
+  "unresolved": [],
+  "lineage_limitations": [
     {
-      "file": "terra.glb",
-      "reason": "active external TGA textures unavailable in inspected official distributions; exact mapping preserved"
+      "file": "terra_repaired.glb",
+      "reason": "The official historical FBX embeds the exact filenames and matching Side Panels/Main Solar Panels Video associations referenced by the later pinned model. The 2024 update removed that FBX and added the current FBX/GLB without embedded texture bytes or texture hashes; unchanged pixels across the update cannot be independently proved. These are recovered historical source textures, not invented or manufacturer-verified current imagery."
+    },
+    {
+      "file": "jason_repaired.glb",
+      "reason": "Restores the texture-free solid backside material and exact published RGBA from the official historical NASA GLB/FBX. All 39 historical/current Draco geometry chunks are byte-identical; the current GLB assigns a texture to this sole no-UV material consumer. This reviewed derivative corrects that incompatible association; it is not a byte-identical copy of the latest NASA asset or a NASA-approved modification. Other current materials, images, textures and binary geometry are unchanged."
     }
   ]
 }

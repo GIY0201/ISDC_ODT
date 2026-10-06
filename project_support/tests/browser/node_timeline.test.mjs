@@ -86,3 +86,26 @@ test('custom validity predicates receive readonly captured rows and cannot leak 
   const buffer=createSampleBuffer(rows,codec.difference,{isValid:row=>{captured=row;return row.status==='valid';}});
   buffer.sampleAt(start);assert.throws(()=>{captured.position_m[0]=999;},TypeError);assert.equal(buffer.sampleAt(start).position_m[0],0);
 });
+
+test('immutable native rows reuse their complete validation while mutable outputs and replacement buffers remain independent',()=>{
+ const f=fixture(),node=structuredClone(f.request.nodes[0]),buffer=createNodeSampleBuffer(f.request,f.response);
+ const measure=fn=>{const finite=Number.isFinite;let count=0;Number.isFinite=value=>{count++;return finite(value);};try{const result=fn();return {result,count};}finally{Number.isFinite=finite;}};
+ const first=measure(()=>buffer.geometryFor(node,{utc:start})),again=measure(()=>buffer.geometryFor(node,{utc:start}));
+ assert.deepEqual(again.result,first.result);assert.ok(again.count<first.count,'a previously validated immutable sample must not repeat all field checks');
+ again.result.row.position_m[0]=NaN;again.result.row.inertial_velocity_km_s[0]=Infinity;again.result.node_definition.orbit.altitude_km=NaN;
+ assert.deepEqual(buffer.geometryFor(node,{utc:start}),first.result);assert.equal(buffer.geometryFor({...node,orbit:{...node.orbit,altitude_km:NaN}},{utc:start}),null);
+ f.response.nodes[0].rows[0].position_m[0]+=1000;f.response.nodes[0].definition_hash='b'.repeat(64);
+ const replacement=createNodeSampleBuffer(f.request,f.response),cold=measure(()=>replacement.geometryFor(node,{utc:start})),warm=measure(()=>replacement.geometryFor(node,{utc:start}));
+ assert.ok(warm.count<cold.count);assert.equal(cold.result.row.position_m[0],first.result.row.position_m[0]+1000);assert.equal(cold.result.definition_hash,'b'.repeat(64));assert.deepEqual(buffer.geometryFor(node,{utc:start}),first.result);
+ f.response.nodes[0].rows[0].position_m[0]=NaN;assert.throws(()=>createNodeSampleBuffer(f.request,f.response),/success row/);
+});
+
+test('native row validation memo cannot approve nonfinite interpolation or mutate nested captured data',()=>{
+ const f=fixture();f.response.nodes[0].rows[0].position_m[0]=Number.MAX_VALUE;f.response.nodes[0].rows[1].position_m[0]=-Number.MAX_VALUE;
+ const buffer=createNodeSampleBuffer(f.request,f.response),node=f.request.nodes[0];assert.ok(buffer.geometryFor(node,{utc:start}));assert.ok(buffer.geometryFor(node,{utc:codec.advance(start,1)}));
+ assert.equal(buffer.geometryFor(node,{utc:codec.advance(start,.5)}),null,'mutable interpolated output must still receive the complete finite-vector validation');
+ const rows=[{utc:start,status:'valid',position_m:[1,2,3],inertial_velocity_km_s:[0,7,0],extra:{power:{samples:[1,2]},basis:{x:[1,0,0]}}}];let captured;
+ const owned=createSampleBuffer(rows,codec.difference,{isValid:row=>{captured=row;return true;}});owned.sampleAt(start);
+ for(const value of [captured,captured.position_m,captured.inertial_velocity_km_s,captured.extra,captured.extra.power,captured.extra.power.samples,captured.extra.basis,captured.extra.basis.x])assert.equal(Object.isFrozen(value),true);
+ assert.throws(()=>{captured.extra.power.samples[0]=999;},TypeError);assert.equal(owned.sampleAt(start).extra.power.samples[0],1);
+});

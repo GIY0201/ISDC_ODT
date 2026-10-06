@@ -39,3 +39,5 @@ test('source editor keeps unsaved input after other-window storage changes and b
   await f.win.dispatch('pagehide',{persisted:false});
  }finally{f.dispose();}
 });
+
+for(const [width,height] of [[1280,720],[1920,1080]])test(`V6 exposes explicit latest-version fresh planning without silently adopting a stored plan ${width}x${height}`,async()=>{const f=fixture(width,height,{hash:'#mission'});try{assert.ok(f.get('ms-replan-latest'),'explicit native replan recovery action absent');assert.match(f.get('source-mission-services').innerHTML,/현재 위성·지상국 입력으로 새 계획/);f.get('ms-name').value='unsaved recovery edit';await f.get('ms-editor').dispatch('input');await f.get('ms-replan-latest').dispatch('click');assert.match(f.get('ms-status').textContent,/저장/);assert.equal(f.get('ms-name').value,'unsaved recovery edit');assert.equal(f.counts().commands,0);await f.win.dispatch('pagehide',{persisted:false});}finally{await f.win.dispatch('pagehide',{persisted:false});f.dispose();}});

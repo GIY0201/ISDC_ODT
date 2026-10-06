@@ -12,9 +12,46 @@ import pytest
 
 from project_support.tooling.validate_satellite_display import inspect_glb, parse_glb, validate_package
 from project_support.tooling.repair_satellite_display import embed_png_images
+from project_support.tooling.repair_satellite_display import match_source_uv_vertices
+from project_support.tooling.repair_satellite_display import restore_historical_solid_material
 
 ROOT = Path(__file__).resolve().parents[2]
 PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=')
+
+
+def test_source_uv_mapping_requires_exact_vertex_bijection_and_same_winding_topology():
+    points = [(0., 0., 0.), (1., 0., 0.), (0., 1., 0.)]
+    source_uv = [(0., 0.), (2., 1.), (0., .25)]
+    permutation, uv = match_source_uv_vertices(points, [0, 1, -3], source_uv,
+                                              [points[2], points[0], points[1]], [1, 2, 0])
+    assert permutation == [2, 0, 1]
+    assert uv == [(0., .75), (0., 1.), (2., 0.)]
+    for positions, indices in [([points[0]] * 3, [0, 1, 2]),
+                               ([points[2], points[0], (1.001, 0., 0.)], [1, 2, 0]),
+                               ([points[2], points[0], points[1]], [1, 0, 2])]:
+        with pytest.raises(ValueError):
+            match_source_uv_vertices(points, [0, 1, -3], source_uv, positions, indices)
+
+
+def test_solid_material_restore_requires_identical_geometry_and_no_uv_consumers():
+    current = document()
+    current['materials'][0]['name'] = 'Verified solid'
+    current['meshes'][0]['primitives'][0]['attributes'] = {}
+    history = copy.deepcopy(current)
+    history['materials'][0]['pbrMetallicRoughness'] = {'baseColorFactor': [.25, .25, .3, 1.]}
+    source = glb(current, PNG)
+    derived, receipt = restore_historical_solid_material(source, glb(history, PNG), 'Verified solid')
+    after, binary = parse_glb(derived)
+    assert after['materials'][0] == history['materials'][0]
+    assert after['meshes'] == current['meshes'] and binary == parse_glb(source)[1]
+    assert after['images'] == current['images'] and after['textures'] == current['textures']
+    assert receipt['consumers'] == [{'mesh': 0, 'primitive': 0}]
+    uv_consumer = copy.deepcopy(current)
+    uv_consumer['meshes'][0]['primitives'][0]['attributes'] = {'TEXCOORD_0': 0}
+    with pytest.raises(ValueError):
+        restore_historical_solid_material(glb(uv_consumer, PNG), glb(history, PNG), 'Verified solid')
+    with pytest.raises(ValueError):
+        restore_historical_solid_material(source, glb(history, PNG + b'changed geometry'), 'Verified solid')
 
 
 def glb(document, binary=b''):
@@ -32,7 +69,8 @@ def document(external=False):
             'bufferViews': [{'buffer': 0, 'byteOffset': 0, 'byteLength': len(PNG)}],
             'images': [{'uri': '..\\Terra.fbm\\missing.tga'}] if external else [{'bufferView': 0, 'mimeType': 'image/png'}],
             'textures': [{'source': 0}], 'materials': [{'pbrMetallicRoughness': {'baseColorTexture': {'index': 0}}}],
-            'meshes': [{'primitives': [{'attributes': {}, 'material': 0}]}],
+            'accessors': [{'bufferView': 0, 'componentType': 5126, 'count': 1, 'type': 'VEC2'}],
+            'meshes': [{'primitives': [{'attributes': {'TEXCOORD_0': 0}, 'material': 0}]}],
             'nodes': [{'mesh': 0}], 'scenes': [{'nodes': [0]}], 'scene': 0}
 
 
@@ -62,6 +100,18 @@ def test_active_embedded_image_and_external_dependency_are_distinguished():
     assert any('external_image' in value and 'missing.tga' in value for value in bad['errors'])
     # An unused export image must not become a false active-render dependency.
     d = document(); d['images'].append({'uri': 'unused.tga'})
+    assert inspect_glb(glb(d, PNG))['valid']
+
+
+def test_textured_primitive_requires_its_material_texcoord_including_transform_override():
+    d = document()
+    d['meshes'][0]['primitives'][0]['attributes'] = {}
+    assert not inspect_glb(glb(d, PNG))['valid']
+    d = document()
+    d['materials'][0]['pbrMetallicRoughness']['baseColorTexture']['extensions'] = {
+        'KHR_texture_transform': {'texCoord': 1}}
+    assert not inspect_glb(glb(d, PNG))['valid']
+    d['meshes'][0]['primitives'][0]['attributes']['TEXCOORD_1'] = 0
     assert inspect_glb(glb(d, PNG))['valid']
 
 
@@ -120,6 +170,32 @@ def test_missing_provenance_or_original_asset_hash_is_not_acceptance(tmp_path):
     p.write_text(json.dumps(record))
     assert not validate_package(root)['complete']
     p.unlink()
+    assert not validate_package(root)['complete']
+
+
+def test_solid_material_derivative_requires_source_receipt_and_preservation(tmp_path):
+    root = package(tmp_path)
+    current = document(); current['materials'][0]['name'] = 'Verified solid'
+    current['meshes'][0]['primitives'][0]['attributes'] = {}
+    history = copy.deepcopy(current)
+    history['materials'][0]['pbrMetallicRoughness'] = {'baseColorFactor': [.25, .25, .3, 1.]}
+    source = glb(current, PNG); (root/'tiny.glb').write_bytes(source)
+    manifest = json.loads((root/'original_manifest.json').read_text())
+    manifest['models'][0].update(sha256=hashlib.sha256(source).hexdigest(), bytes=len(source))
+    raw = json.dumps(manifest).encode(); (root/'original_manifest.json').write_bytes(raw)
+    provenance = json.loads((root/'provenance.json').read_text())
+    provenance['original_manifest_sha256'] = hashlib.sha256(raw).hexdigest()
+    provenance['original_assets'][0].update(sha256=hashlib.sha256(source).hexdigest(), bytes=len(source))
+    derived, correction = restore_historical_solid_material(source, glb(history, PNG), 'Verified solid')
+    (root/'tiny_repaired.glb').write_bytes(derived)
+    manifest['models'][0].update(file='tiny_repaired.glb', sha256=hashlib.sha256(derived).hexdigest(), bytes=len(derived))
+    (root/'manifest.json').write_text(json.dumps(manifest))
+    row = {'file':'tiny_repaired.glb', 'original_file':'tiny.glb', 'original_sha256':hashlib.sha256(source).hexdigest(),
+           'derived_sha256':hashlib.sha256(derived).hexdigest(), 'material_corrections':[correction]}
+    provenance['derivatives']=[row]; (root/'provenance.json').write_text(json.dumps(provenance))
+    assert validate_package(root)['complete']
+    row['material_corrections'][0]['historical_glb_sha256']='unverified'
+    (root/'provenance.json').write_text(json.dumps(provenance))
     assert not validate_package(root)['complete']
 
 

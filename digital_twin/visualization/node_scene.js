@@ -34,8 +34,12 @@ export class NodeScene{
   geometryAt(id,utc){
     const entry=this.descriptions.get(id);if(!entry||typeof utc!=='string')return null;
     const frame=this.frameMemo;
-    if(frame&&!this.frameCurrent(frame)){frame.invalid=true;return null;}
+    if(frame?.invalid)return null;
     const cached=frame?.geometry.get(id);if(cached?.has(utc))return cached.get(utc);
+    // A cached hit performs no external callback. Its exact frame was checked
+    // around the native read, and syncFrame checks the whole binding again
+    // before returning. New reads retain both external-context guards.
+    if(frame&&!this.frameCurrent(frame)){frame.invalid=true;return null;}
     let result=null;
     try{if(this.advanceUtc(utc,0)!==utc)return null;const g=this.geometryFor(structuredClone(entry.definition),{utc});result=this.matches(g,id)&&g.row?.utc===utc&&g.row.status==='valid'&&g.row.error_code===null&&vector(g.row.position_m)?g:null;}catch{/* Invalid native projection remains hidden. */}
     if(frame){
@@ -134,8 +138,13 @@ export class NodeScene{
         let receipt;try{receipt=!versioned||revision?this.pathFor(structuredClone(description.definition)):null;}catch{receipt=null;}
         const valid=(!versioned||revision&&readRevision()===revision)&&this.matches(receipt,id)&&receipt.visible===true&&Array.isArray(receipt.positions_m)&&receipt.positions_m.length===121&&receipt.positions_m.every(vector);
         const points=valid?receipt.positions_m.map(v=>new C.Cartesian3(...v)):[];
-        if(!entry){entry={positions:points,revision,entity:null};entry.entity=entities.add({id:`node-path-${id}`,show:false,polyline:{positions:C.CallbackProperty?new C.CallbackProperty(()=>entry.positions,false):points,width:1.3,material:this.pathColor(C,id),arcType:C.ArcType?.NONE}});this.paths.set(id,entry);}
-        else{entry.positions=points;entry.revision=revision;if(!C.CallbackProperty)entry.entity.polyline.positions=points;}
+        // The accepted native path is fixed until its opaque revision changes.
+        // A nonconstant CallbackProperty forces Cesium to copy/rebuild every
+        // polyline each frame even while these 121 positions remain unchanged.
+        // Assigning the array lets Cesium own a constant property and update it
+        // only when the same guarded receipt accepts a replacement (or failure).
+        if(!entry){entry={positions:points,revision,entity:null};entry.entity=entities.add({id:`node-path-${id}`,show:false,polyline:{positions:points,width:1.3,material:this.pathColor(C,id),arcType:C.ArcType?.NONE}});this.paths.set(id,entry);}
+        else{entry.positions=points;entry.revision=revision;entry.entity.polyline.positions=points;}
       }
       entry.entity.show=entry.positions.length>1&&id!==this.selectedId&&this.tracksVisible()!==false;
     }
@@ -211,7 +220,9 @@ export class NodeScene{
     if(this.disposed)return;
     const frame={utc,viewer:this.viewer,cesium:this.cesium,descriptions:this.descriptions,scope:this.definitionScope,transition:this.isTransitioning(),mode:this.viewer?.scene?.mode,geometry:new Map(),invalid:false};
     this.frameMemo=frame;
-    try{this.placePoints(utc);this.placeModels(utc);this.placeLinks(utc);this.animateLinkFlow(nowMs,utc);}
+    // animateLinkFlow performs the guarded endpoint placement even when phase
+    // is unavailable; do not write every OISL positions array twice per frame.
+    try{this.placePoints(utc);this.placeModels(utc);this.animateLinkFlow(nowMs,utc);}
     finally{
       // A callback may replace a selection, Viewer or UTC within this frame.
       // Suppress every owned primitive rather than publish a mixture of scopes.

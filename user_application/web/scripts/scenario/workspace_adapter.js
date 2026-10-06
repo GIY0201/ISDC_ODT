@@ -64,7 +64,7 @@ export function createWorkspaceScenario({api,nodeWorkspace,ground,missionService
  let pendingNetwork=null;
  const networkTwin={resetHistories:()=>{nodeWorkspace.clearNetwork?.();fabric.invalidate?.();},tick(){pendingNetwork=prepare().then(()=>nodeWorkspace.updateNetwork());return pendingNetwork;},async exchange(){await pendingNetwork;const answer=await fabric.send();requireValue(answer&&readFabric().status==='accepted','current native network was not accepted');return answer;},route:(...args)=>fabric.route(...args),reachable:()=>readFabric().status==='accepted',get report(){return readFabric().receipt;},get fabricState(){const value=readFabric();return {reachable:value.status==='accepted',error:value.error,sequence:value.receipt?.sequence};},get last(){return nodeWorkspace.networkSnapshot?.()??null;}};
  async function beginTick(){commandReady();const state=readRuntime();requireValue(state?.mode==='SIM','actual SIM owner unavailable');const lease={running:state.running,run_id:state.run_id};if(state.running)await refreshRuntime(await api.runtimeControl('pause'));return lease;}
- async function endTick(lease,succeeded,phase){if(!dead&&succeeded&&phase==='playing'&&lease?.running&&readRuntime()?.run_id===lease.run_id){await refreshRuntime(await api.runtimeControl('start'));}}
+ async function endTick(lease,succeeded,phase){if(!dead&&succeeded&&phase==='finished'&&prepared){try{requireValue(readRuntime()?.running===false&&readRuntime()?.run_id===lease?.run_id,'완료 checkpoint의 실제 SIM 실행을 확인하세요.');await checkpoint();}finally{prepared=false;}return;}if(!dead&&succeeded&&phase==='playing'&&lease?.running&&readRuntime()?.run_id===lease.run_id){await refreshRuntime(await api.runtimeControl('start'));}}
  const sourceApi={...api};for(const name of ['runtimeControl','runtimeSpeed','selectScenario','scenarioAdvance'])sourceApi[name]=async(...args)=>{commandReady();return refreshRuntime(await api[name](...args));};
  sourceApi.injectFault=async(...args)=>{commandReady();const result=await api.injectFault(...args);await simController.load();return result;};
  sourceApi.dataManagementRequest=async(...args)=>{commandReady();return api.dataManagementRequest(...args);};
@@ -73,33 +73,64 @@ export function createWorkspaceScenario({api,nodeWorkspace,ground,missionService
  const originalStop=runner.stop;runner.stop=(...args)=>{const result=originalStop(...args);ports?.releaseDisplay?.();prepared=false;return result;};
  const canonical=value=>JSON.stringify(value,(_,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.keys(item).sort().map(key=>[key,item[key]])):item);
  const same=(a,b)=>canonical(a)===canonical(b);
+ // Diagnostics expose contract field names only. Exact canonical equality below
+ // remains the authorization condition; no value or historical proof is rewritten.
+ const mismatchFields=(current,saved)=>[...new Set([...Object.keys(current??{}),...Object.keys(saved??{})])].sort().flatMap(key=>{if(same(current?.[key],saved?.[key]))return [];if(key==='module'){const fields=['instance_id','committed','accepted_plans'].filter(part=>!same(current?.module?.[part],saved?.module?.[part])).map(part=>'module.'+part);return fields.length?fields:['module'];}return [key];});
  const missionRoster=()=>missionServices.store.missions.map(m=>Object.fromEntries(['id','kind','params','notes','version','status','plan'].map(k=>[k,m[k]])));
  function sourceModule(status){const ids=Object.values(runner.state.missions);requireValue(status?.reachable===true&&status.exchange_contract==='guarded-v1'&&typeof status.instance_id==='string','현재 군집 운용 모듈을 확인하세요.');requireValue(Object.keys(status.committed??{}).every(id=>ids.includes(id)),'다른 실행의 확정 임무가 있어 시나리오 재개를 허용할 수 없습니다.');return {instance_id:status.instance_id,committed:status.committed??{},accepted_plans:Object.fromEntries(ids.map(id=>[id,status.accepted_plans?.[id]??null]))};}
  function currentEvidence(status){const runtime=readRuntime(),state=ports.deployment.state;requireValue(!simController.snapshot().error&&ports.store.deploymentConfirmed&&!ports.store.isDirty()&&!state.syncRequired&&!state.busy&&state.server?.run_id===runtime?.run_id,'시나리오의 현재 수락 배치와 초안을 확인하세요.');return {schema_version:1,contract:'source-scenario-resume-v1',source_commit:NODE_COMMUNICATION_METADATA.source_commit,run_id:runtime.run_id,started_at:runtime.started_at,definition:runner.definition,nodes:ports.store.deployed,deployment:state.server,stations:ground.stations,missions:missionRoster(),module:sourceModule(status),faults:runtime.active_faults,native_definition_hashes:lastNativeHashes};}
- async function checkpoint(){if(!prepared||!['ready','paused','playing','finished'].includes(runner.state.phase))return;const status=await missionServices.queryModule();const evidence=currentEvidence(status);requireValue(evidence.run_id===runner.state.runId&&evidence.native_definition_hashes,'현재 시나리오 검증 기록이 없습니다.');runner.checkpointWorkspace(evidence);}
- async function resumePreflight(){
+ async function checkpoint(){if(!prepared||!['ready','paused','playing','finished'].includes(runner.state.phase))return;const phase=runner.state.phase,run=runner.state.runId,runtime=structuredClone(readRuntime());const status=await missionServices.queryModule();requireValue(!dead&&prepared&&runner.state.phase===phase&&runner.state.runId===run&&same(readRuntime(),runtime),'checkpoint 검증 도중 실제 실행 또는 재생 기록이 바뀌었습니다.');const evidence=currentEvidence(status);requireValue(evidence.run_id===runner.state.runId&&evidence.native_definition_hashes,'현재 시나리오 검증 기록이 없습니다.');runner.checkpointWorkspace(evidence);}
+ // A current-input review is a new native analysis proof, never an adoption of
+ // the historical result. Mutable final plans must match the actual module.
+ function validateCurrentReview(current,saved,status){
+  for(const field of ['schema_version','contract','source_commit','run_id','started_at','definition','nodes','deployment','stations','native_definition_hashes'])requireValue(same(current[field],saved[field]),'완료 실행의 원본 입력이 바뀌었습니다: '+field);
+  requireValue(current.module.instance_id===saved.module.instance_id&&Number.isSafeInteger(status.sequence)&&status.sequence>=0,'완료 실행의 모듈 인스턴스·sequence가 바뀌었습니다.');
+  const templates=rows=>rows.map(m=>Object.fromEntries(['id','kind','params','notes','version'].map(k=>[k,m[k]])));
+  requireValue(same(templates(current.missions),templates(saved.missions)),'완료 실행의 원본 임무 정의가 바뀌었습니다.');
+  const hash=value=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
+  const heldTasks=tasks=>tasks.map(t=>({task_id:String(t.id??''),satellite:String(t.satellite),kind:String(t.kind??''),start:t.start,end:t.end}));
+  for(const m of current.missions){
+   const p=current.module.accepted_plans[m.id],held=current.module.committed[m.id];
+   if(!p){requireValue(!m.plan&&!held&&m.status!=='committed','현재 모듈에 수락된 임무 계획이 없습니다: '+m.id);continue;}
+   requireValue(p.exchange_contract==='guarded-v1'&&p.instance_id===status.instance_id&&p.mission_id===m.id&&typeof p.request_id==='string'&&p.request_id.length>0&&hash(p.context_hash)&&Number.isSafeInteger(p.mission_version)&&p.mission_version>=1&&Number.isSafeInteger(p.plan_sequence)&&p.plan_sequence>=1&&p.sequence===p.plan_sequence&&p.sequence<=status.sequence&&typeof p.feasible==='boolean'&&Array.isArray(p.tasks)&&p.tasks.length<=2000&&typeof p.time==='string'&&Number.isFinite(Date.parse(p.time)),'현재 모듈 계획의 guarded 증명이 잘못되었습니다: '+m.id);
+   requireValue(m.plan?.version===p.mission_version&&same(Object.fromEntries(Object.keys(p).filter(k=>k!=='version').map(k=>[k,m.plan?.[k]])),Object.fromEntries(Object.entries(p).filter(([k])=>k!=='version'))),'저장된 임무 계획과 현재 모듈 수락이 다릅니다. 먼저 임무의 최신 버전 새 계획 또는 명시적 취소를 검토하세요: '+m.id);
+   requireValue(Boolean(held)===(m.status==='committed'),'확정 임무 상태와 현재 모듈이 다릅니다: '+m.id);
+   if(held)requireValue(p.feasible&&held.version===p.mission_version&&Number.isSafeInteger(held.sequence)&&held.sequence>=p.plan_sequence&&held.sequence<=status.sequence&&held.time===p.time&&same(held.tasks,heldTasks(p.tasks)),'현재 모듈의 확정 작업 증명이 다릅니다: '+m.id);
+  }
+ }
+ async function resumePreflight(){return validateInputs(false);}
+ async function reviewFinishedInputs(){return validateInputs(true);}
+ async function validateInputs(currentReview=false){
   requireValue(!dead,'scenario workspace disposed');prepared=false;
+  const phase=runner.state.phase,finishedInputsOnly=phase==='finished',runnerBefore=structuredClone(runner.state);requireValue(!currentReview||finishedInputsOnly,'현재 입력 새 검토는 완료 기록에서만 가능합니다.');
   const saved=runner.state.workspaceEvidence;
   requireValue(saved?.schema_version===1&&saved.contract==='source-scenario-resume-v1'&&saved.source_commit===NODE_COMMUNICATION_METADATA.source_commit,'과거 실행에 재개 검증 기록이 없습니다. 새 세팅을 명시적으로 검토하세요.');
-  requireValue(['ready','paused'].includes(runner.state.phase)&&typeof ports?.prepareSimUtc==='function'&&typeof ports?.verifySimUtc==='function'&&typeof api.nodeMissionContext==='function','재개 가능한 정지 시나리오와 native 검증 연결을 확인하세요.');
+  requireValue(['ready','paused','finished'].includes(phase)&&typeof ports?.prepareSimUtc==='function'&&typeof ports?.verifySimUtc==='function'&&typeof api.nodeMissionContext==='function','현재 정지 시나리오의 입력 검증 연결을 확인하세요.');
   const runtime=readRuntime();requireValue(runtime?.running===false&&runtime.run_id===saved.run_id&&runtime.run_id===runner.state.runId&&runtime.scenario_id===runner.state.scenarioId,'같은 시나리오 실행의 실제 SIM을 정지한 뒤 재개를 검증하세요.');
+  const runtimeIdentity=value=>Object.fromEntries(['mode','run_id','scenario_id','started_at','elapsed_seconds','running','speed','active_faults'].map(k=>[k,value?.[k]]));
+  const runtimeBefore=structuredClone(runtimeIdentity(runtime));
   lastNativeHashes=structuredClone(saved.native_definition_hashes);
   requireValue(typeof ports.deployment.reacceptCachedDeployment==='function','저장 배치의 실제 서버 재확인 연결이 필요합니다.');
   await ports.deployment.reacceptCachedDeployment(saved.deployment,saved.nodes);let status=await missionServices.queryModule();
-  requireValue(same(currentEvidence(status),saved),'저장된 실행과 현재 배치·지상국·임무·장애 또는 모듈 증명이 달라 재개할 수 없습니다.');
+  const current=currentEvidence(status);
+  if(currentReview){validateCurrentReview(current,saved,status);}else requireValue(same(current,saved),`저장된 실행과 현재 증명이 달라 입력을 확인할 수 없습니다. 불일치: ${mismatchFields(current,saved).join(', ')}`);
+  const expected=currentReview?structuredClone(current):saved;
   const utc=ports.simUtc(),receipt=await ports.prepareSimUtc(utc);
   requireValue(ports.verifySimUtc(receipt,utc)===true&&same(hashesOf(receipt),saved.native_definition_hashes),'현재 실제 SIM UTC의 전체 native 노드 정의 증명이 일치하지 않습니다.');
-  const context=missionServices.context();requireValue(context.utc===utc&&same(context.nodes,saved.nodes)&&same(context.stations,ground.enabled)&&same(context.faults,saved.faults)&&same(context.deployment,saved.deployment)&&context.module.instance===saved.module.instance_id,'현재 native 임무 입력 범위가 저장 실행과 다릅니다.');
+  const context=missionServices.context();requireValue(context.utc===utc&&same(context.nodes,saved.nodes)&&same(context.stations,ground.enabled)&&same(context.faults,expected.faults)&&same(context.deployment,saved.deployment)&&context.module.instance===saved.module.instance_id,'현재 native 임무 입력 범위가 저장 실행과 다릅니다.');
   const accepted=await api.nodeMissionContext({request_id:'scenario-resume:'+ (++resumeCounter),nodes:context.nodes,run_id:context.deployment.run_id,deployment_revision:context.deployment.revision,utc,stations:context.stations,faults:context.faults,module_instance:context.module.instance,module_sequence:context.module.sequence,external:context.external});
-  requireValue(accepted?.schema_version===1&&accepted.status==='verified_analysis_inputs'&&accepted.communication_status==='unknown'&&/^[a-f0-9]{64}$/.test(accepted.context_hash??'')&&accepted.utc===utc&&same(accepted.nodes,saved.nodes)&&same(accepted.stations,context.stations)&&same(accepted.faults,saved.faults)&&same(accepted.deployment,saved.deployment)&&same(accepted.definition_hashes,saved.native_definition_hashes)&&same(accepted.external,context.external)&&accepted.module_instance===context.module.instance&&accepted.module_sequence===context.module.sequence,'native 재개 입력 수락 증명이 일치하지 않습니다.');
+  requireValue(accepted?.schema_version===1&&accepted.status==='verified_analysis_inputs'&&accepted.communication_status==='unknown'&&/^[a-f0-9]{64}$/.test(accepted.context_hash??'')&&accepted.utc===utc&&same(accepted.nodes,saved.nodes)&&same(accepted.stations,context.stations)&&same(accepted.faults,expected.faults)&&same(accepted.deployment,saved.deployment)&&same(accepted.definition_hashes,saved.native_definition_hashes)&&same(accepted.external,context.external)&&accepted.module_instance===context.module.instance&&accepted.module_sequence===context.module.sequence,'native 재개 입력 수락 증명이 일치하지 않습니다.');
   status=await missionServices.queryModule();
-  requireValue(readRuntime()?.running===false&&ports.simUtc()===utc&&ports.verifySimUtc(receipt,utc)===true&&same(currentEvidence(status),saved)&&status.sequence===accepted.module_sequence,'재개 검증 도중 실제 UTC·배치·임무 또는 모듈 상태가 바뀌었습니다.');
-  prepared=true;return {run_id:saved.run_id,utc,node_count:saved.nodes.length,context_hash:accepted.context_hash,communication_status:'unknown'};
+  requireValue(readRuntime()?.running===false&&ports.simUtc()===utc&&ports.verifySimUtc(receipt,utc)===true&&same(currentEvidence(status),expected)&&same(missionServices.context(),context)&&status.sequence===accepted.module_sequence,'재개 검증 도중 실제 UTC·배치·임무 또는 모듈 상태가 바뀌었습니다.');
+  requireValue(!dead&&same(runner.state,runnerBefore)&&same(runtimeIdentity(readRuntime()),runtimeBefore),'입력 검증 도중 완료 기록 또는 실제 실행 상태가 바뀌었습니다.');
+  // Finished inputs can be reaccepted for readonly/current mission tools. They
+  // never grant the source runner permission to advance or restart its stages.
+  prepared=!finishedInputsOnly;return {run_id:saved.run_id,utc,node_count:saved.nodes.length,context_hash:accepted.context_hash,communication_status:'unknown',validation_kind:currentReview?'finished_current_inputs_review':finishedInputsOnly?'finished_workspace_inputs':'resume_workspace_inputs',playback_authorized:!finishedInputsOnly,...(currentReview?{changed_fields:mismatchFields(current,saved)}:{})};
  }
  async function followAnalysis(){commandReady();requireValue(readRuntime()?.running===false&&typeof clockOwners.followAll==='function','실제 SIM 정지와 기존 분석 시계 연결이 필요합니다.');const run=readRuntime().run_id,utc=ports.simUtc();const result=await clockOwners.followAll(clock);commandReady();requireValue(readRuntime()?.running===false&&readRuntime().run_id===run&&ports.simUtc()===utc&&clockOwners.followedSource?.()===clock,'분석 따라가기 검증 도중 실제 실행이 바뀌었습니다.');return result;}
  async function releaseAnalysis(){requireValue(!dead,'scenario workspace disposed');if(clockOwners.followedSource?.()!==clock)return false;requireValue(typeof clockOwners.releaseAll==='function','기존 분석 시계 해제 연결이 필요합니다.');return clockOwners.releaseAll(clock);}
  async function stopReviewed(options){await releaseAnalysis();runner.stop(options);}
  for(const key of ['setup','pause','advance','skipToNextStep']){const original=runner[key];runner[key]=async(...args)=>{if(key==='setup')await releaseAnalysis();const result=await original(...args);await checkpoint();return result;};}
  const off=runner.subscribe(onChange);
- return Object.freeze({runner,clock,assembly,kpi,preflight,resumePreflight,followAnalysis,releaseAnalysis,stopReviewed,destroy(){if(dead)return;dead=true;runner.suspend();off();}});
+ return Object.freeze({runner,clock,assembly,kpi,preflight,resumePreflight,reviewFinishedInputs,followAnalysis,releaseAnalysis,stopReviewed,destroy(){if(dead)return;dead=true;runner.suspend();off();}});
 }

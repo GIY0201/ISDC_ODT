@@ -52,6 +52,17 @@ function* prepareNodeSampleBuffer(request,response,{expectedHashes={}}={}){
   const start=codec.advance(request.start_utc,0),times=Array.from({length:request.count},(_,i)=>codec.advance(start,i));
   if(!response||response.schema_version!==1||response.request_id!==request.request_id||!['valid','partial','error'].includes(response.status)||Object.entries(metadata).some(([key,value])=>response[key]!==value)||!Array.isArray(response.nodes)||response.nodes.length!==request.nodes.length)throw new Error('node sample metadata mismatch');
   const responseStatus=response.status,entries=new Map(),catalogs=new Set();let errors=0;
+  // createSampleBuffer deep-copies and freezes every custom-predicate row.
+  // Keep the full validation result only for those immutable row/vector objects
+  // inside this prepared native buffer. A replacement buffer gets a new memo;
+  // mutable/interpolated public results still undergo the complete check below.
+  const rowValidity=new WeakMap();
+  const immutableRowValid=row=>{
+    if(rowValidity.has(row))return rowValidity.get(row);
+    const accepted=valid(row);
+    if(row&&typeof row==='object'&&Object.isFrozen(row)&&Object.isFrozen(row.position_m)&&Object.isFrozen(row.inertial_velocity_km_s))rowValidity.set(row,accepted);
+    return accepted;
+  };
   for(const [index,node]of request.nodes.entries()){
     const key=definitionKeyFor(node,entries,catalogs);
     const result=response.nodes[index];
@@ -65,7 +76,7 @@ function* prepareNodeSampleBuffer(request,response,{expectedHashes={}}={}){
       }else if(!valid(row))throw new Error('malformed native node success row');
     }
     catalogs.add(node.catalog_number);
-    const buffer=createSampleBuffer(result.rows,codec.difference,{isValid:valid,interpolateFields:interpolate});
+    const buffer=createSampleBuffer(result.rows,codec.difference,{isValid:immutableRowValid,interpolateFields:interpolate});
     entries.set(node.id,{definition:structuredClone(node),key,hash:result.definition_hash,buffer,failureRows});
     yield;
   }

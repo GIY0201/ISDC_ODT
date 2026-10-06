@@ -161,7 +161,7 @@
       "label": "Terra (EOS AM-1)",
       "origin": "Terra/Terra.glb",
       "origin_image": "Terra/Terra.png",
-      "file": "terra.glb",
+      "file": "terra_repaired.glb",
       "thumbnail": "terra.jpg",
       "size_m": 15,
       "exact": {
@@ -185,8 +185,8 @@
         "roll": 0
       },
       "extent": 26053.829635,
-      "sha256": "8794857595f7a7d416184fe926ecb50e11bf267dbe471d1cf2728a85e8d017fa",
-      "bytes": 2150600
+      "sha256": "85e3a8e05c694463e3e664a3fd702484a0fc0e5eb042fbb3acdfb2dc924dd779",
+      "bytes": 2165908
     },
     {
       "key": "aqua",
@@ -608,7 +608,7 @@
       "label": "Jason 계열 해양고도계 위성",
       "origin": "Jason 1/Jason 1.glb",
       "origin_image": "Jason 1/Jason 1.png",
-      "file": "jason.glb",
+      "file": "jason_repaired.glb",
       "thumbnail": "jason.jpg",
       "size_m": 9.5,
       "exact": {
@@ -637,8 +637,8 @@
         "roll": 0
       },
       "extent": 634.111306,
-      "sha256": "22139020d17a118aeedfa95b8295712b60f1ed992dcd6770b7a59bac57ea225b",
-      "bytes": 592740
+      "sha256": "f9b01e1684fd83fa1242bdce55793128796b3ff6164272b5fae2e656dd2821fb",
+      "bytes": 592788
     },
     {
       "key": "sentinel_6",

@@ -100,10 +100,12 @@ export function createMissionStore({ model, storage = null, now = () => Date.now
     return [];
   }
 
-  function setPlan(id, plan, { source = "orchestrator" } = {}) {
+  function setPlan(id, plan, { source = "orchestrator", acceptedVersion = null } = {}) {
     const mission = find(id);
     if (!mission || !plan) return null;
-    const version = (mission.plan?.version || 0) + 1;
+    const nextVersion = (mission.plan?.version || 0) + 1;
+    if(acceptedVersion!==null&&(!Number.isSafeInteger(acceptedVersion)||acceptedVersion<nextVersion||plan.exchange_contract!=="guarded-v1"||plan.mission_id!==id||plan.mission_version!==acceptedVersion))throw Error("accepted mission version must be monotonic and receipt-bound");
+    const version = acceptedVersion ?? nextVersion;
     const next = { ...mission, plan: { ...plan, version, source, received_at: new Date(now()).toISOString() }, status: mission.status === "committed" ? "committed" : "planned", updated_at: new Date(now()).toISOString() };
     missions = missions.map(item => (item.id === id ? next : item));
     record({ mission_id: id, kind: plan.feasible ? "planned" : "infeasible", message: `${next.name} 계획 v${version} · ${plan.feasible ? `${plan.tasks?.length || 0}개 작업, ${plan.summary?.satellites?.length || 0}기` : (plan.reasons?.[0] || plan.checks?.find(check => !check.ok)?.detail || "실행 불가")}` });

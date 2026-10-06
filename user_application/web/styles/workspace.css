@@ -113,3 +113,5 @@
 .mt .mt-deadline.selected text { font-weight: 700; opacity: 1; }
 html[data-theme="light"] .mt .mt-task.selected rect { stroke: #10213c; filter: none; }
 html[data-theme="light"] .mt .mt-task.running rect { stroke: #10213c; }
+#source-scenario-services[hidden], #source-scenario-services [hidden],
+#source-scenario-dock[hidden], #source-scenario-dock [hidden] { display: none !important; }

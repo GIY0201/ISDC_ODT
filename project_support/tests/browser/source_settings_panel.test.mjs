@@ -41,3 +41,23 @@ test('settings reads actual SIM owner socket string and refreshes when existing 
  sim.connect();notify('open');assert.equal(sim.snapshot().connection,'open');f.panel.update();assert.match(f.get('links').innerHTML,/WebSocket 텔레메트리 수신 중/);
  notify('closed');f.panel.update();assert.match(f.get('links').innerHTML,/WebSocket 끊김/);f.panel.destroy();sim.destroy();
 });
+
+test('received settings drafts persist through remount with booleans and require explicit save',async()=>{
+ const f=fixture();f.panel.show('settings');
+ f.panel.applyDraft([{id:'st-link',value:'L02',settings_link:'L02'},{id:'st-host',value:'remote.unsaved.test',settings_link:'L02'},{id:'st-enabled',value:'on',checked:false,settings_link:'L02'},{id:'st-reconnect',value:'on',checked:false,settings_link:'L02'}],true);
+ f.panel.update();f.panel.show('ground');f.elements.delete('source-module-settings');f.panel.show('settings');
+ assert.equal(f.get('host').value,'remote.unsaved.test');assert.equal(f.get('enabled').checked,false);assert.equal(f.get('reconnect').checked,false);assert.equal(f.records.size,0);assert.equal(f.requests,0);
+ await f.get('save').dispatch('click');assert.equal(f.records.size,0);
+ await f.get('editor').dispatch('submit');await f.get('save').dispatch('click');assert.equal(JSON.parse(f.records.get(STORAGE_KEY)).links.L02.enabled,false);f.panel.destroy();
+});
+
+test('foreign link and missing checkbox proof cannot change current editor; remote mode is only draft',async()=>{
+ const f=fixture();f.panel.show('settings');const before=f.get('host').value;
+ f.panel.applyDraft([{id:'st-host',value:'wrong.test',settings_link:'L03'},{id:'st-enabled',value:'on',settings_link:'L02'}],true);
+ assert.equal(f.get('host').value,before);assert.equal(f.get('enabled').checked,true);
+ const mode=f.panel.controller.snapshot().settings.mode;
+ // Use an actual catalog mode rather than inventing a runtime mode.
+ const {MODES}=await import('../../../user_application/web/scripts/settings/topology.js');const desired=MODES.find(m=>m.id!==mode).id;
+ f.panel.applyDraft([{id:'st-mode',value:desired,settings_link:'L02'}],true);f.panel.update();assert.equal(f.get('mode').value,desired);assert.equal(f.panel.controller.snapshot().settings.mode,mode);assert.equal(f.records.size,0);assert.equal(f.requests,0);
+ await f.get('probe').dispatch('click');assert.equal(f.requests,0);await f.get('save').dispatch('click');assert.equal(JSON.parse(f.records.get(STORAGE_KEY)).mode,desired);f.panel.destroy();
+});

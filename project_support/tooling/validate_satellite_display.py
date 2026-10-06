@@ -9,6 +9,7 @@ import argparse
 import hashlib
 import io
 import json
+import math
 import re
 import struct
 from pathlib import Path
@@ -151,7 +152,7 @@ def inspect_glb(data: bytes, *, decode_images: bool = False) -> dict:
             if isinstance(value, dict):
                 for key, child in value.items():
                     if key.endswith('Texture') and isinstance(child, dict) and 'index' in child:
-                        yield child['index']
+                        yield child
                     yield from material_textures(child)
             elif isinstance(value, list):
                 for child in value:
@@ -168,7 +169,7 @@ def inspect_glb(data: bytes, *, decode_images: bool = False) -> dict:
             visited.add(number)
             if 'mesh' in node:
                 mesh = index('meshes', node['mesh'])
-                for primitive in mesh.get('primitives', []):
+                for primitive_number, primitive in enumerate(mesh.get('primitives', [])):
                     for accessor in primitive.get('attributes', {}).values():
                         index('accessors', accessor)
                     if 'indices' in primitive:
@@ -177,7 +178,15 @@ def inspect_glb(data: bytes, *, decode_images: bool = False) -> dict:
                     if draco is not None:
                         index('bufferViews', draco.get('bufferView'))
                     if 'material' in primitive:
-                        index('materials', primitive['material']); active_materials.add(primitive['material'])
+                        material = index('materials', primitive['material'])
+                        active_materials.add(primitive['material'])
+                        for info in material_textures(material):
+                            texcoord = info.get('extensions', {}).get('KHR_texture_transform', {}).get('texCoord', info.get('texCoord', 0))
+                            if not integer(texcoord) or texcoord < 0:
+                                raise ValueError('material_texcoord_index')
+                            semantic = f'TEXCOORD_{texcoord}'
+                            if semantic not in primitive.get('attributes', {}):
+                                errors.append(f'missing_material_texcoord:mesh:{node["mesh"]}:primitive:{primitive_number}:{semantic}')
             for child in node.get('children', []):
                 visit(child, stack | {number})
 
@@ -186,8 +195,8 @@ def inspect_glb(data: bytes, *, decode_images: bool = False) -> dict:
             visit(root, set())
         images = set()
         for number in sorted(active_materials):
-            for texture_number in material_textures(index('materials', number)):
-                texture = index('textures', texture_number)
+            for texture_info in material_textures(index('materials', number)):
+                texture = index('textures', texture_info['index'])
                 if 'source' in texture:
                     index('images', texture['source']); images.add(texture['source'])
                 webp = texture.get('extensions', {}).get('EXT_texture_webp')
@@ -259,7 +268,31 @@ def validate_package(root: Path, *, decode_images: bool = False) -> dict:
                 errors.append(f'original_thumbnail_mapping_changed:{model["key"]}')
             if model['file'] != old['file']:
                 record = derivatives.get(model['file'])
-                if not record or record.get('original_file') != old['file'] or record.get('original_sha256') != old.get('sha256') or record.get('derived_sha256') != model.get('sha256') or not record.get('textures'):
+                material_proof = False
+                if record and record.get('material_corrections'):
+                    try:
+                        before, original_binary = parse_glb(read(old['file']))
+                        after, derived_binary = parse_glb(read(model['file']))
+                        expected = json.loads(json.dumps(before))
+                        for correction in record['material_corrections']:
+                            if correction.get('kind') != 'historical_solid_material_restoration' or not re.fullmatch(r'[a-f0-9]{64}', correction.get('historical_glb_sha256', '')) or correction.get('binary_preserved') is not True:
+                                raise ValueError('material_source_receipt')
+                            index = correction['material']
+                            material = expected['materials'][index]
+                            pbr = material['pbrMetallicRoughness']
+                            if material.get('name') != correction['name'] or pbr.pop('baseColorTexture') != correction['removed_base_color_texture']:
+                                raise ValueError('material_source_identity')
+                            factor = correction['restored_base_color_factor']
+                            if not isinstance(factor, list) or len(factor) != 4 or any(not isinstance(v, (int, float)) or not math.isfinite(v) or not 0 <= v <= 1 for v in factor):
+                                raise ValueError('material_source_color')
+                            consumers = [{'mesh': m, 'primitive': p} for m, mesh in enumerate(before['meshes']) for p, primitive in enumerate(mesh['primitives']) if primitive.get('material') == index]
+                            if not consumers or consumers != correction['consumers'] or any(any(key.startswith('TEXCOORD_') for key in before['meshes'][row['mesh']]['primitives'][row['primitive']].get('attributes', {})) for row in consumers):
+                                raise ValueError('material_source_consumers')
+                            pbr['baseColorFactor'] = factor
+                        material_proof = after == expected and original_binary == derived_binary
+                    except (ValueError, KeyError, IndexError, TypeError):
+                        material_proof = False
+                if not record or record.get('original_file') != old['file'] or record.get('original_sha256') != old.get('sha256') or record.get('derived_sha256') != model.get('sha256') or not (record.get('textures') or material_proof):
                     errors.append(f'derivative_provenance:{model["key"]}')
             groups.setdefault(model['file'], []).append(model)
         receipt['unique_model_files'] = len(groups)

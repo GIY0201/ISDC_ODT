@@ -12,3 +12,30 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`real V6 assembly moun
   await f.win.dispatch('pagehide',{persisted:false});
  }finally{f.dispose();}
 });
+test('actual multiwindow settings drafts preserve link scope and checked across rerender',async()=>{
+ const f=fixture(1280,720,{hash:'#settings'});
+ try{
+  const channel=f.channels.find(c=>c.name==='isdc-odt-v6-mock');
+  f.get('st-enabled').checked=false;await f.get('screen').dispatch('change',{target:f.get('st-enabled')});
+  const sent=channel.messages.findLast(m=>m.type==='draft'&&m.id==='st-enabled');assert.equal(sent.checked,false);assert.equal(sent.settings_link,'L02');
+  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'settings',id:'st-host',value:'handoff.unsaved.test',settings_link:'L02'}});
+  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'settings',id:'st-reconnect',value:'on',checked:false,settings_link:'L02'}});
+  f.evaluate("location.hash='#ground'");await f.win.dispatch('hashchange');f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');
+  assert.equal(f.get('st-host').value,'handoff.unsaved.test');assert.equal(f.get('st-reconnect').checked,false);
+  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'settings',id:'st-host',value:'foreign.test',settings_link:'L03'}});assert.equal(f.get('st-host').value,'handoff.unsaved.test');
+  await f.win.dispatch('pagehide',{persisted:false});
+ }finally{f.dispose();}
+});
+test('initial popout snapshot owns selected link without saving; focused checkbox rejects conflict',async()=>{
+ const opener={postMessage(){}};const f=fixture(1280,720,{hash:'#settings',popout:true,opener});
+ try{
+  await f.win.dispatch('message',{origin:'http://localhost',source:opener,data:{type:'isdc-v6-snapshot',view:'settings',state:{view:'settings'},draft:[{id:'st-link',value:'L03',settings_link:'L03'},{id:'st-host',value:'snapshot.unsaved.test',settings_link:'L03'},{id:'st-enabled',value:'on',checked:false,settings_link:'L03'}]}});f.flush();
+  assert.equal(f.get('st-link').value,'L03');assert.equal(f.get('st-host').value,'snapshot.unsaved.test');assert.equal(f.get('st-enabled').checked,false);
+  const mode=f.evaluate('sourceSettingsPanel.controller.snapshot()');assert.equal(mode.settings.links.L03,undefined);assert.equal(mode.dirty,false);
+  f.get('st-enabled').focus();const channel=f.channels.find(c=>c.name==='isdc-odt-v6-mock');
+  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'settings',id:'st-enabled',value:f.get('st-enabled').value,checked:true,settings_link:'L03'}});
+  assert.equal(f.get('st-enabled').checked,false);assert.match(f.get('popout-feedback').textContent,/현재 편집값/);
+  f.evaluate("location.hash='#ground'");await f.win.dispatch('hashchange');f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');assert.equal(f.get('st-host').value,'snapshot.unsaved.test');assert.equal(f.get('st-enabled').checked,false);
+  await f.win.dispatch('pagehide',{persisted:false});
+ }finally{f.dispose();}
+});

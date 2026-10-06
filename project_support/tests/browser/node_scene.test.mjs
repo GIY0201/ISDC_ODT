@@ -127,6 +127,21 @@ test('each syncFrame reuses only its exact native poses for points, models and r
  calls.length=0;f.scene.syncFrame(utc,3016);assert.equal(calls.length,4,'next frame verifies fresh native poses');assert.deepEqual(plain(f.scene.links.get('pair').line.positions),positions);
  f.display=codec.advance(utc,1);calls.length=0;f.scene.syncFrame(f.scene.timeSource(),3032);assert.equal(calls.length,4);assert.equal(calls[0][1],f.scene.timeSource());assert.equal(f.scene.links.get('pair').line.show,false);f.scene.destroy();
 });
+
+test('frame-local cache hits do not reread external context and each OISL line is assigned once per frame',async()=>{
+ let calls=0,checks=0;const f=fixture({geometry:g=>{calls++;return g;},verifyLinkSnapshot:()=>true});await f.scene.setNodes(entries());f.scene.setLinks(linkSnapshot());
+ f.scene.isTransitioning=()=>{checks++;return false;};const line=f.scene.links.get('pair').line;let positions=line.positions,writes=0;
+ Object.defineProperty(line,'positions',{get:()=>positions,set:value=>{writes++;positions=value;},configurable:true});calls=0;checks=0;
+ f.scene.syncFrame(utc,3000);assert.equal(calls,4);assert.equal(writes,1,'one guarded endpoint placement before packet phase update');assert.ok(checks<=calls*2+4,`cache hits must not call the external transition reader again: ${checks}`);
+ assert.equal(line.show,true);assert.equal(line.material.uniforms.time,3000/1000*1.4);assert.equal(f.scene.frameMemo,null);f.scene.destroy();
+});
+
+test('a later native buffer replacement at the same UTC is freshly validated and cannot reuse the prior frame',async()=>{
+ let generation=0,bad=false;const f=fixture({geometry:g=>({...g,definition_hash:bad?'invalid hash':hash,row:{...g.row,position_m:[g.row.position_m[0]+generation*1000,...g.row.position_m.slice(1)]}}),verifyLinkSnapshot:()=>true});
+ await f.scene.setNodes(entries());f.scene.setLinks(linkSnapshot());f.scene.syncFrame(utc,3000);const original=plain(f.scene.points.get('1').position);
+ generation++;f.scene.syncFrame(utc,3016);assert.equal(f.scene.points.get('1').position.x,original.x+1000);assert.equal(f.scene.links.get('pair').line.positions[0].x,original.x+1000);assert.equal(f.scene.frameMemo,null);
+ bad=true;f.scene.syncFrame(utc,3032);assert.ok([...f.scene.points.values()].every(p=>!p.show));assert.ok([...f.scene.models.values()].every(m=>!m.model.show));assert.equal(f.scene.links.get('pair').line.show,false);assert.equal(f.scene.links.get('pair').line.material.uniforms.time,3016/1000*1.4);f.scene.destroy();
+});
 test('time, definition scope, morph, viewer or destruction change in a geometry callback cannot publish a mixed frame',async()=>{
  for(const change of ['time','scope','morph','viewer','destroy']){
   let armed=false,count=0;const f=fixture({geometry:g=>{if(armed&&++count===2){if(change==='time')f.display=codec.advance(utc,1);else if(change==='scope')void f.scene.setNodes([{...entries(1)[0],definition:{...definition('1'),name:'changed'}}]);else if(change==='morph')f.morph=true;else if(change==='viewer')f.scene.viewerProvider={scene:{primitives:new Collection(),mode:3}};else f.scene.destroy();}return g;},verifyLinkSnapshot:()=>true});
@@ -165,6 +180,26 @@ test('all240 paths reuse native vectors across unchanged revisions and rebuild o
  for(let i=0;i<20;i++)f.scene.update(utc);assert.equal(reads,240);assert.equal(f.scene.paths.get('1').positions,positions);
  f.tracks=false;f.scene.update(utc);assert.equal(f.scene.paths.get('1').entity.show,false);f.tracks=true;f.scene.update(utc);assert.equal(f.scene.paths.get('1').entity.show,true);assert.equal(reads,240);
  token=Object.freeze({});f.scene.update(utc);assert.equal(reads,480);assert.notEqual(f.scene.paths.get('1').positions,positions);f.scene.destroy();
+});
+
+test('all240 accepted paths use static Cesium positions and replace them only with a new native revision',async()=>{
+ let token=Object.freeze({}),failed=false,reads=0;const f=fixture({pathRevisionFor:()=>token,path:p=>{reads++;return failed?{...p,visible:false,positions_m:[]}:p;}});
+ await f.scene.setNodes(entries(240).map(n=>({...n,model:null})));assert.equal(reads,240);
+ const original=new Map([...f.scene.paths].map(([id,p])=>[id,p.entity.polyline.positions]));
+ for(const [id,p]of f.scene.paths){assert.ok(Array.isArray(p.entity.polyline.positions),`path ${id} must not use a nonconstant CallbackProperty`);assert.equal(p.entity.polyline.positions,p.positions);assert.equal(p.positions.length,121);}
+ for(let i=0;i<3;i++)f.scene.update(utc);
+ assert.equal(reads,240);for(const [id,p]of f.scene.paths)assert.equal(p.entity.polyline.positions,original.get(id));
+ f.scene.select('1');assert.equal(f.scene.paths.get('1').entity.show,false);assert.equal(f.scene.paths.get('2').entity.show,true);
+ f.morph=true;f.scene.syncFrame(utc,1000);f.morph=false;f.scene.syncFrame(utc,1016);
+ for(const [id,p]of f.scene.paths)assert.equal(p.entity.polyline.positions,original.get(id));
+ f.scene.setTheme('light');assert.equal(f.scene.paths.get('2').entity.polyline.material.alpha,golden.lightAlpha);
+ token=Object.freeze({});f.scene.update(utc);assert.equal(reads,480);
+ for(const [id,p]of f.scene.paths){assert.notEqual(p.entity.polyline.positions,original.get(id));assert.equal(p.entity.polyline.positions,p.positions);assert.equal(p.positions.length,121);}
+ failed=true;token=Object.freeze({});f.scene.update(utc);
+ for(const p of f.scene.paths.values()){assert.deepEqual(p.entity.polyline.positions,[]);assert.equal(p.entity.show,false);}
+ failed=false;token=Object.freeze({});f.scene.update(utc);assert.equal(f.scene.paths.get('1').entity.show,false);assert.equal(f.scene.paths.get('2').entity.show,true);
+ token=null;f.scene.update(utc);for(const p of f.scene.paths.values()){assert.deepEqual(p.entity.polyline.positions,[]);assert.equal(p.entity.show,false);}
+ f.scene.destroy();
 });
 test('missing failed or changed path revisions cannot keep an old successful line',async()=>{
  let token=Object.freeze({}),failed=false;const f=fixture({pathRevisionFor:()=>token,path:p=>failed?{...p,visible:false,positions_m:[]}:p});await f.scene.setNodes(entries());assert.equal(f.scene.paths.get('1').entity.show,true);
