@@ -13,6 +13,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  let dead=false,started=false,root=null,panel=null,scene=null,display=null,deployment=null,activeSelection=false,selectedSignature=null,definitionsSignature=null,error='';
  let tracks=true,links=true,modelsVisible=true;const readiness=new Map(),removers=[];
  let restorePromise=null;
+ let reviewedRevision=null;
  const id=()=>createBrowserId(host.crypto);
  const report=value=>{if(dead)return;error=String(value?.message??value);refreshPanel();};
  const readDisplay=()=>({...readClock(display),utc:display?.utc??null});
@@ -59,6 +60,12 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   if(native)native.textContent=calculation.error||(!display?.utc?'공용 표시 UTC를 먼저 선택하세요.':calculation.pending?'Rust 노드 계산 중':store.drafts.length?'Kepler+J2 모의 계산 · 실제 통신 미확인':'작업 세트에 노드가 없습니다.');
   if(retry)retry.disabled=!display?.utc||store.drafts.length===0||calculation.pending;
   const restore=root.querySelector('#nodes-restore');if(restore)restore.disabled=!!restorePromise||(store.loaded&&state.server!==null&&!state.syncRequired&&!state.error);
+  const summary=root.querySelector('#node-scene-summary');if(summary)summary.textContent=`공유 작업 세트 · 초안 ${store.drafts.length}개 · 수락 배치 ${store.deployed.length}개 · ${store.deploymentConfirmed?'서버 수락 확인':'배치 수락 미확인'} · 표시 UTC ${display?.utc??'미제공'} · 실제 통신 미확인`;
+  const definitions=root.querySelector('#node-scene-definitions');if(definitions&&reviewedRevision!==store.revision){reviewedRevision=store.revision;definitions.textContent=JSON.stringify({drafts:store.drafts,deployed:store.deployed,selected_id:store.selectedId},null,2);}
+ }
+ function sceneSnapshot(){
+  if(dead)return null;
+  return structuredClone({drafts:store.drafts,deployed:store.deployed,selected_id:store.selectedId,revision:store.revision,loaded:store.loaded,deployment_confirmed:store.deploymentConfirmed,persistence:store.persistence,display,server:deployment.state.server,calculation:timeline.snapshot(),model_status:[...readiness.values()],error:error||store.error?.message||deployment.state.error||''});
  }
  const editorTools=createNodeEditorTools({library,catalogElements,now});
  deployment=createDataDeployment({constellation:store,fetchImpl,createId:id,setTimer:host.setTimeout.bind(host),clearTimer:host.clearTimeout.bind(host),onChange:refreshPanel});
@@ -97,10 +104,10 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  const external=event=>{if(!dead&&event.key===DRAFT_KEY)store.receiveExternalDraft(event.newValue);};host.addEventListener('storage',external);
  function show(view){
   if(dead||!started)return;
-  if(view!=='satellite'){if(root)root.hidden=true;return;}
-  if(root&&!document.getElementById('satellite-nodes')){panel?.destroy();root=null;panel=null;for(const remove of removers.splice(0))remove();}
+  if(!['satellite','scene','composer'].includes(view)){if(root)root.hidden=true;return;}
+  if(root&&!document.getElementById('satellite-nodes')){panel?.destroy();root=null;panel=null;reviewedRevision=null;for(const remove of removers.splice(0))remove();}
   if(!root){
-   root=document.createElement('section');root.id='satellite-nodes';root.className='panel';root.innerHTML=tools.workPanelMarkup()+'<p role="status" id="node-native-state"></p><button type="button" id="nodes-retry">노드 계산 다시 시도</button><button type="button" id="nodes-restore">초안 복원·서버 조회 재시도</button>';document.getElementById('screen').prepend(root);
+   root=document.createElement('section');root.id='satellite-nodes';root.className='panel';root.innerHTML=tools.workPanelMarkup()+'<p role="status" id="node-native-state"></p><button type="button" id="nodes-retry">노드 계산 다시 시도</button><button type="button" id="nodes-restore">초안 복원·서버 조회 재시도</button><p role="status" id="node-scene-summary"></p><details><summary>공유 노드 정의 확인 · 초안과 수락 배치</summary><pre id="node-scene-definitions" style="max-height:24rem;overflow:auto;white-space:pre-wrap"></pre></details>';document.getElementById('screen').prepend(root);
    panel=tools.createNodeWorkPanel({root,store,editorTools,now,timers:{set:host.setTimeout.bind(host),clear:host.clearTimeout.bind(host)},createFormationId:id,readDisplay,viewport:()=>({width:host.innerWidth,height:host.innerHeight}),scrollTarget:host,geometryFor,linksFor:()=>optical.snapshot(),verifyLinkSnapshot:optical.verifyLinkSnapshot,oislPresentation:oisl,modelFor,modelReadinessFor:node=>readiness.get(node.id)??null,models,onModelChange:key=>resolveModel({model_key:key}),confirmClear:()=>host.confirm('작업 세트의 모든 노드를 삭제할까요?'),onDefinitionsChanged:syncDefinitions,onResetTerminals:optical.resetHistories,onSelected:select,onFocus:focus,onError:report,
     readScene:()=>({ready:globe.nodeRendererState().phase==='ready',cameraReady:globe.cameraState?.().ready===true,lighting:solar?.state().enabled,zoom:globe.cameraState?.().zoom??null,tracks,links,models:modelsVisible}),actions:{...clockActions,setLighting:value=>!dead&&(solar?.setEnabled(value)??false),home:()=>!dead&&globe.home?.(),zoomBy:value=>!dead&&globe.zoomBy?.(value),setZoom:value=>!dead&&globe.setZoom?.(value),untrack:options=>!dead&&globe.releaseSatelliteModel(options),toggleTracks:()=>{tracks=!tracks;scene?.update(display?.utc??null);refreshPanel();},setLinksVisible:value=>{links=value;scene?.setLinksVisible(value);refreshPanel();},setModelsVisible:value=>{modelsVisible=value;scene?.setModelsVisible(value);refreshPose();refreshPanel();}}});
    for(const [key,action]of [['nodes-deploy',()=>deployment.deploy()],['nodes-recall',()=>deployment.recall()]]){const button=root.querySelector('#'+key),handler=()=>{if(dead||button.disabled)return;error='';void action().catch(report);};button.addEventListener('click',handler);removers.push(()=>button.removeEventListener('click',handler));}
@@ -119,7 +126,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  }
  return Object.freeze({
   async start(){if(dead||started)return;started=true;return retryRestore();},retryRestore,
-  show,refresh:refreshPanel,refreshModels,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
+  show,refresh:refreshPanel,refreshModels,sceneSnapshot,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
   destroy(){if(dead)return;dead=true;try{onHover(null);}catch{/* Scoped presentation cleanup. */}for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
  });
 }

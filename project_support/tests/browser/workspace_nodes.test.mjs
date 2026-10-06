@@ -8,6 +8,38 @@ import {NODE_COMMUNICATION_METADATA} from '../../../user_application/web/scripts
 import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
 import {fixture as actualWorkspaceFixture} from './workspace_fixture.mjs';
 
+test('scene snapshot copies the original draft/deployment definitions and never treats passive restore as acceptance',async()=>{
+ const f=fixture();await f.workspace.start();f.workspace.show('scene');assert.equal(f.sections.get('satellite-nodes')?.hidden,false);
+ f.options.store.add({name:'Shared scene'});const s=f.workspace.sceneSnapshot();assert.equal(s.drafts[0].name,'Shared scene');assert.equal(s.selected_id,s.drafts[0].id);assert.deepEqual(s.deployed,[]);assert.equal(s.deployment_confirmed,false);assert.equal(s.display,null);
+ s.drafts[0].name='foreign';s.server.nodes.push({id:'foreign'});assert.equal(f.workspace.sceneSnapshot().drafts[0].name,'Shared scene');assert.deepEqual(f.workspace.sceneSnapshot().server.nodes,[]);
+ f.workspace.show('composer');assert.equal(f.sections.get('satellite-nodes').hidden,false);assert.equal(f.options.store.drafts.length,1);assert.deepEqual(f.calls.filter(c=>c[0]==='http').map(c=>c[2]),['GET']);
+ f.workspace.destroy();assert.equal(f.workspace.sceneSnapshot(),null);
+});
+
+for(const view of ['scene','composer'])test(`actual V6 ${view} shares source node editor and readonly review snapshot`,async()=>{
+ const f=actualWorkspaceFixture(1280,720,{hash:'#'+view});try{
+  await new Promise(resolve=>setTimeout(resolve,10));assert.equal(f.get('satellite-nodes').hidden,false);await f.get('node-add').dispatch('click');
+  assert.equal(f.get('node-count').textContent,'1');assert.match(f.get('node-scene-summary').textContent,/초안 1/);assert.match(f.get('node-scene-summary').textContent,/수락 배치 0/);
+  const s=f.evaluate('nodeWorkspace.sceneSnapshot()');assert.equal(s.drafts.length,1);assert.deepEqual(s.deployed,[]);assert.match(f.get('node-scene-definitions').textContent,/'?schema"?:\s*1/);
+  const count=f.counts().commands;f.evaluate("showWorkspaceOrbit('satellite')");assert.equal(f.get('node-count').textContent,'1');assert.equal(f.counts().commands,count);assert.equal(f.viewers.length,1);
+  await f.win.dispatch('pagehide',{persisted:false});
+ }finally{f.dispose();}
+});
+
+for(const [width,height] of [[1280,720],[1920,1080]])test(`restored source definitions survive actual scene/composer screen reconstruction ${width}x${height}`,async()=>{
+ const records=new Map();const storage={getItem:key=>records.get(key)??null,setItem:(key,value)=>records.set(key,value)};
+ const seed=fixture({storage});await seed.workspace.start();seed.workspace.show('satellite');seed.options.store.add({name:'Restored source'});const expected=seed.options.store.drafts;seed.workspace.destroy();
+ const requests=[],f=actualWorkspaceFixture(width,height,{hash:'#scene',storage,fetch:async(url,options)=>{requests.push(options.method);return{ok:true,json:async()=>({revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]})};}});
+ try{
+  await new Promise(resolve=>setTimeout(resolve,10));const oldRoot=f.get('satellite-nodes');const before=f.counts().commands;
+  assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),expected);assert.match(f.get('node-scene-definitions').textContent,/Restored source/);
+  f.evaluate("location.hash='#composer'");await f.win.dispatch('hashchange');assert.equal(oldRoot.isConnected,false);assert.notEqual(f.get('satellite-nodes'),oldRoot);
+  assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),expected);assert.equal(f.get('node-count').textContent,'1');assert.match(f.get('node-scene-definitions').textContent,/Restored source/);
+  f.evaluate("location.hash='#satellite'");await f.win.dispatch('hashchange');assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),expected);assert.deepEqual(requests,['GET']);assert.equal(f.counts().commands,before);assert.equal(f.viewers.length,1);
+  await f.win.dispatch('pagehide',{persisted:false});
+ }finally{f.dispose();}
+});
+
 for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 source node hover uses one card and expires with owned geometry ${width}x${height}`,async()=>{
  const codec=createUtcCodec(LEAP_SHA256);let samples=0;
  const f=actualWorkspaceFixture(width,height,{hash:'#satellite',setTimeout,clearTimeout,nodeSamples:async p=>{samples++;return{schema_version:1,...NODE_COMMUNICATION_METADATA,request_id:p.request_id,status:'valid',nodes:p.nodes.map(node=>({node_id:node.id,definition_hash:'a'.repeat(64),rows:Array.from({length:p.count},(_,i)=>({utc:codec.advance(p.start_utc,i),status:'valid',error_code:null,position_m:[7000000,2,3],inertial_velocity_km_s:[0,7.5,0],raan_deg:0,argp_deg:0,mean_anomaly_deg:0,sunlit:true,longitude_deg:0,latitude_deg:0,height_km:550}))}))};}});
