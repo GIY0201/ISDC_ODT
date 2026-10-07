@@ -1,3 +1,7 @@
+## 2026-10-07 N020 원본 시나리오 경로 선택값 인계 회귀 통과
+
+기존 scenario:route의3필드를 기존 지상 화면 선택값에 전달한다. 현재실행/전체정의/지상국/마지막routeSpec 검사, 숨김·미저장편집 보존, observer예외와 기존step판정 분리를 유지한다. 추가명령·계산·승인은 없다. 의미 있는 RED 후 두 독립경계 결함을 영구회귀로 수정했다. 독립43PASS CLEAN; 전체 Node1912PASS0FAIL0SKIP23078.159ms exit0. 로그 full_N020_node.log. Python제품변경없어 N019전체967PASS/1PillowSKIP/8ERFAwarnings 증거 유지. 실제화면·GPU·모델·두해상도·전체75-84/T032/PR은 미완료. 원본SIM/40배치/8891/입력과 기존브랜치 보존. validation/scenario_ground_route_handoff.md 참조.
+
 ## 2026-10-07 N019 분석 경로·지상국 상세·선택 링크 RF 연결 회귀 통과
 
 원본 통신 모듈의 등록된 과거 분석을 기존 SVG/공용3D 실제 링크에 연결하고,

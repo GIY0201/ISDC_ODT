@@ -4,20 +4,22 @@ import {createScenarioRunner} from './runner.js';
 import {createScenarioClock} from './clock.js';
 import {NODE_COMMUNICATION_METADATA} from '../nodes/node_timeline.js';
 const requireValue=(value,message)=>{if(!value)throw Error(message);};
-export function createWorkspaceScenario({api,nodeWorkspace,ground,missionServices,fabric,simController,nodeLibrary,missionTypes,stationModel,assemblyFactory,kpi,storage=null,onChange=()=>{},switchTab=()=>{},clockOwners={},affectedTasks=null,onControl=null}={}){
+export function createWorkspaceScenario({api,nodeWorkspace,ground,missionServices,fabric,simController,nodeLibrary,missionTypes,stationModel,assemblyFactory,kpi,storage=null,onChange=()=>{},switchTab=()=>{},clockOwners={},affectedTasks=null,onControl=null,onRouteSpec=null}={}){
  requireValue(api&&nodeWorkspace&&ground&&missionServices&&fabric&&simController&&missionTypes&&stationModel&&typeof assemblyFactory==='function'&&kpi,'existing scenario workspace owners required');
+ requireValue(onRouteSpec===null||typeof onRouteSpec==='function','scenario route draft observer must be a function');
  const ports=typeof nodeWorkspace.scenarioPorts==='function'?nodeWorkspace.scenarioPorts():null;
  const library=nodeLibrary??ports?.nodeLibrary;
  requireValue(library,'existing scenario node model required');
  const assembly=assemblyFactory({nodeLibrary:library,stationModel,missionTypes});
  const readRuntime=()=>simController.snapshot().runtime;
- let dead=false,prepared=false,lastNativeHashes=null,resumeCounter=0;
+ let dead=false,prepared=false,lastNativeHashes=null,resumeCounter=0,routeEpoch={},routeTick=null;
+ const revokeRoute=()=>{routeEpoch={};routeTick=null;};
  const controlReleases=new Set();
  function controlled(work){if(onControl==null)return work();return (async()=>{requireValue(!dead,'scenario workspace disposed');const cleanup=onControl?.();let released=false;const release=()=>{if(released)return;released=true;controlReleases.delete(release);try{cleanup?.();}catch{/* Cleanup cannot replace command results. */}};controlReleases.add(release);try{requireValue(!dead,'scenario workspace disposed');return await work();}finally{release();}})();}
  const clock=createScenarioClock({runtime:readRuntime,...clockOwners,control:{pause:()=>runner.pause(),play:()=>runner.play(),setSpeed:n=>runner.setSpeed(n),advance:n=>runner.advance(n),refuse:message=>{throw Error(message);}}});
  async function refreshRuntime(status){await simController.load();const actual=readRuntime();requireValue(actual?.run_id===status.run_id&&actual.running===status.running,'SIM owner did not accept current runtime response');return actual;}
  async function preflight(definition){
-  requireValue(!dead,'scenario workspace disposed');prepared=false;
+  requireValue(!dead,'scenario workspace disposed');prepared=false;revokeRoute();
   requireValue(typeof ports?.prepareSimUtc==='function'&&typeof ports?.verifySimUtc==='function'&&typeof ports?.preflightSimScenario==='function','native 입력을 실제 SIM UTC에서 검증하는 연결이 아직 없습니다. 현재 실행과 초안을 보존했습니다.');
   requireValue(ports.store&&typeof ports.deployment?.deploy==='function'&&typeof simController.load==='function','existing node deployment/SIM owners unavailable');
   requireValue(typeof missionServices.execution?.plan==='function'&&typeof missionServices.execution?.commit==='function'&&typeof missionServices.execution?.abort==='function'&&typeof missionServices.execution?.inspection==='function','accepted native mission execution owner unavailable');
@@ -65,14 +67,32 @@ export function createWorkspaceScenario({api,nodeWorkspace,ground,missionService
  const readFabric=()=>typeof fabric.snapshot==='function'?fabric.snapshot():{status:'unavailable',error:'기존 통신 모듈 owner가 연결되지 않았습니다.',receipt:null};
  let pendingNetwork=null;
  const networkTwin={resetHistories:()=>{nodeWorkspace.clearNetwork?.();fabric.invalidate?.();},tick(){pendingNetwork=prepare().then(()=>nodeWorkspace.updateNetwork());return pendingNetwork;},async exchange(){await pendingNetwork;const answer=await fabric.send();requireValue(answer&&readFabric().status==='accepted','current native network was not accepted');return answer;},route:(...args)=>fabric.route(...args),reachable:()=>readFabric().status==='accepted',get report(){return readFabric().receipt;},get fabricState(){const value=readFabric();return {reachable:value.status==='accepted',error:value.error,sequence:value.receipt?.sequence};},get last(){return nodeWorkspace.networkSnapshot?.()??null;}};
- function beginTick(){return controlled(async()=>{commandReady();const state=readRuntime();requireValue(state?.mode==='SIM','actual SIM owner unavailable');const lease={running:state.running,run_id:state.run_id};if(state.running)await refreshRuntime(await api.runtimeControl('pause'));return lease;});}
- function endTick(lease,succeeded,phase){if(dead)return Promise.resolve();return controlled(async()=>{if(!dead&&succeeded&&phase==='finished'&&prepared){try{requireValue(readRuntime()?.running===false&&readRuntime()?.run_id===lease?.run_id,'완료 checkpoint의 실제 SIM 실행을 확인하세요.');await checkpoint();}finally{prepared=false;}return;}if(!dead&&succeeded&&phase==='playing'&&lease?.running&&readRuntime()?.run_id===lease.run_id){await refreshRuntime(await api.runtimeControl('start'));}});}
+ function routeScope(){
+  const runtime=readRuntime(),state=runner.state;
+  if(dead||!prepared||simController.snapshot().error||!['ready','paused','playing'].includes(state.phase)||runtime?.run_id!==state.runId||runtime?.scenario_id!==state.scenarioId)return null;
+  return {epoch:routeEpoch,run:runtime.run_id,scenario:runtime.scenario_id,definition:JSON.stringify(runner.definition),nodes:JSON.stringify({drafts:ports.store.drafts,deployed:ports.store.deployed}),stations:JSON.stringify(ground.stations)};
+ }
+ function routeCurrent(scope){try{const value=routeScope();return scope&&scope.epoch===routeEpoch&&value&&value.run===scope.run&&value.scenario===scope.scenario&&value.definition===scope.definition&&value.nodes===scope.nodes&&value.stations===scope.stations;}catch{return false;}}
+ function emit(name,payload){
+  if(name==='scenario:route'&&onRouteSpec){
+   try{
+    const scope=routeTick,actual=runner.state.routeSpec;
+    if(routeCurrent(scope)&&actual&&['source','target','objective'].every(key=>typeof payload?.[key]==='string'&&payload[key]===actual[key])){
+     const draft=Object.fromEntries(['source','target','objective'].map(key=>[key,payload[key]]));
+     if(routeCurrent(scope)&&routeTick===scope&&!dead&&prepared&&scope.epoch===routeEpoch&&['source','target','objective'].every(key=>draft[key]===runner.state.routeSpec?.[key]))Promise.resolve(onRouteSpec(draft)).catch(()=>{/* Draft observer rejection cannot fail a source step. */});
+    }
+   }catch{/* Optional view handoff cannot replace original scenario execution. */}
+  }
+  onChange();
+ }
+ function beginTick(){return controlled(async()=>{commandReady();const state=readRuntime();requireValue(state?.mode==='SIM','actual SIM owner unavailable');const scope=onRouteSpec?routeScope():null;const lease={running:state.running,run_id:state.run_id,...(onRouteSpec?{routeScope:scope}:{})};if(state.running)await refreshRuntime(await api.runtimeControl('pause'));if(onRouteSpec)routeTick=routeCurrent(scope)?scope:null;return lease;});}
+ function endTick(lease,succeeded,phase){if(onRouteSpec&&routeTick===lease?.routeScope)routeTick=null;if(dead)return Promise.resolve();return controlled(async()=>{if(!dead&&succeeded&&phase==='finished'&&prepared){try{requireValue(readRuntime()?.running===false&&readRuntime()?.run_id===lease?.run_id,'완료 checkpoint의 실제 SIM 실행을 확인하세요.');await checkpoint();}finally{prepared=false;}return;}if(!dead&&succeeded&&phase==='playing'&&lease?.running&&readRuntime()?.run_id===lease.run_id){await refreshRuntime(await api.runtimeControl('start'));}});}
  const sourceApi={...api};for(const name of ['runtimeControl','runtimeSpeed','selectScenario','scenarioAdvance'])sourceApi[name]=(...args)=>controlled(async()=>{commandReady();return refreshRuntime(await api[name](...args));});
  sourceApi.injectFault=(...args)=>controlled(async()=>{commandReady();const result=await api.injectFault(...args);await simController.load();return result;});
  sourceApi.dataManagementRequest=(...args)=>controlled(async()=>{commandReady();return api.dataManagementRequest(...args);});
  const unavailable={};
- const runner=createScenarioRunner({assembly,missionTypes,kpi,pairKey,api:sourceApi,constellation:ports?.store??unavailable,groundSegment:ground,missionStore,dataDeployment:ports?.deployment?{async deploy(){await ports.deployment.refresh();return ports.deployment.deploy();}}:unavailable,planner,networkTwin,clock,storage,runtime:readRuntime,now:()=>clock.now(),applyRuntime:()=>{},switchTab,emit:()=>onChange(),preflight,beginTick,endTick,wait:async()=>{}});
- const originalStop=runner.stop;runner.stop=(...args)=>{const result=originalStop(...args);ports?.releaseDisplay?.();prepared=false;return result;};
+ const runner=createScenarioRunner({assembly,missionTypes,kpi,pairKey,api:sourceApi,constellation:ports?.store??unavailable,groundSegment:ground,missionStore,dataDeployment:ports?.deployment?{async deploy(){await ports.deployment.refresh();return ports.deployment.deploy();}}:unavailable,planner,networkTwin,clock,storage,runtime:readRuntime,now:()=>clock.now(),applyRuntime:()=>{},switchTab,emit,preflight,beginTick,endTick,wait:async()=>{}});
+ const originalStop=runner.stop;runner.stop=(...args)=>{revokeRoute();const result=originalStop(...args);ports?.releaseDisplay?.();prepared=false;return result;};
  const canonical=value=>JSON.stringify(value,(_,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.keys(item).sort().map(key=>[key,item[key]])):item);
  const same=(a,b)=>canonical(a)===canonical(b);
  // Diagnostics expose contract field names only. Exact canonical equality below
@@ -109,7 +129,7 @@ export function createWorkspaceScenario({api,nodeWorkspace,ground,missionService
  async function resumePreflight(){return validateInputs(false);}
  async function reviewFinishedInputs(){return validateInputs(true);}
  async function validateInputs(currentReview=false){
-  requireValue(!dead,'scenario workspace disposed');prepared=false;
+  requireValue(!dead,'scenario workspace disposed');prepared=false;revokeRoute();
   const phase=runner.state.phase,finishedInputsOnly=phase==='finished',runnerBefore=structuredClone(runner.state);requireValue(!currentReview||finishedInputsOnly,'현재 입력 새 검토는 완료 기록에서만 가능합니다.');
   const saved=runner.state.workspaceEvidence;
   requireValue(saved?.schema_version===1&&saved.contract==='source-scenario-resume-v1'&&saved.source_commit===NODE_COMMUNICATION_METADATA.source_commit,'과거 실행에 재개 검증 기록이 없습니다. 새 세팅을 명시적으로 검토하세요.');
@@ -140,6 +160,7 @@ export function createWorkspaceScenario({api,nodeWorkspace,ground,missionService
  async function releaseAnalysis(){requireValue(!dead,'scenario workspace disposed');if(clockOwners.followedSource?.()!==clock)return false;requireValue(typeof clockOwners.releaseAll==='function','기존 분석 시계 해제 연결이 필요합니다.');return clockOwners.releaseAll(clock);}
  async function stopReviewed(options){await releaseAnalysis();runner.stop(options);}
  for(const key of ['setup','pause','advance','skipToNextStep']){const original=runner[key];runner[key]=async(...args)=>{if(key==='setup')await releaseAnalysis();const result=await original(...args);await checkpoint();return result;};}
+ if(onRouteSpec&&typeof runner.select==='function'){const originalSelect=runner.select;runner.select=(...args)=>{revokeRoute();return originalSelect(...args);};}
  const off=runner.subscribe(onChange);
- return Object.freeze({runner,clock,assembly,kpi,preflight,resumePreflight,reviewFinishedInputs,followAnalysis,releaseAnalysis,stopReviewed,destroy(){if(dead)return;dead=true;for(const release of [...controlReleases])release();runner.suspend();off();}});
+ return Object.freeze({runner,clock,assembly,kpi,preflight,resumePreflight,reviewFinishedInputs,followAnalysis,releaseAnalysis,stopReviewed,destroy(){if(dead)return;dead=true;revokeRoute();for(const release of [...controlReleases])release();runner.suspend();off();}});
 }

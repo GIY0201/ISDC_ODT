@@ -696,3 +696,8 @@ is fullnative validatedfuture flow then actual UI acceptance, not a physics stub
 - [x] T169 ADR0056 gate then RED-first sourceLinkRfDraft/applySourceLinkDraft in existing rf_link_budget.js + closest tests; preserve source11-field conversions/provenance/manual API.
 - [x] T170 RED-first current registered native selectedgroundlink explicit button/onRfLinkDraft + root existingRF owner DI, callback/lifecycle/draft/late-result tests.
 - [ ] T171 Independent scoped review, full regressions and actual UI source-flow verification; whole live/performance acceptance remains distinct.
+
+## N020 original scenario route draft handoff
+- [x] T172 ADR0057 gate then RED-first optional scenario onRouteSpec with actual current runner/run/input/reentry/disposal guards.
+- [x] T173 RED-first existing ground adoptRouteDraft validates full roster/definitions/distinct endpoints/objective and preserves hidden draft/editor; root DI, no new command.
+- [ ] T174 Independent review and changed JS whole regression; source event/root/periodic handoff and actual screen evidence tracked separately from GPU/full goal.

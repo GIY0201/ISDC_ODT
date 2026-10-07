@@ -6,6 +6,31 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
  let root=null,view=null,dead=false,editorId=null,externalPending=false,message='',busy=false,page=0;
  const editor=createGroundStationEditorTools({model,escape}),removers=[];
  const routeChoice={source:'',target:'',objective:'balanced'};
+ let routeDraftGeneration=0;
+ function adoptRouteDraft(input){
+  const generation=++routeDraftGeneration,ticket=paintGeneration,mounted=root,visible=view;
+  const bound=()=>!dead&&routeDraftGeneration===generation&&paintGeneration===ticket&&root===mounted&&view===visible;
+  const ready=()=>store.ready===true&&!store.error&&!externalPending&&bound();
+  try{
+   const draft={source:input?.source,target:input?.target,objective:input?.objective};
+   if(!ready()||typeof draft.source!=='string'||typeof draft.target!=='string'||draft.source===draft.target||!['balanced','latency','reliability'].includes(draft.objective))return false;
+   const stations=stationInputs();if(!bound())return false;
+   const read=()=>{const exact=network.networkSnapshot();if(!bound())return null;if(exact?.status==='valid'&&network.verifyNetworkSnapshot(exact)===true&&bound())return{value:exact,sampled:false};if(hasSampled){const value=network.networkSampledPresentation();if(!bound())return null;if(value?.presentation_kind==='NETWORK_SAMPLED_UI_V1'&&value.status==='valid'&&network.verifySampledNetworkPresentation(value,{utc:value.display_utc})===true&&bound())return{value,sampled:true};}return null;};
+   const first=read(),snapshot=first?.value;if(!snapshot||!ready()||!Array.isArray(snapshot.node_definitions)||!snapshot.node_definitions.length||snapshot.node_definitions.length>240||!Array.isArray(snapshot.stations)||!Array.isArray(snapshot.network?.nodes))return false;
+   const nodes=snapshot.node_definitions.map(n=>n.id),ground=snapshot.stations.filter(n=>n.enabled).map(n=>n.id),members=[...nodes,...ground];
+   if(new Set(members).size!==members.length||!members.includes(draft.source)||!members.includes(draft.target)||JSON.stringify(snapshot.stations)!==JSON.stringify(store.stations)||JSON.stringify(snapshot.network.nodes.map(n=>n.id).sort())!==JSON.stringify([...members].sort())||!ready())return false;
+   const scope=JSON.stringify(snapshot),fields=visible==='ground'?['source','target','objective'].map(name=>get('fabric-'+name)):null;if(!bound())return false;
+   const fresh=read();if(!fresh||fresh.sampled!==first.sampled||JSON.stringify(fresh.value)!==scope||stationInputs()!==stations||!ready())return false;
+   const proof=first.sampled?network.verifySampledNetworkPresentation(fresh.value,{utc:fresh.value.display_utc}):network.verifyNetworkSnapshot(fresh.value);
+   if(proof!==true||!ready()||stationInputs()!==stations||!bound())return false;
+   // Readiness/station getters may revoke native authority. Its registered
+   // observational verifier is the final external callback before publication.
+   const terminal=first.sampled?network.verifySampledNetworkPresentation(fresh.value,{utc:fresh.value.display_utc}):network.verifyNetworkSnapshot(fresh.value);
+   if(terminal!==true||!bound())return false;
+   Object.assign(routeChoice,draft);if(fields)for(const [i,name]of ['source','target','objective'].entries())if(fields[i])fields[i].value=draft[name];
+   return true;
+  }catch{return false;}
+ }
  let routeDetail=null,linkDetail=null,stationDetail=null,analyticalDiagram=null,rfDetail=null;
  let passReceipt=null,passAbort=null,passGeneration=0,passBusy=false,passError='',passStation='',passPage=0;
  let selection=null,groundLinksVisible=true,coverageVisible=true,paintGeneration=0,viewGeneration=0;
@@ -461,7 +486,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   if(historical&&!historicalCurrent())return current()?fallback():false;
   return current();
  }
- const unsubscribe=store.subscribe(()=>{let next=null;try{next=stationInputs();}catch{/* Failed config revokes old geometry. */}const changed=next===null||next!==stationInputSignature;stationInputSignature=next;if(changed){cancelContacts();network.clearNetwork();void futurePasses?.observe?.();}update();});
+ const unsubscribe=store.subscribe(()=>{routeDraftGeneration++;let next=null;try{next=stationInputs();}catch{/* Failed config revokes old geometry. */}const changed=next===null||next!==stationInputSignature;stationInputSignature=next;if(changed){cancelContacts();network.clearNetwork();void futurePasses?.observe?.();}update();});
  const external=event=>{
   if(dead||event.key!=='spacetwin-ground-stations-v1')return;cancelContacts();
   if(editorId){externalPending=true;network.clearNetwork();void futurePasses?.observe?.();update();}
@@ -480,6 +505,6 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   }
   update();if(current()&&next==='ground')startStatusPolling();
  }
- return Object.freeze({show,update,routeRequest:()=>Object.freeze({...routeChoice}),selectedLinkId:()=>!dead&&selection?.type==='link'?selection.id:null,hasExternalChange:()=>externalPending,
+ return Object.freeze({show,update,adoptRouteDraft,routeRequest:()=>Object.freeze({...routeChoice}),selectedLinkId:()=>!dead&&selection?.type==='link'?selection.id:null,hasExternalChange:()=>externalPending,
   destroy(){if(dead)return;paintGeneration++;dead=true;futurePasses?.setActive(false);clearFuturePasses();clearAnalyticalFabric();stopStatusPolling();clearObservations();clearSampledUi();cancelContacts();networkScene?.setActive?.(false);networkScene?.clear();unsubscribe();host.removeEventListener('storage',external);for(const remove of removers.splice(0))remove();root?.remove();root=null;}});
 }
