@@ -701,3 +701,7 @@ is fullnative validatedfuture flow then actual UI acceptance, not a physics stub
 - [x] T172 ADR0057 gate then RED-first optional scenario onRouteSpec with actual current runner/run/input/reentry/disposal guards.
 - [x] T173 RED-first existing ground adoptRouteDraft validates full roster/definitions/distinct endpoints/objective and preserves hidden draft/editor; root DI, no new command.
 - [ ] T174 Independent review and changed JS whole regression; source event/root/periodic handoff and actual screen evidence tracked separately from GPU/full goal.
+
+## N021 validated source clock label
+- [x] T175 ADR0058 then meaningful RED for source clock labels in existing satellite_nodes.js; keep legacy/unknown/owner/clock/button guards unchanged.
+- [ ] T176 Independent scoped review/full changed JS and actual normal catalogue label before closure; whole75-84/model/GPU acceptance stays separate.

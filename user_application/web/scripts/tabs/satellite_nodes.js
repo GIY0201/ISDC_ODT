@@ -538,7 +538,10 @@ function createNodeSceneControls({root,readScene=()=>null,readDisplay,actions={}
     const lighting=get('#node-lighting');if(lighting){if(typeof scene?.lighting==='boolean')lighting.setAttribute('aria-pressed',String(scene.lighting));else lighting.removeAttribute('aria-pressed');}
     const zoom=get('#node-zoom');if(zoom&&Number.isFinite(scene?.zoom)){zoom.value=String(Math.max(0,Math.min(100,scene.zoom)));zoom.setAttribute('aria-valuetext',`확대 수준 ${Math.round(Number(zoom.value))}%`);}
     const clock=get('#node-clock');if(clock)clock.textContent=display?.utc||'—';
-    const mode=get('#node-clock-mode');if(mode)mode.textContent=display?.mode==='live'?'현재 시각':display?.mode==='paused'?'분석 시각 · 정지':display?.running===true?'분석 시각 · 재생':'표시 시각 미확인';
+    const mode=get('#node-clock-mode');if(mode){
+      const known=['카탈로그','저장 궤도','SIM','SIM 따라가기'].includes(display?.mode);
+      mode.textContent=display?.mode==='live'?'현재 시각':display?.mode==='paused'?'분석 시각 · 정지':known&&typeof display.running==='boolean'?`${display.mode} 분석 시각 · ${display.running?'재생':'정지'}`:display?.mode==='카탈로그'&&!Object.hasOwn(display,'running')?'카탈로그 분석 시각 · 재생 샘플 미계산':display?.running===true?'분석 시각 · 재생':'표시 시각 미확인';
+    }
     const pause=get('#node-clock-pause');if(pause){pause.textContent=display?.running===true?'Ⅱ':'▶';pause.setAttribute('aria-label',display?.running===true?'분석 시계 일시정지':display?.running===false?'분석 시계 재생':'분석 시계 재생 상태 미확인');}
     const speed=get('#node-clock-speed');if(speed){
       const supported=speedsOf(display)??[],choices=[...new Set([...supported,1,10,60,600])].sort((a,b)=>a-b),key=JSON.stringify([choices,supported]);

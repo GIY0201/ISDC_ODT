@@ -670,3 +670,5 @@ ADR0055/contracts/analytical_mixed_route_visual.md/T166–T168: historical captu
 ADR0056/contracts/selected_link_rf_prefill.md: missing original selected ground-link -> existing RF calculator draft flow, T169–T171. Current geometry registration/ID/endpoints only; explicit copy cancels obsolete result, all11 editable labelled source representative assumptions. No formula/API/clock/automatic query change. Precode independent analysis required; whole live/performance gates unchanged.
 
 N020 ADR0057 precode independent HIGH0/CRITICAL0. Adapter and ground ports are disjoint; root DI follows both. Regression-first, actual current input/run fences; existing source calculations unchanged.
+
+N021 ADR0058 repairs actual normal catalogue mode label only, with regression-first existing owner guards unchanged.

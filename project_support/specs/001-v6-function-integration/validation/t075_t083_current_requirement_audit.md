@@ -76,3 +76,9 @@ Read-only pinned-source audit confirmed owner/root ports for catalogue/models/ti
 Concrete remaining connection: original runner scenario:route payload is discarded by current workspace_adapter emit, so ground route dropdowns can retain unrelated choices although actual scenario route calculation already works. ADR0057/T172174 covers a minimal existing-owner draft handoff. Original objective-change immediate query differs from current explicit query/next periodic tick by declared command policy. Do not mark that trigger identical.
 
 Stable N019 fullNode1878PASS/0FAIL/0SKIP26.050s and Python967PASS/1existingPillowSKIP/8existingERFAwarnings272.95s exit0, commit239a2be. Actual savedISS currentUTC samples422 from finalB EOP cutoff is preserved; separate current catalogA uses predicted EOP. Live mixed route/RF/future rows, complete50asset appearance/twores/GPU/gameperformance/whole75-84/T032/remotePR remain open.
+
+## 2026-10-07 11:47 actual current catalogue body pixels
+
+Aside isolated ordinary TERRA25994 catalogue owner uses native GP epoch2026-10-06T14:00:37.897344000Z and IERS-A predicted UT1/polar motion. Root independently viewed512 actual1440x900 screenshot: gold bus, blue multi-section grid solar panel and bracing visible on native globe. This proves qualitative single-body visibility, not all50 materials/true physical scale/actual attitude/two required viewports/GPU performance/currentwallclock or RF approval. Previous509 overlay-obscured and510 tiny-marker evidence remains retained. Two normal focus clicks occurred; no benchmark or storedISS/UTC apply. Evidence ignored live_N020_20261007_1139/512 PNG +513 JSON.
+
+Native node public clock remains unknown despite catalogue UTC; currently investigating existing-owner provenance/clock connection rather than bypassing approval or pretending accepted40 roster is current native evidence. Wholegoal stays open.
