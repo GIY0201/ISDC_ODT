@@ -5,7 +5,7 @@ import {LEAP_SHA256,createUtcCodec} from './orbit_utc.js';
 export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let globe=null,latest=null,catalog=null,sceneInput=null,sceneMetadata=null,trackInput=null,onCatalogSelect=()=>{},groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
   let catalogLabelsVisible=true,attributionBinding=null;
-  let choice={mode:'3d',imagery:'blue_marble',theme:'dark',emphasis:true},imagery={requestedImagery:'blue_marble',displayedImagery:null,phase:'pending',error:null},mode={phase:'ready',error:null},modeRevision=0;
+  let choice={mode:'3d',imagery:'blue_marble',theme:'light',emphasis:true},imagery={requestedImagery:'blue_marble',displayedImagery:null,phase:'pending',error:null},mode={phase:'ready',error:null},modeRevision=0;
   const viewObservers=new Set();
   const displayObservers=new Set();let displayKey=null,solarFactory=null,solarRenderer=null;
   let catalogContinuity=null,continuityCache=null,continuityEpoch=0,continuitySourceKey=null;

@@ -25,3 +25,11 @@ T185/T186 및 전체 이식 완료를 이 문서만으로 선언하지 않는다
 Cesium 1.143 endFrame이 expand link의 inline display를 갱신하는 점을 확인했다. 어댑터가 소유한 정확한 expand link 클래스만 숨기고, 원본 logo/text/container를 유지한다. 연결 없음·비활성·unbind·destroy에서 기존 접근으로 복원한다. 실제 원본 클릭 handler를 재사용하며 private showLightbox를 호출하지 않는다.
 
 최종 author 가까운 6개 시험군 42 PASS / 0 FAIL / 463.59ms, JS 문법과 diff 검사 통과. 독립 readonly 검토 CLEAN, 관련 47 PASS / 0 FAIL / 492.7834ms. 실제 브라우저 smoke와 전체 GPU·두 해상도·성능 검증은 진행 중이다. 기존 콘솔 legacy.html/app.js는 이번 수정 대상이 아니며 최근 변경도 없음을 Git에서 확인했다.
+
+## 사용자의 설정 분류 정정과 밝은 기본 테마
+
+모듈 연결 설정과 ICD를 DT 그룹의 integration 작업창으로 옮겼다. 왼쪽 환경 설정은 공용 지구 표시·자료 출처·성능 진단만 제공한다. 기존 source_settings 단일 controller, 저장 키, 선택 링크와 editor/mode 초안을 보존한다. 화면을 오갈 때 초안을 캡처하고 재조립된 DOM의 기존 listener를 정리한다. 별도 창의 st-* draft는 기존 view 일치와 settings_link 검사를 그대로 따른다.
+
+공용 지구의 최초 choice.theme을 light로 변경했다. 명시적인 dark 선택과 초안 적용은 유지한다. 원본 계산, UTC, 배치, 서버 실행은 바꾸지 않는다.
+
+Author 의미 있는 분리 RED12건과 기본 테마 RED1건 후 가까운6시험군35 PASS / 0 FAIL / 527.61ms. 독립 readonly 검토 CLEAN, 가까운4시험군32 PASS / 472.768ms. 문법·diff 검사 통과. 실제 수정 화면 smoke와 전체 T075-T083/게임 성능/두 해상도는 별도 진행 중이다.

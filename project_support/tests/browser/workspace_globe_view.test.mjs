@@ -30,3 +30,9 @@ test('provider factory preserves original URLs/options and current local Blue Ma
  assert.equal(calls[0][1],'/static/assets/nasa_blue_marble_september.jpg');assert.equal(calls[1][2].enablePickFeatures,false);assert.match(calls[1][1],/World_Imagery\/MapServer$/);assert.equal(calls[2][1].url,'https://tile.openstreetmap.org/');assert.equal(calls[3][1],'cesium/Assets/Textures/NaturalEarthII');
  f.ui.destroy();
 });
+
+test('new workspace uses light theme while explicit dark before boot remains authoritative',async()=>{
+ const f=await fixture();assert.equal(f.ui.viewState().choice.theme,'light');
+ assert.equal(f.ui.changeView({theme:'dark'}),true);f.boot();await Promise.resolve();assert.equal(f.ui.viewState().choice.theme,'dark');
+ assert.ok(f.calls.some(c=>c[0]==='style'&&c[1]==='dark'));f.ui.destroy();
+});

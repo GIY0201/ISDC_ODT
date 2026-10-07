@@ -5,10 +5,10 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
   const stopSharedContext=observeWorkspaceContext(applySharedContext);window.addEventListener('pagehide',event=>{if(!event.persisted)stopSharedContext();});
   const groups = [
     ['공용', [['wall','공용 상황판'],['normal','정상 임무 흐름'],['initial','초기 운용 흐름'],['exception','장애·복구 흐름']]],
-    ['운용자', [['mission','임무·결과'],['operations','지상 운용'],['satellite','위성 상태·궤도'],['ground','지상국·통신'],['data','데이터·산출물'],['security','보안·사고'],['facility','지상 IT·시설'],['em','EM·통합검증'],['settings','모듈 연결 설정']]],
-    ['DT', [['scene','장면 구성'],['composer','시나리오 작성'],['run','실행·기록 설계'],['compare','비교·검증']]]
+    ['운용자', [['mission','임무·결과'],['operations','지상 운용'],['satellite','위성 상태·궤도'],['ground','지상국·통신'],['data','데이터·산출물'],['security','보안·사고'],['facility','지상 IT·시설'],['em','EM·통합검증']]],
+    ['DT', [['integration','모듈 연결 설정과 ICD'],['scene','장면 구성'],['composer','시나리오 작성'],['run','실행·기록 설계'],['compare','비교·검증']]]
   ];
-  const names = Object.fromEntries(groups.flatMap(([,views]) => views));
+  const names = {settings:'환경 설정',...Object.fromEntries(groups.flatMap(([,views]) => views))};
   const state = {view:'wall',sat:'',follow:false,case:'X-GS01',step:0,normalPoint:0,orbit:'LEO',station:'제주 후보',insertion:6,satLat:0,satLon:0,gsLat:33.5,gsLon:126.5,scenario:'',events:[],editIndex:-1,injected:false,run:'RUN-P01',mode:'기준'};
   const isPopout=new URLSearchParams(location.search).get('popout')==='1';
   const windowId=`${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -88,7 +88,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
       }
     });
     const v=state.view;
-    if(v==='wall')wall(); else if(v==='normal')normal(); else if(v==='initial')initial(); else if(v==='exception')exception(); else if(roles[v])role(v); else if(v==='scene')scene(); else if(v==='composer')composer(); else if(v==='run')run(); else if(v==='settings')screen.innerHTML=''; else compare();
+    if(v==='wall')wall(); else if(v==='normal')normal(); else if(v==='initial')initial(); else if(v==='exception')exception(); else if(roles[v])role(v); else if(v==='scene')scene(); else if(v==='composer')composer(); else if(v==='run')run(); else if(['settings','integration'].includes(v))screen.innerHTML=''; else compare();
     document.querySelectorAll('#nav button').forEach(b=>b.dataset.view===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
     document.getElementById('view-name').textContent=names[v];document.getElementById('footer-view').textContent=names[v];
     document.getElementById('window-title').textContent=names[v];

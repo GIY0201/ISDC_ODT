@@ -726,3 +726,5 @@ is fullnative validatedfuture flow then actual UI acceptance, not a physics stub
 ## U001 requested product presentation cleanup
 - [ ] T185 Explicit styled performance diagnostics, no query autoactivation; preserve records on reopen and never infer completion during an unobserved closed interval. Hide empty shelf while retaining minimize/restore; remove obsolete research-demo and V6 labels. Closest lifecycle regressions and independent review.
 - [ ] T186 Move optional map attribution entry into settings while retaining provider-required on-screen attribution and existing single Viewer. Verify supported Cesium API, source controls and closest regression; actual browser smoke separately qualified.
+
+- [ ] T187 Separate environment settings from DT module connection/ICD using the existing controller and scoped drafts, keep diagnostic recorder and Viewer singular, set initial map theme light and preserve explicit dark selection. Closest regression and independent review, actual UI smoke.

@@ -2,40 +2,40 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fixture} from './workspace_fixture.mjs';
 for(const [width,height] of [[1280,720],[1920,1080]])test(`real V6 assembly mounts original settings and preserves edits ${width}x${height}`,async()=>{
- const records=new Map(),f=fixture(width,height,{hash:'#settings',storage:{getItem:k=>records.get(k)??null,setItem:(k,v)=>records.set(k,v)}});
+ const records=new Map(),f=fixture(width,height,{hash:'#integration',storage:{getItem:k=>records.get(k)??null,setItem:(k,v)=>records.set(k,v)}});
  try{
   assert.ok(f.get('source-module-settings'));assert.match(f.get('source-module-settings').innerHTML,/ICD-08/);assert.match(f.get('st-topology').innerHTML,/1320 720/);
   f.get('st-host').value='unsaved.test';await f.get('st-editor').dispatch('input');
-  f.evaluate("location.hash='#ground'");await f.win.dispatch('hashchange');f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');
+  f.evaluate("location.hash='#ground'");await f.win.dispatch('hashchange');f.evaluate("location.hash='#integration'");await f.win.dispatch('hashchange');
   assert.equal(f.get('st-host').value,'unsaved.test');await f.get('st-save').dispatch('click');assert.match(f.get('st-status').textContent,/반영/);assert.equal(records.has('spacetwin-integration-settings'),false);
   await f.get('st-editor').dispatch('submit');await f.get('st-save').dispatch('click');assert.equal(JSON.parse(records.get('spacetwin-integration-settings')).links.L02.host,'unsaved.test');
   await f.win.dispatch('pagehide',{persisted:false});
  }finally{f.dispose();}
 });
 test('actual multiwindow settings drafts preserve link scope and checked across rerender',async()=>{
- const f=fixture(1280,720,{hash:'#settings'});
+ const f=fixture(1280,720,{hash:'#integration'});
  try{
   const channel=f.channels.find(c=>c.name==='isdc-odt-v6-mock');
   f.get('st-enabled').checked=false;await f.get('screen').dispatch('change',{target:f.get('st-enabled')});
   const sent=channel.messages.findLast(m=>m.type==='draft'&&m.id==='st-enabled');assert.equal(sent.checked,false);assert.equal(sent.settings_link,'L02');
-  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'settings',id:'st-host',value:'handoff.unsaved.test',settings_link:'L02'}});
-  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'settings',id:'st-reconnect',value:'on',checked:false,settings_link:'L02'}});
-  f.evaluate("location.hash='#ground'");await f.win.dispatch('hashchange');f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');
+  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'integration',id:'st-host',value:'handoff.unsaved.test',settings_link:'L02'}});
+  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'integration',id:'st-reconnect',value:'on',checked:false,settings_link:'L02'}});
+  f.evaluate("location.hash='#ground'");await f.win.dispatch('hashchange');f.evaluate("location.hash='#integration'");await f.win.dispatch('hashchange');
   assert.equal(f.get('st-host').value,'handoff.unsaved.test');assert.equal(f.get('st-reconnect').checked,false);
-  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'settings',id:'st-host',value:'foreign.test',settings_link:'L03'}});assert.equal(f.get('st-host').value,'handoff.unsaved.test');
+  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'integration',id:'st-host',value:'foreign.test',settings_link:'L03'}});assert.equal(f.get('st-host').value,'handoff.unsaved.test');
   await f.win.dispatch('pagehide',{persisted:false});
  }finally{f.dispose();}
 });
 test('initial popout snapshot owns selected link without saving; focused checkbox rejects conflict',async()=>{
- const opener={postMessage(){}};const f=fixture(1280,720,{hash:'#settings',popout:true,opener});
+ const opener={postMessage(){}};const f=fixture(1280,720,{hash:'#integration',popout:true,opener});
  try{
-  await f.win.dispatch('message',{origin:'http://localhost',source:opener,data:{type:'isdc-v6-snapshot',view:'settings',state:{view:'settings'},draft:[{id:'st-link',value:'L03',settings_link:'L03'},{id:'st-host',value:'snapshot.unsaved.test',settings_link:'L03'},{id:'st-enabled',value:'on',checked:false,settings_link:'L03'}]}});f.flush();
+  await f.win.dispatch('message',{origin:'http://localhost',source:opener,data:{type:'isdc-v6-snapshot',view:'integration',state:{view:'integration'},draft:[{id:'st-link',value:'L03',settings_link:'L03'},{id:'st-host',value:'snapshot.unsaved.test',settings_link:'L03'},{id:'st-enabled',value:'on',checked:false,settings_link:'L03'}]}});f.flush();
   assert.equal(f.get('st-link').value,'L03');assert.equal(f.get('st-host').value,'snapshot.unsaved.test');assert.equal(f.get('st-enabled').checked,false);
   const mode=f.evaluate('sourceSettingsPanel.controller.snapshot()');assert.equal(mode.settings.links.L03,undefined);assert.equal(mode.dirty,false);
   f.get('st-enabled').focus();const channel=f.channels.find(c=>c.name==='isdc-odt-v6-mock');
-  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'settings',id:'st-enabled',value:f.get('st-enabled').value,checked:true,settings_link:'L03'}});
+  await channel.dispatch('message',{data:{type:'draft',sender:'other',view:'integration',id:'st-enabled',value:f.get('st-enabled').value,checked:true,settings_link:'L03'}});
   assert.equal(f.get('st-enabled').checked,false);assert.match(f.get('popout-feedback').textContent,/현재 편집값/);
-  f.evaluate("location.hash='#ground'");await f.win.dispatch('hashchange');f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');assert.equal(f.get('st-host').value,'snapshot.unsaved.test');assert.equal(f.get('st-enabled').checked,false);
+  f.evaluate("location.hash='#ground'");await f.win.dispatch('hashchange');f.evaluate("location.hash='#integration'");await f.win.dispatch('hashchange');assert.equal(f.get('st-host').value,'snapshot.unsaved.test');assert.equal(f.get('st-enabled').checked,false);
   await f.win.dispatch('pagehide',{persisted:false});
  }finally{f.dispose();}
 });
@@ -43,7 +43,7 @@ test('initial popout snapshot owns selected link without saving; focused checkbo
 test('environment settings reuse the one shared globe controls and preserve preferences across routes',async()=>{
  const f=fixture(1280,720,{hash:'#settings'});
  try{
-  assert.ok(f.get('globe-view'));assert.ok(f.get('st-diagnostics'));assert.equal(f.get('screen').children[0].id,'globe-view');
+  assert.ok(f.get('globe-view'));assert.ok(f.get('st-diagnostics'));assert.equal(f.doc.getElementById('st-host'),null);assert.equal(f.get('screen').children[0].id,'globe-view');
   f.get('globe-theme').value='light';await f.get('globe-theme').dispatch('change');
   f.evaluate("location.hash='#satellite'");await f.win.dispatch('hashchange');assert.equal(f.get('globe-theme').value,'light');
   f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');assert.equal(f.get('globe-theme').value,'light');assert.equal(f.viewers.length,1);
