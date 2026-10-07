@@ -674,3 +674,8 @@ N020 ADR0057 precode independent HIGH0/CRITICAL0. Adapter and ground ports are d
 N021 ADR0058 repairs actual normal catalogue mode label only, with regression-first existing owner guards unchanged.
 
 N022 ADR0059 exposes existing cached deployment readonly review from node workspace; no receipt builder/API/schema/automaticapproval changes. Regression-first actualworkspace/cache/lifecycle tests.
+
+N023 ADR0060/contracts/catalog_draft_noop_handoff.md repairs V6 self-navigation
+discarding a valid catalogue buffer when identical draft fields are reapplied.
+Existing catalogue panel only; compare actual string draft values before detach.
+No clock/buffer creation or source calculation change; T179–T180 RED-first.

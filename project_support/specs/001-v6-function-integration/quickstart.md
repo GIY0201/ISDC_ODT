@@ -215,3 +215,9 @@ record unconfirmed status, then use the explicit saved deployment review. Observ
 GET-only exact receipt matching; server run/roster/held missions/UTC must remain
 unchanged. Test full mismatch and late edits without reapplying a deployment.
 Confirm future/native flows separately after successful existing-owner restoration.
+
+N023: calculate normal catalogue native observations in the satellite workspace,
+record stopped clock and exact UTC, then navigate normally to ground. Identical
+draft handoff must retain the actual buffer/owner; query future contacts normally.
+Changed remote observer/UTC strings must still revoke old results and require
+explicit recalculation. No forced pause, saved ISS UTC rewrite or proof injection.

@@ -160,3 +160,8 @@ N022 creates no new domain state. Existing store receipt/deployed definitions an
 deployment private restore authorization retain ownership. An explicit workspace
 request has a bounded pending lifecycle; full drafts/deployed equality includes
 updated_at. Existing future/mission/fabric capabilities remain separately verified.
+
+N023 no new state: current catalog_time draft strings retain ownership. Identical
+supported incoming values are a no-op; changed strings use the existing draft,
+utcDirty, follow detachment and timeline invalidation states. No buffer cloning,
+new clock, inferred stopped state or duplicate runtime is introduced.

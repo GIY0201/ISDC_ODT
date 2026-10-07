@@ -709,3 +709,7 @@ is fullnative validatedfuture flow then actual UI acceptance, not a physics stub
 ## N022 explicit cached deployment review
 - [x] T177 ADR0059 independent gate then RED-first existing workspace_nodes explicit button/operation to existing reacceptCachedDeployment; exactfullcache guard retained; no mutatingAPI/scenario command.
 - [ ] T178 Independent review/full changed JS/actual reload receipt-matching or refusal evidence and current future/module native flows; whole acceptance remains separate.
+
+## N023 identical catalogue draft handoff
+- [x] T179 ADR0060 independent gate then meaningful actual-root-navigation RED and existing catalog_time.applyDraft exact no-op; preserve changed-input invalidation and all owner/clock/follow guards.
+- [ ] T180 Independent review/changed JS full regression and actual paused catalogue→ground→future/module flow; retain whole acceptance gates.
