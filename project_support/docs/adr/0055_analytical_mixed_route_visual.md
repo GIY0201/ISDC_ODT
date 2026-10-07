@@ -1,5 +1,16 @@
 # ADR0055 Captured analytical route의 별도 3D 시각 강조
 
+Independent precode review repair1: analytical projection includes `selected_id`
+and `fabric_view` (borrowed actual registered analytical presentation). Existing
+ground panel exposes readonly `selectedLinkId()`; existing periodic binding passes
+`readSelectedLinkId`, checked before and after proof. A selected ID must match a
+captured native link and the current renderer endpoint roster. Selection conveys
+navigation/style only. Projection/fabric identity must match, including same-UTC
+receipt replacement. `clearAnalytical()` rotates the visual registration epoch;
+composition calls it on existing hide/clear/control/dispose paths. A renderer also
+rejects its locally revoked old projection identity on reactivation until the
+owner supplies a fresh registered visual value. No command/result owner is added.
+
 상태: 구현 전 설계. N018 남은 실제 원본 기능이며 optical-only 또는 analytical table로 완료하지 않는다.
 
 ## 원본과 잔여

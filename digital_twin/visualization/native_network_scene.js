@@ -40,11 +40,13 @@ function sampledScope(value,utc){
  return true;
 }
 export class NativeNetworkScene {
- constructor({viewer,cesium,timeSource,geometryFor,verifyNetworkSnapshot,readFabricState,coverageRadiusKm,isTransitioning=()=>false,sampledNetwork=null}={}){
+ constructor({viewer,cesium,timeSource,geometryFor,verifyNetworkSnapshot,readFabricState,coverageRadiusKm,isTransitioning=()=>false,sampledNetwork=null,analyticalRouteEmphasis=null}={}){
   if([timeSource,geometryFor,verifyNetworkSnapshot,coverageRadiusKm].some(fn=>typeof fn!=='function'))throw TypeError('verified native network rendering ports required');
+  if(analyticalRouteEmphasis!==null&&['read','verify'].some(key=>typeof analyticalRouteEmphasis?.[key]!=='function'))throw TypeError('registered analytical route read/verify port required');
   Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,geometryFor,verifyNetworkSnapshot,readFabricState,coverageRadiusKm,isTransitioning});
   this.stations=new Map();this.groundLinks=new Map();this.routeIds=new Set();this.selectedLinkId=null;this.groundLinksVisible=true;this.coverageVisible=true;this.disposed=false;this.snapshot=null;this.dataSource=null;this.linkPolylines=null;
   this.sampledNetwork=sampledNetwork;this.sampledActive=false;this.sampledSnapshot=null;this.sampledGeneration=0;this.sampledFrame=0;
+  this.analyticalRouteEmphasis=analyticalRouteEmphasis;this.analyticalRouteGeneration=0;this.analyticalRouteStyled=new Map();this.analyticalRouteReceipt=null;this.analyticalRouteCandidate=null;this.analyticalRouteLastView=null;this.revokedAnalyticalRoutes=new WeakSet();
   stationPickOwners.set(this,{epoch:{},tokens:new WeakMap()});
  }
  get viewer(){return typeof this.viewerProvider==='function'?this.viewerProvider():this.viewerProvider;}
@@ -64,8 +66,9 @@ export class NativeNetworkScene {
   }catch{return null;}
  }
  setSnapshot({snapshot,receipt=null,route=null,selectedLinkId=null}={}){
+  this.restoreAnalyticalRouteEmphasis();
   if(this.disposed)return false;
-  try{const copy=structuredClone(snapshot);if(copy?.presentation_kind==='NETWORK_SAMPLED_UI_V1'||copy?.status!=='valid'||!Array.isArray(copy.node_definitions)||copy.node_definitions.length>240||!Array.isArray(copy.stations)||copy.stations.length>24||!Array.isArray(copy.network?.links))throw Error('network scope unavailable');if(copy.stations.some(s=>!s||['longitude','latitude','altitude_km'].some(k=>!Number.isFinite(s[k]))||Math.abs(s.longitude)>180||Math.abs(s.latitude)>90))throw Error('invalid station geometry');this.snapshot=copy;if(!this.valid(copy.utc))throw Error('stale native scope');
+  try{const copy=structuredClone(snapshot);if(['NETWORK_SAMPLED_UI_V1','MIXED_ROUTE_ANALYTICAL_UI_V1'].includes(copy?.presentation_kind)||copy?.status!=='valid'||!Array.isArray(copy.node_definitions)||copy.node_definitions.length>240||!Array.isArray(copy.stations)||copy.stations.length>24||!Array.isArray(copy.network?.links))throw Error('network scope unavailable');if(copy.stations.some(s=>!s||['longitude','latitude','altitude_km'].some(k=>!Number.isFinite(s[k]))||Math.abs(s.longitude)>180||Math.abs(s.latitude)>90))throw Error('invalid station geometry');this.snapshot=copy;if(!this.valid(copy.utc))throw Error('stale native scope');
    this.receipt=structuredClone(receipt);this.route=structuredClone(route);this.selectedLinkId=selectedLinkId==null?null:String(selectedLinkId);
    this.setStations(copy.stations.filter(s=>s.enabled));this.refreshGroundLinks();this.syncFrame(copy.utc,0);return true;
   }catch{this.clear();return false;}
@@ -255,6 +258,7 @@ export class NativeNetworkScene {
   // Route and selection emphasis over both OISL and ground link lines; base styling is restored
   // for everything else so a route that moves on does not leave thick lines behind.
   setGroundLinksVisible(visible) {
+    if(visible===false)this.restoreAnalyticalRouteEmphasis(true);
     this.groundLinksVisible = visible !== false;
     this.syncFrame(this.timeSource());
     return this.groundLinksVisible;
@@ -282,7 +286,36 @@ export class NativeNetworkScene {
  if(current&&!this.valid(utc)){this.revokeStationPicks();for(const entry of this.stations.values()){entry.entity.show=false;entry.coverage.show=false;}for(const entry of this.groundLinks.values())entry.line.show=false;}
  }
  applyEmphasis(){const C=this.cesium;if(!C?.Color)return;for(const [key,entry]of this.groundLinks){const routed=this.routeIds.has(key);if(entry.material?.uniforms&&'time'in entry.material.uniforms){entry.material.uniforms.color=C.Color.fromCssColorString(routed?ROUTE_COLOR:GROUND_LINK_COLORS.usable).withAlpha(.55);entry.line.material=entry.material;}else entry.line.material=routed?C.Material.fromType('Color',{color:C.Color.fromCssColorString(ROUTE_COLOR).withAlpha(.95)}):entry.material;entry.line.width=routed?ROUTE_WIDTH:key===this.selectedLinkId?SELECTED_WIDTH:BASE_WIDTH;}}
- hideSampledNetwork(){this.revokeStationPicks();for(const e of this.stations.values()){e.entity.show=false;e.coverage.show=false;}for(const e of this.groundLinks.values())e.line.show=false;this.sampledSnapshot=null;}
+ restoreAnalyticalRouteEmphasis(revoke=false){
+  if(revoke){this.analyticalRouteGeneration++;for(const value of [this.analyticalRouteLastView,this.analyticalRouteReceipt?.view,this.analyticalRouteCandidate])if(value&&typeof value==='object')this.revokedAnalyticalRoutes.add(value);this.analyticalRouteCandidate=null;this.analyticalRouteLastView=null;}
+  for(const [entry,base]of this.analyticalRouteStyled){entry.line.width=base.width;entry.line.material=base.material;if(base.uniforms)base.uniforms.color=base.color;}
+  this.analyticalRouteStyled.clear();this.analyticalRouteReceipt=null;
+ }
+ applyAnalyticalRouteEmphasis(utc){
+  const ticket=++this.analyticalRouteGeneration;this.restoreAnalyticalRouteEmphasis();const port=this.analyticalRouteEmphasis;if(!port||this.disposed||!this.groundLinksVisible)return false;
+  const read=port.read,verify=port.verify,viewerProvider=this.viewerProvider,cesiumProvider=this.cesiumProvider,timeSource=this.timeSource,transition=this.isTransitioning,geometryFor=this.geometryFor,links=this.groundLinks,stations=this.stations,snapshot=this.snapshot,sampled=this.sampledSnapshot,sampledFrame=this.sampledFrame,sampledGeneration=this.sampledGeneration;
+  let viewer,C,view;const bound=()=>!this.disposed&&ticket===this.analyticalRouteGeneration&&this.analyticalRouteEmphasis===port&&port.read===read&&port.verify===verify&&viewerProvider===this.viewerProvider&&cesiumProvider===this.cesiumProvider&&timeSource===this.timeSource&&transition===this.isTransitioning&&geometryFor===this.geometryFor&&this.groundLinks===links&&this.stations===stations&&this.snapshot===snapshot&&this.sampledSnapshot===sampled&&this.sampledFrame===sampledFrame&&this.sampledGeneration===sampledGeneration&&this.groundLinksVisible&&this.linkOwner===viewer&&this.sourceOwner===viewer;
+  const frame=()=>{const stamp=timeSource(),moving=transition(),v=this.viewer,c=this.cesium,mode=v?.scene?.mode;return stamp===utc&&!moving&&v===viewer&&c===C&&(!C?.SceneMode||mode!==C.SceneMode.MORPHING)&&bound();};
+  const fail=()=>{if(ticket===this.analyticalRouteGeneration){for(const value of [view,this.analyticalRouteLastView])if(value&&typeof value==='object')this.revokedAnalyticalRoutes.add(value);this.restoreAnalyticalRouteEmphasis();this.analyticalRouteCandidate=null;this.analyticalRouteLastView=null;}return false;};
+  try{
+   viewer=this.viewer;C=this.cesium;if(!frame())return fail();const base=snapshot?.utc===utc?snapshot:sampled,nodes=base?.node_definitions;
+   if(!Array.isArray(nodes)||nodes.length>240)return fail();const baseProof=()=>base===snapshot?this.valid(utc):this.sampledActive&&this.sampledNetwork?.verify(base,{utc})===true&&bound();const proof=()=>verify(view,{utc,nodes})===true&&bound();
+   view=read({utc});if(!bound())return fail();this.analyticalRouteCandidate=view;
+   if(!bound()||!view||this.revokedAnalyticalRoutes.has(view)||view.presentation_kind!=='MIXED_ROUTE_ANALYTICAL_UI_V1'||!deeplyFrozen(view)||view.display_utc!==utc||view.source!=='captured_native_analysis'||view.availability!=='accepted'||typeof view.analysis_utc!=='string'||!Number.isFinite(view.age_seconds)||view.current_analysis!==(view.analysis_utc===utc)||!view.fabric_view||!nativeProfile(view.native_snapshot)||signature(view.node_definitions)!==signature(nodes)||signature(view.native_snapshot.node_definitions)!==signature(nodes)||signature(view.native_snapshot.definition_hashes)!==signature(view.definition_hashes)||signature(base.definition_hashes)!==signature(view.definition_hashes)||signature(base.stations)!==signature(view.native_snapshot.stations)||signature(base.faults)!==signature(view.native_snapshot.faults)||!Array.isArray(view.ground_links)||!Array.isArray(view.routed_ids)||!frame()||!baseProof()||!proof())return fail();
+   if(!view.definition_hashes||Object.keys(view.definition_hashes).length!==nodes.length)return fail();
+   for(const n of nodes){const g=geometryFor(structuredClone(n),{utc}),row=g?.row,hash=view.definition_hashes[n.id];if(!bound()||typeof hash!=='string'||!/^[a-f0-9]{64}$/.test(hash)||!nativeProfile(g)||g.node_id!==n.id||signature(g.node_definition)!==signature(n)||g.definition_hash!==hash||row?.utc!==utc||row.status!=='valid'||row.error_code!==null||!Array.isArray(row.position_m)||row.position_m.length!==3||!row.position_m.every(Number.isFinite))return fail();}
+   const routed=new Set(view.routed_ids),prepared=[],nativeLinks=new Map();
+   for(const link of view.ground_links){if(typeof link?.id!=='string'||nativeLinks.has(link.id))return fail();nativeLinks.set(link.id,link);}
+   for(const [id,entry]of links){const native=nativeLinks.get(id);if(!native||!(native.a===entry.station&&native.b===entry.satellite||native.a===entry.satellite&&native.b===entry.station)||!entry.line.show||!routed.has(id)&&view.selected_id!==id)continue;
+    const material=entry.line.material,uniforms=material?.uniforms&&'time'in material.uniforms?material.uniforms:null,color=routed.has(id)?C.Color.fromCssColorString(ROUTE_COLOR).withAlpha(uniforms?.55:.95):null;
+    const override=routed.has(id)&&!uniforms?C.Material.fromType('Color',{color}):material;prepared.push({entry,base:{width:entry.line.width,material,uniforms,color:uniforms?.color},width:routed.has(id)?ROUTE_WIDTH:SELECTED_WIDTH,color,override});
+   }
+   if(!frame()||!baseProof()||!proof())return fail();for(const item of prepared){this.analyticalRouteStyled.set(item.entry,item.base);item.entry.line.width=item.width;item.entry.line.material=item.override;if(item.color&&item.base.uniforms)item.base.uniforms.color=item.color;}
+   // External getters precede the terminal observational owner proof; no callbacks follow it.
+   if(!frame()||!baseProof()||!proof()||!frame()||!baseProof()||!proof())return fail();this.analyticalRouteReceipt={presentation_kind:view.presentation_kind,analysis_utc:view.analysis_utc,display_utc:utc,age_seconds:view.age_seconds,current_analysis:view.current_analysis,view};this.analyticalRouteLastView=view;this.analyticalRouteCandidate=null;return true;
+  }catch{return fail();}
+ }
+ hideSampledNetwork(){this.restoreAnalyticalRouteEmphasis(true);this.revokeStationPicks();for(const e of this.stations.values()){e.entity.show=false;e.coverage.show=false;}for(const e of this.groundLinks.values())e.line.show=false;this.sampledSnapshot=null;}
  setSampledActive(active){this.sampledGeneration++;this.sampledActive=active===true&&!this.disposed;this.sampledSnapshot=null;if(!this.sampledActive)this.hideSampledNetwork();return this.sampledActive;}
  placeSampledNetwork(utc){
   const frame=++this.sampledFrame,generation=this.sampledGeneration,port=this.sampledNetwork,read=port?.read,verify=port?.verify;
@@ -329,7 +362,7 @@ export class NativeNetworkScene {
    return true;
   }catch{return fail();}
  }
- syncFrame(utc,nowMs=0){if(this.disposed)return;const exact=this.snapshot?.utc===utc&&this.valid(utc);if(this.sampledActive&&!exact){this.placeSampledNetwork(utc);return;}if(exact)this.refreshGroundLinks();else this.placeGroundLinks(utc);if(Number.isFinite(nowMs))for(const e of this.groundLinks.values())if(e.line.show&&e.state==='usable'&&e.line.material?.uniforms&&'time'in e.line.material.uniforms)e.line.material.uniforms.time=nowMs/1000*1.4;}
- clear(){this.setSampledActive(false);for(const id of [...this.stations.keys()])this.removeStation(id);for(const id of [...this.groundLinks.keys()])this.removeGroundLink(id);this.snapshot=null;this.receipt=null;this.route=null;this.routeIds=new Set();this.selectedLinkId=null;}
+ syncFrame(utc,nowMs=0){if(this.disposed)return;this.restoreAnalyticalRouteEmphasis();const exact=this.snapshot?.utc===utc&&this.valid(utc);if(this.sampledActive&&!exact){this.placeSampledNetwork(utc);this.applyAnalyticalRouteEmphasis(utc);return;}if(exact)this.refreshGroundLinks();else this.placeGroundLinks(utc);if(Number.isFinite(nowMs))for(const e of this.groundLinks.values())if(e.line.show&&e.state==='usable'&&e.line.material?.uniforms&&'time'in e.line.material.uniforms)e.line.material.uniforms.time=nowMs/1000*1.4;this.applyAnalyticalRouteEmphasis(utc);}
+ clear(){this.restoreAnalyticalRouteEmphasis(true);this.setSampledActive(false);for(const id of [...this.stations.keys()])this.removeStation(id);for(const id of [...this.groundLinks.keys()])this.removeGroundLink(id);this.snapshot=null;this.receipt=null;this.route=null;this.routeIds=new Set();this.selectedLinkId=null;}
  destroy(){if(this.disposed)return;this.clear();this.disposed=true;if(this.linkPolylines)this.linkOwner?.scene?.primitives?.remove?.(this.linkPolylines);if(this.dataSource)this.sourceOwner?.dataSources?.remove?.(this.dataSource,true);this.linkPolylines=null;this.dataSource=null;}
 }

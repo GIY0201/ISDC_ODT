@@ -2,11 +2,11 @@ import {createGroundStationEditorTools} from './ground_station_editor.js';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const numeric=['latitude','longitude','altitude_km','dish_m','min_elevation_deg'];
 // Reuses original ground store and station editor; no native/clock/Viewer/transport owner.
-export function createGroundNetworkPanel({store,model,network,fabric=null,diagram=null,networkScene=null,contactWindows=null,futurePasses=null,document,host,refreshRuntime,drawSparkline=null}={}) {
+export function createGroundNetworkPanel({store,model,network,fabric=null,diagram=null,networkScene=null,contactWindows=null,futurePasses=null,document,host,refreshRuntime,drawSparkline=null,onRfLinkDraft=null}={}) {
  let root=null,view=null,dead=false,editorId=null,externalPending=false,message='',busy=false,page=0;
  const editor=createGroundStationEditorTools({model,escape}),removers=[];
  const routeChoice={source:'',target:'',objective:'balanced'};
- let routeDetail=null,linkDetail=null,stationDetail=null;
+ let routeDetail=null,linkDetail=null,stationDetail=null,analyticalDiagram=null,rfDetail=null;
  let passReceipt=null,passAbort=null,passGeneration=0,passBusy=false,passError='',passStation='',passPage=0;
  let selection=null,groundLinksVisible=true,coverageVisible=true,paintGeneration=0,viewGeneration=0;
  const hasSampled=typeof network.networkSampledPresentation==='function'&&typeof network.verifySampledNetworkPresentation==='function';
@@ -119,6 +119,29 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   }catch(error){message=String(error.message);}
   if(!dead)update();
  }
+ async function rfLinkDraft(event){
+  const button=event.target?.closest?.('button'),held=rfDetail;
+  const current=()=>held&&rfDetail===held&&held.current()&&selection?.type==='link'&&selection.id===held.id&&button===get('detail-rf-draft')&&button.disabled!==true;
+  if(button?.id!=='ground-node-detail-rf-draft'||typeof onRfLinkDraft!=='function'||!current())return;
+  let revoked=false;
+  const isCurrent=()=>{
+   if(revoked)return false;
+   try{
+    if(!current()||!store.ready||externalPending)throw Error('RF draft view unavailable');
+    const snapshot=held.sampled?network.networkSampledPresentation():network.networkSnapshot();
+    if(!current()||snapshot?.status!=='valid'||JSON.stringify(snapshot)!==held.scope)throw Error('RF geometry changed');
+    const verified=held.sampled?network.verifySampledNetworkPresentation(snapshot,{utc:snapshot.display_utc})===true:network.verifyNetworkSnapshot(snapshot)===true;
+    if(!verified||!current()||!store.ready||externalPending)throw Error('RF geometry proof revoked');
+    const link=snapshot.network.links.find(link=>link.id===held.id);if(!link||link.kind!=='ground'||JSON.stringify(link)!==held.link)throw Error('RF selected native link changed');
+    return true;
+   }catch{revoked=true;return false;}
+  };
+  try{
+   if(!isCurrent())return;
+   const link=structuredClone(held.nativeLink),context={analysis_utc:held.analysisUtc,display_utc:held.displayUtc,source:'native_geometry',isCurrent};
+   if(!isCurrent())return;await onRfLinkDraft(link,context);isCurrent();
+  }catch(error){if(current()){message=String(error?.message??error);update();}}
+ }
  async function stationShortcut(event){
   const button=event.target?.closest?.('button'),action=button?.id==='ground-node-detail-focus'?'focus':button?.id==='ground-node-detail-edit'?'edit':null,held=stationDetail;
   const current=()=>held&&stationDetail===held&&held.current()&&selection?.type==='node'&&selection.id===held.id&&button===get('detail-'+action)&&button.disabled!==true;
@@ -202,7 +225,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
    const node=target.getAttribute('data-diagram-node'),link=target.getAttribute('data-diagram-link');
    if(!node&&!link)return;value.preventDefault?.();selection={type:node?'node':'link',id:node||link};update();
   });
-  listen(get('diagram-detail'),'click',event=>{const id=event.target?.closest?.('button')?.id;if(['ground-node-detail-focus','ground-node-detail-edit'].includes(id))return stationShortcut(event);linkEndpoint(event);return routeShortcut(event);});
+  listen(get('diagram-detail'),'click',event=>{const id=event.target?.closest?.('button')?.id;if(id==='ground-node-detail-rf-draft')return rfLinkDraft(event);if(['ground-node-detail-focus','ground-node-detail-edit'].includes(id))return stationShortcut(event);linkEndpoint(event);return routeShortcut(event);});
   const analytical=document.createElement('section');analytical.id='ground-node-fabric-analytical';analytical.innerHTML='<h4>주기 통신 모듈 결과</h4><p id="ground-node-fabric-analytical-status"></p><div id="ground-node-fabric-analytical-results" style="max-height:22rem;overflow:auto"></div>';controls.append(analytical);
   for(const kind of ['send','refresh','route'])listen(get('fabric-'+kind),'click',()=>fabricAction(kind));
   for(const field of ['source','target','objective'])listen(get('fabric-'+field),'change',()=>{routeChoice[field]=get('fabric-'+field).value;update();});
@@ -258,7 +281,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   get('prev').disabled=page===0;get('next').disabled=(page+1)*50>=links.length;
   if(!visualCurrent()&&current())clearSampledUi();
   }catch(error){if(!sampled)throw error;if(current())clearSampledUi();}
-  }finally{if(current())renderFuturePasses(current);if(current())renderAnalyticalFabric(current);}
+  }finally{if(current())renderFuturePasses(current);if(current())renderAnalyticalFabric(current);if(current()&&analyticalDiagram){const proof=analyticalDiagram;if(!proof.verify()&&current()&&analyticalDiagram===proof)proof.fallback();}}
  }
  function clearAnalyticalFabric(){const rows=get('fabric-analytical-results'),label=get('fabric-analytical-status');if(rows)rows.innerHTML='';if(label)label.textContent='주기 통신 결과 미확인';}
  function renderAnalyticalFabric(current){
@@ -357,31 +380,57 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   get('pass-status').textContent=`모의 기하 · 승인 UTC ${passReceipt.accepted_context.utc} → ${passReceipt.conditions.end_utc} · 전체 수락 배치 ${passReceipt.node_definitions.length}기 · 선택 지상국 ${rows.length}구간 · ${passPage+1}/${Math.max(1,Math.ceil(rows.length/50))}페이지 · 원본 ${report?.geometry.coverage.resolution_seconds??'미확인'}초 탐색 · 짧은 구간 누락 가능 · 실제 RF 미확인`;
   get('pass-results').innerHTML=rows.length?'<table><thead><tr><th>위성</th><th>AOS UTC</th><th>LOS UTC</th><th>최대 고각 °</th><th>지속 s</th><th>구간 상태</th></tr></thead><tbody>'+rows.slice(passPage*50,(passPage+1)*50).map(row=>'<tr>'+[names.get(row.satellite)||row.satellite,row.start,row.end,row.max_elevation_deg,Number.isFinite(row.duration_seconds)?row.duration_seconds:(Date.parse(row.end)-Date.parse(row.start))/1000,[row.in_progress?'이미 진행 중':'',row.truncated?'조회 범위에서 잘림':''].filter(Boolean).join(' · ')||'구간 완료'].map(v=>'<td>'+escape(v)+'</td>').join('')+'</tr>').join('')+'</tbody></table>':'<p>조회한 범위에서 마스크 위 통과 없음 · RF 연결 상태를 뜻하지 않습니다.</p>';
  }
- function renderDiagram(snapshot,valid,receipt,route,sampled=false,current=()=>true,fabricState=null){
+ function renderDiagram(snapshot,valid,receipt,route,sampled=false,current=()=>true,fabricState=null,allowHistorical=true){
   if(!current())return false;
-  routeDetail=null;linkDetail=null;stationDetail=null;
+  routeDetail=null;linkDetail=null;stationDetail=null;analyticalDiagram=null;rfDetail=null;
   get('diagram').innerHTML='';get('diagram-detail').innerHTML='';
   get('diagram-status').textContent=!valid?'현재 UTC·입력의 연결도 미확인':!diagram?'연결도 표시 모듈 미확인':sampled?`분석 UTC ${snapshot.analysis_utc} · 표시 UTC ${snapshot.display_utc} · 통신 품질·보관 상태·현재 경로 미확인 · 공학 가정`:receipt?'모의 연결 구조 · 지리적 위치 아님 · 움직이는 선은 실측 패킷이 아님':'모의 노드 배치 · 통신망 미전송으로 링크 품질·보관 상태 미확인';
   if(!valid||!diagram)return current();
   const nodes=snapshot.network.nodes,ids=new Set(nodes.map(node=>node.id));
   const layout=diagram.layoutNetwork({satellites:(snapshot.node_definitions??[]).filter(node=>ids.has(node.id)).map(node=>({id:node.id,name:node.name,raan:node.orbit?.raan,meanAnomaly:node.orbit?.mean_anomaly,formation:node.formation})),stations:(snapshot.stations??[]).filter(station=>station.enabled&&ids.has(station.id))});
   if(!current())return false;
-  const reports=new Map((receipt?.links??[]).map(link=>[link.id,link]));
-  // No receipt means unknown link quality, never an invented usable/unusable verdict.
-  const links=sampled?snapshot.network.links:receipt?snapshot.network.links.filter(link=>reports.has(link.id)).map(link=>({...link,...reports.get(link.id)})):[];
-  const states=new Map((receipt?.nodes??[]).map(node=>[node.id,{tone:node.kind==='ground'?(node.serving?.length?'ok':'neutral'):node.ground_path?'ok':node.custody==='full'?'danger':node.custody?'warning':'neutral',title:diagram.CUSTODY_LABELS?.[node.custody]||node.custody||'미확인',badge:Number.isFinite(node.stored_mb)&&node.stored_mb>0?node.stored_mb+' MB':''}]));
-  const routeLinkIds=new Set(route?.status==='available'?(route.hop_list??[]).map(hop=>hop.link_id):[]);
+  let historical=null;
+  const utc=sampled?snapshot.display_utc:snapshot.utc;
+  const historicalCurrent=()=>{
+   try{return current()&&historical!==null&&historical.fabric_view===fabric.analyticalPresentation()&&current()&&fabric.verifyAnalyticalPresentation(historical.fabric_view)===true&&current()&&network.verifyAnalyticalRoute(historical,{utc,nodes:snapshot.node_definitions})===true&&current();}catch{return false;}
+  };
+  if(allowHistorical&&sampled&&typeof network.readAnalyticalRoute==='function'&&typeof network.verifyAnalyticalRoute==='function'&&typeof fabric?.analyticalPresentation==='function'&&typeof fabric?.verifyAnalyticalPresentation==='function'){
+   try{const value=network.readAnalyticalRoute({utc});if(current()&&value?.presentation_kind==='MIXED_ROUTE_ANALYTICAL_UI_V1'&&value.display_utc===utc&&value.source==='captured_native_analysis'&&JSON.stringify(value.node_definitions)===JSON.stringify(snapshot.node_definitions)){historical=value;if(!historicalCurrent())historical=null;}}catch{historical=null;}
+   if(!current())return false;
+  }
+  const visualReceipt=historical?historical.fabric_view.receipt:receipt;
+  const reports=new Map((visualReceipt?.links??[]).map(link=>[link.id,link]));
+  const captured=new Map((historical?.native_snapshot?.network?.links??[]).map(link=>[link.id,link]));
+  const sameLink=(link,other)=>other&&link.kind===other.kind&&link.a===other.a&&link.b===other.b;
+  // Historical module verdicts are only shown on existing, identically scoped native links.
+  const links=historical?snapshot.network.links.filter(link=>reports.has(link.id)&&sameLink(link,captured.get(link.id))).map(link=>({...link,...reports.get(link.id),id:link.id,a:link.a,b:link.b,kind:link.kind})):sampled?snapshot.network.links:receipt?snapshot.network.links.filter(link=>reports.has(link.id)).map(link=>({...link,...reports.get(link.id)})):[];
+  const states=new Map((visualReceipt?.nodes??[]).filter(node=>ids.has(node.id)).map(node=>[node.id,{tone:node.kind==='ground'?(node.serving?.length?'ok':'neutral'):node.ground_path?'ok':node.custody==='full'?'danger':node.custody?'warning':'neutral',title:diagram.CUSTODY_LABELS?.[node.custody]||node.custody||'미확인',badge:Number.isFinite(node.stored_mb)&&node.stored_mb>0?node.stored_mb+' MB':''}]));
+  const routeLinkIds=new Set(historical?(historical.routed_ids??[]).filter(id=>links.some(link=>link.id===id)):route?.status==='available'?(route.hop_list??[]).map(hop=>hop.link_id):[]);
+  const fallback=()=>renderDiagram(snapshot,valid,receipt,route,sampled,current,fabricState,false);
+  if(historical&&!historicalCurrent())return current()?fallback():false;
   const selected=selection&&((selection.type==='link'&&links.some(link=>link.id===selection.id))||(selection.type==='node'&&ids.has(selection.id)))?selection:null;
-  const markup=diagram.diagramMarkup(layout,links,{selected,routeLinkIds,nodeStates:states,showLabels:true,flowTimeSeconds:Number.isFinite(receipt?.elapsed_s)?receipt.elapsed_s:0,...sampled?{unverifiedAnalysis:true}:{}});
-  if(!current())return false;get('diagram').innerHTML=markup;
+  const markup=diagram.diagramMarkup(layout,links,{selected,routeLinkIds,nodeStates:states,showLabels:true,flowTimeSeconds:Number.isFinite(visualReceipt?.elapsed_s)?visualReceipt.elapsed_s:0,...sampled&&!historical?{unverifiedAnalysis:true}:{}});
+  if(!current())return false;if(historical&&!historicalCurrent())return current()?fallback():false;get('diagram').innerHTML=markup;
+  if(historical){get('diagram-status').textContent=`과거 분석 UTC ${historical.analysis_utc} · 표시 UTC ${historical.display_utc} · 분석 경과 ${Number(historical.age_seconds).toFixed(3)} s · 현재 기하와 일치하는 과거 모의 품질·보관·경로 · 현재 통신 승인·실제 RF 미확인`;analyticalDiagram={verify:historicalCurrent,fallback};}
   if(selected){
-   const record=selected.type==='link'?links.find(link=>link.id===selected.id):{definition:(snapshot.node_definitions??[]).find(node=>node.id===selected.id)||(snapshot.stations??[]).find(node=>node.id===selected.id),fabric:(receipt?.nodes??[]).find(node=>node.id===selected.id)??null};
+   const record=selected.type==='link'?{...links.find(link=>link.id===selected.id)}:{definition:(snapshot.node_definitions??[]).find(node=>node.id===selected.id)||(snapshot.stations??[]).find(node=>node.id===selected.id),fabric:(visualReceipt?.nodes??[]).find(node=>node.id===selected.id)??null};
+   if(historical&&selected.type==='link'){record.current_geometry=snapshot.network.links.find(link=>link.id===selected.id);record.captured_module=reports.get(selected.id)??null;}
+   if(historical)record.historical_analysis={source:historical.source,analysis_utc:historical.analysis_utc,display_utc:historical.display_utc,age_seconds:historical.age_seconds,current_communication_approval:false};
    get('diagram-detail').innerHTML='<h4>선택한 모의 '+(selected.type==='link'?'링크':'노드')+'</h4><pre style="white-space:pre-wrap;overflow-wrap:anywhere">'+escape(JSON.stringify(record,null,2))+'</pre>';
    if(selected.type==='link'){
     const endpoints=['a','b'].filter(side=>typeof record?.[side]==='string'&&ids.has(record[side]));
     get('diagram-detail').innerHTML+='<div>'+endpoints.map(side=>'<button type="button" id="ground-node-detail-select-'+side+'">'+escape(side.toUpperCase()+' 노드 선택 · '+record[side])+'</button>').join('')+'</div>';
     if(!current())return false;
     linkDetail={id:selected.id,a:record.a,b:record.b,current,sampled,scope:JSON.stringify(snapshot)};
+    const nativeLink=snapshot.network.links.find(link=>link.id===selected.id);
+    if(nativeLink?.kind==='ground'&&typeof onRfLinkDraft==='function'){
+     const analysisUtc=sampled?snapshot.analysis_utc:snapshot.utc,displayUtc=sampled?snapshot.display_utc:snapshot.utc;
+     get('diagram-detail').innerHTML+='<div><button type="button" id="ground-node-detail-rf-draft">이 지상 링크의 native 조건을 RF 초안에 적용</button><small>입력 계산 UTC '+escape(analysisUtc)+' · 표시 UTC '+escape(displayUtc)+' · 대표 장비 가정 · 적용 후 직접 계산 · 실제 RF 미확인</small></div>';
+     if(!current())return false;
+     get('detail-rf-draft').disabled=!store.ready||externalPending;
+     rfDetail={id:selected.id,current,sampled,scope:JSON.stringify(snapshot),link:JSON.stringify(nativeLink),nativeLink:structuredClone(nativeLink),analysisUtc,displayUtc};
+    }
+
    }
    if(selected.type==='node'){
     const node=nodes.find(node=>node.id===selected.id),fields=node?.kind==='satellite'?['source','target']:node?.kind==='ground'?['target']:[];
@@ -398,15 +447,18 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
      stationDetail={id:selected.id,kind:node.kind,current,sampled,scope:JSON.stringify(snapshot)};
     }
     if(node?.kind==='ground'){
-     let focusReady=false;try{focusReady=!sampled&&store.ready&&!externalPending&&network.canFocusGroundNetworkStation?.(selected.id)===true;}catch{}
+     let focusReady=false;try{focusReady=store.ready&&!externalPending&&network.canFocusGroundNetworkStation?.(selected.id)===true;}catch{}
      if(!current())return false;
      get('diagram-detail').innerHTML+='<div><button type="button" id="ground-node-detail-focus">뷰 정렬</button><button type="button" id="ground-node-detail-edit">편집</button></div>';
-     get('detail-focus').disabled=!focusReady;get('detail-edit').disabled=sampled||!store.ready||externalPending;
-     if(!sampled)stationDetail={id:selected.id,kind:node.kind,current,sampled,scope:JSON.stringify(snapshot)};
+     get('detail-focus').disabled=!focusReady;get('detail-edit').disabled=!store.ready||externalPending;
+     stationDetail={id:selected.id,kind:node.kind,current,sampled,scope:JSON.stringify(snapshot)};
     }
+    // Appending detail controls reparses markup, so restore action gating on final DOM nodes.
+    for(const field of fields)get('detail-route-'+field).disabled=!ready;
 
    }
   }
+  if(historical&&!historicalCurrent())return current()?fallback():false;
   return current();
  }
  const unsubscribe=store.subscribe(()=>{let next=null;try{next=stationInputs();}catch{/* Failed config revokes old geometry. */}const changed=next===null||next!==stationInputSignature;stationInputSignature=next;if(changed){cancelContacts();network.clearNetwork();void futurePasses?.observe?.();}update();});
@@ -428,6 +480,6 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   }
   update();if(current()&&next==='ground')startStatusPolling();
  }
- return Object.freeze({show,update,routeRequest:()=>Object.freeze({...routeChoice}),hasExternalChange:()=>externalPending,
+ return Object.freeze({show,update,routeRequest:()=>Object.freeze({...routeChoice}),selectedLinkId:()=>!dead&&selection?.type==='link'?selection.id:null,hasExternalChange:()=>externalPending,
   destroy(){if(dead)return;paintGeneration++;dead=true;futurePasses?.setActive(false);clearFuturePasses();clearAnalyticalFabric();stopStatusPolling();clearObservations();clearSampledUi();cancelContacts();networkScene?.setActive?.(false);networkScene?.clear();unsubscribe();host.removeEventListener('storage',external);for(const remove of removers.splice(0))remove();root?.remove();root=null;}});
 }

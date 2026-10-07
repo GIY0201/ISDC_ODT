@@ -676,18 +676,23 @@ new executable tasks, all US20, existingfeature/IDs/branches preserved. MVP here
 is fullnative validatedfuture flow then actual UI acceptance, not a physics stub.
 
 ## N017 mixed route emphasis: ADR0053 prerequisite pending
-- [ ] T160 Meaningful RED for pure nodes/mixed_route_emphasis.js and new mixed_route_emphasis.test.mjs: full exact native/fabric scope, mixed OISL-ground complete hops, selected native link, copied/fake/sampled proof, current UTC/source/node/hash/station/fault/endpoint/instance/sequence/error/review/pending and irreversible revoke/clear/dispose/reentry. Analyze ADR0053/contract before code.
-- [ ] T161 After T160 RED implement the existing-owner readonly route projection and optional NodeScene read/verify port; new node_scene_route_emphasis.test.mjs must prove original #a78bfa/4.5/4/2, same material/time, no new links/Viewer/clock, actual native frame/visibility/morph/callback-final fences and default exact/sampled parity.
+- [x] T160 Meaningful RED for pure nodes/mixed_route_emphasis.js and new mixed_route_emphasis.test.mjs: full exact native/fabric scope, mixed OISL-ground complete hops, selected native link, copied/fake/sampled proof, current UTC/source/node/hash/station/fault/endpoint/instance/sequence/error/review/pending and irreversible revoke/clear/dispose/reentry. Analyze ADR0053/contract before code.
+- [x] T161 After T160 RED implement the existing-owner readonly route projection and optional NodeScene read/verify port; new node_scene_route_emphasis.test.mjs must prove original #a78bfa/4.5/4/2, same material/time, no new links/Viewer/clock, actual native frame/visibility/morph/callback-final fences and default exact/sampled parity.
 - [ ] T162 Connect only existing workspace_nodes setNetworkScene/composite lifecycle, test actual mixed route assembly and cleanup; preserve NativeNetworkScene ground/SVG/fabric action contracts. Independently review, full regression and actual8891 two-resolution/GPU/game criteria evidence before closure. N018 separate captured native-analysis command authority remains pending; no automatic exchange in this renderer delivery.
 
 ## N018 원본 periodic captured-native exchange
 
-- [ ] T163 Raw optical/network registered analytical capabilities RED/GREEN; full scopes/continuity/epoch.
-- [ ] T164 Existing fabric single lane analytical send/route plus source 1s/MIN900 scheduler RED/GREEN.
+- [x] T163 Raw optical/network registered analytical capabilities RED/GREEN; full scopes/continuity/epoch.
+- [x] T164 Existing fabric single lane analytical send/route plus source 1s/MIN900 scheduler RED/GREEN.
 - [ ] T165 Actual module/DTN/selected-route UI provenance and whole-source two-resolution/live/regression gates.
 
 ## N018 analytical mixed route visual 잔여
 
-- [ ] T166 Registered analytical fabric/native full-hop visual projection RED/GREEN (ADR0055).
-- [ ] T167 Existing OISL+ground shared-Viewer route style connection and lifecycle/current-geometry regressions.
+- [x] T166 Registered analytical fabric/native full-hop visual projection RED/GREEN (ADR0055).
+- [x] T167 Existing OISL+ground shared-Viewer route style connection and lifecycle/current-geometry regressions.
 - [ ] T168 Actual periodic accepted module→selected route→two-resolution mixed3D/UI/performance source parity proof.
+
+## Original selected-link RF prefill flow
+- [x] T169 ADR0056 gate then RED-first sourceLinkRfDraft/applySourceLinkDraft in existing rf_link_budget.js + closest tests; preserve source11-field conversions/provenance/manual API.
+- [x] T170 RED-first current registered native selectedgroundlink explicit button/onRfLinkDraft + root existingRF owner DI, callback/lifecycle/draft/late-result tests.
+- [ ] T171 Independent scoped review, full regressions and actual UI source-flow verification; whole live/performance acceptance remains distinct.

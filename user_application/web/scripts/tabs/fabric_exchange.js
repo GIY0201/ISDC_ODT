@@ -4,7 +4,7 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
  let dead=false,counter=0,active=null,command=null,accepted=null,routeResult=null,state='unavailable',error='',review=false;
  const copy=value=>value==null?null:structuredClone(value);
  const freeze=value=>{if(value&&typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}return value;};
- const analyticalViews=new WeakMap();
+ const analyticalViews=new WeakMap();let analyticalCache=null;
  const hasRaw=typeof network.captureRawAnalysis==='function'&&typeof network.verifyRawAnalysis==='function';
  const signature=value=>JSON.stringify(value);
  let poll=null,pollEpoch={},pollCancellation=0,commandEpoch={},controlEpoch={},commandEntry=0,observation={endpoint:null,status:'unavailable',value:null,error:''},historyEndpoint=null,historyInstance=null;
@@ -147,13 +147,15 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
  }
  function analyticalPresentation(){
   reconcile();if(dead||!accepted||accepted.origin!=='captured_analysis'||active||review||state!=='accepted')return null;
-  const record=accepted,route=routeResult,value=freeze({presentation_kind:'FABRIC_ANALYTICAL_UI_V1',analysis_utc:record.proof.utc,receipt:copy(record.receipt),route:copy(route),network:copy(record.proof.network),source:'captured_native_analysis',current_analysis:false});
+  const record=accepted,route=routeResult;if(analyticalCache?.record===record&&analyticalCache.route===route&&analyticalViews.has(analyticalCache.value))return verifyAnalyticalPresentation(analyticalCache.value)?analyticalCache.value:null;
+  const native=freeze(copy(record.proof)),value=freeze({presentation_kind:'FABRIC_ANALYTICAL_UI_V1',analysis_utc:record.proof.utc,receipt:copy(record.receipt),route:copy(route),native_snapshot:native,network:native.network,source:'captured_native_analysis',current_analysis:false});
+  analyticalCache={record,route,value};
   analyticalViews.set(value,{record,route});return verifyAnalyticalPresentation(value)?value:null;
  }
  function verifyAnalyticalPresentation(value){
   const registration=analyticalViews.get(value);if(!registration)return false;
   const current=()=>!dead&&!active&&!review&&state==='accepted'&&accepted===registration.record&&routeResult===registration.route;
-  if(!current()||!matches(registration.record.key,registration.record)||!current()){analyticalViews.delete(value);return false;}return true;
+  if(!current()||!matches(registration.record.key,registration.record)||!current()){analyticalViews.delete(value);if(analyticalCache?.value===value)analyticalCache=null;return false;}return true;
  }
  function refreshCommand(){
   if(dead)return Promise.resolve(null);cancelStatusPoll();observationScope();if(dead)return Promise.resolve(null);if(active)return active.origin==='captured_analysis'?Promise.resolve(null):active.promise;
@@ -188,5 +190,5 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
    finally{if(active===task){active=null;reconcile();notify();}}
   });notify();return task.promise;
  }
- return Object.freeze({send,sendAnalytical,routeAnalytical,analyticalPresentation,verifyAnalyticalPresentation,refresh,route,snapshot,pollStatus,cancelStatusPoll,moduleStatus,qualityHistory,invalidate(){if(dead)return;commandEpoch={};controlEpoch={};const uncertainAnalytical=active?.origin==='captured_analysis'&&active.posted===true&&!accepted;pollCancellation++;try{cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();command=null;accepted=null;routeResult=null;state='unavailable';error=uncertainAnalytical?'이전 분석 통신 요청의 수락이 미확인입니다. 모듈 상태를 명시적으로 검토하세요.':'';review=uncertainAnalytical||review;notify();}finally{pollCancellation--;}},destroy(){if(dead)return;dead=true;cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();active=null;command=null;accepted=null;routeResult=null;}});
+ return Object.freeze({send,sendAnalytical,routeAnalytical,analyticalPresentation,verifyAnalyticalPresentation,refresh,route,snapshot,pollStatus,cancelStatusPoll,moduleStatus,qualityHistory,invalidate(){if(dead)return;analyticalCache=null;commandEpoch={};controlEpoch={};const uncertainAnalytical=active?.origin==='captured_analysis'&&active.posted===true&&!accepted;pollCancellation++;try{cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();command=null;accepted=null;routeResult=null;state='unavailable';error=uncertainAnalytical?'이전 분석 통신 요청의 수락이 미확인입니다. 모듈 상태를 명시적으로 검토하세요.':'';review=uncertainAnalytical||review;notify();}finally{pollCancellation--;}},destroy(){if(dead)return;dead=true;analyticalCache=null;cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();active=null;command=null;accepted=null;routeResult=null;}});
 }

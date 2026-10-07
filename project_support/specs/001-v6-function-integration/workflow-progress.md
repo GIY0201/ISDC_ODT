@@ -1470,3 +1470,23 @@ Whole source N018 moving analytical SVG/3D mixedroute still missing: ADR0055/T16
 precode design in progress, not closed by tables. Actual8891 tworesolution/model/GPU/
 gameperformance/full75–84/PR stillOPEN. Git HTTPS push dry-run lackscredentials;
 no remotebranch/history reconstruction or resets. Fixed8891 originalrun/40deployed heldmissions preserved.
+
+2026-10-07 N019: user asked to group validation. All code authors stopped before
+one full parallel Node/Python run. Node1878PASS0FAIL0SKIP26050.4651ms exit0;
+Python pending at this checkpoint. ADR0055 and ADR0056 precode independent
+analysis HIGH0/CRITICAL0; existing checklist8/8 is quality only, bootstrap and
+prerequisite checks passed without resetting .specify. Meaningful failure-first
+repairs precede analytical projection, renderer, station detail and selected RF
+connections. Helper49PASS and renderer175PASS independent final reviews clean.
+See validation/analytical_mixed_route_visual.md and selected_link_rf_prefill.md.
+Actual native fixture uses installed Rust0.3.0 and complete240 definitions;
+CPU timing is not GPU evidence. Live current savedISS sample422 is EOP-range
+failure: preserved2020 GP/current2026UTC uses finalB ending2026-08-21. Separate
+catalogA supports current date as predicted. Do not silently change preserved
+UTC/GP, zero EOP or weaken current approvals to clear the gate. Live future rows,
+mixed native route/RF flow, allmodels/twores/GPU/whole75–84/T032/PR remain open.
+Independent final source audit also examines scenario:route payload handoff and
+objective-change automatic refresh; do not treat all original triggers as closed
+from component coverage. No newbranch/server restart/port/reset/state mutation.
+
+Final N019 full regression: Python967PASS1existingPillowSKIP8existingERFAwarnings272.95s exit0; data/workspace/validation/full_N019_python.log. Node1878PASS0FAIL0SKIP26050.4651ms exit0. No product edits during this full run. Whole live/GPU/PR gates remain open.

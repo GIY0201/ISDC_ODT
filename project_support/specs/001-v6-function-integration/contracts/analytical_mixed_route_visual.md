@@ -1,5 +1,13 @@
 # N018 analytical mixed route visual contract
 
+Repair1: projection includes selected_id and borrowed registered fabric_view.
+Existing ground panel selectedLinkId() -> bindPeriodicFabric readSelectedLinkId
+is a readonly selected-style hint, verified before/after proof and against full
+native/current endpoints. Same-UTC replaced fabric views cannot be paired.
+Helper clearAnalytical() rotates the visual epoch on composition hide/clear/
+control/dispose; renderer local revoked identities cannot revive on reactivation
+without a fresh owner registration. No new selection or command owner.
+
 ADR0055 implementation-precondition. Existing fabric registered analyticalPresentation adds full native_snapshot; verification remains raw current command/deployment/continuity/endpoint/module owner authority. This UI copy is not command/action authority.
 
 Existing mixed-route helper adds optional readAnalyticalFabric/verifyAnalyticalFabric/differenceUtc dependencies, readAnalytical({utc})/verifyAnalytical(view,{utc,nodes}) with separately registered frozen MIXED_ROUTE_ANALYTICAL_UI_V1. Captured analysis_utc unchanged, current display_utc and canonical age/current equality separately visible. Validate ALL full captured hops before projecting ground/OISL IDs. Existing exact read/verify unchanged.

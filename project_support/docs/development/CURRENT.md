@@ -1,3 +1,24 @@
+## 2026-10-07 N019 분석 경로·지상국 상세·선택 링크 RF 연결 회귀 통과
+
+원본 통신 모듈의 등록된 과거 분석을 기존 SVG/공용3D 실제 링크에 연결하고,
+분석/표시 UTC를 구분했다. 전체240 native 정의/hash/전체hop 검사와 철회 가드를
+유지한다. 지상국 상세 초점·편집, 원본 선택 지상 링크의11필드→기존 RF 계산기
+명시 초안 전달을 보완했다. RF/OISL/모듈 계산식은 재작성하지 않았다.
+
+모든 작성자 수정 중지 후 전체 병렬 회귀: Node1878PASS0FAIL0SKIP26050.4651ms
+exit0(19218), Python967PASS1기존PillowSKIP8기존ERFAwarnings272.95s exit0(24920).
+로그 data/workspace/validation/full_N019_node.log 및 full_N019_python.log.
+실제 ASGI/Rust0.3.0/720행→JS→원본 모듈→helper 시험도 전체 Python에 포함됐다.
+독립 helper/renderer/ground/RF 조립 검토는 추가 차단 결함 없이 통과했다.
+
+실제 화면에서는 보존된2020 ISS GP/current2026UTC의 확정B EOP범위가
+2026-08-21까지여서 samples422다. 별도 현재 catalogA는 예측 자료를 지원한다.
+기존GP/UTC/SIM/40수락배치/8891을 임의 변경하지 않았다. 실제 두해상도/
+모든모델/GPU/게임성능/전체75–84/T032/PR은 미완료다. 최종 원본 대조에서
+scenario:route의 지상 화면 선택값 인계 누락을 확인해 ADR0057로 남겼다.
+원본 objective 즉시 조회와 현재 명시/periodic 조회는 선언된 정책 차이다.
+Git HTTPS 인증 부재는 유지되며 이력 재생성/강제 push/브랜치 삭제는 하지 않는다.
+
 ## 2026-10-07 N018 주기 통신 연결 변경 묶음 회귀 통과
 
 기존 raw 분석 owner/수락 배치/통신 command lane에서 원본1초·MIN900·동일UTC

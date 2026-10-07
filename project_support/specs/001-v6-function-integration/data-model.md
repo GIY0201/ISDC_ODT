@@ -153,3 +153,5 @@ Raw native command token: private registered frozen {kind,analysis_utc,snapshot}
 ## N018 analytical mixed route 시각 연결 잔여
 
 ADR0055/contracts/analytical_mixed_route_visual.md/T166–T168: historical captured native route를 exact approval로 승격하지 않고 별도 등록 UI proof로 같은 OISL/ground 현재 native primitive의 원본 purple/width/material을 표시한다. immutable route 분석 UTC와 current display UTC/age/incomplete-current를 구분한다. 현재 구현 전이며 전체 이식/실제 두 해상도/성능 gate는 보존한다.
+
+ADR0056/contracts/selected_link_rf_prefill.md: missing original selected ground-link -> existing RF calculator draft flow, T169–T171. Current geometry registration/ID/endpoints only; explicit copy cancels obsolete result, all11 editable labelled source representative assumptions. No formula/API/clock/automatic query change. Precode independent analysis required; whole live/performance gates unchanged.

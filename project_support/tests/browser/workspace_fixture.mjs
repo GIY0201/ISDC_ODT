@@ -163,6 +163,7 @@ export function fixture(width=1280,height=720,options={}){
   if(options.simPanelFactory)context.createSimPanel=(...args)=>options.simPanelFactory(createSimPanel,...args);
   if(options.scenarioFactory)context.createWorkspaceScenario=args=>options.scenarioFactory(createWorkspaceScenario,args);
   if(options.nodeWorkspaceFactory)context.createWorkspaceNodes=args=>options.nodeWorkspaceFactory(createWorkspaceNodes,args);
+  if(options.groundNetworkPanelFactory)context.createGroundNetworkPanel=args=>options.groundNetworkPanelFactory(createGroundNetworkPanel,args);
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}
   const resize=async(w,h)=>{context.innerWidth=w;context.innerHeight=h;await win.dispatch('resize');};

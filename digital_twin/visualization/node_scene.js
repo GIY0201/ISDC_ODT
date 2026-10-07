@@ -9,15 +9,17 @@ const vector=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite);
 function signature(value){const ordered=v=>Array.isArray(v)?v.map(ordered):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,ordered(v[k])])):v;return JSON.stringify(ordered(value));}
 
 export class NodeScene{
-  constructor({viewer,cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry=null,sampledLinks=null,routeEmphasis=null,palette=()=>({}),tracksVisible=()=>true,isTransitioning=()=>false,onStatus=()=>{},verifyLinkSnapshot,animationNow=()=>0}={}){
+  constructor({viewer,cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry=null,sampledLinks=null,routeEmphasis=null,analyticalRouteEmphasis=null,palette=()=>({}),tracksVisible=()=>true,isTransitioning=()=>false,onStatus=()=>{},verifyLinkSnapshot,animationNow=()=>0}={}){
     if(typeof advanceUtc!=='function'||typeof geometryFor!=='function'||typeof pathFor!=='function')throw new TypeError('node scene native display dependencies required');
     if(displayGeometry!==null&&['revision','viewFor','isCurrent','sampleAt','verifySample'].some(key=>typeof displayGeometry?.[key]!=='function'))throw new TypeError('registered readonly native display geometry port required');
     if(sampledLinks!==null&&['read','verify'].some(key=>typeof sampledLinks?.[key]!=='function'))throw new TypeError('registered sampled links read/verify port required');
     if(routeEmphasis!==null&&['read','verify'].some(key=>typeof routeEmphasis?.[key]!=='function'))throw new TypeError('registered route emphasis read/verify port required');
+    if(analyticalRouteEmphasis!==null&&['read','verify'].some(key=>typeof analyticalRouteEmphasis?.[key]!=='function'))throw new TypeError('registered analytical route read/verify port required');
     Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry,sampledLinks,palette,tracksVisible,isTransitioning,onStatus,verifyLinkSnapshot,animationNow});
     this.links=new Map();this.linkPolylines=null;this.linkOwner=null;this.linkReceipt=null;this.definitionScope='[]';this.linksVisible=true;this.models=new Map();this.descriptions=new Map();this.paths=new Map();this.points=new Map();this.labels=new Map();this.selectedId=null;this.hoveredId=null;this.visibleIds=null;this.sdcMode=false;this.theme='dark';this.loadToken=0;this.modelsVisible=true;this.disposed=false;this.dataSource=null;this.dataSourceOwner=null;this.markerOwner=null;this.pointCollection=null;this.labelCollection=null;
     this.frameMemo=null;
     this.routeEmphasis=routeEmphasis;this.routeGeneration=0;this.routeStyled=new Map();
+    this.analyticalRouteEmphasis=analyticalRouteEmphasis;this.analyticalRouteGeneration=0;this.analyticalRouteStyled=new Map();this.analyticalRouteReceipt=null;this.analyticalRouteCandidate=null;this.analyticalRouteLastView=null;this.revokedAnalyticalRoutes=new WeakSet();this.analyticalFrozen=new WeakSet();
     this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.linkGeneration=0;this.sampledFrozen=new WeakSet();this.sampledScopes=new WeakMap();this.sampledPairValidation=null;
   }
   get viewer(){return typeof this.viewerProvider==='function'?this.viewerProvider():this.viewerProvider;}
@@ -189,9 +191,10 @@ export class NodeScene{
 
   // The renderer consumes a T077 verified snapshot; it never calculates terminal success.
   setLinks(snapshot){
+    this.restoreAnalyticalRouteEmphasis();
     this.restoreRouteEmphasis();
     if(this.disposed)return false;
-    if(snapshot?.presentation_kind==='OPTICAL_SAMPLED_UI_V1'){this.clearLinks();return false;}
+    if(['OPTICAL_SAMPLED_UI_V1','MIXED_ROUTE_ANALYTICAL_UI_V1'].includes(snapshot?.presentation_kind)){this.clearLinks();return false;}
     let captured;
     try{
       captured=structuredClone(snapshot);
@@ -304,7 +307,41 @@ export class NodeScene{
       this.sampledFlowGuard=()=>{try{return current()&&port.verify(view,{utc})===true&&current()&&port.verify(view,{utc})===true&&bound();}catch{return false;}};return true;
     }catch{hide();return true;}
   }
-  hideSampledLinks(){for(const entry of this.links.values())entry.line.show=false;this.sampledLinkReceipt=null;this.sampledFlowGuard=null;}
+  hideSampledLinks(){this.restoreAnalyticalRouteEmphasis(true);for(const entry of this.links.values())entry.line.show=false;this.sampledLinkReceipt=null;this.sampledFlowGuard=null;}
+  restoreAnalyticalRouteEmphasis(revoke=false){
+    if(revoke){this.analyticalRouteGeneration++;for(const value of [this.analyticalRouteLastView,this.analyticalRouteReceipt?.view,this.analyticalRouteCandidate])if(value&&typeof value==='object')this.revokedAnalyticalRoutes.add(value);this.analyticalRouteCandidate=null;this.analyticalRouteLastView=null;}
+    for(const [entry,base]of this.analyticalRouteStyled){entry.line.width=base.width;entry.line.material=base.material;if(base.uniforms)base.uniforms.color=base.color;}
+    this.analyticalRouteStyled.clear();this.analyticalRouteReceipt=null;
+  }
+  analyticalReadonly(value){
+    const seen=new Set(),visit=v=>{if(!v||typeof v!=='object'||seen.has(v)||this.analyticalFrozen.has(v))return true;seen.add(v);return Object.isFrozen(v)&&Object.values(Object.getOwnPropertyDescriptors(v)).every(d=>'value'in d&&visit(d.value));};
+    const valid=visit(value);if(valid)for(const v of seen)this.analyticalFrozen.add(v);return valid;
+  }
+  applyAnalyticalRouteEmphasis(utc){
+    const ticket=++this.analyticalRouteGeneration;this.restoreAnalyticalRouteEmphasis();const port=this.analyticalRouteEmphasis;if(!port||this.disposed||!this.linksVisible)return false;
+    const read=port.read,verify=port.verify,viewerProvider=this.viewerProvider,cesiumProvider=this.cesiumProvider,timeSource=this.timeSource,transition=this.isTransitioning,geometryFor=this.geometryFor,descriptions=this.descriptions,scope=this.definitionScope,links=this.links,generation=this.linkGeneration,baseReceipt=this.linkReceipt,sampledReceipt=this.sampledLinkReceipt;
+    let viewer,C,view;const bound=()=>!this.disposed&&ticket===this.analyticalRouteGeneration&&this.analyticalRouteEmphasis===port&&port.read===read&&port.verify===verify&&viewerProvider===this.viewerProvider&&cesiumProvider===this.cesiumProvider&&timeSource===this.timeSource&&transition===this.isTransitioning&&geometryFor===this.geometryFor&&this.descriptions===descriptions&&this.definitionScope===scope&&this.links===links&&this.linkGeneration===generation&&this.linkReceipt===baseReceipt&&this.sampledLinkReceipt===sampledReceipt&&this.linksVisible&&this.linkOwner===viewer;
+    const frame=()=>{const stamp=timeSource?.(),moving=transition(),v=this.viewer,c=this.cesium,mode=v?.scene?.mode;return stamp===utc&&!moving&&v===viewer&&c===C&&(!C?.SceneMode||mode!==C.SceneMode.MORPHING)&&bound();};
+    const nodes=[...descriptions.values()].map(e=>e.definition),flowGuard=this.sampledFlowGuard;
+    const baseProof=()=>baseReceipt?baseReceipt.utc===utc&&baseReceipt.scope===scope:sampledReceipt?.display_utc===utc&&sampledReceipt.scope===scope&&this.sampledFlowGuard===flowGuard&&typeof flowGuard==='function'&&flowGuard()===true;
+    const proof=()=>baseProof()&&verify(view,{utc,nodes})===true&&bound();
+    const fail=()=>{if(ticket===this.analyticalRouteGeneration){for(const value of [view,this.analyticalRouteLastView])if(value&&typeof value==='object')this.revokedAnalyticalRoutes.add(value);this.restoreAnalyticalRouteEmphasis();this.analyticalRouteCandidate=null;this.analyticalRouteLastView=null;}return false;};
+    try{
+      viewer=this.viewer;C=this.cesium;if(!frame()||(!baseReceipt&&!sampledReceipt))return fail();view=read({utc});if(!bound())return fail();this.analyticalRouteCandidate=view;
+      if(!bound()||!view||this.revokedAnalyticalRoutes.has(view)||view.presentation_kind!=='MIXED_ROUTE_ANALYTICAL_UI_V1'||!this.analyticalReadonly(view)||view.display_utc!==utc||view.source!=='captured_native_analysis'||view.availability!=='accepted'||typeof view.analysis_utc!=='string'||!Number.isFinite(view.age_seconds)||view.current_analysis!==(view.analysis_utc===utc)||!view.fabric_view||!Object.entries(metadata).every(([k,v])=>view.native_snapshot?.[k]===v)||signature(view.node_definitions)!==scope||signature(view.native_snapshot.node_definitions)!==scope||signature(view.native_snapshot.definition_hashes)!==signature(view.definition_hashes)||!Array.isArray(view.oisl_links)||!Array.isArray(view.routed_ids)||!frame()||!proof())return fail();
+      if(!view.definition_hashes||Object.keys(view.definition_hashes).length!==nodes.length)return fail();
+      for(const n of nodes){const hash=view.definition_hashes[n.id];if(typeof hash!=='string'||!/^[a-f0-9]{64}$/.test(hash)||this.geometryAt(n.id,utc)?.definition_hash!==hash||!bound())return fail();}
+      const routed=new Set(view.routed_ids),prepared=[],nativeLinks=new Map();
+      for(const link of view.oisl_links){if(typeof link?.id!=='string'||nativeLinks.has(link.id))return fail();nativeLinks.set(link.id,link);}
+      for(const [id,entry]of links){const native=nativeLinks.get(id);if(!native||!(native.a===entry.a&&native.b===entry.b||native.a===entry.b&&native.b===entry.a)||!entry.line.show||!routed.has(id)&&view.selected_id!==id)continue;
+        const material=entry.line.material,uniforms=material?.uniforms&&'time'in material.uniforms?material.uniforms:null,color=routed.has(id)?C.Color.fromCssColorString('#a78bfa').withAlpha(uniforms?.55:.95):null;
+        const override=routed.has(id)&&!uniforms?C.Material.fromType('Color',{color}):material;prepared.push({entry,base:{width:entry.line.width,material,uniforms,color:uniforms?.color},width:routed.has(id)?4.5:4,color,override});
+      }
+      if(!frame()||!proof())return fail();for(const item of prepared){this.analyticalRouteStyled.set(item.entry,item.base);item.entry.line.width=item.width;item.entry.line.material=item.override;if(item.color&&item.base.uniforms)item.base.uniforms.color=item.color;}
+      // The terminal owner verifier is observational; only private binding checks follow it.
+      if(!frame()||!proof()||!frame()||!proof())return fail();this.analyticalRouteReceipt={presentation_kind:view.presentation_kind,analysis_utc:view.analysis_utc,display_utc:utc,age_seconds:view.age_seconds,current_analysis:view.current_analysis,view};this.analyticalRouteLastView=view;this.analyticalRouteCandidate=null;return true;
+    }catch{return fail();}
+  }
   restoreRouteEmphasis(){
     for(const [entry,base]of this.routeStyled){entry.line.width=base.width;entry.line.material=base.material;if(base.uniforms)base.uniforms.color=base.color;}
     this.routeStyled.clear();
@@ -332,23 +369,23 @@ export class NodeScene{
       if(!frame()||port.verify(view,{utc,nodes:[...descriptions.values()].map(e=>e.definition)})!==true||!frame()||port.verify(view,{utc,nodes:[...descriptions.values()].map(e=>e.definition)})!==true||!bound()){if(ticket===this.routeGeneration)this.restoreRouteEmphasis();return false;}return true;
     }catch{if(ticket===this.routeGeneration)this.restoreRouteEmphasis();return false;}
   }
-  placeDisplayLinks(utc){this.restoreRouteEmphasis();if(!this.placeSampledLinks(utc))this.placeLinks(utc);if(!this.frameMemo)this.applyRouteEmphasis(utc);}
+  placeDisplayLinks(utc){this.restoreAnalyticalRouteEmphasis();this.restoreRouteEmphasis();if(!this.placeSampledLinks(utc))this.placeLinks(utc);if(!this.frameMemo){this.applyRouteEmphasis(utc);this.applyAnalyticalRouteEmphasis(utc);}}
   animateLinkFlow(nowMs,utc=this.timeSource?.()){
     if(this.disposed)return;
     // Always recheck scope and endpoints; direct animation calls cannot revive stale results.
     this.placeDisplayLinks(utc);
     const sampledGuard=this.sampledFlowGuard;
-    if(nowMs===undefined)try{nowMs=this.animationNow();}catch{this.restoreRouteEmphasis();if(sampledGuard)this.hideSampledLinks();return;}
+    if(nowMs===undefined)try{nowMs=this.animationNow();}catch{this.restoreAnalyticalRouteEmphasis(true);this.restoreRouteEmphasis();if(sampledGuard)this.hideSampledLinks();return;}
     if(sampledGuard&&!sampledGuard()){this.hideSampledLinks();return;}
-    if(!Number.isFinite(nowMs)){if(!this.frameMemo)this.applyRouteEmphasis(utc);return;}
+    if(!Number.isFinite(nowMs)){if(!this.frameMemo){this.restoreAnalyticalRouteEmphasis();this.applyRouteEmphasis(utc);this.applyAnalyticalRouteEmphasis(utc);}return;}
     const previous=sampledGuard?[]:null;
     for(const entry of this.links.values()){const uniforms=entry.line.material?.uniforms;if(entry.line.show&&entry.state==='locked'&&uniforms&&'time'in uniforms){previous?.push([uniforms,uniforms.time]);uniforms.time=nowMs/1000*OISL_FLOW_RATE;}}
     if(sampledGuard&&!sampledGuard()){for(const [uniforms,time]of previous)uniforms.time=time;this.hideSampledLinks();}
-    if(!this.frameMemo)this.applyRouteEmphasis(utc);
+    if(!this.frameMemo){this.restoreAnalyticalRouteEmphasis();this.applyRouteEmphasis(utc);this.applyAnalyticalRouteEmphasis(utc);}
   }
-  setLinksVisible(visible){if(this.disposed)return false;this.linksVisible=visible!==false;this.placeDisplayLinks(this.timeSource?.());return this.linksVisible;}
+  setLinksVisible(visible){if(this.disposed)return false;if(visible===false)this.restoreAnalyticalRouteEmphasis(true);this.linksVisible=visible!==false;this.placeDisplayLinks(this.timeSource?.());return this.linksVisible;}
   removeLink(key){const entry=this.links.get(key);if(!entry)return;entry.line.show=false;try{this.linkPolylines?.remove(entry.line);}catch{/* Owned primitive already gone. */}this.links.delete(key);}
-  clearLinks(){this.routeGeneration++;this.restoreRouteEmphasis();this.linkGeneration++;for(const key of [...this.links.keys()])this.removeLink(key);this.linkReceipt=null;this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.sampledPairValidation=null;}
+  clearLinks(){this.restoreAnalyticalRouteEmphasis(true);this.routeGeneration++;this.restoreRouteEmphasis();this.linkGeneration++;for(const key of [...this.links.keys()])this.removeLink(key);this.linkReceipt=null;this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.sampledPairValidation=null;}
 
   select(id){if(this.disposed)return;this.selectedId=id==null?null:String(id);this.refreshMarkerStyles();this.placePoints(this.timeSource?.());this.placeModels(this.timeSource?.());for(const [key,p]of this.paths)p.entity.show=p.positions.length>1&&key!==this.selectedId&&this.tracksVisible()!==false;}
   setModelsVisible(visible){this.modelsVisible=visible!==false;this.placeModels(this.timeSource?.());return this.modelsVisible;}
@@ -370,7 +407,7 @@ export class NodeScene{
     finally{
       // A callback may replace a selection, Viewer or UTC within this frame.
       // Suppress every owned primitive rather than publish a mixture of scopes.
-      if(!this.frameCurrent(frame)){this.restoreRouteEmphasis();for(const p of this.points.values())p.show=false;for(const label of this.labels.values())label.show=false;for(const m of this.models.values())m.model.show=false;for(const link of this.links.values())link.line.show=false;}else this.applyRouteEmphasis(utc);
+      if(!this.frameCurrent(frame)){this.restoreAnalyticalRouteEmphasis(true);this.restoreRouteEmphasis();for(const p of this.points.values())p.show=false;for(const label of this.labels.values())label.show=false;for(const m of this.models.values())m.model.show=false;for(const link of this.links.values())link.line.show=false;}else{this.applyRouteEmphasis(utc);this.applyAnalyticalRouteEmphasis(utc);}
       if(this.frameMemo===frame)this.frameMemo=null;
     }
   }
