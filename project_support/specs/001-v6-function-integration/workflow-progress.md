@@ -1567,3 +1567,6 @@ Earlier526/533 unknown snapshots were taken before asynchronous native display/p
 
 
 Actual572 settles the single legacy native query: fullaccepted40, same exact 3h UTC, selectedstation24 contacts/1page. Public tables contain24 contacts,50 links,12 future rows. Fabric send/refresh/route all disabled and module status unknown while fabric says pending; this is unresolved, not a pass. Separate readonly server GET data-fabric/status responds249ms reachable guarded-v1 same instance sequence63; UI request/state lifecycle diagnosis started without weakening guards. T178/T180 and whole75-84 remainopen.
+
+
+Fabric follow-up: current agent/read-only tests reproduce healthy status GET concurrent with a held network POST;55 focused PASS379.7496ms. This is fake transport diagnostic, not live acceptance. Actual574 bounded39s Page request/response/terminal listeners register but return empty arrays; public UI remainspending. ResourceTiming count250 is full; last03:38 entry cannot prove request absence. The one normal retry produced a transient analytical receipt72/DTN display in freshsnapshot, but later sampledstatespending: source lifecycle/route acceptance stillunproven. No producttimeout/bypass/repeatedPOST added. Evidence fabric_pending_readonly_probe.log, fabric_pending_readonly_focused.log and live_N023_20261007_1239/574*.
