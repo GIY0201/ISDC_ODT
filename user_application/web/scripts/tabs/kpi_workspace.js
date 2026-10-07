@@ -81,7 +81,7 @@ export function createKpiPanel(api,drawChart=()=>{},providedDownload){
   let view=null,loaded=false;const urls=new Map();
   function save(file){const blob=new Blob([file.bytes],{type:file.mediaType});const url=URL.createObjectURL(blob),anchor=document.createElement('a');anchor.href=url;anchor.download=file.filename;document.body.prepend(anchor);anchor.click();anchor.remove();const timer=setTimeout(()=>{URL.revokeObjectURL(url);urls.delete(url);},1000);urls.set(url,timer);}
   const controller=createKpiWorkspace(api,draw,providedDownload||save);
-  const visible=()=>['data','compare'].includes(view);
+  const visible=()=>view==='compare';
   function draw(){if(!visible())return;const screen=document.getElementById('screen');let panel=document.getElementById('kpi-workspace');
     if(!panel){if(view==='data')screen.innerHTML='';panel=document.createElement('section');panel.id='kpi-workspace';panel.className='panel';screen.prepend(panel);}
     const s=controller.snapshot(),f=s.display,a=f?.analytics;
@@ -112,5 +112,5 @@ export function createKpiPanel(api,drawChart=()=>{},providedDownload){
     node('kpi-events').innerHTML=`<h3>표시 표본의 최근 SIM 사건</h3><ul>${(f?.events||[]).slice(0,12).map(e=>`<li>${e.simulation_time}s · ${esc(e.type)} · ${esc(e.message)}</li>`).join('')}</ul>`;
     const r=s.report;node('kpi-export').innerHTML=r?`<h3>마지막 내려받기 원본</h3><p>${esc(r.filename)} · ${r.byteLength} bytes · ${r.generated_at?esc(r.generated_at):'CSV에는 생성 시각/실행/출처가 없습니다.'}</p>${r.kind==='csv'?`<div class="cp-table"><table><thead><tr>${['KPI','Name','Value','Target','Unit','Status'].map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${s.csv.map(row=>`<tr>${row.map(x=>`<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<p>현재 표시는 이 JSON 응답의 분석입니다. 실시간 표시 버튼으로 복귀하세요.</p>'}`:'';
   }
-  return {show(next){view=next;if(visible()){draw();if(!loaded){loaded=true;controller.load();}}},update:draw,receive:value=>controller.receive(value),connection:value=>controller.connection(value),applyDraft(items){for(const item of items){if(item.id==='kpi-select'&&typeof item.value==='string')controller.selectKpi(item.value);}},destroy(){controller.destroy();for(const [url,timer]of urls){clearTimeout(timer);URL.revokeObjectURL(url);}urls.clear();},controller};
+  return {show(next){view=next;const panel=document.getElementById('kpi-workspace');if(panel)panel.hidden=!visible();if(visible()){draw();if(!loaded){loaded=true;controller.load();}}},update:draw,receive:value=>controller.receive(value),connection:value=>controller.connection(value),applyDraft(items){for(const item of items){if(item.id==='kpi-select'&&typeof item.value==='string')controller.selectKpi(item.value);}},destroy(){controller.destroy();for(const [url,timer]of urls){clearTimeout(timer);URL.revokeObjectURL(url);}urls.clear();},controller};
 }

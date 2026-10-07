@@ -1,7 +1,7 @@
 // V6 presentation over the reused source mission model/store/scheduler client and UTC timeline.
 const escape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LABELS={target:'관측 지점',target_name:'지점 이름',latitude:'위도 °',longitude:'경도 °',max_off_nadir_deg:'최대 비직하각 °',product_mb:'원본 데이터 MB',processing:'궤도상 처리',processing_ratio:'처리 결과 비율',preferred_satellite:'선호 위성',station:'지상국',source_satellite:'데이터 보유 위성',input_mb:'입력 데이터 MB',output_ratio:'출력 비율',source:'출발점',destination:'도착점',volume_mb:'데이터 MB',max_latency_ms:'지연 제한 ms (0: 제한 없음)',external_id:'외부 위성 카탈로그 번호',external_name:'외부 위성 이름',crosslink_rate_mbps:'가정 수신 속도 Mbps',max_range_km:'교차링크 거리 km',image_mb:'갱신 이미지 MB',apply_s:'위성당 적용 시간 s',max_concurrent:'동시 갱신 수',satellites:'대상 위성 ID (쉼표 구분)'};
-const serviceViews=new Set(['mission','normal']);
+const serviceViews=new Set(['mission']);
 // Port of source mission.js allTasks/renderTimeline and planner affectedTasks.
 // Display projection only; accepted module receipts remain with execution.
 export function projectMissionSchedule({missions=[],context=null,inspection=null,model,selectedId=null,hours=12,rowFilter='busy'}={}){

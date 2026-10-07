@@ -3,15 +3,15 @@ import assert from 'node:assert/strict';
 import {fixture} from './workspace_fixture.mjs';
 for(const [width,height] of [[1280,720],[1920,1080]])test(`V6 source mission console mounts five service kinds ${width}x${height}`,async()=>{const f=fixture(width,height,{hash:'#mission'});try{assert.ok(f.get('source-mission-services'));assert.match(f.get('source-mission-services').innerHTML,/fleet_update/);assert.ok(f.get('ms-plan'));await f.get('ms-plan').dispatch('click');assert.match(f.get('ms-status').textContent,/등록|선택/);await f.win.dispatch('pagehide',{persisted:false});}finally{f.dispose();}});
 
-for(const [width,height] of [[1280,720],[1920,1080]])test(`normal mission view retains service draft across route reconstruction ${width}x${height}`,async()=>{
- const f=fixture(width,height,{hash:'#normal'});
+for(const [width,height] of [[1280,720],[1920,1080]])test(`mission editor retains draft across normal overview without duplication ${width}x${height}`,async()=>{
+ const f=fixture(width,height,{hash:'#mission'});
  try{
-  assert.match(f.get('source-mission-services').innerHTML,/군집 서비스 임무/,'normal mission view must expose original service planning');
+  assert.match(f.get('source-mission-services').innerHTML,/군집 서비스 임무/,'mission editor must expose original service planning');
   assert.equal(f.get('source-mission-services').hidden,false);
   f.get('ms-name').value='unsaved normal request';await f.get('ms-editor').dispatch('input');
-  f.evaluate("location.hash='#mission'");await f.win.dispatch('hashchange');
-  assert.equal(f.get('ms-name').value,'unsaved normal request');
   f.evaluate("location.hash='#normal'");await f.win.dispatch('hashchange');
+  assert.ok(!f.doc.getElementById('source-mission-services')||f.doc.getElementById('source-mission-services').hidden);
+  f.evaluate("location.hash='#mission'");await f.win.dispatch('hashchange');
   assert.equal(f.get('ms-name').value,'unsaved normal request');
   await f.get('ms-plan').dispatch('click');assert.match(f.get('ms-status').textContent,/저장/);
   await f.win.dispatch('pagehide',{persisted:false});

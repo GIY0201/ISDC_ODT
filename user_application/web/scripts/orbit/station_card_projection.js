@@ -11,6 +11,6 @@ export function stationCatalogCard(site,timeline=null,passes=null){
  const model=stationCardModel(site,{selectedName:selected?.name??(selected?`NORAD ${selected.catalog_number}`:null),look,maskDegrees:t.minimumElevation??site.minElevationDeg,isObserver,nextPass:first?{aos:new Date(first.start_utc),maxElevation:first.max_elevation_deg}:null});
  model.live=model.live.map(([key,value])=>key==='다음 관측창'?[key,!selected?'—':!isObserver?'관측 조건 미적용':passes?.pending?'계산 중':passes?.error?'계산 실패 · 미확인':!passMatches?'24 h 구간 미조회':r.status==='none'?'조회한 24 h 내 없음':first?value+(r.status==='partial'?' · 부분 결과 / 누락 가능':''):r.status==='partial'?'부분 실패 · 관측창 미확인':'계산 실패 · 미확인']:[key,value]);
  model.observationUtc=matching&&look?v.observation_utc:null;
- model.note+=' Rust SGP4·IERS-A 관측 표본을 재사용하며, 다른 지점·GP·UTC 결과는 섞지 않습니다. 실제 통신·장비 상태 미확인.';
+ model.note+=' SGP4 궤도 모델과 IERS-A 관측 표본을 재사용하며, 다른 지점·GP·UTC 결과는 섞지 않습니다. 실제 통신·장비 상태 미확인.';
  return model;
 }

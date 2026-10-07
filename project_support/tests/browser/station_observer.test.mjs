@@ -18,10 +18,10 @@ for(const [w,h] of [[1280,720],[1920,1080]])test(`station explicit draft preserv
   assert.match(f.get('visibility-result').innerHTML,/実際|실제 통신 미확인/);assert.equal(f.viewers.length,1);
  }finally{f.dispose();}
 });
-test('invalid/busy presets preserve draft and satellite handoff stages before ground panel exists',async()=>{
+test('invalid presets preserve draft and direct handoff stages before ground panel exists',async()=>{
  const f=fixture(1280,720,{hash:'#satellite'});try{
   f.context.testSite={...GROUND_STATIONS.DAEJEON,latitude:NaN};assert.equal(vm.runInContext('groundPanel.stageStation(testSite)',f.context),false);
-  f.get('station-select').value='SVALBARD';await f.get('station-select').dispatch('change');await f.get('station-use').dispatch('click');assert.equal(f.context.location.hash,'ground');f.context.location.hash='#ground';await f.win.dispatch('hashchange');
+  assert.equal(f.doc.getElementById('station-workspace'),null);f.context.testSite=GROUND_STATIONS.SVALBARD;assert.equal(vm.runInContext('groundPanel.stageStation(testSite)',f.context),true);f.context.location.hash='#ground';await f.win.dispatch('hashchange');
   assert.equal(f.get('ground-lat').value,'78.2298');assert.equal(f.get('ground-angle').value,'3');assert.equal(f.get('ground-height').value,'0');assert.equal(f.counts().commands,0);
  }finally{f.dispose();}
 });

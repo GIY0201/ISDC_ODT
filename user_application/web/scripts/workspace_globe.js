@@ -7,19 +7,40 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let displayVisibility={catalog:true,selected:true};
   const displayReplicas=new Set(),renderProofs=new WeakMap(),renderCopies=new WeakMap();let replicaProvider=null,renderCache=null;
   const freezeRender=value=>{if(value&&typeof value==='object'&&!Object.isFrozen(value)){for(const child of Object.values(value))freezeRender(child);Object.freeze(value);}return value;};
+  let sceneTimeBinding=null,sceneOriginal=null,appliedTimedScene=null,sceneBindingRemoved=false;
+  function unboundSceneCurrent(){const binding=sceneTimeBinding,input=sceneOriginal;if(!binding||!input||scenarioContext||disposed||failed||typeof binding.verifyUnboundSnapshot!=='function')return false;try{return binding.verifyUnboundSnapshot(input)===true&&!disposed&&!failed&&sceneTimeBinding===binding&&sceneOriginal===input&&!scenarioContext;}catch{return false;}}
+  function applyTimedScene(proof){
+    const unbound=!proof&&unboundSceneCurrent(),value=proof||unbound?sceneCopy:null;if(appliedTimedScene===value)return;
+    const binding=sceneTimeBinding;globe.setCatalogScene(value,number=>{if(!disposed&&sceneTimeBinding===binding&&(proof?sceneTimeProof()?.snapshot===proof.snapshot:unboundSceneCurrent()))onCatalogSelect(number);});appliedTimedScene=value;
+    if(proof&&!sceneTimeProof()||unbound&&!unboundSceneCurrent()){globe.setCatalogScene(null,onCatalogSelect);appliedTimedScene=null;}
+  }
+  function sceneTimeProof(){
+    const binding=sceneTimeBinding,input=sceneOriginal,sim=scenarioContext;
+    if(!binding||!input||disposed||failed)return null;
+    try{const view=binding.read();
+      if(!view||view.presentation_kind!=='CATALOGUE_SCENE_TIME_UI_V1'||!Object.isFrozen(view)||view.snapshot!==input||view.analysis_utc!==input.utc||input.frame!=='ITRF'||input.leap_sha256!==LEAP_SHA256||!['sim','stored','catalog'].includes(view.source_kind)||typeof view.running!=='boolean'||typeof view.source_key!=='string'||!view.source_key.startsWith(`${view.source_kind}:`))return null;
+      if(scenarioUtcCodec.advance(view.analysis_utc,0)!==view.analysis_utc||scenarioUtcCodec.advance(view.display_utc,0)!==view.display_utc)return null;
+      const age=scenarioUtcCodec.difference(view.display_utc,view.analysis_utc);if(!Number.isFinite(age)||age<0||!view.running&&age!==0)return null;
+      if(sim){const context=validScenarioContext();if(!context||view.source_kind!=='sim'||view.source_key!==context.key||view.running!==Boolean(context.projected)||!view.running&&view.display_utc!==context.utc)return null;}
+      if(binding.verify(view)!==true)return null;
+      if(sim){const current=validScenarioContext();if(!current||current.key!==view.source_key||!view.running&&current.utc!==view.display_utc)return null;}
+      return !disposed&&!failed&&sceneTimeBinding===binding&&sceneOriginal===input&&scenarioContext===sim?view:null;
+    }catch{return null;}
+  }
   function renderProjection(){
-    const context=displayContext(),key=JSON.stringify(context),refs=[latest,catalog,sceneCopy,trackInput,stations,selectedStation,groundPoint,modelDescription,modelSource,scenarioContext];
+    const context=displayContext(),sceneProof=sceneTimeProof(),unboundScene=!sceneProof&&unboundSceneCurrent(),key=JSON.stringify(context),refs=[latest,catalog,sceneCopy,trackInput,stations,selectedStation,groundPoint,modelDescription,modelSource,scenarioContext,sceneTimeBinding,sceneProof,unboundScene,sceneBindingRemoved];
     if(renderCache&&renderCache.key===key&&refs.every((value,index)=>value===renderCache.refs[index]))return renderCache.value;
     const borrow=item=>{if(!item||typeof item!=='object')return item;let value=renderCopies.get(item);if(!value){value=freezeRender(structuredClone(item));renderCopies.set(item,value);}return value;};
-    const value=freezeRender({context:borrow(context),selected:borrow(scenarioContext?null:validPosition(catalog)?catalog:latest),scene:borrow(scenarioContext?null:sceneCopy),track:borrow(scenarioContext?null:trackInput),stations:borrow(stations),selectedStation,groundPoint:borrow(groundPoint),model:borrow(modelDescription)});
+    const value=freezeRender({context:borrow(context),selected:borrow(scenarioContext?null:validPosition(catalog)?catalog:latest),scene:borrow(sceneTimeBinding?sceneProof||unboundScene?sceneCopy:null:scenarioContext||sceneBindingRemoved?null:sceneCopy),track:borrow(scenarioContext?null:trackInput),stations:borrow(stations),selectedStation,groundPoint:borrow(groundPoint),model:borrow(modelDescription)});
     const runtime=context?.projected?JSON.stringify(scenarioBinding.readRuntime()):null;
-    renderCache={key,refs,value};renderProofs.set(value,{key,refs,runtime,binding:scenarioBinding});return value;
+    renderCache={key,refs,value};renderProofs.set(value,{key,refs,runtime,binding:scenarioBinding,sceneProof,unboundScene,sceneBinding:sceneTimeBinding,sceneBindingRemoved});return value;
   }
   function verifyRenderProjection(value){const proof=renderProofs.get(value);if(!proof)return false;const reject=()=>{renderProofs.delete(value);if(renderCache?.value===value)renderCache=null;return false;};if(disposed||failed||!globe)return reject();try{
     const context=displayContext();if(!context)return reject();
     const scope=item=>{if(!item)return null;const{utc,projection_age_ms,...rest}=item;return rest;};
     const timeCurrent=value.context?.projected?Boolean(context?.projected)&&context.projection_age_ms>=value.context.projection_age_ms&&JSON.stringify(scope(context))===JSON.stringify(scope(value.context))&&proof.binding===scenarioBinding&&JSON.stringify(scenarioBinding.readRuntime())===proof.runtime:JSON.stringify(context)===proof.key;
-    return timeCurrent&&[latest,catalog,sceneCopy,trackInput,stations,selectedStation,groundPoint,modelDescription,modelSource,scenarioContext].every((item,index)=>item===proof.refs[index])&&!disposed&&!failed&&!!globe&&proof.binding===scenarioBinding||reject();
+    const sceneCurrent=proof.sceneBinding===sceneTimeBinding&&proof.sceneBindingRemoved===sceneBindingRemoved&&(!proof.unboundScene||unboundSceneCurrent())&&(!proof.sceneProof||sceneTimeBinding?.verify(proof.sceneProof)===true&&sceneTimeProof()?.snapshot===proof.sceneProof.snapshot);
+    return sceneCurrent&&timeCurrent&&[latest,catalog,sceneCopy,trackInput,stations,selectedStation,groundPoint,modelDescription,modelSource,scenarioContext].every((item,index)=>item===proof.refs[index])&&!disposed&&!failed&&!!globe&&proof.binding===scenarioBinding&&proof.sceneBinding===sceneTimeBinding||reject();
   }catch{return reject();}}
   function syncDisplayReplicas(){for(const replica of [...displayReplicas])replica.sync();}
   let catalogLabelsVisible=true,attributionBinding=null;
@@ -189,8 +210,9 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     focusButton.disabled=true;
     if(!globe){if(!failed)describe('Cesium 준비 중 · 계산 위치는 아직 표시하지 않습니다.');return;}
     try{
-      if(scenarioContext){globe.update(null);globe.setCatalogScene(null,onCatalogSelect);globe.setCatalogTrack(null);container.dataset.orbitVisible='false';const sim=validScenarioContext();describe(sim?`SIM ${sim.projected?'보간 표시':'정지 표시'} UTC ${sim.utc} · 실제 수신/실측 아님 · GP 위치는 이 UTC로 재표시하지 않습니다.`:'현재 SIM 실행과 일치하는 신선한 표시 UTC가 없습니다.');return;}
+      if(scenarioContext){globe.update(null);const proof=sceneTimeProof();if(sceneTimeBinding)applyTimedScene(proof);else{globe.setCatalogScene(null,onCatalogSelect);appliedTimedScene=null;}globe.setCatalogTrack(null);container.dataset.orbitVisible='false';const sim=validScenarioContext();describe(sim?`SIM ${sim.projected?'보간 표시':'정지 표시'} UTC ${sim.utc}${proof?` · 전체 ${sceneMetadata?.valid_count??0}개 · native 분석 UTC ${proof.analysis_utc}`:''} · 실제 수신/실측 아님 · GP 위치는 이 UTC로 재표시하지 않습니다.`:'현재 SIM 실행과 일치하는 신선한 표시 UTC가 없습니다.');syncDisplayReplicas();return;}
       const display=validPosition(catalog)?catalog:latest;
+      if(sceneTimeBinding)applyTimedScene(sceneTimeProof());
       const shown=globe.update(display);
       globe.setCatalogObservationLine?.(display===catalog?catalog:null);
       globe.setGroundPoint(groundPoint);
@@ -256,6 +278,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       binding.sync=()=>{
         if(!current()){if(!binding.dead)hide();return false;}
         try{
+          owner.setAttributionAccess(Boolean(attributionBinding));if(!current())return false;
           // Geographic imagery does not require a satellite time or native position receipt.
           const style={theme:choice.theme,emphasis:choice.emphasis,imagery:choice.imagery},styleKey=JSON.stringify(style);
           if(binding.styleKey!==styleKey){owner.setViewStyle(style.theme,style.emphasis);if(!current())return false;if(binding.imagery!==style.imagery){binding.imagery=style.imagery;void owner.setViewImagery(style.imagery);}if(!current())return false;binding.styleKey=styleKey;}
@@ -282,8 +305,8 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
     showAttribution(){return !disposed&&!failed&&(globe?.showAttribution()??false);},
     bindAttributionAccess(){
       if(disposed||failed)return()=>{};
-      const binding={};attributionBinding=binding;globe?.setAttributionAccess(true);
-      return()=>{if(attributionBinding!==binding)return;attributionBinding=null;globe?.setAttributionAccess(false);};
+      const binding={};attributionBinding=binding;globe?.setAttributionAccess(true);for(const replica of displayReplicas)replica.sync();
+      return()=>{if(attributionBinding!==binding)return;attributionBinding=null;globe?.setAttributionAccess(false);for(const replica of displayReplicas)replica.sync();};
     },
     captureDisplayContinuity,verifyDisplayContinuity,
     observeDisplayContinuity(fn){if(typeof fn!=='function')throw new TypeError('display continuity observer required');if(disposed)return()=>{};continuityObservers.add(fn);return()=>continuityObservers.delete(fn);},
@@ -305,7 +328,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       return()=>{if(scenarioBinding!==binding)return;scenarioBinding=null;notifyDisplay();};
     },
     setScenarioDisplayContext(value){if(disposed)return false;if(!validScenarioContext(value)){if(scenarioContext)paint();return false;}scenarioContext=structuredClone({run_id:value.run_id,utc:value.utc,leap_sha256:value.leap_sha256});paint();return true;},
-    clearScenarioDisplayContext(run_id){if(disposed||!scenarioContext||scenarioContext.run_id!==run_id)return false;scenarioContext=null;try{globe?.setCatalogScene(sceneCopy,onCatalogSelect);globe?.setCatalogTrack(trackInput);paint();}catch{fail();}return true;},
+    clearScenarioDisplayContext(run_id){if(disposed||!scenarioContext||scenarioContext.run_id!==run_id)return false;scenarioContext=null;try{if(!sceneTimeBinding&&!sceneBindingRemoved)globe?.setCatalogScene(sceneCopy,onCatalogSelect);globe?.setCatalogTrack(trackInput);paint();}catch{fail();}return true;},
     palette(theme){return !disposed&&!failed?globe?.palette?.(theme)??{}:{};},
     cameraState,
     observeCamera(fn){if(disposed)return()=>{};cameraObservers.add(fn);fn({...cameraState()});return()=>cameraObservers.delete(fn);},
@@ -373,12 +396,19 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       const proof=value=>current()&&verify(value)===true&&current();
       try{if(!proof(station))return false;const result=owner.focusGroundNetworkStation?.(station,{verify:proof})===true;if(result&&proof(station)){focused=true;return true;}return false;}catch{return false;}
     },
+    bindCatalogueSceneTime(ports){
+      if(disposed||typeof ports?.read!=='function'||typeof ports?.verify!=='function')throw TypeError('explicit catalogue scene time proof ports required');
+      const binding={read:ports.read,verify:ports.verify,verifyUnboundSnapshot:ports.verifyUnboundSnapshot};sceneTimeBinding=binding;sceneBindingRemoved=false;appliedTimedScene=undefined;renderCache=null;paint();
+      return()=>{if(sceneTimeBinding!==binding)return;sceneTimeBinding=null;sceneBindingRemoved=true;appliedTimedScene=null;renderCache=null;globe?.setCatalogScene(null,onCatalogSelect);paint();};
+    },
     catalogScene(value,onSelect){
       if(disposed)return;onCatalogSelect=onSelect;
+      sceneOriginal=value;
+      sceneBindingRemoved=false;
       if(value){const {rows,...metadata}=value;sceneMetadata=structuredClone(metadata);}else sceneMetadata=null;
       sceneCopy=value?structuredClone(value):null;
       sceneInput=globe?null:sceneCopy;
-      try{globe?.setCatalogScene(scenarioContext?null:value,onSelect);container.dataset.catalogCount=String(value?.valid_count??0);paint();}catch{fail();}
+      try{if(!sceneTimeBinding)globe?.setCatalogScene(scenarioContext?null:value,onSelect);container.dataset.catalogCount=String(value?.valid_count??0);paint();}catch{fail();}
     },
     setCatalogLabels(value){if(disposed)return false;catalogLabelsVisible=Boolean(value);try{globe?.setCatalogLabels(catalogLabelsVisible);}catch{fail();}return catalogLabelsVisible;},
     catalogLabelsVisible(){return catalogLabelsVisible;},
@@ -395,6 +425,6 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       paint();
       if(!scenarioContext&&!catalog&&!latest&&!sceneMetadata&&globe&&(displayUtc||snapshot.error))describe(`표시 UTC ${displayUtc||'미제공'} · ${snapshot.error||'해당 시각 데이터 준비 중 / 자료 없으면 위치 미표시'} · 실제 통신 미확인`);
     },
-    destroy(){if(disposed)return;disposed=true;for(const replica of [...displayReplicas])replica.destroy();renderCache=null;groundInteractionBinding=null;globe?.setGroundNetworkInteraction?.(null);const continuity=catalogContinuity;catalogContinuity=null;continuityCache=null;continuityObservers.clear();try{continuity?.remove?.();}catch{/* Release other renderer owners. */}scenarioBinding=null;scenarioContext=null;sceneCopy=null;cameraObservers.clear();nodeInteractionBinding=null;nodeObservers.clear();detachNodes();nodeBinding=null;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;displayObservers.clear();hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
+    destroy(){if(disposed)return;disposed=true;for(const replica of [...displayReplicas])replica.destroy();renderCache=null;groundInteractionBinding=null;globe?.setGroundNetworkInteraction?.(null);const continuity=catalogContinuity;catalogContinuity=null;continuityCache=null;continuityObservers.clear();try{continuity?.remove?.();}catch{/* Release other renderer owners. */}scenarioBinding=null;scenarioContext=null;sceneCopy=null;sceneTimeBinding=null;sceneOriginal=null;appliedTimedScene=null;cameraObservers.clear();nodeInteractionBinding=null;nodeObservers.clear();detachNodes();nodeBinding=null;solarRenderer?.destroy();solarRenderer=null;solarFactory=null;displayObservers.clear();hoverObservers.clear();viewObservers.clear();modelObservers.clear();++modelRevision;modelDescription=null;modelSource=null;++modeRevision;host.clearTimeout(timer);host.removeEventListener('load',boot);focusButton.removeEventListener('click',focus);removeError?.();globe?.destroy();globe=null;latest=null;sceneInput=null;sceneMetadata=null;trackInput=null;},
   };
 }

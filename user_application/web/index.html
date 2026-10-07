@@ -31,7 +31,7 @@
       <div class="rail-foot"><button type="button" class="button" data-view="settings"><svg class="rail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m10 3-.6 2.5-2 .9-2.3-.8-2 3.4 1.8 1.7-.2 2.3L3 14.7l2 3.5 2.4-.7 2 .9.6 2.6h4l.6-2.6 2-.9 2.4.7 2-3.5-1.7-1.7-.2-2.3L21 9l-2-3.4-2.3.8-2-.9L14 3Z"/><circle cx="12" cy="12" r="3"/></svg><span class="rail-label">환경 설정</span></button></div>
     </aside>
     <div class="app">
-      <div class="context"><div class="identity"><b id="context-id">현재 대상 미선택</b><span id="context-rel">자료 준비 중</span></div><span id="current-mode" class="badge gray">운용 모드 미확인</span><div class="provenance"><span><i class="key observed"></i>운용 예시</span><span><i class="key planned"></i>계획</span><span><i class="key assumed"></i>DT 가정</span><span><i class="key missing"></i>미연동·미확인</span></div></div>
+      <div class="context"><div class="identity"><b id="context-id">현재 대상 미선택</b><span id="context-rel">자료 준비 중</span></div><div class="header-mode-control"><button type="button" id="current-mode" class="badge gray" aria-label="운용 모드 변경" aria-haspopup="menu" aria-expanded="false" aria-controls="workspace-mode-picker">운용 모드 미확인</button><div id="workspace-mode-picker" class="header-mode-picker" hidden><div id="workspace-mode-items" role="menu" aria-label="운용 모드"></div><p id="workspace-mode-status" role="status" aria-live="polite" hidden></p></div></div><div class="provenance"><span><i class="key observed"></i>운용 예시</span><span><i class="key planned"></i>계획</span><span><i class="key assumed"></i>DT 가정</span><span><i class="key missing"></i>미연동·미확인</span></div></div>
       <div class="alertline" hidden><b>사건 예시</b><span id="alert-text">E-014 링크 품질 저하 · 실제 경보·우선순위 판정 없음</span><button id="alert-open" type="button">운용 창 열기</button></div>
       <div class="desktop" id="desktop">
         <div id="workspace-time-dock"></div>
@@ -40,7 +40,7 @@
         <div id="orbit-solar-overlay" class="space-sun" hidden aria-hidden="true"></div>
         </div>
         <section class="glass overview" aria-label="선택 위성 빠른 상태"><div class="eyebrow">선택 위성 · 빠른 상태</div><img id="desktop-sat-thumbnail" hidden alt="선택 위성의 연결된 3D 모델 미리보기"><strong id="desktop-sat-name">위성 미선택</strong><div id="desktop-sat-status">상태 자료 준비 중</div><dl><div><dt>다음 접촉</dt><dd id="desktop-next">접촉 자료 없음</dd></div><div><dt>사건</dt><dd id="desktop-event">실제 사건 미확인</dd></div><div><dt>자료 시각</dt><dd id="desktop-data-utc">자료 시각 미확인</dd></div></dl><button id="orbit-globe-focus" type="button" disabled>계산 위치로 이동</button><details id="desktop-sat-details"><summary>상세정보</summary><div class="orbit-globe-caption"><p id="orbit-globe-status" role="status">Cesium 준비 중</p></div></details><button type="button" data-view="satellite">위성 상태·궤도 열기</button></section>
-        <div class="scene-credit" id="desktop-scene-credit">NASA Blue Marble / Cesium WGS84 · 현재 계산 출처 미확인</div>
+        <div class="scene-credit" id="desktop-scene-credit" hidden>NASA Blue Marble / Cesium WGS84 · 현재 계산 출처 미확인</div>
       </div>
     </div>
   </div>

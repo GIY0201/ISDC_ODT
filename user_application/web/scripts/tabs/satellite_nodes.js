@@ -599,17 +599,19 @@ function createNodeWorkPanel({root,store,readPresentation=null,editorTools,now,t
 
 function workPanelMarkup({sampledLinks=false}={}){return `<div class="satellite-node-work-panel">
 <header class="ns-scene-toolbar" aria-label="공용 지구의 내 위성 제어">
-<div><button type="button" data-node-scene="home">뷰 초기화</button><button type="button" data-node-scene="focus" disabled>뷰 정렬</button><button type="button" data-node-scene="tracks" aria-pressed="false" disabled>궤적</button><button type="button" data-node-scene="links" aria-pressed="false" disabled>OISL 링크</button><button type="button" data-node-scene="models" aria-pressed="false" disabled>3D 모델</button></div>
-<div class="ns-clock"><button type="button" id="node-lighting" aria-pressed="false" disabled>☀</button><span id="node-clock-mode">표시 시각 미확인</span><time id="node-clock">—</time><small>UTC</small><button type="button" id="node-clock-back" disabled>−60s</button><button type="button" id="node-clock-pause" aria-label="분석 시계 재생 상태 미확인" disabled>Ⅱ</button><button type="button" id="node-clock-forward" disabled>+60s</button><select id="node-clock-speed" aria-label="분석 배속" disabled><option value="1">×1</option><option value="10">×10</option><option value="60">×60</option><option value="600">×600</option></select><button type="button" id="node-clock-now" disabled>현재</button></div>
-<div class="ns-zoom"><button type="button" id="node-zoom-in" aria-label="공용 지구 확대" disabled>+</button><input id="node-zoom" type="range" min="0" max="100" step="0.1" value="50" aria-label="공용 지구 확대 수준" disabled><button type="button" id="node-zoom-out" aria-label="공용 지구 축소" disabled>−</button></div>
+<div class="ns-control-group ns-view" role="group" aria-label="지구 보기"><span class="ns-control-heading">지구 보기</span><div class="ns-control-actions"><button type="button" data-node-scene="home">뷰 초기화</button><button type="button" data-node-scene="focus" disabled>뷰 정렬</button><button type="button" data-node-scene="tracks" aria-pressed="false" disabled>궤적</button><button type="button" data-node-scene="links" aria-pressed="false" disabled>OISL 링크</button><button type="button" data-node-scene="models" aria-pressed="false" disabled>3D 모델</button><button type="button" id="node-lighting" aria-pressed="false" aria-label="햇빛 표시" disabled>햇빛</button></div></div>
+<div class="ns-control-group ns-clock" role="group" aria-label="분석 시각"><span class="ns-control-heading">분석 시각</span><div class="ns-control-actions"><span id="node-clock-mode">표시 시각 미확인</span><time id="node-clock">—</time><small>UTC</small><button type="button" id="node-clock-back" disabled>−60s</button><button type="button" id="node-clock-pause" aria-label="분석 시계 재생 상태 미확인" disabled>Ⅱ</button><button type="button" id="node-clock-forward" disabled>+60s</button><select id="node-clock-speed" aria-label="분석 배속" disabled><option value="1">×1</option><option value="10">×10</option><option value="60">×60</option><option value="600">×600</option></select><button type="button" id="node-clock-now" disabled>현재</button></div></div>
+<div class="ns-control-group ns-zoom" role="group" aria-label="확대·축소"><span class="ns-control-heading">확대·축소</span><div class="ns-control-actions"><button type="button" id="node-zoom-in" aria-label="공용 지구 확대" disabled>+</button><input id="node-zoom" type="range" min="0" max="100" step="0.1" value="50" aria-label="공용 지구 확대 수준" disabled><button type="button" id="node-zoom-out" aria-label="공용 지구 축소" disabled>−</button></div></div>
 </header><p class="ns-note">공용 지구와 표시 UTC를 사용합니다. Kepler+J2 모의 노드 · 실제 통신 미확인</p>
 <section class="ns-formation ns-panel" aria-label="편대 배치 도구">
           <header class="ns-formation-head">
             <h2>편대 배치</h2>
             <div class="ns-preset" role="group" aria-label="배치 프리셋"><button data-formation-preset="single" aria-pressed="false">단일</button><button data-formation-preset="train" aria-pressed="false">열차형</button><button data-formation-preset="walker_delta" aria-pressed="true">Walker Δ</button><button data-formation-preset="walker_star" aria-pressed="false">Walker ★</button></div>
+            <div class="ns-formation-inputs">
             <label data-tip="생성되는 위성 이름의 접두사입니다. Walker는 접두사-면기호번호(ODT-A1), 열차형은 접두사-번호(ODT-1)로 이름을 붙입니다.">이름 접두사 <input type="text" id="formation-prefix" maxlength="12" value="ODT" autocomplete="off"></label>
-            <label>버스 <select id="formation-bus" aria-label="버스 프리셋" data-tip="위성 버스 프리셋"></select></label>
-            <label>OISL <select id="formation-links" aria-label="OISL 링크 정책" data-tip="OISL 링크 정책"></select></label>
+            <label>위성 버스 <select id="formation-bus" aria-label="버스 프리셋" data-tip="위성 버스 프리셋"></select></label>
+            <label>OISL 연결 정책 <select id="formation-links" aria-label="OISL 링크 정책" data-tip="OISL 링크 정책"></select></label>
+            </div>
           </header>
           <div class="ns-sliders" id="formation-controls"></div>
           <footer class="ns-formation-foot">

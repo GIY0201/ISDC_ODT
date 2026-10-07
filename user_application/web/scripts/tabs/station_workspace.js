@@ -16,7 +16,7 @@ export function createStationSelection(sites,onSelect=()=>{},onFocus=()=>{},noti
 export function createStationPanel(sites,groups,{select=()=>{},focus=()=>{},use=()=>{},useCatalog=()=>{},getCatalogTimeline=()=>null,getCatalogPasses=()=>null,queryCatalogPasses=()=>{}}={}){
  let view=null;const controller=createStationSelection(sites,select,focus,draw);
  function draw(){
-  if(!['satellite','ground'].includes(view))return;
+  if(view!=='ground')return;
   const screen=document.getElementById('screen');let panel=document.getElementById('station-workspace');
   if(!panel){panel=document.createElement('section');panel.id='station-workspace';panel.className='panel';screen.prepend(panel);panel.innerHTML=`<header><h2>지상국 목록과 지구 선택</h2></header><div class="body"><p>대표 지상국 설정입니다. 실제 시설 좌표·높이·장비 사양과 수신 상태는 미확인입니다. 선택은 지구 표시만 바꾸며 저장 궤도와 가상 계산 지점은 유지합니다.</p><label>지상국 지역 <select id="station-region"></select></label><label>표시 지상국 <select id="station-select"></select></label><button class="button" id="station-focus">선택 지상국으로 이동</button> <button class="button" id="station-clear">지상국 선택 해제</button><button class="button" id="station-use">좌표·최소각을 계산 초안에 사용</button><button class="button" id="station-catalog-use">카탈로그 관측 초안에 사용</button><p id="station-status" role="status"></p><button class="button" id="station-pass-query">선택 관측 기준의 24시간 구간 조회</button><p id="station-observation-status" role="status"></p><div id="station-live"></div><div id="station-detail"></div></div>`;
    panel.querySelector('#station-pass-query').addEventListener('click',()=>queryCatalogPasses());
@@ -34,5 +34,5 @@ export function createStationPanel(sites,groups,{select=()=>{},focus=()=>{},use=
   node('station-observation-status').textContent=card?`${card.state==='visible'?'최소각 충족':card.state==='hidden'?'최소각 미충족':card.state==='none'?'위성 미선택':'관측 표본 미확인'} · ${card.observationUtc?'관측 수치 UTC '+card.observationUtc:'현재 선택 지점의 관측 조건을 시간 탐색에서 적용·계산하세요.'} · 실제 통신 미확인`:'';
   node('station-live').innerHTML=card?`<dl>${card.live.map(([key,value])=>`<dt>${escape(key)}</dt><dd>${escape(value)}</dd>`).join('')}</dl><p>${escape(card.note)}</p>`:'';node('station-detail').innerHTML=card?`<h3>${escape(card.title)} · ${escape(card.subtitle)}</h3><p>${escape(card.kicker)} · 원본 대표 설정</p><dl>${card.facts.map(([key,value])=>`<dt>${escape(key==='고도'?'대표 프리셋 높이 · 실측 미확인':key)}</dt><dd>${escape(value)}</dd>`).join('')}</dl><p>자료 출처: 원본 고정 지상국 목록. 안테나·대역·최소 고각은 대표 설정입니다. 지도 선택만으로 계산 지점을 적용하지 않습니다. 계산 초안 버튼은 좌표·최소각만 가져오며 높이를 확인한 뒤 적용해야 합니다. 저장 궤도와 카탈로그 표시 위성은 별개입니다. 실제 수신 미확인.</p>`:'';
  }
- return{controller,show(next){view=next;if(!['satellite','ground'].includes(view)){document.getElementById('station-workspace')?.remove();return;}draw();},update:draw,destroy:()=>controller.destroy()};
+ return{controller,show(next){view=next;if(view!=='ground'){document.getElementById('station-workspace')?.remove();return;}draw();},update:draw,destroy:()=>controller.destroy()};
 }

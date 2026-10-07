@@ -90,7 +90,12 @@ test('unavailable shared camera disables home before it can release tracking',as
 test('formation/inspector markup and source presentation rules match pinned original static receipt',async()=>{
   const {tools}=setup();const fixture=JSON.parse(await readFile(new URL('../fixtures/original_node_work_panel.json',import.meta.url),'utf8'));
   const formation=fixture.formationMarkup.replace('id="nodes-deploy" class="ns-deploy"','id="nodes-deploy" class="ns-deploy" disabled').replace('대시보드 미반영','서버 배치 미확인').replace('작업 세트의 사본을 대시보드(궤도 탭) 카탈로그에 반영합니다. 대시보드의 SDC 버튼으로 내 위성만 볼 수 있습니다.','서버 수락 경로 연결 후 명시적으로 배치합니다. 현재는 서버 배치 미확인입니다.').replace('대시보드에서 내 위성을 모두 제거합니다. 작업 세트는 유지됩니다.','서버 수락 경로 연결 후 명시적으로 회수합니다. 작업 세트는 유지됩니다.');
-  assert.ok(tools.workPanelMarkup().includes(formation.replaceAll('\r\n','\n')));assert.ok(tools.workPanelMarkup().includes(fixture.inspectorMarkup.replaceAll('\r\n','\n')));
+  // The user requested a readable grouped header; source controls/footer and inspector remain exact.
+  const withoutHeader=value=>value.replace(/<header class="ns-formation-head">[\s\S]*?<\/header>/,'');
+  assert.ok(withoutHeader(tools.workPanelMarkup()).includes(withoutHeader(formation.replaceAll('\r\n','\n'))));assert.ok(tools.workPanelMarkup().includes(fixture.inspectorMarkup.replaceAll('\r\n','\n')));
+  const sourcePresets=formation.match(/<div class="ns-preset"[\s\S]*?<\/div>/)[0];
+  assert.ok(tools.workPanelMarkup().includes(sourcePresets));
+  for(const id of ['formation-prefix','formation-bus','formation-links'])assert.equal([...tools.workPanelMarkup().matchAll(new RegExp('id="'+id+'"','g'))].length,1);
   const css=await readFile(new URL('../../../user_application/web/styles/satellite_nodes.css',import.meta.url),'utf8');
   for(const rule of fixture.presentationRules)assert.ok(css.includes(rule.replaceAll('#view-nodes','.satellite-node-work-panel')),rule);
   assert.deepEqual(fixture.zoomWheelAmounts,[120,-120]);

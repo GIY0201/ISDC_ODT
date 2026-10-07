@@ -45,7 +45,7 @@ test('environment settings reuse the one shared globe controls and preserve pref
  try{
   assert.ok(f.get('globe-view'));assert.ok(f.get('st-diagnostics'));assert.equal(f.doc.getElementById('st-host'),null);assert.equal(f.get('screen').children[0].id,'globe-view');
   f.get('globe-theme').value='light';await f.get('globe-theme').dispatch('change');
-  f.evaluate("location.hash='#satellite'");await f.win.dispatch('hashchange');assert.equal(f.get('globe-theme').value,'light');
+  f.evaluate("location.hash='#satellite'");await f.win.dispatch('hashchange');assert.equal(f.doc.getElementById('globe-view'),null);assert.equal(f.evaluate('globe.viewState().choice.theme'),'light');
   f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');assert.equal(f.get('globe-theme').value,'light');assert.equal(f.viewers.length,1);
  }finally{f.dispose();}
 });
@@ -87,7 +87,7 @@ for(const view of ['settings','integration'])test(`${view} hides target quickbar
 test('satellite to environment route cannot recreate stale satellite panels during transition',async()=>{
  const f=fixture(1280,720,{hash:'#satellite'});
  try{
-  assert.ok(f.doc.getElementById('satellite-model-panel'));assert.ok(f.doc.getElementById('station-workspace'));assert.ok(f.doc.getElementById('catalog-workspace'));
+  assert.ok(f.doc.getElementById('satellite-model-panel'));assert.equal(f.doc.getElementById('station-workspace'),null);assert.ok(f.doc.getElementById('catalog-workspace'));
   f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');
   for(const id of ['satellite-model-panel','station-workspace','catalog-workspace'])assert.equal(f.doc.getElementById(id)?.isConnected===true,false,id);
   assert.ok(f.doc.getElementById('source-environment-settings'));assert.ok(f.doc.getElementById('globe-view'));assert.equal(f.viewers.length,1);

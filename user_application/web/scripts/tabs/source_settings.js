@@ -70,5 +70,7 @@ export function createSourceSettingsPanel({document,host,storage,probe,readSocke
   }
   if(changed){editorDraft=draft;editor();capture();}update();
  }
- return Object.freeze({show,update,applyDraft,controller,destroy(){if(dead)return;dead=true;preferences.destroy();removeAttribution?.();abort?.abort();controller.destroy();for(const remove of removers.splice(0))remove();host.removeEventListener('storage',storageEvent);root?.remove();for(const remove of environmentRemovers.splice(0))remove();environmentRoot?.remove();}});
+ function readHeaderMode(){const s=controller.snapshot();return{mode:s.settings.mode,options:MODES.map(({id,label})=>({id,label})),blocked:dead||s.external||s.busy||s.dirty||editorDraft!==null||modeDraft!==null,error:dead?'설정 창이 종료되었습니다.':s.external?'다른 창의 변경을 설정에서 다시 불러오세요.':s.busy?'연결 확인이 진행 중입니다.':s.dirty||editorDraft!==null||modeDraft!==null?'편집 중인 연결 설정을 먼저 반영·저장하세요.':s.error};}
+ function saveHeaderMode(mode){if(dead)throw Error('설정 창이 종료되었습니다.');capture();const state=readHeaderMode();if(state.blocked||state.error)throw Error(state.error||'연결 설정을 확인하세요.');if(!MODES.some(m=>m.id===mode))throw Error('운용 모드를 확인하세요.');if(mode===state.mode)return true;controller.setMode(mode);controller.save();update();return true;}
+ return Object.freeze({show,update,applyDraft,controller,readHeaderMode,saveHeaderMode,destroy(){if(dead)return;dead=true;preferences.destroy();removeAttribution?.();abort?.abort();controller.destroy();for(const remove of removers.splice(0))remove();host.removeEventListener('storage',storageEvent);root?.remove();for(const remove of environmentRemovers.splice(0))remove();environmentRoot?.remove();}});
 }

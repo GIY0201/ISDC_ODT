@@ -207,3 +207,44 @@ html[data-theme="light"] .mt .mt-task.running rect { stroke: #10213c; }
 
 /* Bodyless feature sections keep all native controls reachable within their own content area. */
 .work-window[data-work-layout] #screen>.panel[data-work-section-hidden=false]:not(:has(>.body,>.panel-body)){display:block;overflow:auto;overscroll-behavior:contain}
+
+/* Every function choice stays visible; wrap naturally instead of a scroll strip. */
+.work-section-nav{max-height:none;overflow:visible;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,175px),1fr));gap:5px}
+.work-section-nav button{text-align:center;white-space:normal;line-height:1.35;min-height:30px;padding:5px 7px}
+/* Stored input controls read as separate actions, UTC entry and current outputs. */
+#stored-orbit .body{line-height:1.65}
+#stored-orbit .orbit-playback-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 0 12px}
+#stored-orbit .orbit-playback-controls label{display:flex;align-items:center;gap:6px}
+#stored-orbit #orbit-utc{width:31ch;font-family:Consolas,monospace;padding:6px 8px}
+#stored-orbit button{padding:6px 10px;border:1px solid var(--line);border-radius:4px;background:#1d4b5d;color:var(--text)}
+#stored-orbit select{padding:5px 8px}
+#stored-orbit .orbit-playback-controls p{flex-basis:100%;margin:5px 0;padding:9px 11px;background:#07192366;border-left:3px solid var(--cyan);overflow-wrap:anywhere}
+#stored-orbit .orbit-playback-controls small{flex-basis:100%;color:var(--muted)}
+#stored-orbit .body>p[role=status]{padding:8px 11px;border-left:3px solid var(--amber);overflow-wrap:anywhere}
+#stored-orbit dl{display:grid;grid-template-columns:115px minmax(0,1fr);gap:8px 14px;margin:14px 0}
+#stored-orbit dt{color:var(--muted)}
+#stored-orbit dd{margin:0;overflow-wrap:anywhere;font-family:Consolas,monospace}
+.node-server-terminal{margin:12px 0}.node-server-terminal summary{cursor:pointer;padding:7px 0;color:var(--cyan)}#node-server-configuration{background:#080d11;color:#bce6cb;border:1px solid #34424c;border-radius:5px;padding:13px;font:12px/1.6 Consolas,monospace;white-space:pre;tab-size:2}
+.scene-credit[hidden]{display:none!important}.stored-orbit-details summary{cursor:pointer;padding:7px 0;color:var(--cyan)}
+/* Readability across operator task content: clear hierarchy and a stable backdrop. */
+.work-window{background:#102938f5;backdrop-filter:blur(16px)}
+.work-window #screen{font-size:14px;line-height:1.55}
+.work-window #screen h1{font-size:20px;line-height:1.4}
+.work-window #screen h2{font-size:16px;line-height:1.4}
+.work-window #screen h3{font-size:15px;line-height:1.4}
+.work-window #screen label,.work-window #screen button,.work-window #screen input,.work-window #screen select,.work-window #screen textarea{font-size:13px;line-height:1.5}
+.work-window #screen button{min-height:30px}
+.work-window #screen small,.work-window #screen .small{font-size:12px;line-height:1.5}
+.work-window #screen p{overflow-wrap:anywhere}
+.work-window #screen td,.work-window #screen th{font-size:13px;line-height:1.5;padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.work-window #screen th{font-weight:600;color:var(--cyan)}
+.work-window #screen table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+.work-window #screen dl{line-height:1.6}
+.work-window #screen dd{overflow-wrap:anywhere}
+.work-window #screen pre{font:12px/1.6 Consolas,monospace}
+.work-window[data-work-layout] #screen .panel>header small{font-size:12px;white-space:normal}
+.header-mode-control{position:relative;flex:0 0 auto}.header-mode-control #current-mode{cursor:pointer;min-height:25px}.header-mode-picker{position:absolute;right:0;top:calc(100% + 8px);z-index:60;width:280px;max-width:calc(100vw - 96px);padding:14px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--text);box-shadow:0 8px 28px #081a2680;font-size:13px;white-space:normal}.header-mode-picker[hidden]{display:none}.header-mode-picker label{display:block;margin-bottom:6px;font-weight:600}.header-mode-picker select{width:100%;min-height:34px}.header-mode-picker p{margin:8px 0;line-height:1.5}.header-mode-picker small{display:block;font-size:12px;line-height:1.5;color:var(--muted)}.header-mode-control :focus-visible{outline:2px solid var(--accent,#a8eeee);outline-offset:2px}
+.header-mode-picker{width:160px;padding:5px}.header-mode-picker #workspace-mode-items{display:flex;flex-direction:column;gap:3px}.header-mode-picker [role="menuitemradio"]{width:100%;text-align:left;padding:8px 10px;min-height:34px;border:0;border-radius:5px;background:transparent;color:var(--text);cursor:pointer;font-size:13px}.header-mode-picker [role="menuitemradio"]:hover,.header-mode-picker [role="menuitemradio"][aria-checked="true"]{background:#49849a40}.header-mode-picker #workspace-mode-status{font-size:12px;padding:5px;overflow-wrap:anywhere}.header-mode-picker #workspace-mode-status[hidden]{display:none}
+.work-window #screen .headrow p{font-size:12px;line-height:1.5}.work-window #screen input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),.work-window #screen select,.work-window #screen textarea{min-height:32px;padding:5px 8px;max-width:100%;box-sizing:border-box}.work-window #screen .actions{gap:8px;flex-wrap:wrap}.work-window #screen details>summary{min-height:28px;padding:5px 0;cursor:pointer}
+.work-window #screen .satellite-node-work-panel .ns-note,.work-window #screen .satellite-node-work-panel .ns-kicker,.work-window #screen .satellite-node-work-panel .ns-values dt,.work-window #screen .satellite-node-work-panel small,.work-window #screen .satellite-node-work-panel .ns-terminal-grid,.work-window #screen .satellite-node-work-panel .ns-fleet-mode{font-size:12px;line-height:1.5}.work-window #screen #station-workspace label{display:inline-flex;gap:7px;align-items:center;margin:0 12px 8px 0}.work-window #screen #station-workspace .button{margin:0 6px 8px 0}
+.work-window #screen #wall-summary p{font-size:12px;line-height:1.55}.work-window #screen .wall-scope-controls{gap:8px;flex-wrap:wrap}

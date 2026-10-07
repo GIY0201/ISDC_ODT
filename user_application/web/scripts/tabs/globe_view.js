@@ -4,7 +4,7 @@ export function createGlobeViewPanel(globe,solar=null){
   function unbind(){for(const [node,fn,event='change']of bindings)node.removeEventListener(event,fn);bindings=[];boundPanel=null;}
   const names={blue_marble:'NASA Blue Marble',satellite:'ArcGIS 위성 영상',osm:'OpenStreetMap',natural:'Natural Earth'};
   function draw(){
-    if(disposed||!['satellite','ground','settings'].includes(view))return;
+    if(disposed||!['settings'].includes(view))return;
     let panel=document.getElementById('globe-view');
     if(!panel){
       panel=document.createElement('section');panel.id='globe-view';panel.className='panel';document.getElementById('screen').prepend(panel);

@@ -1,100 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
-
+import {fixture} from './workspace_fixture.mjs';
 test('empty UI choice restores server selection without clearing its result or sending a command',async()=>{
-  const calls=[];
-  const selection={value:'stored-tle',listeners:{},addEventListener(type,listener){this.listeners[type]=listener;}};
-  const calculation={addEventListener(){}};
-  const panel={innerHTML:'',querySelector(selector){return selector==='#orbit-input'?selection:calculation;}};
-  const data={inputs:[{input_id:'stored-tle',satellite_id:'25544',format:'TLE',epoch_utc:'2020-07-12T21:16:01Z',raw_sha256:'hash'}],state:{input_id:'stored-tle',current_utc:'2020-07-12T21:16:01Z'},result:{revision:3,status:'complete',rows:[{utc:'2020-07-12T21:16:01Z',position_m:[1,2,3],elevation_deg:10,status:'valid'}]},status:'ready',error:''};
-  globalThis.document={getElementById(id){return id==='stored-orbit'?panel:{};}};
-  globalThis.testOrbitClient={snapshot:()=>data,select:value=>calls.push(value),samples(){},load(){}};
-  globalThis.window={addEventListener(){},fetch:async()=>{throw Error('isolated orbit handler cannot deploy');}};
-  const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
-    .replace("'./browser_identity.js'",JSON.stringify(new URL('../../../user_application/web/scripts/browser_identity.js',import.meta.url).href))
-    .replace("'./orbit_ui_measurement.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_ui_measurement.js',import.meta.url).href))
-    // Model composition has dedicated real-assembly tests; this fixture isolates
-    // the unchanged stored-orbit select handler and its no-command assertion.
-    .replace(/import \{createMissionServices\} from [^;]+;/,'const createMissionServices=()=>({destroy(){}});')
-    .replace(/import \{createFuturePasses\} from [^;]+;/,'const createFuturePasses=()=>({observe(){},destroy(){}});')
-    .replace(/import \{createSourceDataPanel\} from [^;]+;/,'const createSourceDataPanel=()=>({show(){},destroy(){}});')
-    .replace(/import \{createSourceSecurityPanel\} from [^;]+;/,'const createSourceSecurityPanel=()=>({show(){},updateTelemetry(){},updateSocket(){},destroy(){}});')
-    .replace(/import \{createSourceSettingsPanel\} from [^;]+;/,'const createSourceSettingsPanel=()=>({show(){},destroy(){}});')
-    .replace(/import \* as dataViewModel from [^;]+;/,'const dataViewModel={};')
-    .replace(/import \{projectWorkspaceContext\} from [^;]+;/,'const projectWorkspaceContext=()=>({text:{}});')
-    .replace(/import \{createAnalysisTransport\} from [^;]+;/,`const {createAnalysisTransport}=await import(${JSON.stringify(new URL('../../../user_application/web/scripts/scenario/analysis_transport.js',import.meta.url).href)});`)
-    .replace(/import \{createAnalysisFollowCoordinator\} from [^;]+;/,'const createAnalysisFollowCoordinator=()=>({isFollowing:()=>false,isPending:()=>false,followedSource:()=>null,invalidate(){},destroy(){}});')
-    .replace(/import \{createWorkspaceScenario\} from [^;]+;/,'const createWorkspaceScenario=()=>({runner:{},destroy(){}});')
-    .replace(/import \{createSourceScenarioPanel\} from [^;]+;/,'const createSourceScenarioPanel=()=>({show(){},destroy(){}});')
-    .replace(/import \{createScenarioAssembly\} from [^;]+;/,'const createScenarioAssembly=()=>({});')
-    .replace(/import \* as scenarioKpi from [^;]+;/,'const scenarioKpi={};')
-    .replace(/import \* as networkDiagram from [^;]+;/,'const networkDiagram={};')
-    .replace(/import \{NativeNetworkScene\} from [^;]+;/,'const NativeNetworkScene=class{};')
-    .replace(/import \{createSourceMissionPanel\} from [^;]+;/,'const createSourceMissionPanel=()=>({show(){},update(){},destroy(){}});')
-    .replace(/import \{createMissionTypes\} from [^;]+;/,'const createMissionTypes=()=>({});')
-    .replace(/import \{createMissionConstraints\} from [^;]+;/,'const createMissionConstraints=()=>({});')
-    .replace(/import \{createOrchestrationClient\} from [^;]+;/,'const createOrchestrationClient=()=>({});')
-    .replace(/import \{layoutTimeline,timelineMarkup\} from [^;]+;/,'const layoutTimeline=()=>{},timelineMarkup=()=>{};')
-    .replace(/import \{createWorkspaceSolar\} from [^;]+;/,'const createWorkspaceSolar=()=>({destroy(){}});')
-    .replace(/import \{createWorkspaceNodes\} from [^;]+;/,'const createWorkspaceNodes=()=>({async start(){},show(){},refresh(){},refreshModels(){},destroy(){}});')
-    .replace(/import \{createGroundSegmentStore\} from [^;]+;/,'const createGroundSegmentStore=()=>({load(){},destroy(){}});')
-    .replace(/import \{createGroundNetworkPanel\} from [^;]+;/,'const createGroundNetworkPanel=()=>({show(){},update(){},destroy(){}});')
-    .replace(/import \{createFabricExchange\} from [^;]+;/,'const createFabricExchange=()=>({destroy(){}});')
-    .replace(/import \{createDataFabricClient\} from [^;]+;/,'const createDataFabricClient=()=>({});')
-    .replace(/import \* as sourceStationModel from [^;]+;/,'const sourceStationModel={};')
-    .replace(/import \{createGroundLinkModel\} from [^;]+;/,'const createGroundLinkModel=()=>({});')
-    .replace(/import \{createNetworkSnapshotModel\} from [^;]+;/,'const createNetworkSnapshotModel=()=>({});')
-    .replace(/import \{createNodeClockControls\} from [^;]+;/,'const createNodeClockControls=()=>({read(){return{}},actions:{},destroy(){}});')
-    .replace(/import \{createUtcCodec,LEAP_SHA256\} from [^;]+;/,'const createUtcCodec=()=>({}),LEAP_SHA256="test";')
-    .replace(/import \{createNodeLibrary\} from [^;]+;/,'const createNodeLibrary=()=>({});')
-    .replace(/import \{orbitElements,catalogElements\} from [^;]+;/,'const orbitElements=()=>null,catalogElements=()=>null;')
-    .replace(/import \* as nodeOisl from [^;]+;/,'const nodeOisl={};')
-    .replace(/import \{NodeScene\} from [^;]+;/,'const NodeScene=class{};')
-    .replace(/import \{createSatelliteNodePanelTools\} from [^;]+;/,'const createSatelliteNodePanelTools=()=>({});')
-    .replace(/import \{createSatelliteModelPanel\} from [^;]+;/,'const createSatelliteModelPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{createSatelliteModelSelection\} from [^;]+;/,'const createSatelliteModelSelection=()=>({select(){},async load(){},destroy(){}});')
-    .replace(/import \{createModelResolver,validateSatelliteManifest\} from [^;]+;/,'const createModelResolver=()=>{},validateSatelliteManifest=()=>{};')
-    .replace(/import \{createGlobeViewPanel\} from [^;]+;/,'const createGlobeViewPanel=()=>({show(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{createCatalogTrack\} from [^;]+;/,'const createCatalogTrack=()=>({select(){},observe(){},destroy(){}});')
-    .replace(/import \{createCatalogPasses\} from [^;]+;/,'const createCatalogPasses=()=>({update(){},destroy(){}});')
-    .replace(/import \{createCatalogPassPanel\} from [^;]+;/,'const createCatalogPassPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{createWorkspaceRevisionSync\} from [^;]+;/,'const createWorkspaceRevisionSync=()=>({observe(){},destroy(){}});')
-    .replace(/import \{GROUND_STATIONS,stationGroups\} from [^;]+;/,'const GROUND_STATIONS={},stationGroups=()=>[];')
-    .replace(/import \{createStationPanel\} from [^;]+;/,'const createStationPanel=()=>({controller:{choose(){}},show(){},update(){},destroy(){}});')
-    .replace(/import \{createGroundPanel\} from [^;]+;/,'const createGroundPanel=()=>({show(){},update(){},destroy(){}});')
-    .replace(/import \{createCatalogTimePanel\} from [^;]+;/,'const createCatalogTimePanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{createCatalogTimeline\} from [^;]+;/,'const createCatalogTimeline=()=>({select(){},destroy(){}});')
-    .replace(/import \{createCatalogScene\} from [^;]+;/,'const createCatalogScene=()=>({snapshot(){return {}},destroy(){}});')
-    .replace(/import \{createCatalogScenePanel\} from [^;]+;/,'const createCatalogScenePanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{createCatalogGeometry\} from [^;]+;/,'const createCatalogGeometry=()=>({select(){},clear(){},snapshot(){return {}},destroy(){}});')
-    .replace(/import \{createCatalogPanel\} from [^;]+;/,'const createCatalogPanel=()=>({controller:{observeSelection(){return()=>{}}},show(){},update(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{createHilPanel\} from [^;]+;/,'const createHilPanel=()=>({show(){},update(){},receive(){},connection(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{hilTopology\} from [^;]+;/,'const hilTopology=()=>{};')
-    .replace(/import \{createKpiPanel\} from [^;]+;/,'const createKpiPanel=()=>({show(){},update(){},receive(){},connection(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{drawMultiLine,drawSparkline\} from [^;]+;/,'const drawMultiLine=()=>{},drawSparkline=()=>{};')
-    .replace(/import \{createSimPanel\} from [^;]+;/,'const createSimPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{createMissionPanel\} from [^;]+;/,'const createMissionPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{createRadioSeriesPanel\} from [^;]+;/,'const createRadioSeriesPanel=()=>({show(){},update(){},applyDraft(){},choose(){},clearInterval(){},destroy(){}});')
-    .replace(/import \{createOrbitRadioPanel\} from [^;]+;/,'const createOrbitRadioPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{createCommunicationPlanningPanel\} from [^;]+;/,'const createCommunicationPlanningPanel=()=>({show(){},update(){},applyDraft(){},destroy(){}});')
-    .replace(/import \{createRfPanel\} from [^;]+;/,'const createRfPanel=()=>({show(){},update(){},destroy(){}});')
-    .replace(/import \{api,telemetrySocket\} from [^;]+;/,'const api={},telemetrySocket=()=>()=>{};')
-    .replace(/import \{createOrbitSelection\} from [^;]+;/,'const createOrbitSelection=()=>globalThis.testOrbitClient;')
-    .replace(/import \{createWorkspacePlayback\} from [^;]+;/,'const createWorkspacePlayback=()=>({update(){},destroy(){}});')
-    .replace(/import \{createSatelliteHover\} from [^;]+;/,'const createSatelliteHover=()=>({show(){},clear(){},destroy(){}});')
-    .replace(/import \{createWorkspaceGlobe\} from [^;]+;/,'const createWorkspaceGlobe=()=>({observeDisplayContext(){return()=>{};},observeSatelliteHover(){return()=>{};},bindScenarioRuntime(){return()=>{};},update(){},catalog(){},stations(){},selectStation(){},focusStation(){},destroy(){}});');
-  try {
-    const ui=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
-    ui.showWorkspaceOrbit('satellite');
-    const rendered=panel.innerHTML;
-    selection.value='';
-    selection.listeners.change({target:selection});
-    assert.equal(selection.value,'stored-tle');
-    assert.deepEqual(calls,[]);
-    assert.equal(panel.innerHTML,rendered);
-    selection.value='another-input';
-    selection.listeners.change({target:selection});
-    assert.deepEqual(calls,['another-input']);
-  } finally {delete globalThis.document;delete globalThis.testOrbitClient;delete globalThis.window;}
+ const f=fixture(1280,720,{hash:'#satellite'});
+ try{f.evaluate('globalThis.selectionCalls=[];client.select=value=>selectionCalls.push(value);');const selection=f.get('orbit-input'),panel=f.get('stored-orbit'),before=f.snapshot(),rendered=panel.innerHTML,counts=f.counts();
+  selection.value='';await selection.dispatch('change');assert.equal(selection.value,before.state.input_id);assert.deepEqual(structuredClone(f.context.selectionCalls),[]);assert.deepEqual(f.snapshot(),before);assert.deepEqual(f.counts(),counts);assert.equal(panel.innerHTML,rendered);
+  selection.value='another-input';await selection.dispatch('change');assert.deepEqual(structuredClone(f.context.selectionCalls),['another-input']);assert.deepEqual(f.snapshot(),before);
+ }finally{f.dispose();}
 });

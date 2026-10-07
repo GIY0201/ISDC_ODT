@@ -427,7 +427,7 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 node lighti
  const f=actualWorkspaceFixture(width,height,{hash:'#satellite'});
  try{
   await new Promise(resolve=>setTimeout(resolve,10));assert.equal(f.evaluate('globe.nodeRendererState().phase'),'ready');
-  const before=f.counts();assert.equal(f.get('node-lighting').attributes['aria-pressed'],'true');
+  assert.equal(f.doc.getElementById('globe-view'),null);f.evaluate("globeViewPanel.show('settings')");const before=f.counts();assert.equal(f.get('node-lighting').attributes['aria-pressed'],'true');
   await f.get('node-lighting').dispatch('click');assert.equal(f.evaluate('solar.state().enabled'),false);assert.equal(f.get('globe-lighting').checked,false);
   f.get('globe-lighting').checked=true;await f.get('globe-lighting').dispatch('change');assert.equal(f.get('node-lighting').attributes['aria-pressed'],'true');
   f.get('globe-theme').value='light';await f.get('globe-theme').dispatch('change');assert.equal(f.evaluate('globe.viewState().choice.theme'),'light');assert.equal(f.evaluate('solar.state().enabled'),true);
