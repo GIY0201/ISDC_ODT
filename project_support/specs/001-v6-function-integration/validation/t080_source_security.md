@@ -31,6 +31,18 @@ The existing in-app browser opened the mounted security pane, initially showing 
 
 After the receipt aged beyond the presentation window, the same live pane changed to **모듈 보고 지연** and **마지막 수신값입니다. 최신 상태를 확인할 수 없습니다.**, preserving the last numeric value and run identity. This bounded actual-browser check verifies pending→received→stale presentation and honest source semantics. No SIM fault, runtime transport, settings or deployment was changed for this check. Remote failure, run-change race and full two-resolution security acceptance remain separate gates; this does not close T080 or certify authentication/encryption.
 
+## 2026-10-07 12:35 latest automatic entry observation
+
+Aside564 normal navigation enters the current security pane with receipt pending,
+without pressing the manual query. Actual565 then shows SIM report received for
+the same RUN-904CE008D00B, authentication99.78%, throughput47.2Mbps, loss0.16%,
+source observedUTC2026-10-06T19:22:50.000Z and receivedUTC2026-10-07T03:35:38.832Z.
+This proves automatic entry retrieval only. The 2.5-second hidden resource check
+has an empty observed resource list and does not prove exact polling cadence,
+timeout, old-run response rejection or remote503 UI. No manual query/scenario/
+fault/reset was used. Copies: data/workspace/validation/live_security_auto_20261007_1235.
+T080 remains open; this is source SIM rule output, not physical security evidence.
+
 ## 계층 검증 후 구조 보완
 
 전체 회귀의 architecture 시험이 외부 transport에서 digital_twin.contracts 예외를 import하는 원본 의존성을 거부했다. 기준을 완화하지 않고 기존 ICD-01 방식과 같이 원본 SecurityUnavailable 클래스 본문을 foundation/security_errors.py로 그대로 추출했다. contracts/security.py는 같은 클래스를 재공개하며 external/security.py는 foundation에서 가져온다. Runtime/HTTP/transport의 예외 클래스 identity는 동일하다. 따라서 앞선 7개 파일의 바이트 동일 주장은 이 구조 보완 이전 상태를 설명한다. 현재는 5개 파일 바이트 동일, 2개 파일은 예외 위치/import만 변경했다. 골든 시험은 명시된 이 두 변경만 역변환하여 원본 SHA256을 검사하고 정책·schema·adapter의 다른 차이를 허용하지 않는다.
