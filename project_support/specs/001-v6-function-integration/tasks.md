@@ -704,4 +704,4 @@ is fullnative validatedfuture flow then actual UI acceptance, not a physics stub
 
 ## N021 validated source clock label
 - [x] T175 ADR0058 then meaningful RED for source clock labels in existing satellite_nodes.js; keep legacy/unknown/owner/clock/button guards unchanged.
-- [ ] T176 Independent scoped review/full changed JS and actual normal catalogue label before closure; whole75-84/model/GPU acceptance stays separate.
+- [x] T176 Independent scoped review/full changed JS and actual normal catalogue label before closure; whole75-84/model/GPU acceptance stays separate.

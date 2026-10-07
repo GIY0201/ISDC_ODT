@@ -1496,3 +1496,9 @@ Final N020 full Node1912PASS0FAIL0SKIP23078.159ms exit0; data/workspace/validati
 N021 actualcatalog native API/clockprobe proved validsource; source mode label gap only repaired RED-first afterADR0058 independent HIGH0/CRITICAL0. Finalindependent54PASS CLEAN; fullNode1931PASS0FAIL0SKIP24470.3885ms exit0. No clock/button/UTC/API/approval change. Currentreloadlabel and whole75-84/live/allmodel/twores/GPU/game/PR remainopen.
 
 Actual526 after normal isolated reload/select still reads old unknown clock label; savedISS/local/session bytes exact. Do NOT record N021 real screen PASS. HTTP served satellite_nodes.js equals local bytes SHA256fef82ae9dd8f90690a72edb98e7abf52d6cb33868e675e2494ecd102213d3c61 with no-cache, so source-file deployment is current. Fresh distinct-document navigation and actualroot/display-owner diagnosis in progress; no authority bypass.
+
+## Actual settled catalogue clock verification
+
+Aside534 records pre-calculation mode=카탈로그 분석 시각 · 재생 샘플 미계산 and after ordinaryreadonly observation calculation mode=카탈로그 분석 시각 · 정지 with playback enabled. Root independently viewed535 actual1440x900 screenshot and read534/535 JSON; savedISS/local/session bytes exact. One existing calculate action, no SIM/storedUTC/fabric send. Original paused RUN-904CE008D00B/SIM/speed5/elapsed884.681/SDC_POC_01/faults[]/recordingtrue reverified GET health at02:57:42UTC.
+
+Earlier526/533 unknown snapshots were taken before asynchronous native display/panel settlement; actualroot composition review confirms normalcatalogue owner and rules out SIM override for observed Terra body/clock. Retain counter-evidence, do not erase early states. Native observation geometry is predictedA/representative station assumptions, not real RF reception. Replay itself/full40module/whole75-84/all50/twores/GPU/PR remain separate. Evidence data/workspace/validation/live_N021_20261007_1205 and runtime_preserved_20261007_1158.json.
