@@ -104,11 +104,13 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
     applySharedContext();
     if(!applyingRemote&&!awaitingInitial)syncChannel?.postMessage({type:'state',sender:windowId,state:{...state}});
   }
-  const workWindow=document.getElementById('work-window'),launcher=document.getElementById('launcher'),nav=document.getElementById('nav'),shelf=document.getElementById('shelf-restore');
+  const workWindow=document.getElementById('work-window'),launcher=document.getElementById('launcher'),nav=document.getElementById('nav'),shelf=document.getElementById('shelf-restore'),shelfContainer=document.getElementById('window-shelf');
+  const showShelf=value=>{shelf.hidden=!value;if(shelfContainer)shelfContainer.hidden=!value;};
+  showShelf(false);
   const groupLabels=['관제','운용','DT'];
   document.getElementById('rail-groups').innerHTML=groups.map(([g],i)=>`<button type="button" data-group="${i}" aria-label="${g} 작업 목록 열기">${groupLabels[i]}</button>`).join('');
   function showGroup(index){const [label,views]=groups[index];document.getElementById('launcher-title').textContent=label+' 작업공간';nav.innerHTML=views.map(([id,n])=>`<button type="button" data-view="${id}">${n}</button>`).join('');launcher.hidden=false;document.querySelectorAll('#rail-groups button').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.group)===index)));nav.querySelector('button')?.focus()}
-  function openView(view){if(!names[view])return;state.view=view;workWindow.hidden=false;fitWindow();shelf.hidden=true;launcher.hidden=true;render();location.hash=view;screen.focus()}
+  function openView(view){if(!names[view])return;state.view=view;workWindow.hidden=false;fitWindow();showShelf(false);launcher.hidden=true;render();location.hash=view;screen.focus()}
   bindWorkspaceView(openView);
   function isDraftField(id){return !id.startsWith('ms-')&&!['kpi-history','kpi-filter-PASS','kpi-filter-FAIL','kpi-filter-INVALID','mw-mission','mw-task','ground-input','orbit-input','orbit-rate'].includes(id);}
   function draftScope(id){if(id.startsWith('st-'))return {settings_link:document.getElementById('st-link')?.value};return id.startsWith('mw-')?{mission_id:document.getElementById('mw-mission')?.value,task_id:document.getElementById('mw-task')?.value}:{};}
@@ -144,9 +146,9 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
     // A fresh window requests its snapshot after loading; an existing named window receives it here.
     try{if(child.location.origin===location.origin&&child.document.readyState==='complete')child.postMessage(transferSnapshot(),location.origin);}catch{}
   });
-  document.getElementById('window-minimize').addEventListener('click',()=>{workWindow.hidden=true;shelf.hidden=false;shelf.textContent=`${names[state.view]} 창 다시 열기`;shelf.focus()});
-  document.getElementById('window-close').addEventListener('click',()=>{if(isPopout){window.close();return;}workWindow.hidden=true;shelf.hidden=true;document.querySelector('#rail-groups button')?.focus()});
-  shelf.addEventListener('click',()=>{workWindow.hidden=false;fitWindow();shelf.hidden=true;document.getElementById('window-title').focus()});
+  document.getElementById('window-minimize').addEventListener('click',()=>{workWindow.hidden=true;showShelf(true);shelf.textContent=`${names[state.view]} 창 다시 열기`;shelf.focus()});
+  document.getElementById('window-close').addEventListener('click',()=>{if(isPopout){window.close();return;}workWindow.hidden=true;showShelf(false);document.querySelector('#rail-groups button')?.focus()});
+  shelf.addEventListener('click',()=>{workWindow.hidden=false;fitWindow();showShelf(false);document.getElementById('window-title').focus()});
   document.getElementById('launcher-close').addEventListener('click',()=>{launcher.hidden=true;document.querySelector('#rail-groups button[aria-pressed=true]')?.focus()});
   const dragTarget=document.getElementById('window-titlebar'),resizeTarget=document.getElementById('resize-handle');
   // Keep the entire window between the navigation rail, header and footer.
@@ -215,5 +217,3 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
   window.addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(names[v]&&v!==state.view)openView(v)});
   const initialView=location.hash.slice(1);if(names[initialView])openView(initialView);else{showGroup(0);launcher.hidden=true}
 })();
-
-if(['t028','t032'].includes(new URLSearchParams(location.search).get('validation'))){import('./orbit_ui_measurement.js?v=t032-r2').then(module=>module.installOrbitUiMeasurement());}

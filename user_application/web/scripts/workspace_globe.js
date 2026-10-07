@@ -4,7 +4,7 @@ import {LEAP_SHA256,createUtcCodec} from './orbit_utc.js';
 /** Render-only copy, never a clock/selection authority. One controller per document. */
 export function createWorkspaceGlobe(container,status,focusButton,host=window){
   let globe=null,latest=null,catalog=null,sceneInput=null,sceneMetadata=null,trackInput=null,onCatalogSelect=()=>{},groundPoint=null,disposed=false,failed=false,removeError=null,focused=false,stations=[],selectedStation=null,onStationSelect=()=>{};
-  let catalogLabelsVisible=true;
+  let catalogLabelsVisible=true,attributionBinding=null;
   let choice={mode:'3d',imagery:'blue_marble',theme:'dark',emphasis:true},imagery={requestedImagery:'blue_marble',displayedImagery:null,phase:'pending',error:null},mode={phase:'ready',error:null},modeRevision=0;
   const viewObservers=new Set();
   const displayObservers=new Set();let displayKey=null,solarFactory=null,solarRenderer=null;
@@ -219,6 +219,7 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
       attachNodes();
       attachNodeInteraction();
       attachGroundInteraction();
+      if(attributionBinding)globe.setAttributionAccess(true);
     }catch{fail();}
   }
   const timer=host.setTimeout(boot,12000);
@@ -226,6 +227,13 @@ export function createWorkspaceGlobe(container,status,focusButton,host=window){
   const focus=()=>{try{globe?.focus();}catch{fail();}};focusButton.addEventListener('click',focus);
   return {
     displayContext,
+    canShowAttribution(){const available=!disposed&&!failed&&(globe?.attributionAvailable()??false);if(available&&attributionBinding)globe.setAttributionAccess(true);return available;},
+    showAttribution(){return !disposed&&!failed&&(globe?.showAttribution()??false);},
+    bindAttributionAccess(){
+      if(disposed||failed)return()=>{};
+      const binding={};attributionBinding=binding;globe?.setAttributionAccess(true);
+      return()=>{if(attributionBinding!==binding)return;attributionBinding=null;globe?.setAttributionAccess(false);};
+    },
     captureDisplayContinuity,verifyDisplayContinuity,
     observeDisplayContinuity(fn){if(typeof fn!=='function')throw new TypeError('display continuity observer required');if(disposed)return()=>{};continuityObservers.add(fn);return()=>continuityObservers.delete(fn);},
     bindCatalogDisplayContinuity(port){

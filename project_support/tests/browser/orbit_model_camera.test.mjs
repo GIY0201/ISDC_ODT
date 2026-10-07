@@ -23,3 +23,17 @@ test('mode change, station/point focus and destroy release model ownership; inpu
   f.globe.position={};f.globe.focus();assert.deepEqual(f.calls.slice(-2),['release','point_focus']);
   f.globe.destroy();f.globe.destroy();assert.equal(f.inputs.get(2),f.oldWheel);assert.equal(f.calls.filter(v=>v==='model_destroy').length,1);assert.equal(f.calls.filter(v=>v==='viewer_destroy').length,1);assert.equal(f.globe.viewer.scene.preUpdate.f.size,0);
 });
+
+test('settings attribution access activates only the original Cesium 1.143 expand link and restores fallback',()=>{
+ const f=fixture();let clicks=0;const classes=new Set(),link={style:{display:'inline'},classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)},disabled:false,click(){clicks++;}},logo={style:{display:'inline'}};
+ f.globe.viewer.creditDisplay={container:{querySelector:q=>q==='.cesium-credit-expand-link'?link:null}};
+ assert.equal(f.globe.setAttributionAccess(true),true);assert.equal(classes.has('isdc-settings-attribution'),true);link.style.display='inline';assert.equal(classes.has('isdc-settings-attribution'),true);
+ assert.equal(f.globe.showAttribution(),true);assert.equal(clicks,1);assert.equal(logo.style.display,'inline');
+ link.disabled=true;assert.equal(f.globe.showAttribution(),false);assert.equal(classes.has('isdc-settings-attribution'),false);
+ link.disabled=false;f.globe.setAttributionAccess(true);f.globe.setAttributionAccess(false);assert.equal(classes.has('isdc-settings-attribution'),false);
+ f.globe.destroy();assert.equal(f.globe.showAttribution(),false);assert.equal(clicks,1);
+});
+test('absent original credit link leaves attribution fallback untouched',()=>{
+ const f=fixture();f.globe.viewer.creditDisplay={container:{querySelector:()=>null}};
+ assert.equal(f.globe.setAttributionAccess(true),false);assert.equal(f.globe.showAttribution(),false);f.globe.destroy();
+});

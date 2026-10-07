@@ -1,5 +1,12 @@
 /** Opt-in validation recorder; no runtime state or calculation ownership. */
 const targets={frames:16.7,feedback:50,utcResult:100,dayResult:1000};
+export function bindOrbitUiDiagnostics(button,install=()=>installOrbitUiMeasurement()){
+  if(!button)return ()=>{};
+  let recorder=null;
+  const open=()=>{recorder??=install();recorder.show();};
+  button.addEventListener('click',open);
+  return ()=>button.removeEventListener('click',open);
+}
 export function summarizeMeasurements(raw){
   const report={gates:{}};
   for(const name of [...Object.keys(targets),'hiddenFrames']){
@@ -18,8 +25,8 @@ export function summarizeMeasurements(raw){
 }
 export function installOrbitUiMeasurement(host=window){
   const doc=host.document,raw={frames:[],hiddenFrames:[],feedback:[],utcResult:[],dayResult:[],events:[],eventTiming:[]};
-  const box=doc.createElement('aside');box.id='orbit-ui-measurement';box.style.cssText='position:fixed;top:0;right:0;z-index:10000;background:#fff;color:#111;max-width:420px;max-height:200px;overflow:auto;font:12px monospace;padding:5px';
-  box.innerHTML='<button id="measure-start">30초 프레임 측정</button><button id="measure-report">결과 기록</button><button id="measure-download">원본 기록 내려받기</button><pre id="measure-output"></pre>';doc.body.append(box);
+  const box=doc.createElement('aside');box.id='orbit-ui-measurement';box.className='orbit-ui-diagnostics';box.ariaLabel='브라우저 성능 진단';
+  box.innerHTML='<header><strong>브라우저 성능 진단</strong><button type="button" id="measure-close" aria-label="성능 진단 닫기">닫기</button></header><p>화면의 프레임 간격과 조작 반응 시간을 측정합니다.</p><button type="button" id="measure-start">30초 프레임 측정</button><button type="button" id="measure-report">결과 기록</button><button type="button" id="measure-download">원본 기록 내려받기</button><pre id="measure-output"></pre>';doc.body.append(box);
   let frame=null,last=null,until=0,query=null,utcQuery=null,disposed=false,trial=0,eventObserver=null,eventTimingStatus='unsupported';
   const captureTiming=entries=>{for(const entry of entries){const id=entry.target?.closest?.('[id]')?.id;
     if(!id||id.startsWith('measure-'))continue;
@@ -73,6 +80,20 @@ export function installOrbitUiMeasurement(host=window){
     }
   });
   doc.addEventListener('click',click,true);observer.observe(doc.body,{subtree:true,childList:true,characterData:true});
+  function hide(){
+    if(disposed||box.hidden)return;
+    const end=host.performance.now();
+    if(query)raw.events.push({id:'query-observation-aborted',query_id:'visibility-query',start:query.start,end,range:query.range,reason:'diagnostics_closed'});
+    if(utcQuery)raw.events.push({id:'query-observation-aborted',query_id:utcQuery.id,start:utcQuery.start,end,reason:'diagnostics_closed'});
+    query=null;utcQuery=null;
+    output();box.hidden=true;observer.disconnect();eventObserver?.disconnect();doc.removeEventListener('click',click,true);
+  }
+  function show(){
+    if(disposed||!box.hidden)return;
+    box.hidden=false;doc.addEventListener('click',click,true);observer.observe(doc.body,{subtree:true,childList:true,characterData:true});
+    eventObserver?.observe({type:'event',buffered:false,durationThreshold:16});
+  }
+  box.querySelector('#measure-close').addEventListener('click',hide);
   host.addEventListener('pagehide',event=>{if(event.persisted)return;disposed=true;if(frame!==null){host.cancelAnimationFrame(frame);raw.events.push({id:'frame-trial-aborted',trial,end:host.performance.now()});}observer.disconnect();eventObserver?.disconnect();doc.removeEventListener('click',click,true);});
-  output();return {raw,report:output};
+  output();return {raw,report:output,show,hide};
 }

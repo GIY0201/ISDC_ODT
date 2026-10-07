@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createSourceSettingsPanel} from '../../../user_application/web/scripts/tabs/source_settings.js';
 import {ICDS,MODULES,STORAGE_KEY} from '../../../user_application/web/scripts/settings/topology.js';
 import {createSimWorkspace} from '../../../user_application/web/scripts/tabs/sim_workspace.js';
-function fixture(readSocket=()=>null){
+function fixture(readSocket=()=>null,attribution={}){
  const elements=new Map(),records=new Map(),events=new Map();let requests=0;
  class Element{
   constructor(){this.listeners=new Map();this.hidden=false;this.value='';this.checked=false;this.html='';}
@@ -16,7 +16,7 @@ function fixture(readSocket=()=>null){
  const document={createElement:()=>new Element(),getElementById:id=>elements.get(id)};
  const host={location:{host:'127.0.0.1:8891'},confirm:()=>true,addEventListener:(e,fn)=>events.set(e,fn),removeEventListener:e=>events.delete(e)};
  const storage={getItem:k=>records.get(k)??null,setItem:(k,v)=>records.set(k,v)};
- const panel=createSourceSettingsPanel({document,host,storage,readSocket,probe:async body=>{requests++;return{checked_at:'2026-10-06T16:00:00Z',results:Object.fromEntries(body.links.map(l=>[l.id,{state:'unverified',method:'in-process',detail:'original planned component'}]))};}});
+ const panel=createSourceSettingsPanel({document,host,storage,readSocket,...attribution,probe:async body=>{requests++;return{checked_at:'2026-10-06T16:00:00Z',results:Object.fromEntries(body.links.map(l=>[l.id,{state:'unverified',method:'in-process',detail:'original planned component'}]))};}});
  return{panel,elements,records,events,get requests(){return requests;},get:id=>elements.get('st-'+id)};
 }
 test('V6 settings presents original modules, topology and all ICD message histories with explicit probe',async()=>{
@@ -60,4 +60,22 @@ test('foreign link and missing checkbox proof cannot change current editor; remo
  const {MODES}=await import('../../../user_application/web/scripts/settings/topology.js');const desired=MODES.find(m=>m.id!==mode).id;
  f.panel.applyDraft([{id:'st-mode',value:desired,settings_link:'L02'}],true);f.panel.update();assert.equal(f.get('mode').value,desired);assert.equal(f.panel.controller.snapshot().settings.mode,mode);assert.equal(f.records.size,0);assert.equal(f.requests,0);
  await f.get('probe').dispatch('click');assert.equal(f.requests,0);await f.get('save').dispatch('click');assert.equal(JSON.parse(f.records.get(STORAGE_KEY)).mode,desired);f.panel.destroy();
+});
+
+test('settings attribution explicit access preserves unsaved editor and never probes or saves',async()=>{
+ let clicks=0,available=true,bindings=0;const f=fixture(undefined,{canShowAttribution:()=>available,showAttribution:()=>{clicks++;return true;},bindAttributionAccess:()=>{bindings++;return()=>bindings--;}});
+ f.panel.show('settings');assert.equal(bindings,1);assert.equal(f.get('attribution').disabled,false);assert.equal(clicks,0);
+ f.get('host').value='unsaved.example';await f.get('editor').dispatch('input');await f.get('attribution').dispatch('click');
+ assert.equal(clicks,1);assert.equal(f.get('host').value,'unsaved.example');assert.equal(f.requests,0);assert.equal(f.records.size,0);
+ available=false;f.panel.update();assert.equal(f.get('attribution').disabled,true);await f.get('attribution').dispatch('click');assert.equal(clicks,1);
+ f.panel.destroy();assert.equal(bindings,0);await f.get('attribution').dispatch('click');assert.equal(clicks,1);
+});
+test('settings without attribution owner keeps unavailable button disabled',()=>{
+ const f=fixture();f.panel.show('settings');assert.equal(f.get('attribution').disabled,true);f.panel.destroy();
+});
+
+test('performance diagnostics opens only by explicit settings click without saving or probing',async()=>{
+ let opens=0;const f=fixture(undefined,{openDiagnostics:()=>opens++});f.panel.show('settings');assert.equal(opens,0);
+ await f.get('diagnostics').dispatch('click');assert.equal(opens,1);assert.equal(f.records.size,0);assert.equal(f.requests,0);
+ f.panel.destroy();await f.get('diagnostics').dispatch('click');assert.equal(opens,1);
 });

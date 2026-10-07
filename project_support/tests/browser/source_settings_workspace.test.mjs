@@ -39,3 +39,34 @@ test('initial popout snapshot owns selected link without saving; focused checkbo
   await f.win.dispatch('pagehide',{persisted:false});
  }finally{f.dispose();}
 });
+
+test('environment settings reuse the one shared globe controls and preserve preferences across routes',async()=>{
+ const f=fixture(1280,720,{hash:'#settings'});
+ try{
+  assert.ok(f.get('globe-view'));assert.ok(f.get('st-diagnostics'));assert.equal(f.get('screen').children[0].id,'globe-view');
+  f.get('globe-theme').value='light';await f.get('globe-theme').dispatch('change');
+  f.evaluate("location.hash='#satellite'");await f.win.dispatch('hashchange');assert.equal(f.get('globe-theme').value,'light');
+  f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');assert.equal(f.get('globe-theme').value,'light');assert.equal(f.viewers.length,1);
+ }finally{f.dispose();}
+});
+
+test('settings remount retains one diagnostics recorder and its original measurements',async()=>{
+ let installs=0,shows=0;const raw={frames:[42]},recorder={raw,show(){shows++;}};
+ const f=fixture(1280,720,{hash:'#settings',installOrbitUiMeasurement:()=>{installs++;return recorder;}});
+ try{
+  assert.equal(installs,0);await f.get('st-diagnostics').dispatch('click');assert.equal(installs,1);
+  f.evaluate("location.hash='#ground'");await f.win.dispatch('hashchange');f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');
+  await f.get('st-diagnostics').dispatch('click');assert.equal(installs,1);assert.equal(shows,2);assert.deepEqual(raw.frames,[42]);assert.equal(f.viewers.length,1);
+ }finally{f.dispose();}
+});
+
+test('settings attribution uses the existing Viewer original credit action and preserves required credit containers',async()=>{
+ const f=fixture(1280,720,{hash:'#settings'});let clicks=0;const classes=new Set(),link={disabled:false,classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)},click(){clicks++;}},logo={},screenCredits={};
+ try{
+  assert.equal(f.get('st-attribution').disabled,true);
+  const container={logo,screenCredits,querySelector:q=>q==='.cesium-credit-expand-link'?link:null};f.viewers[0].creditDisplay={container};
+  f.evaluate('sourceSettingsPanel.update()');assert.equal(f.get('st-attribution').disabled,false);assert.equal(classes.has('isdc-settings-attribution'),true);assert.equal(clicks,0);
+  await f.get('st-attribution').dispatch('click');assert.equal(clicks,1);assert.equal(f.viewers.length,1);assert.equal(container.logo,logo);assert.equal(container.screenCredits,screenCredits);
+  await f.win.dispatch('pagehide',{persisted:false});assert.equal(classes.has('isdc-settings-attribution'),false);
+ }finally{f.dispose();}
+});

@@ -381,5 +381,26 @@ export class OrbitGlobe {
     for(const [number,point]of this.catalogPoints){const visual=this.catalogVisuals.get(number);if(!visual)continue;const alpha=visual.alpha*(this.selectedCatalog!==null&&this.selectedCatalog!==number ? .65 : 1),css=palette[visual.regime]||palette.LEO,style=`${css}:${alpha}`;if(!colors.has(style))colors.set(style,C.Color.fromCssColorString(css).withAlpha(alpha));point.color=colors.get(style);this.catalogStyles.set(number,style);const label=this.catalogLabels.get(number);if(label){label.fillColor=labelColor;label.outlineColor=outline;}}
     this._paintHovered();this.viewer.scene.requestRender();
   }
-  destroy(){if(this.destroyed)return;this.setGroundNetworkInteraction(null);this.setNodeInteraction(null);this.hoverCatalog(null);this._clearSatelliteHover();this.selectedHover=null;this.container.removeEventListener?.('mouseleave',this.leaveCatalog);this.modelLayer?.dispose();this.cameraMotion.dispose();this.destroyed=true;this.position=null;this.viewControls.destroy();this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.viewer.destroy();}
+  // Cesium 1.143 DOM adapter: activate its existing handler; showLightbox is private.
+  attributionAvailable(){
+    if(this.destroyed||this.viewer?.isDestroyed?.())return false;
+    const link=this.viewer?.creditDisplay?.container?.querySelector?.('.cesium-credit-expand-link');
+    const available=!!link&&typeof link.click==='function'&&!link.disabled;
+    if(!available)this.setAttributionAccess(false);
+    return available;
+  }
+  setAttributionAccess(enabled){
+    const previous=this.attributionLink;
+    if(previous){previous.classList.remove('isdc-settings-attribution');this.attributionLink=null;}
+    if(!enabled||this.destroyed||this.viewer?.isDestroyed?.())return false;
+    const link=this.viewer?.creditDisplay?.container?.querySelector?.('.cesium-credit-expand-link');
+    if(!link||typeof link.click!=='function'||link.disabled||!link.classList)return false;
+    this.attributionLink=link;link.classList.add('isdc-settings-attribution');return true;
+  }
+  showAttribution(){
+    if(!this.attributionAvailable())return false;
+    const link=this.viewer.creditDisplay.container.querySelector('.cesium-credit-expand-link');
+    link.click();return !this.destroyed;
+  }
+  destroy(){if(this.destroyed)return;this.setAttributionAccess(false);this.setGroundNetworkInteraction(null);this.setNodeInteraction(null);this.hoverCatalog(null);this._clearSatelliteHover();this.selectedHover=null;this.container.removeEventListener?.('mouseleave',this.leaveCatalog);this.modelLayer?.dispose();this.cameraMotion.dispose();this.destroyed=true;this.position=null;this.viewControls.destroy();this.stationPickHandler?.destroy();this.stationPickHandler=null;this.stationEntities.clear();this.stationSites.clear();this.stationIds.clear();this.catalogPoints.clear();this.catalogLabels.clear();this.catalogHashes.clear();this.catalogStyles.clear();this.catalogEpochs.clear();this.catalogVisuals.clear();this.viewer.destroy();}
 }

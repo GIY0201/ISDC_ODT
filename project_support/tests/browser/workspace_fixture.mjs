@@ -1,4 +1,5 @@
 import {createBrowserId} from '../../../user_application/web/scripts/browser_identity.js';
+import {installOrbitUiMeasurement} from '../../../user_application/web/scripts/orbit_ui_measurement.js';
 import {createGlobeViewPanel} from '../../../user_application/web/scripts/tabs/globe_view.js';
 import {createSatelliteModelPanel} from '../../../user_application/web/scripts/tabs/satellite_model.js';
 import {createSatelliteHover} from '../../../user_application/web/scripts/tabs/satellite_hover.js';
@@ -69,7 +70,7 @@ import {layoutTimeline,timelineMarkup} from '../../../digital_twin/visualization
 const orchestrationSource=(await readFile(new URL('../../../communication/browser/orchestration.js',import.meta.url),'utf8')).replace('"/static/communication/data_fabric.js"',JSON.stringify(new URL('../../../communication/browser/data_fabric.js',import.meta.url).href));
 const {createOrchestrationClient}=await import(`data:text/javascript;base64,${Buffer.from(orchestrationSource).toString('base64')}`);
 const web=new URL('../../../user_application/web/scripts/',import.meta.url);
-const windowSource=(await readFile(new URL('workspace.js',web),'utf8')).replace(/^import .*;\r?\n/,'');
+const windowSource=(await readFile(new URL('workspace.js',web),'utf8')).replace(/^import .*;\r?\n/gm,'');
 const orbitSource=(await readFile(new URL('workspace_orbit.js',web),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/export function /g,'function ');
 const globeSource=(await readFile(new URL('workspace_globe.js',web),'utf8')).replace(/'\/static\/visualization\/orbit_globe\.js(?:\?[^']*)?'/,JSON.stringify(new URL('../../../digital_twin/visualization/orbit_globe.js',import.meta.url).href)).replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href));
 const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(globeSource).toString('base64')}`);
@@ -164,6 +165,7 @@ export function fixture(width=1280,height=720,options={}){
   if(options.scenarioFactory)context.createWorkspaceScenario=args=>options.scenarioFactory(createWorkspaceScenario,args);
   if(options.nodeWorkspaceFactory)context.createWorkspaceNodes=args=>options.nodeWorkspaceFactory(createWorkspaceNodes,args);
   if(options.groundNetworkPanelFactory)context.createGroundNetworkPanel=args=>options.groundNetworkPanelFactory(createGroundNetworkPanel,args);
+  context.installOrbitUiMeasurement=options.installOrbitUiMeasurement??installOrbitUiMeasurement;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}
   const resize=async(w,h)=>{context.innerWidth=w;context.innerHeight=h;await win.dispatch('resize');};

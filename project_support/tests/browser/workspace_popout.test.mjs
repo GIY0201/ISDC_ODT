@@ -2,6 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fixture} from './workspace_fixture.mjs';
 
+test('restore shelf is absent without a minimized target and restores the same window when present',async()=>{
+ const f=fixture();try{
+  assert.equal(f.get('window-shelf').hidden,true);
+  await f.get('window-minimize').dispatch('click');assert.equal(f.get('window-shelf').hidden,false);assert.equal(f.get('work-window').hidden,true);
+  await f.get('shelf-restore').dispatch('click');assert.equal(f.get('window-shelf').hidden,true);assert.equal(f.get('work-window').hidden,false);
+  await f.get('window-minimize').dispatch('click');await f.get('window-close').dispatch('click');assert.equal(f.get('window-shelf').hidden,true);assert.equal(f.viewers.length,1);
+ }finally{f.dispose();}
+});
+
 test('blocked popout is explained without changing the parent window or Viewer',async()=>{const f=fixture();try{await f.get('window-popout').dispatch('click');assert.equal(f.get('popout-feedback').hidden,false);assert.match(f.get('popout-feedback').textContent,/차단/);assert.equal(f.viewers.length,1);assert.equal(f.get('work-window').hidden,false);}finally{f.dispose();}});
 test('popout opens the current task on the same origin and sends a draft to an already loaded child',async()=>{
   let opened;const messages=[];const child={location:{origin:'http://localhost'},document:{readyState:'complete'},focus(){},postMessage:(value,origin)=>messages.push({value,origin})};
