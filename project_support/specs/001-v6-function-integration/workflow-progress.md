@@ -1549,3 +1549,18 @@ newfuture/module and whole acceptance stillpending; T180 OPEN. N022T178 OPEN.
 Aside534 records pre-calculation mode=카탈로그 분석 시각 · 재생 샘플 미계산 and after ordinaryreadonly observation calculation mode=카탈로그 분석 시각 · 정지 with playback enabled. Root independently viewed535 actual1440x900 screenshot and read534/535 JSON; savedISS/local/session bytes exact. One existing calculate action, no SIM/storedUTC/fabric send. Original paused RUN-904CE008D00B/SIM/speed5/elapsed884.681/SDC_POC_01/faults[]/recordingtrue reverified GET health at02:57:42UTC.
 
 Earlier526/533 unknown snapshots were taken before asynchronous native display/panel settlement; actualroot composition review confirms normalcatalogue owner and rules out SIM override for observed Terra body/clock. Retain counter-evidence, do not erase early states. Native observation geometry is predictedA/representative station assumptions, not real RF reception. Replay itself/full40module/whole75-84/all50/twores/GPU/PR remain separate. Evidence data/workspace/validation/live_N021_20261007_1205 and runtime_preserved_20261007_1158.json.
+
+
+## N023 실제 화면 인계와 자동 통과 결과 확인
+
+2026-10-07 실제 Aside566–570: 일반 새로고침, 기존 저장 배치 재확인,
+카탈로그 관측 계산 후 정지 상태에서 ground로 이동했다. 새로 계산하거나
+시계를 강제하지 않고 분석 UTC 2026-10-06T14:00:37.897344000Z가 유지됐다.
+자동 future 조회가 전체 수락 배치40기와 대전 지상국, 고각 마스크5도,
+3시간 종료 UTC17:00:37.897344000Z의 결과12행을 표시했다. 수동 future
+새로고침0회이며 원본30초 탐색의 짧은 구간 누락 가능과 실제RF미확인 표시를
+유지한다. Root도 공개 DOM을 별도로 확인했고 전체행/상태 캡처를 저장했다.
+1440x900의 표 영역은 viewport/main 안에 포함됐다. 두 요구 해상도/GPU 증거는
+아니다. 이어지는 legacy 전체 지상국 조회571은 요청 중이므로 성공으로 쓰지
+않는다. 통신 모듈/DTN/RF 실제 흐름과 T178/T180 및 전체75–84는 계속 열린 상태다.
+증거: data/workspace/validation/live_N023_20261007_1239.
