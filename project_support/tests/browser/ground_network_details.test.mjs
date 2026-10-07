@@ -36,7 +36,7 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`verified ground SVG, 
   await f.get('ground-node-diagram').dispatch('click',{target:{closest:()=>({getAttribute:key=>key==='data-diagram-link'?'AG':null})}});
   assert.match(f.get('ground-node-diagram-detail').innerHTML,/range_km.*400/s);
   valid=false;panel.update();assert.ok(sceneCalls.some(v=>v.clear));assert.equal(f.get('ground-node-diagram-detail').innerHTML,'');assert.equal(f.get('ground-node-diagram').innerHTML,'');assert.equal(f.get('ground-node-fabric-custody').innerHTML,'');assert.equal(f.get('ground-node-fabric-hops').innerHTML,'');
-  valid=true;accepted=false;panel.update();assert.match(f.get('ground-node-diagram-status').textContent,/미확인/);assert.doesNotMatch(f.get('ground-node-diagram').innerHTML,/data-diagram-link=/);assert.equal(f.get('ground-node-fabric-custody').innerHTML,'');
+  valid=true;accepted=false;panel.update();assert.match(f.get('ground-node-diagram-status').textContent,/미확인/);/* ADR0062: current verified geometry remains inspectable without module approval. */assert.match(f.get('ground-node-diagram').innerHTML,/data-diagram-link=/);assert.doesNotMatch(f.get('ground-node-diagram').innerHTML,/routed|품질 88%/);assert.equal(f.get('ground-node-fabric-route').disabled,true);assert.equal(f.get('ground-node-fabric-custody').innerHTML,'');
   assert.equal(f.counts().commands,0);
  }finally{panel?.destroy();f.dispose();}
 });

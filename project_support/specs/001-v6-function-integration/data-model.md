@@ -168,3 +168,6 @@ new clock, inferred stopped state or duplicate runtime is introduced.
 
 
 N024 ADR0061/contracts/periodic_analytical_display_retention.md restores original lastaccepted analytical report while same-fullscope periodic refresh pending, with explicit historical/pending label. Existing fabricowner only, boundedone readonlyrecord/privateepoch; no exact command approval, timers/API/physics changes. Sourcefailure/control/fullscope invalidation clears. Precode independent review and meaningful240/owner RED precede implementation. Whole75-84/T032/game/model/PR gates unchanged.
+
+
+N025 ADR0062/contracts/paused_native_diagram_connection.md fixes actual583 pausednative SVG43nodes0links. Existinggroundpanel uses nativeunknown-quality fallback and SAME registered historical moduleprojection in pausedexact too, with fullnative current/captured inputproof, pending/history labels, existing selectedlinkRFdraft. No actionapproval/physics/API/clock/store changes. T183/184 RED-first afterindependentprecode review; wholeacceptanceunchanged.
