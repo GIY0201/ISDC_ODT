@@ -1494,3 +1494,5 @@ Final N019 full regression: Python967PASS1existingPillowSKIP8existingERFAwarning
 Final N020 full Node1912PASS0FAIL0SKIP23078.159ms exit0; data/workspace/validation/full_N020_node.log. No Python product changes; N019967PASS1existingPillowSKIP8warnings retained. Independent review CLEAN; live/GPU/fullgoal/PR still open.
 
 N021 actualcatalog native API/clockprobe proved validsource; source mode label gap only repaired RED-first afterADR0058 independent HIGH0/CRITICAL0. Finalindependent54PASS CLEAN; fullNode1931PASS0FAIL0SKIP24470.3885ms exit0. No clock/button/UTC/API/approval change. Currentreloadlabel and whole75-84/live/allmodel/twores/GPU/game/PR remainopen.
+
+Actual526 after normal isolated reload/select still reads old unknown clock label; savedISS/local/session bytes exact. Do NOT record N021 real screen PASS. HTTP served satellite_nodes.js equals local bytes SHA256fef82ae9dd8f90690a72edb98e7abf52d6cb33868e675e2494ecd102213d3c61 with no-cache, so source-file deployment is current. Fresh distinct-document navigation and actualroot/display-owner diagnosis in progress; no authority bypass.

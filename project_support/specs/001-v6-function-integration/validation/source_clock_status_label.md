@@ -20,3 +20,5 @@ N019 전체967PASS1기존PillowSKIP8기존ERFAwarnings272.95s 증거를 유지�
 실제 reload 문구 확인은 아직 별도 기록 전이다. 이 문구는 수락 배치/통신/RF/GPU
 판정이 아니며 저장ISS EOP범위 오류, 전체모델/두해상도/게임성능/whole75–84/
 T032/remotePR 게이트는 미완료다.
+
+Actual526 after normal isolated reload/select still reads old unknown clock label; savedISS/local/session bytes exact. Do NOT record N021 real screen PASS. HTTP served satellite_nodes.js equals local bytes SHA256fef82ae9dd8f90690a72edb98e7abf52d6cb33868e675e2494ecd102213d3c61 with no-cache, so source-file deployment is current. Fresh distinct-document navigation and actualroot/display-owner diagnosis in progress; no authority bypass.
