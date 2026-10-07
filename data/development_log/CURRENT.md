@@ -1280,3 +1280,6 @@ Actual564565 current security entry automatically retrieves sameRUN SIM report w
 아니다. 이어지는 legacy 전체 지상국 조회571은 요청 중이므로 성공으로 쓰지
 않는다. 통신 모듈/DTN/RF 실제 흐름과 T178/T180 및 전체75–84는 계속 열린 상태다.
 증거: data/workspace/validation/live_N023_20261007_1239.
+
+
+Actual572 settles the single legacy native query: fullaccepted40, same exact 3h UTC, selectedstation24 contacts/1page. Public tables contain24 contacts,50 links,12 future rows. Fabric send/refresh/route all disabled and module status unknown while fabric says pending; this is unresolved, not a pass. Separate readonly server GET data-fabric/status responds249ms reachable guarded-v1 same instance sequence63; UI request/state lifecycle diagnosis started without weakening guards. T178/T180 and whole75-84 remainopen.
