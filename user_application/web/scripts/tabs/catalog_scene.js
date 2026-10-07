@@ -27,6 +27,6 @@ export function createCatalogScenePanel(controller,getTimeline=()=>null,hooks={}
   if(s.timings&&r){panel.dataset.maxPreparationSliceMilliseconds=String(s.timings.max_preparation_slice_ms);panel.dataset.httpMilliseconds=String(s.timings.http_ms);panel.dataset.validationMilliseconds=String(s.timings.validation_and_copy_ms);panel.dataset.displayMilliseconds=String(s.timings.display_callback_ms);}
   node('scene-hashes').textContent=r?`전체 GP: ${r.scene_sha256}\nEOP: ${r.eop_sha256}\nUTC 윤초: ${r.leap_sha256}`:'자료 없음';
  }
- return{show(next){view=next;draw();},update:draw,followsTimeline:()=>follow,
+ return{show(next){view=next;draw();},update:draw,followsTimeline:()=>follow,requestUtc:()=>follow&&getTimeline()?.utc||draft,
   applyDraft(items){for(const item of items){if(item.id==='scene-utc'&&typeof item.value==='string'){draft=item.value;dirty=true;}if(item.id==='scene-follow'&&['true','false'].includes(item.value))follow=item.value==='true';}draw();const field=document.getElementById('scene-utc');if(visible()&&field)field.value=draft;},destroy(){view=null;}};
 }

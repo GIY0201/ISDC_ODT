@@ -70,13 +70,13 @@ import {createCommunicationPlanningPanel} from './tabs/communication_planning.js
 import {createRfPanel} from './tabs/rf_link_budget.js?v=t039-r1';
 
 const escape=value=>String(value??'미확인').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let view=null,displayUtc=null,displayElevation='자료 준비 중';
+let view=null,displayUtc=null,displayElevation='자료 준비 중',wallSceneScope='ours';
 let analysisFollow=null,transportError='';
 const followPorts={pending:()=>analysisFollow?.isPending()===true,source:()=>analysisFollow?.followedSource()??null,locked:()=>analysisFollow?.isFollowing()===true,invalidate:reason=>analysisFollow?.invalidate(reason)};
 const storedTransport=createAnalysisTransport({follow:followPorts,independent:{play:()=>command(()=>client.control('play')),pause:()=>command(()=>client.control('pause')),speed:n=>command(()=>client.control('speed',n)),seek:utc=>command(()=>client.seek(utc)),epoch:utc=>command(()=>client.seek(utc))}});
 async function transport(action,value){try{transportError='';await storedTransport.run(action,value);}catch(error){transportError=error.message;}render();}
 const contextListeners=new Set();let contextReady=false;
-function notifyWorkspaceContext(){if(!contextReady)return;nodeWorkspace?.observeNetworkInputs();void futurePasses?.observe();const value=readWorkspaceContext();for(const listener of contextListeners){try{listener(value);}catch{}}}
+function notifyWorkspaceContext(){if(!contextReady)return;updateWallDisplay();nodeWorkspace?.observeNetworkInputs();void futurePasses?.observe();const value=readWorkspaceContext();for(const listener of contextListeners){try{listener(value);}catch{}}}
 export function observeWorkspaceContext(listener){contextListeners.add(listener);if(contextReady)listener(readWorkspaceContext());return()=>contextListeners.delete(listener);}
 export function readWorkspaceContext(){let context=null;try{context=missionServices.context();}catch{}const network=typeof nodeWorkspace.networkPresentation==='function'?nodeWorkspace.networkPresentation():(()=>{const proof=nodeWorkspace.networkSnapshot?.();return {proof,verified:proof?nodeWorkspace.verifyNetworkSnapshot?.(proof)===true:false};})();return projectWorkspaceContext({selection:nodeWorkspace.selection?.()??null,display:globe.displayContext(),catalog:catalogTimeline.snapshot(),stored:client.snapshot(),nodes:nodeWorkspace.contextPresentation(),sim:simPanel.controller.snapshot(),mission:{ready:missionServices.store.ready,selected:missionServices.store.selected,module:missionServices.moduleSnapshot(),inspection:missionServices.store.selectedId?missionServices.execution.inspection(missionServices.store.selectedId):null,context},network,fabric:fabric.snapshot(),data:sourceDataPanel.contextSnapshot()});}
 let openWorkspaceView=()=>{};
@@ -125,7 +125,7 @@ catalogPasses=createCatalogPasses(api,()=>{catalogPassPanel?.update();stationPan
 catalogPassPanel=createCatalogPassPanel(catalogTrack,catalogPasses,()=>catalogTimeline.snapshot());
 catalogTimePanel=createCatalogTimePanel(catalogTimeline,GROUND_STATIONS,{follow:followPorts});
 const catalogGeometry=createCatalogGeometry(api,(value,pin)=>{catalogTimeline.select(value,pin);syncModel();},()=>{catalogPanel?.update();if(catalogGeometry.snapshot().hashConflict){catalogScene?.clear();catalogTimeline.clear();}});
-catalogScene=createCatalogScene(api,value=>globe.catalogScene(value,number=>{const s=catalogScene.snapshot();const row=catalogScene.row(number);if(row&&s.result&&!catalogPanel.controller.snapshot().pending){catalogPanel.controller.selectExternal(row,s.result);openWorkspaceView('satellite');}}),()=>catalogScenePanel?.update(),{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
+catalogScene=createCatalogScene(api,value=>globe.catalogScene(value,number=>{const s=catalogScene.snapshot();const row=catalogScene.row(number);if(row&&s.result&&!catalogPanel.controller.snapshot().pending){catalogPanel.controller.selectExternal(row,s.result);openWorkspaceView('satellite');}}),()=>{catalogScenePanel?.update();if(contextReady)updateWallDisplay();},{onConflict:()=>{catalogGeometry.clear();catalogTimeline.clear();}});
 catalogScenePanel=createCatalogScenePanel(catalogScene,()=>catalogTimeline.snapshot(),{setLabelsVisible:value=>globe.setCatalogLabels(value),labelsVisible:()=>globe.catalogLabelsVisible()});
 catalogPanel=createCatalogPanel(api,catalogGeometry,{applied:p=>catalogScene.configure(p),getCatalogTimeline:()=>catalogTimeline.snapshot()});
 modelSelection=createSatelliteModelSelection({api,globe,timeline:catalogTimeline,validateManifest:validateSatelliteManifest,createResolver:createModelResolver});
@@ -166,9 +166,37 @@ const playback=createWorkspacePlayback(client,(snapshot,row,utc,error)=>{
   const clock=document.getElementById('orbit-display-utc');if(clock)clock.textContent=utc||'미선택';
   const elevation=document.getElementById('orbit-display-elevation');if(elevation)elevation.textContent=displayElevation;
 });
+const removeWallModel=globe.observeModel?.(()=>{if(contextReady)updateWallDisplay();})??(()=>{});
 let disposed=false;
-window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removePeriodicFabric();removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();removeCatalogContinuity();nodeClock?.destroy();groundNetworkPanel?.destroy();futurePasses?.destroy();fabric.destroy();sourceGround.destroy();nodeWorkspace?.destroy();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();sourceMissionPanel.destroy();missionServices.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
+window.addEventListener('pagehide',event=>{if(!event.persisted&&!disposed){disposed=true;removeWallModel();removePeriodicFabric();removeSatelliteHover();satelliteHover?.destroy();removeModelSelection();removeCatalogContinuity();nodeClock?.destroy();groundNetworkPanel?.destroy();futurePasses?.destroy();fabric.destroy();sourceGround.destroy();nodeWorkspace?.destroy();modelSelection.destroy();modelPanel.destroy();globeViewPanel.destroy();solar.destroy();revisionSync.destroy();client.destroy();groundPanel.destroy();rfPanel.destroy();planningPanel.destroy();radioPanel.destroy();seriesPanel.destroy();missionPanel.destroy();sourceMissionPanel.destroy();missionServices.destroy();simPanel.destroy();kpiPanel.destroy();hilPanel.destroy();catalogPanel.destroy();catalogGeometry.destroy();catalogTimePanel.destroy();catalogTimeline.destroy();catalogScene.destroy();catalogScenePanel.destroy();catalogPassPanel.destroy();catalogPasses.destroy();catalogTrack.destroy();stationPanel.destroy();playback.destroy();globe.destroy();}});
 async function command(work){await work();const current=client.snapshot();if(current.status==='ready'&&!current.state?.playing)await client.samples({stepSeconds:1,count:3});}
+let wallCatalogGeneration=0,wallCatalogRequest=null,wallReplica=null,wallMode='3d';
+export function detachWorkspaceWall(){wallReplica?.destroy();wallReplica=null;}
+export function mountWorkspaceWall(target,caption){detachWorkspaceWall();wallReplica=globe.createDisplayReplica(target,caption);if(!wallReplica)return false;nodeWorkspace.bindDisplayReplica(wallReplica);solar.bindDisplayReplica(wallReplica,document.getElementById('wall-solar-overlay'));wallReplica.setMode(wallMode);updateWallDisplay();return true;}
+function updateWallDisplay(){
+  if(!nodeWorkspace)return;
+  if(view!=='wall'){nodeWorkspace.setSceneDisplayScope?.('all');globe.setDisplayVisibility?.({catalog:true,selected:true});return;}
+  const own=wallSceneScope==='ours',selected=globe.modelState().selected;
+  nodeWorkspace.setSceneDisplayScope('all');
+  const row=selected?.catalog_number?catalogScene.row(selected.catalog_number):null;
+  const selectedVisible=!!selected?.node_id&&nodeWorkspace.isSceneNodeDisplayed(selected.node_id)||!own&&!!row&&row.status==='valid'&&row.normalized_gp_sha256===selected.normalized_gp_sha256;
+  globe.setDisplayVisibility({catalog:true,selected:true});wallReplica?.setCatalogVisible(!own);
+  const source=catalogScene.snapshot(),context=nodeWorkspace.contextPresentation(),display=globe.displayContext();
+  const status=document.getElementById('wall-scope-status');if(status)status.textContent=own?`우리 위성 · 프로젝트 배포 ${context?.deployed_count??0}개 · 배포와 일치하는 정의의 준비된 기하만 표시 · 표시 UTC ${display?.utc??'미제공'}`:`전체 위성 · 불러온 카탈로그 ${source.result?.count??0}개 / 유효 ${source.result?.valid_count??0} / 실패 ${source.result?.error_count??0} · 원본 snapshot UTC ${source.result?.utc??'미제공'} · 현재 표시 UTC ${display?.utc??'미제공'} · 전체 우주 위성 목록이 아닙니다.`;
+  const toggle=document.getElementById('wall-whole');if(toggle){toggle.setAttribute('aria-pressed',String(!own));toggle.textContent=!own&&(source.pending||wallCatalogRequest?.pending)?'전체 위성 준비 중 · OFF':'전체 위성 '+(own?'OFF':'ON');toggle.disabled=false;}const mode=document.getElementById('wall-mode');if(mode)mode.value=wallMode;if(status&&!own){status.textContent+=` · 프로젝트 배포 ${context?.deployed_count??0}개 함께 표시${source.error?' · '+source.error:''}`;if(wallCatalogRequest)status.textContent+=` · ${wallCatalogRequest.pending?'조회 준비 중':'조회'} UTC ${wallCatalogRequest.utc||'기존 조회 초안 준비 중'}${wallCatalogRequest.error?' · '+wallCatalogRequest.error:''}`;const caption=document.getElementById('wall-globe-caption');if(caption&&!globe.displayContext()?.utc)caption.textContent=source.result?status.textContent:source.error||wallCatalogRequest?.error||`전체 카탈로그 ${source.pending||wallCatalogRequest?.pending?'조회 준비 중':'위치 미표시'} · 조회 UTC ${wallCatalogRequest?.utc||catalogScenePanel.requestUtc()} · GP 모델 / 실측 아님`;}
+  const current=document.getElementById('wall-current-status');if(current){const value=readWorkspaceContext();current.textContent=`${value.text.satellite} · ${value.text.clock} · ${value.text.status}`;}
+  if(own){if(status&&!context?.deployment_confirmed)status.textContent+=' · 로컬 배포 수락 미확인';const caption=document.getElementById('wall-globe-caption');if(caption&&!display?.utc)caption.textContent=status?.textContent||'프로젝트 배포의 현재 UTC 위치 미표시';}
+}
+export function resizeWorkspaceGlobe(){wallReplica?.resize();return globe.resize();}
+export function observeWorkspaceModel(listener){return globe.observeModel?.(listener)??(()=>{});}
+export function setWorkspaceWallMode(mode){if(disposed||!['2d','3d'].includes(mode))return false;wallMode=mode;wallReplica?.setMode(mode);updateWallDisplay();return true;}
+async function requestWallCatalog(ticket){
+ const current=()=>!disposed&&ticket===wallCatalogGeneration&&wallSceneScope==='whole'&&view==='wall';
+ try{if(!catalogScene.snapshot().context){await catalogPanel.controller.load();if(!current())return;}if(!current())return;if(!catalogScene.snapshot().context)throw Error(catalogPanel.controller.snapshot().error||'카탈로그 조회 조건을 준비하지 못했습니다.');const utc=catalogScenePanel.requestUtc();wallCatalogRequest={pending:true,utc,error:''};updateWallDisplay();if(!current())return;await catalogScene.load(utc);}
+ catch(error){if(current())wallCatalogRequest={pending:false,utc:wallCatalogRequest?.utc||'',error:String(error.message||error)};}
+ finally{if(current()){if(wallCatalogRequest)wallCatalogRequest.pending=false;updateWallDisplay();}}
+}
+export function setWorkspaceWallScope(scope){if(disposed||!['ours','whole','toggle'].includes(scope))return false;const ticket=++wallCatalogGeneration;wallSceneScope=scope==='toggle'?(wallSceneScope==='ours'?'whole':'ours'):scope;wallCatalogRequest=null;updateWallDisplay();globe.resize();if(scope==='toggle'&&wallSceneScope==='whole'){const source=catalogScene.snapshot();if(!source.result&&!source.pending){wallCatalogRequest={pending:true,utc:'',error:''};updateWallDisplay();void requestWallCatalog(ticket);}}return true;}
 function render(){
   groundNetworkPanel?.update();
   nodeWorkspace?.refresh();
@@ -190,6 +218,7 @@ function render(){
   catalogPassPanel.update();
   stationPanel.update();
   modelPanel.update();
+  updateWallDisplay();
   if(view!=='satellite')return;
   const screen=document.getElementById('screen');let panel=document.getElementById('stored-orbit');
   if(!panel){panel=document.createElement('section');panel.id='stored-orbit';panel.className='panel';screen.prepend(panel);}
@@ -215,7 +244,7 @@ function render(){
 // telemetry receipt callback, so it does not revalidate all mission proofs at FPS.
 contextReady=true;const stopContextDisplay=globe.observeDisplayContext(value=>{if(!value?.projected)notifyWorkspaceContext();});
 window.addEventListener('pagehide',event=>{if(!event.persisted){contextReady=false;stopContextDisplay();contextListeners.clear();}});
-export function showWorkspaceOrbit(currentView){view=currentView;if(['integration','security','composer'].includes(view))simPanel.controller.connect();groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);render();catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);if(view!=='settings')globeViewPanel.show(view);modelPanel.show(view);nodeWorkspace?.show(view);groundNetworkPanel?.show(view);sourceMissionPanel?.show(view);sourceDataPanel.show(view);sourceSecurityPanel.show(view);sourceSettingsPanel.show(view);if(view==='settings')globeViewPanel.show(view);sourceScenarioPanel.show(view);}
+export function showWorkspaceOrbit(currentView){if(view==='wall'&&currentView!=='wall'){wallCatalogGeneration++;wallCatalogRequest=null;detachWorkspaceWall();}view=currentView;if(['integration','security','composer'].includes(view))simPanel.controller.connect();groundPanel.show(view);rfPanel.show(view);planningPanel.show(view);radioPanel.show(view);seriesPanel.show(view);missionPanel.show(view);simPanel.show(view);kpiPanel.show(view);hilPanel.show(view);catalogPanel.show(view);catalogTimePanel.show(view);catalogScenePanel.show(view);catalogPassPanel.show(view);stationPanel.show(view);if(view!=='settings')globeViewPanel.show(view);modelPanel.show(view);nodeWorkspace?.show(view);groundNetworkPanel?.show(view);sourceMissionPanel?.show(view);sourceDataPanel.show(view);sourceSecurityPanel.show(view);sourceSettingsPanel.show(view);if(view==='settings')globeViewPanel.show(view);sourceScenarioPanel.show(view);render();globe.resize?.();}
 client.load();
 
 export function applyWorkspaceDraft(items,remote=false){

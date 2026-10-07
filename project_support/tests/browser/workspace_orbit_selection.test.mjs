@@ -13,6 +13,7 @@ test('empty UI choice restores server selection without clearing its result or s
   globalThis.window={addEventListener(){},fetch:async()=>{throw Error('isolated orbit handler cannot deploy');}};
   const source=(await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8'))
     .replace("'./browser_identity.js'",JSON.stringify(new URL('../../../user_application/web/scripts/browser_identity.js',import.meta.url).href))
+    .replace("'./orbit_ui_measurement.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_ui_measurement.js',import.meta.url).href))
     // Model composition has dedicated real-assembly tests; this fixture isolates
     // the unchanged stored-orbit select handler and its no-command assertion.
     .replace(/import \{createMissionServices\} from [^;]+;/,'const createMissionServices=()=>({destroy(){}});')

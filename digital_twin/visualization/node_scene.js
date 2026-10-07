@@ -17,7 +17,7 @@ export class NodeScene{
     if(analyticalRouteEmphasis!==null&&['read','verify'].some(key=>typeof analyticalRouteEmphasis?.[key]!=='function'))throw new TypeError('registered analytical route read/verify port required');
     Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry,sampledLinks,palette,tracksVisible,isTransitioning,onStatus,verifyLinkSnapshot,animationNow});
     this.links=new Map();this.linkPolylines=null;this.linkOwner=null;this.linkReceipt=null;this.definitionScope='[]';this.linksVisible=true;this.models=new Map();this.descriptions=new Map();this.paths=new Map();this.points=new Map();this.labels=new Map();this.selectedId=null;this.hoveredId=null;this.visibleIds=null;this.sdcMode=false;this.theme='dark';this.loadToken=0;this.modelsVisible=true;this.disposed=false;this.dataSource=null;this.dataSourceOwner=null;this.markerOwner=null;this.pointCollection=null;this.labelCollection=null;
-    this.frameMemo=null;
+    this.frameMemo=null;this.displayIds=null;this.displayRevision=0;
     this.routeEmphasis=routeEmphasis;this.routeGeneration=0;this.routeStyled=new Map();
     this.analyticalRouteEmphasis=analyticalRouteEmphasis;this.analyticalRouteGeneration=0;this.analyticalRouteStyled=new Map();this.analyticalRouteReceipt=null;this.analyticalRouteCandidate=null;this.analyticalRouteLastView=null;this.revokedAnalyticalRoutes=new WeakSet();this.analyticalFrozen=new WeakSet();
     this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.linkGeneration=0;this.sampledFrozen=new WeakSet();this.sampledScopes=new WeakMap();this.sampledPairValidation=null;
@@ -36,7 +36,7 @@ export class NodeScene{
   ambientLighting(C){try{if(!C.ImageBasedLighting||!C.Cartesian3)return undefined;return new C.ImageBasedLighting({sphericalHarmonicCoefficients:Array.from({length:9},(_,i)=>i===0?new C.Cartesian3(AMBIENT_IRRADIANCE,AMBIENT_IRRADIANCE,AMBIENT_IRRADIANCE*1.05):new C.Cartesian3())});}catch{return undefined;}}
   matches(value,id){const entry=this.descriptions.get(id);return !!entry&&value?.node_id===id&&Object.entries(metadata).every(([k,v])=>value[k]===v)&&typeof value.definition_hash==='string'&&/^[a-f0-9]{64}$/.test(value.definition_hash)&&signature(value.node_definition)===entry.signature;}
   frameCurrent(frame,verifyNative=true){
-    try{return (!verifyNative||!frame.displayGeometry||frame.displayGeometry.revision()===frame.nativeRevision)&&!this.disposed&&this.frameMemo===frame&&!frame.invalid&&this.displayGeometry===frame.displayGeometry&&this.advanceUtc===frame.advanceUtc&&this.viewer===frame.viewer&&this.cesium===frame.cesium&&this.descriptions===frame.descriptions&&this.definitionScope===frame.scope&&this.timeSource?.()===frame.utc&&this.isTransitioning()===frame.transition&&this.viewer?.scene?.mode===frame.mode&&(!verifyNative||!frame.displayGeometry||frame.displayGeometry.revision()===frame.nativeRevision);}catch{return false;}
+    try{return (!verifyNative||!frame.displayGeometry||frame.displayGeometry.revision()===frame.nativeRevision)&&!this.disposed&&this.frameMemo===frame&&!frame.invalid&&this.displayGeometry===frame.displayGeometry&&this.advanceUtc===frame.advanceUtc&&this.viewer===frame.viewer&&this.cesium===frame.cesium&&this.descriptions===frame.descriptions&&this.definitionScope===frame.scope&&this.displayRevision===frame.displayRevision&&this.timeSource?.()===frame.utc&&this.isTransitioning()===frame.transition&&this.viewer?.scene?.mode===frame.mode&&(!verifyNative||!frame.displayGeometry||frame.displayGeometry.revision()===frame.nativeRevision);}catch{return false;}
   }
   frameCall(frame,callback){
     if(frame&&!this.frameCurrent(frame)){frame.invalid=true;return null;}
@@ -124,13 +124,20 @@ export class NodeScene{
   }
   placePoints(utc){
     const C=this.cesium;if(!C?.Cartesian3)return;
-    for(const [id,point]of this.points){const label=this.labels.get(id),g=this.geometryAt(id,utc),visible=!!g&&(this.visibleIds===null||this.visibleIds.has(id)||id===this.selectedId);point.show=visible;if(label)label.show=visible;if(!g)continue;
+    for(const [id,point]of this.points){const label=this.labels.get(id),g=this.geometryAt(id,utc),visible=!!g&&this.displayed(id)&&(this.visibleIds===null||this.visibleIds.has(id)||id===this.selectedId);point.show=visible;if(label)label.show=visible;if(!g)continue;
       const position=new C.Cartesian3(...g.row.position_m);point.position=position;if(label)label.position=position;
     }
   }
   removeMarker(id){const point=this.points.get(id),label=this.labels.get(id);if(point)this.pointCollection?.remove(point);if(label)this.labelCollection?.remove(label);this.points.delete(id);this.labels.delete(id);}
   setSdcMode(enabled){if(this.disposed)return;this.sdcMode=Boolean(enabled);this.refreshMarkerStyles();}
   setHovered(id){if(this.disposed)return;this.hoveredId=id!=null&&this.descriptions.has(String(id))?String(id):null;this.refreshMarkerStyles();}
+  displayed(id){return this.displayIds===null||this.displayIds.has(String(id));}
+  setDisplayNodes(ids=null){
+    if(this.disposed)return false;if(ids!==null&&(!Array.isArray(ids)||ids.some(id=>typeof id!=='string')))throw new TypeError('display node IDs required');
+    const next=ids===null?null:new Set(ids);if(next===null&&this.displayIds===null||next&&this.displayIds&&next.size===this.displayIds.size&&[...next].every(id=>this.displayIds.has(id)))return true;
+    this.displayIds=next;this.displayRevision++;
+    const utc=this.timeSource?.();this.placePoints(utc);this.placeModels(utc);this.rebuildPaths();this.placeDisplayLinks(utc);return true;
+  }
   setVisibleNodes(ids=null){if(this.disposed)return;if(ids!==null&&!Array.isArray(ids))throw new TypeError('node visibility IDs must be an array or null');this.visibleIds=ids===null?null:new Set(ids.map(String));this.placePoints(this.timeSource?.());}
   modelKey(id){const d=this.descriptions.get(id)?.model;return d?.url?`${d.url}|${Number(d.scale)>0?d.scale:1}`:null;}
   async loadModels(){
@@ -161,7 +168,7 @@ export class NodeScene{
   }
   placeModels(utc){
     const C=this.cesium;if(!C)return;const morph=this.isTransitioning()||C.SceneMode&&this.viewer?.scene?.mode===C.SceneMode.MORPHING;
-    for(const [id,entry]of this.models){const g=!entry.failed&&!morph&&id!==this.selectedId&&this.modelsVisible?this.geometryAt(id,utc):null;if(!g){entry.model.show=false;continue;}const here=new C.Cartesian3(...g.row.position_m);entry.model.modelMatrix=this.bodyMatrix(C,id,here,utc,entry.orientation,g.definition_hash);entry.model.show=true;}
+    for(const [id,entry]of this.models){const displayRevision=this.displayRevision;const g=this.displayed(id)&&!entry.failed&&!morph&&id!==this.selectedId&&this.modelsVisible?this.geometryAt(id,utc):null;if(!g){entry.model.show=false;continue;}const here=new C.Cartesian3(...g.row.position_m);entry.model.modelMatrix=this.bodyMatrix(C,id,here,utc,entry.orientation,g.definition_hash);entry.model.show=!this.disposed&&displayRevision===this.displayRevision&&this.displayed(id);}
   }
   pathColor(C,id){const palette=this.palette(this.theme)||{},regime=this.descriptions.get(id)?.orbit_regime;return C.Color.fromCssColorString(palette[String(regime||'').toUpperCase()]||palette.fallback||'#ff9f43').withAlpha(PATH_ALPHA[this.theme]);}
   rebuildPaths(){
@@ -183,7 +190,7 @@ export class NodeScene{
         if(!entry){entry={positions:points,revision,entity:null};entry.entity=entities.add({id:`node-path-${id}`,show:false,polyline:{positions:points,width:1.3,material:this.pathColor(C,id),arcType:C.ArcType?.NONE}});this.paths.set(id,entry);}
         else{entry.positions=points;entry.revision=revision;entry.entity.polyline.positions=points;}
       }
-      entry.entity.show=entry.positions.length>1&&id!==this.selectedId&&this.tracksVisible()!==false;
+      entry.entity.show=this.displayed(id)&&entry.positions.length>1&&id!==this.selectedId&&this.tracksVisible()!==false;
     }
   }
 
@@ -235,9 +242,9 @@ export class NodeScene{
     const current=!!this.linkReceipt&&this.linkReceipt.utc===utc&&utc===this.timeSource?.()&&this.linkReceipt.scope===this.definitionScope&&this.linkOwner===this.viewer;
     const morph=this.isTransitioning()||this.cesium?.SceneMode&&this.viewer?.scene?.mode===this.cesium.SceneMode.MORPHING;
     for(const entry of this.links.values()){
-      const a=current&&!morph&&this.linksVisible?this.cartesianAt(entry.a,utc):null,b=a?this.cartesianAt(entry.b,utc):null;
+      const displayRevision=this.displayRevision;const a=this.displayed(entry.a)&&this.displayed(entry.b)&&current&&!morph&&this.linksVisible?this.cartesianAt(entry.a,utc):null,b=a?this.cartesianAt(entry.b,utc):null;
       const drawable=!!a&&!!b&&!['blocked','idle','none'].includes(entry.state);
-      if(drawable){entry.positions=[a,b];entry.line.positions=entry.positions;}entry.line.show=drawable;
+      if(drawable){entry.positions=[a,b];entry.line.positions=entry.positions;}entry.line.show=drawable&&!this.disposed&&displayRevision===this.displayRevision&&this.displayed(entry.a)&&this.displayed(entry.b);
     }
   }
   sampledReadonly(value){
@@ -295,7 +302,7 @@ export class NodeScene{
         if(!entry){entry={a:pair.a,b:pair.b,state:pair.state,positions:[],line:lines.add({id:`node-link-${pair.key}`,positions:[],show:false,width:2,material:this.linkMaterial(C,pair.state)})};this.links.set(pair.key,entry);}
         else if(entry.state!==pair.state){entry.line.material=this.linkMaterial(C,pair.state);entry.state=pair.state;}
         entry.a=pair.a;entry.b=pair.b;entry.material=entry.line.material;entry.presentation_kind=view.presentation_kind;entry.analysis_utc=view.analysis_utc;
-        const value=positions.get(pair.key);if(value){entry.positions=value;entry.line.positions=value;}entry.line.show=!!value;
+        const value=positions.get(pair.key);if(value){entry.positions=value;entry.line.positions=value;}entry.line.show=!!value&&this.displayed(entry.a)&&this.displayed(entry.b);
       }
       for(const key of [...this.links.keys()])if(!keep.has(key))this.removeLink(key);
       if(port.verify(view,{utc})!==true||!current())throw Error('sampled authority changed during publication');
@@ -387,13 +394,13 @@ export class NodeScene{
   removeLink(key){const entry=this.links.get(key);if(!entry)return;entry.line.show=false;try{this.linkPolylines?.remove(entry.line);}catch{/* Owned primitive already gone. */}this.links.delete(key);}
   clearLinks(){this.restoreAnalyticalRouteEmphasis(true);this.routeGeneration++;this.restoreRouteEmphasis();this.linkGeneration++;for(const key of [...this.links.keys()])this.removeLink(key);this.linkReceipt=null;this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.sampledPairValidation=null;}
 
-  select(id){if(this.disposed)return;this.selectedId=id==null?null:String(id);this.refreshMarkerStyles();this.placePoints(this.timeSource?.());this.placeModels(this.timeSource?.());for(const [key,p]of this.paths)p.entity.show=p.positions.length>1&&key!==this.selectedId&&this.tracksVisible()!==false;}
+  select(id){if(this.disposed)return;this.selectedId=id==null?null:String(id);this.refreshMarkerStyles();this.placePoints(this.timeSource?.());this.placeModels(this.timeSource?.());for(const [key,p]of this.paths)p.entity.show=this.displayed(key)&&p.positions.length>1&&key!==this.selectedId&&this.tracksVisible()!==false;}
   setModelsVisible(visible){this.modelsVisible=visible!==false;this.placeModels(this.timeSource?.());return this.modelsVisible;}
   setTheme(theme){this.theme=theme==='light'?'light':'dark';this.refreshMarkerStyles();const C=this.cesium;if(C?.Color)for(const [id,p]of this.paths)p.entity.polyline.material=this.pathColor(C,id);}
   update(utc=this.timeSource?.()){if(this.disposed)return;this.placePoints(utc);this.placeModels(utc);this.placeDisplayLinks(utc);this.rebuildPaths();}
   syncFrame(utc,nowMs){
     if(this.disposed)return;
-    const frame={utc,viewer:this.viewer,cesium:this.cesium,descriptions:this.descriptions,scope:this.definitionScope,transition:this.isTransitioning(),mode:this.viewer?.scene?.mode,geometry:new Map(),utcAdvances:new Map(),displayGeometry:this.displayGeometry,nativeRevision:null,advanceUtc:this.advanceUtc,invalid:false};
+    const frame={utc,viewer:this.viewer,cesium:this.cesium,descriptions:this.descriptions,scope:this.definitionScope,displayRevision:this.displayRevision,transition:this.isTransitioning(),mode:this.viewer?.scene?.mode,geometry:new Map(),utcAdvances:new Map(),displayGeometry:this.displayGeometry,nativeRevision:null,advanceUtc:this.advanceUtc,invalid:false};
     this.frameMemo=frame;
     if(frame.displayGeometry){
       // Capture the owner token inside the already bound frame, so a revision

@@ -60,3 +60,8 @@ test('clear during yielded validation fences prepared rows and late failures nev
  const invalid=createCatalogScene({catalogScene:async p=>{const v=reply(p,16633);v.rows.at(-1).position_m[0]=NaN;return v;}},v=>seen.push(v),()=>{},{...host(),yieldTask:async()=>{}});
  invalid.configure(context);await invalid.load(utc);assert.equal(invalid.snapshot().result,null);assert.match(invalid.snapshot().error,/응답/);assert.equal(seen.filter(Boolean).length,0);invalid.destroy();
 });
+
+test('original scene query UTC port preserves follow and explicit draft without creating a new clock',async()=>{
+ const {createCatalogScenePanel}=await import('../../../user_application/web/scripts/tabs/catalog_scene.js');const previous=globalThis.document;globalThis.document={getElementById:()=>null};
+ try{let timeline={utc};const panel=createCatalogScenePanel({},()=>timeline);assert.equal(panel.requestUtc(),utc);panel.applyDraft([{id:'scene-follow',value:'false'},{id:'scene-utc',value:'2020-07-13T01:00:00Z'}]);assert.equal(panel.requestUtc(),'2020-07-13T01:00:00Z');timeline={utc:'2020-07-14T01:00:00Z'};assert.equal(panel.requestUtc(),'2020-07-13T01:00:00Z');panel.applyDraft([{id:'scene-follow',value:'true'}]);assert.equal(panel.requestUtc(),timeline.utc);panel.destroy();}finally{globalThis.document=previous;}
+});

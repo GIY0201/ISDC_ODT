@@ -29,3 +29,12 @@ test('actual timeline assembly follows injected UTC, reports copied quality, fai
  f.api.solarSamples=()=>{calls++;return Promise.reject(Error('EOP unavailable'));};f.context({...context,utc:codec.advance(utc,1000)});await new Promise(r=>setImmediate(r));assert.equal(d.updates.at(-1),null);assert.match(f.c.state().timeline.error,/EOP unavailable/);assert.equal(f.c.state().geometry,null);
  f.api.solarSamples=p=>{calls++;return Promise.resolve(response(p));};f.c.retry();await new Promise(r=>setImmediate(r));assert.equal(d.updates.at(-1).utc,codec.advance(utc,1000));f.c.destroy();
 });
+
+test('replica solar uses the existing native sample and preferences without another query or primary teardown',async()=>{
+ const f=await fixture(),primary=f.boot(),codec=createUtcCodec(LEAP_SHA256),H='a'.repeat(64),utc='2020-07-12T21:16:01.000416000Z';let calls=0,valid=true,child;
+ f.api.solarSamples=p=>{calls++;return Promise.resolve({...p,schema_version:1,status:'valid',frame:'ITRF',end_utc:codec.advance(p.start_utc,600),eop_sha256:H,leap_sha256:LEAP_SHA256,solar_model:'ERFA_builtin',frame_transform:'IAU2006_2000A',observed_cip_offsets:false,purpose:'display_geometry',units:{time:'UTC',direction:'unitless'},rows:Array.from({length:601},(_,i)=>({utc:codec.advance(p.start_utc,i),status:'valid',direction_to_sun:[1,0,0],eop_quality:{ut1:'predicted_a',polar_motion:'observed_a'}}))});};
+ const context={key:'catalog:25544:hash',utc,leap_sha256:LEAP_SHA256,eop_sha256:H};f.context(context);await new Promise(r=>setImmediate(r));
+ const replica={bindSolar(factory){child=factory({}, {},{readContext:()=>valid?context:null,verifySource:()=>valid});return true;}};
+ assert.equal(f.c.bindDisplayReplica(replica,{}),true);const secondary=f.instances[1];child.syncFrame(utc);assert.equal(calls,1);assert.equal(secondary.updates.at(-1).utc,utc);assert.equal(secondary.updates.at(-1).eop_sha256,H);
+ f.c.setEnabled(true);f.view('light');child.syncFrame(utc);assert.deepEqual(secondary.styles.at(-1),['light',true]);valid=false;child.syncFrame(utc);assert.equal(secondary.updates.at(-1),null);child.destroy();assert.equal(secondary.destroyed,true);assert.notEqual(primary.destroyed,true);f.c.destroy();assert.equal(primary.destroyed,true);
+});

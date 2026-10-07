@@ -111,5 +111,5 @@ export function createCatalogPanel(api,geometry,hooks={}){
   const item=s.selectedItem??r?.items.find(x=>x.NORAD_CAT_ID===s.selected),d=s.profile;
   node('cat-detail').innerHTML=item?`<h3>${esc(d?.catalog?.OBJECT_NAME||item.OBJECT_NAME)} · ${s.selected}</h3><p>${d?esc(sourceLabels[d.source]):'SATCAT 상세 아직 없음'} · 상세 응답 시각 ${esc(known(d?.fetched_at))} · ${esc(d?.warning||'')}</p><dl>${[...profileRows(item,d),...catalogInspectorRows(item,d,{timeline:hooks.getCatalogTimeline?.()})].map(([key,value])=>`<dt>${esc(key)}</dt><dd>${esc(value)}</dd>`).join('')}</dl><p>원본 코드와 서버 파생 궤도값입니다. 실제 통신 상태는 미확인입니다.</p>`:'';
  }
- return {controller,show(next){view=next;if(visible()){draw();if(!loaded){loaded=true;controller.load();}}},update:draw,applyDraft(items){for(const x of items){if(x.id.startsWith('cat-'))controller.edit(x.id.slice(4),x.value);}},destroy:()=>controller.destroy()};
+ return {controller,show(next){view=next;if(!visible()){document.getElementById('catalog-workspace')?.remove();return;}if(visible()){draw();if(!loaded){loaded=true;controller.load();}}},update:draw,applyDraft(items){for(const x of items){if(x.id.startsWith('cat-'))controller.edit(x.id.slice(4),x.value);}},destroy:()=>controller.destroy()};
 }

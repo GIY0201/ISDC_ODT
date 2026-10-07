@@ -6,7 +6,7 @@ export function createWorkspacePlayback(client,showFrame,{
   now=()=>performance.now(),requestFrame=fn=>requestAnimationFrame(fn),cancelFrame=id=>cancelAnimationFrame(id),
   setTimer=fn=>setInterval(fn,5000),clearTimer=id=>clearInterval(id),
 }={}){
-  let current=null,codec=null,codecHash=null,buffer=null,bufferId=null,frame=null,disposed=false,lastAttempt=null;
+  let current=null,codec=null,codecHash=null,buffer=null,bufferId=null,frame=null,disposed=false,lastAttempt=null,stateReadPending=false;
   function draw(){
     if(disposed||!current)return;
     let utc=null,row=null,error='';
@@ -28,7 +28,13 @@ export function createWorkspacePlayback(client,showFrame,{
     }
   }
   function tick(){frame=null;draw();if(!disposed&&current?.state?.playing&&frame===null)frame=requestFrame(tick);}
-  const timer=setTimer(()=>{if(!disposed&&current?.state?.playing)client.refresh();});
+  const timer=setTimer(()=>{
+    if(disposed||stateReadPending||!current?.state?.current_utc||current.status!=='ready'||current.fetching)return;
+    stateReadPending=true;
+    // The selection owner handles request failures. This flag only serializes timer reads.
+    try{Promise.resolve(client.refresh()).catch(()=>{}).finally(()=>{stateReadPending=false;});}
+    catch{stateReadPending=false;}
+  });
   return {
     update(snapshot){
       if(disposed)return;

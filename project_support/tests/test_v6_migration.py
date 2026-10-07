@@ -9,8 +9,12 @@ def test_v6_workspace_is_root_and_legacy_is_preserved():
         for name in ('rail-groups', 'work-window', 'window-titlebar', 'screen', 'shelf-restore'):
             assert f'id="{name}"' in page
         assert '/static/scripts/workspace.js' in page
-        assert 'href="/legacy"' in page
-        legacy = client.get('/legacy').text
+        # The user removed the console shortcut; its preserved route still serves
+        # the original console independently of the current workspace.
+        assert 'href="/legacy"' not in page
+        legacy_response = client.get('/legacy')
+        assert legacy_response.status_code == 200
+        legacy = legacy_response.text
         assert '/static/scripts/app.js' in legacy
         assert 'id="rail-groups"' not in legacy
         for asset in ('styles/workspace.css', 'scripts/workspace.js', 'assets/branding/aerodt.png', 'assets/nasa_blue_marble_september.jpg'):

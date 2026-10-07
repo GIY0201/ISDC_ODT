@@ -249,3 +249,20 @@ test('actual native track decoder revisions drive renderer reuse and whole-path 
  for(let i=0;i<30;i++)f.scene.update(utc);assert.equal(reads,2);assert.equal(f.scene.paths.get('1').positions,positions);assert.deepEqual(plain(positions[120]),{x:120,y:1,z:3});
  buffer=build(true);f.scene.update(utc);assert.equal(reads,4);assert.equal(f.scene.paths.get('1').entity.show,false);assert.deepEqual(f.scene.paths.get('1').positions,[]);buffer=null;f.scene.update(utc);assert.equal(reads,4);f.scene.destroy();
 });
+
+test('render-only fleet scope filters selected markers models paths and links without changing definitions or native receipt',async()=>{
+ const f=fixture({verifyLinkSnapshot:()=>true});await f.scene.setNodes(entries());
+ f.scene.select('2');f.scene.linkReceipt={utc,scope:f.scene.definitionScope};const line={show:true};f.scene.links.set('pair',{a:'1',b:'2',state:'locked',line});f.scene.linkOwner=f.viewer;
+ const scope=f.scene.definitionScope,selected=f.scene.selectedId,geometry=f.scene.geometryAt('1',utc);
+ f.scene.setDisplayNodes(['1']);f.scene.syncFrame(utc,2000);f.scene.rebuildPaths();
+ assert.equal(f.scene.points.get('2').show,false);assert.equal(f.scene.models.get('2').model.show,false);assert.equal(f.scene.paths.get('2').entity.show,false);assert.equal(line.show,false);
+ assert.equal(f.scene.points.get('1').show,true);assert.equal(f.scene.models.get('1').model.show,true);
+ f.scene.setDisplayNodes([]);f.scene.syncFrame(utc,2000);f.scene.rebuildPaths();assert.ok([...f.scene.points.values()].every(p=>!p.show));assert.ok([...f.scene.models.values()].every(m=>!m.model.show));assert.ok([...f.scene.paths.values()].every(p=>!p.entity.show));
+ f.scene.setDisplayNodes(null);f.scene.syncFrame(utc,2000);assert.equal(f.scene.points.get('2').show,true);assert.equal(f.scene.definitionScope,scope);assert.equal(f.scene.selectedId,selected);assert.deepEqual(f.scene.geometryAt('1',utc),geometry);f.scene.destroy();
+});
+
+test('reentrant native geometry cannot republish a model hidden by a newer display scope',async()=>{
+ let armed=false,f;f=fixture({geometry:g=>{if(armed){armed=false;f.scene.setDisplayNodes([]);}return g;}});
+ await f.scene.setNodes(entries(1));armed=true;f.scene.placeModels(utc);
+ assert.equal(f.scene.models.get('1').model.show,false);assert.equal(f.scene.points.get('1').show,false);f.scene.destroy();
+});

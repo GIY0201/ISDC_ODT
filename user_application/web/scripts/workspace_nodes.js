@@ -15,7 +15,7 @@ import {createUtcCodec,LEAP_SHA256} from './orbit_utc.js';
 export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements,catalogElements,oisl,Scene,NetworkScene=null,tools,document,host,now,resolveModel,models,fetchImpl,clockActions={},readClock=()=>({}),onHover=()=>{},networkInputs=null,scenarioClock=null}={}){
  const codec=createUtcCodec(LEAP_SHA256),advanceUtc=codec.advance;
  let dead=false,started=false,root=null,panel=null,scene=null,display=null,deployment=null,activeSelection=false,selectedSignature=null,definitionsSignature=null,error='';
- let networkScene=null,networkSceneInput=null,groundLinksVisible=true,coverageVisible=true,networkVisualActive=false,network=null,networkComposition=0,displayLease=null;
+ let networkScene=null,networkSceneInput=null,groundLinksVisible=true,coverageVisible=true,networkVisualActive=false,network=null,networkComposition=0,displayLease=null,replicaOptical=null;
  let tracks=true,links=true,modelsVisible=true;const readiness=new Map(),removers=[];
  let savedRecheckJob=null,savedRecheckPromise=null,savedReceiptKnown=null;
  let restorePromise=null,scenarioReceipt=null,networkFaultSignature=null,mixedRoute=null,periodicFabric=null,analyticalFabricBinding=null;
@@ -92,7 +92,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  // HTTP source track grids use the source three-decimal-minute n0 period.
  const timeline=createNodeDisplayTimeline({api,periodFor:node=>Math.round(orbitElements(node.orbit)?.period/60*1000)/1000,requestId:id,yieldControl:()=>new Promise(resolve=>host.setTimeout(resolve,0)),onChange:(_snapshot,reason)=>{if(dead)return;if(reason?.kind==='communication'){refreshPanel({metadataOnly:true});return;}refreshPose();scene?.update(display?.utc??null);refreshPanel();},onError:report});
  let opticalScopeRevision=Object.freeze({});
- const optical=createNodeOpticalTimeline({resolver:createNodeLinkResolver({library,oisl}),requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>store.drafts,nodeScopeRevision:()=>dead?null:opticalScopeRevision,readDisplay:readAnalyticalDisplay,advanceUtc,readContinuity,verifyContinuity,onChange:value=>{if(dead)return;const sampled=optical.sampledPresentation();if(sampled.status==='valid'&&optical.verifySampledPresentation(sampled,{utc:display?.utc}))scene?.update(display?.utc??null);else scene?.setLinks(value);refreshPanel();}});
+ const optical=createNodeOpticalTimeline({resolver:createNodeLinkResolver({library,oisl}),requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>store.drafts,nodeScopeRevision:()=>dead?null:opticalScopeRevision,readDisplay:readAnalyticalDisplay,advanceUtc,readContinuity,verifyContinuity,onChange:value=>{if(dead)return;replicaOptical=value;const sampled=optical.sampledPresentation();if(sampled.status==='valid'&&optical.verifySampledPresentation(sampled,{utc:display?.utc}))scene?.update(display?.utc??null);else scene?.setLinks(value);refreshPanel();}});
  const opticalScheduler=createOpticalDisplayScheduler({readDisplay:readAnalyticalDisplay,readContinuity,verifyContinuity,
   requestSampled:async(_display,lease)=>{const ticket=networkComposition;if(verifyContinuity?.(lease)===true)displayLease=lease;await optical.updateSampled();if(!dead&&networkVisualActive&&ticket===networkComposition&&verifyContinuity?.(lease)===true)return network?.updateSampled();},
   requestExact:async value=>{const ticket=networkComposition;await optical.update();if(!dead&&networkVisualActive&&ticket===networkComposition&&display?.utc===value?.utc)return network?.update();},
@@ -109,6 +109,13 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  mixedRoute=createMixedRouteEmphasis({readNetwork:()=>network?.snapshot(),verifyNetwork:value=>!dead&&network?.verifySnapshot(value)===true,readFabric:()=>networkInputs?.readFabricState?.(),readDisplay:()=>dead?null:display,readAnalyticalFabric:()=>dead||!networkVisualActive?null:analyticalFabricBinding?.fabric?.analyticalPresentation?.()??null,verifyAnalyticalFabric:value=>!dead&&networkVisualActive&&analyticalFabricBinding?.fabric?.verifyAnalyticalPresentation?.(value)===true,readSelectedLinkId:()=>analyticalFabricBinding?.readSelectedLinkId?.()??null,differenceUtc:codec.difference});
  const geometryFor=(node,at)=>timeline.geometryFor(node,at);
  const modelFor=node=>resolveModel(library.nodeCatalogItem(node));
+ let sceneDisplayScope='all';
+ function displayNodeIds(){
+  if(sceneDisplayScope==='all')return null;if(sceneDisplayScope==='none')return [];
+  const roster=store.presentationRoster(),accepted=new Map(roster.deployed.map(node=>[node.id,JSON.stringify(node)]));
+  return roster.drafts.filter(node=>accepted.get(node.id)===JSON.stringify(node)).map(node=>node.id);
+ }
+ function applySceneDisplayScope(){scene?.setDisplayNodes?.(displayNodeIds());}
  function refreshPose(){
   if(dead||!activeSelection)return;
   const node=store.selected,geometry=node&&display?.utc?geometryFor(node,{utc:display.utc}):null;
@@ -136,12 +143,12 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  function syncDefinitions(){
   if(dead||!started||!store.loaded)return;const nodes=store.drafts,signature=JSON.stringify(nodes);
   if(signature!==definitionsSignature){definitionsSignature=signature;timeline.setDefinitions(nodes);optical.pruneHistories(new Set(nodes.map(n=>n.id)));network?.clear();refreshModels();if(display?.utc){if(hasContinuity)opticalScheduler.force();else void optical.update();}}
-  scene?.select(activeSelection?store.selectedId:null);refreshPose();refreshPanel();
+  scene?.select(activeSelection?store.selectedId:null);applySceneDisplayScope();refreshPose();refreshPanel();
  }
  function refreshModels(){
   if(dead)return;
   if(scene)void scene.setNodes(store.drafts.map(node=>({id:node.id,definition:node,model:modelFor(node),orbit_regime:library.nodeCatalogItem(node).ORBIT_REGIME}))).catch(report);
-  refreshPose();refreshPanel();
+  applySceneDisplayScope();refreshPose();refreshPanel();
  }
  function refreshPanel(options){
   const metadataOnly=options?.metadataOnly===true;
@@ -172,6 +179,26 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  function sceneSnapshot(){
   if(dead)return null;
   return structuredClone({drafts:store.drafts,deployed:store.deployed,selected_id:store.selectedId,revision:store.revision,loaded:store.loaded,deployment_confirmed:store.deploymentConfirmed,persistence:store.persistence,display,server:deployment.state.server,calculation:timeline.snapshot(),model_status:[...readiness.values()],error:error||store.error?.message||deployment.state.error||''});
+ }
+ function bindDisplayReplica(replica){
+  if(dead||!replica||typeof replica.bindNodes!=='function')return false;
+  return replica.bindNodes((cesium,viewer,ports)=>{
+   const readonlyGeometry=(node,options)=>{const before=ports.readDisplayUtc();if(dead||!before)return null;const value=geometryFor(node,options);return !dead&&ports.readDisplayUtc()===before?value:null;};
+   const nodeRenderer=new Scene({cesium,viewer,timeSource:ports.readDisplayUtc,advanceUtc,geometryFor:readonlyGeometry,displayGeometry:timeline.displayGeometry,pathFor:timeline.pathFor,pathRevisionFor:timeline.pathRevisionFor,tracksVisible:()=>tracks,palette:theme=>globe.palette?.(theme)??{},isTransitioning:ports.isTransitioning,sampledLinks:{read:()=>dead?null:optical.sampledPresentation(),verify:(value,options)=>!dead&&optical.verifySampledPresentation(value,options)===true},analyticalRouteEmphasis:{read:options=>dead||!networkVisualActive?null:mixedRoute.readAnalytical(options),verify:(value,options)=>!dead&&networkVisualActive&&mixedRoute.verifyAnalytical(value,options)},routeEmphasis:{read:options=>dead?null:mixedRoute.read(options),verify:(value,options)=>!dead&&mixedRoute.verify(value,options)},verifyLinkSnapshot:optical.verifyLinkSnapshot});
+   const groundRenderer=NetworkScene&&network?new NetworkScene({cesium,viewer,timeSource:ports.readDisplayUtc,geometryFor:readonlyGeometry,verifyNetworkSnapshot:value=>!dead&&network.verifySnapshot(value),analyticalRouteEmphasis:{read:options=>dead||!networkVisualActive?null:mixedRoute.readAnalytical(options),verify:(value,options)=>!dead&&networkVisualActive&&mixedRoute.verifyAnalytical(value,options)},sampledNetwork:{read:()=>!dead&&networkVisualActive?network.sampledPresentation():null,verify:(value,options)=>!dead&&networkVisualActive&&network.verifySampledPresentation(value,options)===true},readFabricState:()=>networkInputs.readFabricState?.(),coverageRadiusKm:(station,snapshot)=>networkInputs.coverageRadiusKm?.(station,snapshot?.node_definitions??[])??0,isTransitioning:ports.isTransitioning}):null;
+   let stopped=false,roster=null,selection=null,networkValue=null,opticalValue=null,theme=null;
+   const isNodeDisplayed=id=>{if(stopped||dead)return false;const value=store.presentationRoster(),node=value.drafts.find(node=>node.id===id),accepted=value.deployed.find(node=>node.id===id);return !!node&&!!accepted&&JSON.stringify(node)===JSON.stringify(accepted);};
+   const nativeNode=id=>{const utc=ports.readDisplayUtc(),node=store.find(id);if(stopped||dead||!utc||!isNodeDisplayed(id)||!node||ports.verifySource()!==true)return null;const value=readonlyGeometry(node,{utc});return value?.row?.status==='valid'&&value.row.error_code===null&&ports.readDisplayUtc()===utc&&ports.verifySource()===true?value:null;};
+   const verifyStation=value=>{if(stopped||dead||!networkVisualActive||!groundRenderer||networkInputs.stationInteractionReady?.()!==true||ports.verifySource()!==true)return false;const station=networkInputs.readStations().find(station=>station.id===value?.id);return station?.enabled===true&&JSON.stringify(station)===JSON.stringify(value.station)&&groundRenderer.verifyStationPick(value)===true&&ports.verifySource()===true&&groundRenderer.verifyStationPick(value)===true&&!stopped&&!dead;};
+   return {isNodeDisplayed,interaction:{owns(id,primitive,selectedModel){return nativeNode(id)!==null&&primitive?.show===true&&(selectedModel||[nodeRenderer.points.get(id),nodeRenderer.labels.get(id),nodeRenderer.models.get(id)?.model].includes(primitive))&&nativeNode(id)!==null&&!stopped&&!dead;},onSelect:id=>{if(nativeNode(id)){store.select(id);select();}}},groundInteraction:groundRenderer?{read:picked=>{const value=groundRenderer.stationPick(picked);return value&&verifyStation(value)?value:null;},verify:verifyStation,onSelect:value=>{if(verifyStation(value))networkInputs.selectStation?.(value.id);}}:null,syncFrame(utc,phase){
+    if(stopped)return;const value=dead?null:store.presentationRoster();
+    if(!value||!started){nodeRenderer.setDisplayNodes([]);nodeRenderer.syncFrame(null,phase);groundRenderer?.clear();return;}
+    const currentTheme=globe.viewState?.().choice.theme??'light';if(theme!==currentTheme){theme=currentTheme;nodeRenderer.setTheme(theme);}if(roster!==value.drafts){roster=value.drafts;void nodeRenderer.setNodes(roster.map(node=>({id:node.id,definition:node,model:modelFor(node),orbit_regime:library.nodeCatalogItem(node).ORBIT_REGIME}))).catch(()=>{});}
+    if(selection!==value.selected_id){selection=value.selected_id;nodeRenderer.select(selection);}
+    const accepted=new Map(value.deployed.map(node=>[node.id,JSON.stringify(node)]));nodeRenderer.setDisplayNodes(value.drafts.filter(node=>accepted.get(node.id)===JSON.stringify(node)).map(node=>node.id));nodeRenderer.setModelsVisible(modelsVisible);nodeRenderer.setLinksVisible(links);if(opticalValue!==replicaOptical){opticalValue=replicaOptical;if(opticalValue)nodeRenderer.setLinks(opticalValue);}nodeRenderer.syncFrame(utc,phase);
+    if(groundRenderer){groundRenderer.setSampledActive(networkVisualActive);groundRenderer.setGroundLinksVisible(groundLinksVisible);groundRenderer.setCoverageVisible(coverageVisible);if(networkValue!==networkSceneInput){networkValue=networkSceneInput;if(networkValue)groundRenderer.setSnapshot(networkValue);else groundRenderer.clear();}groundRenderer.syncFrame(utc,phase);}
+   },destroy(){if(stopped)return;stopped=true;try{groundRenderer?.destroy();}finally{nodeRenderer.destroy();}}};
+  });
  }
  function contextPresentation(){
   if(dead)return null;
@@ -333,7 +360,9 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  return Object.freeze({
   async start(){if(dead||started)return;started=true;const result=await retryRestore();if(!dead&&(hasContinuity||periodicFabric))opticalScheduler.start();return result;},retryRestore,
   scenarioPorts:()=>scenarioPorts,
-  show,refresh:refreshPanel,refreshModels,sceneSnapshot,contextPresentation,selection,captureFuturePassInputs,verifyFuturePassInputs,beginFuturePassControl,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
+  setSceneDisplayScope(scope){if(dead||!['all','deployed','none'].includes(scope))return false;sceneDisplayScope=scope;applySceneDisplayScope();return true;},
+  isSceneNodeDisplayed(id){if(dead)return false;const ids=displayNodeIds();return ids===null||ids.includes(String(id));},
+  show,refresh:refreshPanel,refreshModels,sceneSnapshot,contextPresentation,selection,bindDisplayReplica,captureFuturePassInputs,verifyFuturePassInputs,beginFuturePassControl,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
   missionInputs(){
    const state=deployment.state;
    if(dead||!started||!store.loaded||!store.deploymentConfirmed||store.deployed.length===0||store.error||state.server===null||state.syncRequired||state.busy||store.isDirty())throw Error('위성 설정을 불러오고 현재 초안을 서버에 배치하세요.');

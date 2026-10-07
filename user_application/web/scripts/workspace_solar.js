@@ -5,7 +5,7 @@ const KEY='spacetwin-globe-lighting-v1',EVENT='spacetwin:globelighting';
 /** Existing globe/display owner assembly and original browser preference. */
 export function createWorkspaceSolar({api,globe,overlay,host=window,createDisplay=(...args)=>new SolarDisplay(...args)}){
  let dead=false,renderer=null,context=null,theme='dark',enabled=true,renderStatus={phase:'unavailable',reason:'no_solar_geometry',indicator:'unavailable'},sample=null;
- const observers=new Set();
+ const observers=new Set(),replicas=new Set();
  try{enabled=host.localStorage?.getItem(KEY)!=='off';}catch{/* original session-only policy */}
  const state=()=>structuredClone({enabled,theme,context,timeline:timeline.snapshot(),renderer:renderStatus,
   geometry:sample?{utc:sample.utc,eop_quality:sample.eop_quality,eop_sha256:sample.eop_sha256,leap_sha256:sample.leap_sha256}:null});
@@ -36,7 +36,16 @@ export function createWorkspaceSolar({api,globe,overlay,host=window,createDispla
  const storage=value=>{if(value.key===KEY&&['on','off',null].includes(value.newValue))setEnabled(value.newValue!=='off',false);};
  host.addEventListener?.(EVENT,event);host.addEventListener?.('storage',storage);
  return{state,setEnabled,retry:()=>{if(!dead)timeline.retry();},
+  bindDisplayReplica(replica,replicaOverlay){if(dead||typeof replica?.bindSolar!=='function')return false;return replica.bindSolar((C,viewer,ports)=>{
+   const display=createDisplay(C,viewer,replicaOverlay,{onStatus:()=>{}});let stopped=false;
+   const owned={syncFrame(utc){if(stopped||dead)return;const input=ports.readContext(),before=timeline.snapshot(),value=input&&input.utc===utc&&context&&input.key===context.key&&input.leap_sha256===context.leap_sha256&&input.eop_sha256===context.eop_sha256?timeline.sampleAt(utc):null;
+    display.setStyle(theme,enabled);
+    if(stopped||dead)return;
+    if(!value||before.error||value.leap_sha256!==input.leap_sha256||input.eop_sha256&&value.eop_sha256!==input.eop_sha256||!ports.verifySource()||timeline.snapshot().key!==before.key){if(!stopped&&!dead)display.clear('no_solar_geometry');return;}if(stopped||dead)return;display.update(value);
+    if(!stopped&&!dead&&!ports.verifySource()&&!stopped&&!dead){display.clear('no_solar_geometry');}
+   },clear(){if(!stopped)display.clear('no_solar_geometry');},destroy(){if(stopped)return;stopped=true;replicas.delete(owned);display.destroy();}};replicas.add(owned);return owned;
+  });},
   observe(fn){if(dead)return()=>{};observers.add(fn);fn(state());return()=>observers.delete(fn);},
-  destroy(){if(dead)return;dead=true;removeContext();removeView();removeRenderer();timeline.destroy();observers.clear();host.removeEventListener?.(EVENT,event);host.removeEventListener?.('storage',storage);context=null;sample=null;},
+  destroy(){if(dead)return;dead=true;for(const replica of [...replicas])replica.destroy();removeContext();removeView();removeRenderer();timeline.destroy();observers.clear();host.removeEventListener?.(EVENT,event);host.removeEventListener?.('storage',storage);context=null;sample=null;},
  };
 }

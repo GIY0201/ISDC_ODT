@@ -33,3 +33,18 @@ Cesium 1.143 endFrame이 expand link의 inline display를 갱신하는 점을 �
 공용 지구의 최초 choice.theme을 light로 변경했다. 명시적인 dark 선택과 초안 적용은 유지한다. 원본 계산, UTC, 배치, 서버 실행은 바꾸지 않는다.
 
 Author 의미 있는 분리 RED12건과 기본 테마 RED1건 후 가까운6시험군35 PASS / 0 FAIL / 527.61ms. 독립 readonly 검토 CLEAN, 가까운4시험군32 PASS / 472.768ms. 문법·diff 검사 통과. 실제 수정 화면 smoke와 전체 T075-T083/게임 성능/두 해상도는 별도 진행 중이다.
+
+Actual612/613 narrowed2D acceptance: public mode status settled NASA Blue Marble before one normal model focus; root viewed nonblackzoomed map image. Existing keep-range follow shows '선택 위성 추적 중', explicit release clears it, return3D retains pausedTerra originalUTC/sourceExacttrue. Drag support exists but actualdrag/no-resnap not executed, and return3D screenshot stillneeds settledcheck. Actual1440x900 only; no camera/frustum/privateViewer/GPU/two-resolution proof inferred. Current source UI changes require separate freshsafe-tab smoke; historical screenshot obsolete demo badges reflect preserved oldtabmodules, not currentservercode absence.
+
+## 실제 UI 확인 616–621 및 최신 수정 범위
+검증용 별도 페이지에서 환경 설정의 명시적 진단 버튼으로 styled recorder를 열고, 닫기와 재열기를 확인했다(616/617/619). 자동 표시가 아니라 명시적 버튼 동작이며, 기록과 동일 recorder가 유지된다. 원시 기록은 data/workspace/validation/live_group2_20261007에 보존했다. 이 결과는 화면 기능 검증이며 SC006 성능 통과를 뜻하지 않는다.
+618의 실제 DOM에서 환경 설정에 satellite-model-panel, station-workspace, catalog-workspace가 hidden=false, display:flex와 실제 영역을 갖는 누출을 확인했다. 원인은 이전 view에서 panel.update가 먼저 실행되어 패널을 재생성하는 lifecycle이다. T189에서 view 지정과 갱신 순서를 고친다. 단순 CSS 추정으로 숨기지 않는다.
+사용자가 공용 상황판의 개념 그림 대신 동일 실제 지구, 프로젝트 위성/불러온 카탈로그 표시 선택, 3D/2D 전환을 요청했다(T188). 빠른 상태 막대와 기존 콘솔 링크는 제품 화면에서 제거하며 참조 콘솔 파일/route는 보존한다. 성능 검증은 사용자 지시에 따라 이 UI 조정과 PR 정리 이후로 보류했다.
+621은 다른 Chrome 부모 페이지의 읽기 전용 자료이며, 사용자 in-app t103 페이지가 browser inventory에 없어 그 페이지의 태양 UTC 상태를 직접 입증하지 못한다. 다른 페이지 자료로 현재 사용자 화면의 오류를 단정하지 않는다.
+
+## Actual U002 fresh whole-catalogue ON result
+Root DOM-only IAB on independent127.0.0.6/u002-fresh-on, originaluser.5/.1 untouched. One explicitON afterfinalsource reload preparesoriginalsearch then currentcatalogue positionquery. Actualresult16689 count/16689valid/0error, originalsnapshotUTC2026-10-07T05:47:24.498000000Z; onecanvas. This is calculatedGP scene, notphysicaltracking/RF/GPUperformance. ExplicitOFF changes button+projectbaseline presentation while sameanalysisUTC andscenehash551dc2c7412d8e51af3e82eb8660041dc950fdb4088e910efd636da3a883e9d0 remain; rendererhidden contract independentlytested. No savedinput/SIM/deployment apply. Existing originalquerydraft reused. Earlier storedEOP error duringsetup wasnotcatalogueresult; finalcatalogue succeeded without zeroEOP/UTCfallback.
+LatestABA leaveentry ticket fence independentlyCLEAN4PASS279.9914ms; prioraggregateCLEAN94PASS850.9524ms, nofullmatrixrepeat. User requestsfourrailSVGicons; separateauthorownsHTMLCSS/newpresentationtest; mainauthorstaticnavretentionguardJS1lineSTOP4wallPASS. Finaliconstable/review+Gitcheckpointnext.
+
+## U004 startup actual verification
+The normal startup no longer opens task windows from retained hashes. Root independently reviewed startup/hashchange and explicit-popout policy and ran startup/popout/wall/dual-display regression: 28 PASS, 0 FAIL (489.105 ms). Actual IAB public-server document `?validation=u004-startup#mission` retained #mission with work-window.hidden=true, launcher.hidden=true, and one primary canvas. Clicking the existing satellite task button opened the satellite window normally. Server/runtime/input data were not changed. Actual `#satellite` reload also started closed with the main globe parent still desktop. T196 is complete within this scope; overall migration, PR and other acceptance gates remain open.

@@ -112,3 +112,12 @@ test('same node ID and model URL with edited definition fences pending load and 
   const old=f.model();f.pending[0].resolve(old);await p;assert.equal(old.destroyCount,1);
   f.pending[1].resolve(f.model());await q;assert.equal(f.layer.model.show,false);f.layer.clear();
 });
+
+test('render-only hidden selected model stays hidden through late load and resumes only with native geometry',async()=>{
+ const f=fixture(),p=f.layer.show(description,f.sampleAt,utc);f.layer.setRenderVisible(false);
+ const m=f.model();f.pending[0].resolve(m);await p;m.ready=true;m.readyEvent.raise();
+ assert.equal(m.show,false);assert.equal(f.statuses.at(-1).phase,'ready');assert.equal(f.loads.length,1);
+ f.layer.setRenderVisible(true);assert.equal(m.show,false);f.layer.update(utc);assert.equal(m.show,true);
+ f.setMissing(true);f.layer.update(utc);assert.equal(m.show,false);assert.equal(f.statuses.at(-1).phase,'hidden_no_geometry');
+ f.setMissing(false);assert.equal(f.layer.nativeAt(utc).normalized_gp_sha256,description.normalized_gp_sha256);f.layer.dispose();
+});

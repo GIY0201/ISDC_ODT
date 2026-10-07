@@ -1,6 +1,10 @@
-import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceContext,observeWorkspaceContext} from './workspace_orbit.js?v=t151-r1';
+import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceContext,observeWorkspaceContext,observeWorkspaceModel,setWorkspaceWallScope,setWorkspaceWallMode,mountWorkspaceWall,detachWorkspaceWall,resizeWorkspaceGlobe} from './workspace_orbit.js?v=t151-r1';
 (() => {
   const screen = document.getElementById('screen');
+  let failedThumbnail=null,activeThumbnail=null;
+  const thumbnail=document.getElementById('desktop-sat-thumbnail'),hideThumbnail=()=>{failedThumbnail=activeThumbnail;if(thumbnail){thumbnail.hidden=true;thumbnail.removeAttribute('src');}};thumbnail?.addEventListener('error',hideThumbnail);
+  const removeThumbnail=observeWorkspaceModel(value=>{const image=document.getElementById('desktop-sat-thumbnail');if(!image)return;const preview=value.selected&&value.match?.thumbnail;activeThumbnail=preview||null;if(!preview)failedThumbnail=null;image.hidden=!preview||failedThumbnail===preview;if(!image.hidden){image.src=preview;image.alt='선택 위성에 연결된 3D 모델의 미리보기';}else image.removeAttribute('src');});window.addEventListener('pagehide',event=>{if(!event.persisted){removeThumbnail();thumbnail?.removeEventListener('error',hideThumbnail);}});
+  function restoreGlobeSurface(){detachWorkspaceWall();}
   function applySharedContext(value=readWorkspaceContext()){const t=value.text;for(const [id,text] of Object.entries({'desktop-handoff':t.next,'desktop-handoff-state':t.status,'desktop-scene-credit':('NASA Blue Marble / Cesium WGS84 · '+t.satellite+' · '+t.clock+' · 모델 계산 / 실제 RF 미확인'),'clock':t.clock,'desktop-event':t.event,'desktop-data-utc':t.clock,'quick-sat':t.satellite,'quick-pass':t.next,'quick-event':t.event,'desktop-sat-name':t.satellite,'desktop-sat-status':t.status,'desktop-next':t.next,'context-id':t.contextId,'context-rel':t.contextRelated,'alert-text':t.alert})){const el=document.getElementById(id);if(el&&el.textContent!==text)el.textContent=text;}}
   const stopSharedContext=observeWorkspaceContext(applySharedContext);window.addEventListener('pagehide',event=>{if(!event.persisted)stopSharedContext();});
   const groups = [
@@ -40,9 +44,8 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
   const btn=(label,view,cl='')=>`<button type="button" class="button ${cl}" data-view="${view}">${label}</button>`;
   const globe=()=>`<div class="globe ${state.follow?'follow':''}" aria-label="지구와 위성 위치의 개념 시안"><div class="orbit"></div><div class="orbit secondary"></div><div class="earth" aria-hidden="true"></div><button class="sat a" data-sat="SAT-A" aria-pressed="${state.sat==='SAT-A'}">SAT-A</button><button class="sat b" data-sat="SAT-B" aria-pressed="${state.sat==='SAT-B'}">SAT-B</button><button class="sat c" data-sat="SAT-C" aria-pressed="${state.sat==='SAT-C'}" style="left:${Math.max(8,Math.min(78,50+state.satLon/5))}%;top:${Math.max(10,Math.min(78,50-state.satLat/3))}%;right:auto;bottom:auto">SAT-C</button><span class="ground-pin one">GS-01</span><span class="ground-pin two">GS-02</span><span class="ground-pin virtual" style="left:${Math.max(8,Math.min(82,50+state.gsLon/5))}%;top:${Math.max(12,Math.min(80,50-state.gsLat/3))}%">가상 ${esc(state.station)}</span><div class="globe-caption"><span>NASA Blue Marble · 마커는 좌표 입력의 2D 개념 위치</span><span>실제 3D 투영·가시 계산 없음</span></div></div>`;
   function wall(){
-    const selected=state.sat;
-    const detail=selected?`<div class="row"><span>선택 위성</span><strong class="cyan mono">${selected}</strong></div>${rows([['자료 시각','03:18 UTC 예시'],['궤도·위치','개념 표시 / 실측 없음'],['다음 접촉',selected==='SAT-B'?'GS-01 · 03:41 계획':'GS-02 · 03:24 계획'],['관련 사건',selected==='SAT-C'?'SCN-01 연구 장면':'E-014 / M-204'],['담당','지상 운용 / 통신']])}<div class="actions" style="margin-top:8px"><button class="button" data-follow aria-pressed="${state.follow}">${state.follow?'따라가기 해제':'위성 따라가기'}</button>${btn('상세 상태','satellite')}</div>`:`<p class="muted">위성 마커나 아래 선택 버튼을 누르면 상태·접촉·사건이 여기에 나타납니다. 선택만으로 카메라는 이동하지 않습니다.</p><div class="actions"><button class="button" data-sat="SAT-A">SAT-A</button><button class="button" data-sat="SAT-B">SAT-B</button></div>`;
-    screen.innerHTML=`<div class="view wall"><div class="stack left">${panel('검토할 사건','실제 우선순위 미판정',`<button class="event" data-view="exception"><b>E-014 · 링크 품질 저하</b><small>SAT-A / M-204 / GS-02 · 운용 예시</small></button><button class="event" data-view="exception"><b>X-GS01 · 예약 충돌</b><small>독립 연구 가정 · 동시 경보 아님</small></button><div class="note">자료가 없으므로 사건의 우선순위와 기한 영향은 판정하지 않았습니다.</div>`) }${panel('군집·임무 영향','E-014 고정 예시',rows([['우리 위성','SAT-A / SAT-B'],['영향 임무','M-204 · 미판정'],['데이터','D-731 · 수신 미확인'],['인계','통신 → 운용']])+`<div class="actions" style="margin-top:8px">${btn('정상 임무','normal')}${btn('DT 비교','compare','alt')}</div>`)}</div>${panel('군집 공간 상황','선택과 카메라 추적 분리',globe()+`<div class="actions" style="position:absolute;top:43px;right:8px;z-index:3"><button class="button" data-reset>전체 보기</button></div>`,'globe-panel')}<div class="stack right">${panel('선택 위성','선택·추적 분리',detail)}${panel('접촉·자료 출처','계획과 실측 분리',rows([['GS-02','03:24 UTC 계획'],['GS-01','03:41 UTC 계획'],['실제 AOS/RF','자료 없음'],['EM','미연동'],['카탈로그','외부 자료 없음']]))}</div>${panel('사건·접촉·DT 시간축','기준 03:18 UTC · 실제 예약/예측 아님',`<div class="timepoint"><b>03:18</b><span>E-014 기준</span><small>운용 예시</small></div><div class="timepoint"><b>03:24</b><span>SAT-A / GS-02</span><small>접촉 계획</small></div><div class="timepoint"><b>03:41</b><span>SAT-B / GS-01</span><small>접촉 계획</small></div><div class="timepoint"><b>분리 +${state.insertion}분</b><span>가상 궤도 투입</span><small>DT 입력</small></div><div class="timepoint"><b>미확인</b><span>D-731 이용자</span><small>수신 증거 없음</small></div>`,'timeline')}</div>`;
+    screen.innerHTML=`<div class="view wall-live"><div class="headrow"><h1>공용 상황판</h1><p>같은 표시 UTC와 Cesium 지구를 사용합니다.</p></div>${panel('군집 공간 상황','현재 계산 자료 · 실측 아님',`<div class="wall-scope-controls"><label>표시 방식 <select id="wall-mode"><option value="3d">3D 지구</option><option value="2d">2D 지도</option></select></label><button type="button" id="wall-whole" class="button" data-wall-scope="toggle">전체 위성 OFF</button></div><p id="wall-scope-status" role="status"></p><div id="wall-globe-slot" aria-label="상황판 Cesium 지구"><div id="wall-globe" style="position:absolute;inset:0"></div><div id="wall-solar-overlay" class="space-sun" hidden aria-hidden="true"></div><p id="wall-globe-caption" role="status" style="position:absolute;left:12px;top:12px"></p></div>`,'wall-globe-panel')}${panel('현재 자료와 표시 경계','기존 소유자 상태',`<p id="wall-current-status" role="status"></p><div class="actions">${btn('위성 상태·궤도','satellite')}${btn('지상국·통신','ground')}${btn('환경 설정','settings')}</div>`)}</div>`;
+    mountWorkspaceWall(document.getElementById('wall-globe'),document.getElementById('wall-globe-caption'));document.getElementById('wall-mode').addEventListener('change',event=>setWorkspaceWallMode(event.target.value));
   }
   function normal(){
     const steps=[['요청 접수','SYS-01 · 요청자','조건·기한·수신처','접수·수락 이유'],['계획·배정','SYS-02 · 운용','위성/탑재/접촉','계획·승인 상태'],['관측·선별','SYS-03 · 위성','관측·처리 결과','기록·메타데이터'],['복제·품질','SYS-04 · 데이터','저장·무결성','복제·체크섬'],['지상 수신','SYS-05 · 통신','RF/지상 수신','수신·무결성 로그'],['이용자 확인','SYS-01 · 이용자','결과 수락/거절','수신·품질 확인']];
@@ -78,6 +81,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
     screen.innerHTML=`<div class="view studio">${head('DT · 운용자 비교·검증','SYS-07 · F04/F09/F10 · 기준/후보/실측의 차이와 인계',btn('EM 검증','em'))}${panel('비교 기준','동일 시각 필요',`<div class="actions"><button class="choice" data-run="RUN-P01" aria-pressed="${state.run==='RUN-P01'}">RUN-P01 기준 예시</button><button class="choice" data-run="RUN-P02" aria-pressed="${state.run==='RUN-P02'}">RUN-P02 후보 예시</button></div>${rows([['기준 시각','03:18 UTC 예시'],['선택 run',state.run],['동일 입력 검증','없음'],['실제 실행','없음']])}`)}${panel('업무 영향 비교','미산출',`<div class="comparison"><div class="tile"><small>기준</small><strong>접촉·기한 미산출</strong></div><div class="tile"><small>후보</small><strong>사건 ${state.events.length}건 · 결과 없음</strong></div><div class="tile"><small>차이</small><strong>판정 보류</strong></div></div><div class="tiles" style="margin-top:8px"><div class="tile"><small>M-204 결과 기한</small><strong>영향 미판정</strong></div><div class="tile"><small>D-731 품질/수신</small><strong>실측·모델 없음</strong></div></div>`)}${panel('신뢰도·인계','운용 판단 전',rows([['모델/자료 버전','없음'],['적용 범위','미정'],['불확실성','미산정'],['EM/실측 대조','없음'],['운용 권고','없음']])+`<div class="note violet-note" style="margin-top:8px">DT 가정을 관측 상태나 승인된 조치로 읽지 않습니다.</div>`)}${panel('운용자에게 전달할 근거 묶음','현재 모두 비어 있음',`<div class="mini-timeline"><div><b>기준</b><span>스냅샷·UTC</span></div><div><b>변경</b><span>입력·사건·모델</span></div><div><b>차이</b><span>임무·데이터·접촉</span></div><div><b>한계</b><span>검증·불확실성</span></div></div>`,'bottom')}</div>`;
   }
   function render(){
+    restoreGlobeSurface();
     if(!pendingWorkspaceDraft.length)pendingWorkspaceDraft=draftValues();
     queueMicrotask(()=>{
       showWorkspaceOrbit(state.view);
@@ -90,11 +94,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
     const v=state.view;
     if(v==='wall')wall(); else if(v==='normal')normal(); else if(v==='initial')initial(); else if(v==='exception')exception(); else if(roles[v])role(v); else if(v==='scene')scene(); else if(v==='composer')composer(); else if(v==='run')run(); else if(['settings','integration'].includes(v))screen.innerHTML=''; else compare();
     document.querySelectorAll('#nav button').forEach(b=>b.dataset.view===v?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
-    document.getElementById('view-name').textContent=names[v];document.getElementById('footer-view').textContent=names[v];
     document.getElementById('window-title').textContent=names[v];
-    document.getElementById('quick-sat').textContent=state.sat?`${state.sat} · ${state.sat==='SAT-C'?'DT 가정':'운용 예시'}`:'SAT-A · 운용 예시';
-    document.getElementById('quick-pass').textContent=state.sat==='SAT-B'?'GS-01 03:41 계획':'GS-02 03:24 계획';
-    document.getElementById('quick-event').textContent=v==='exception'?`${state.case} · 연구 가정`:['scene','composer','run','compare','initial'].includes(v)?'SCN-01 · DT 가정':'E-014 · 우선순위 미판정';
     document.getElementById('desktop-sat-name').textContent=state.sat||'SAT-A';
     document.getElementById('desktop-next').textContent=state.sat==='SAT-B'?'GS-01 · 03:41 UTC 계획':'GS-02 · 03:24 UTC 계획';
     document.querySelectorAll('.desktop-sat').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sat===state.sat)));
@@ -108,7 +108,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
   const showShelf=value=>{shelf.hidden=!value;if(shelfContainer)shelfContainer.hidden=!value;};
   showShelf(false);
   const groupLabels=['관제','운용','DT'];
-  document.getElementById('rail-groups').innerHTML=groups.map(([g],i)=>`<button type="button" data-group="${i}" aria-label="${g} 작업 목록 열기">${groupLabels[i]}</button>`).join('');
+  const railGroups=document.getElementById('rail-groups');if(!railGroups.querySelector('button[data-group]'))railGroups.innerHTML=groups.map(([g],i)=>`<button type="button" data-group="${i}" aria-label="${g} 작업 목록 열기">${groupLabels[i]}</button>`).join('');
   function showGroup(index){const [label,views]=groups[index];document.getElementById('launcher-title').textContent=label+' 작업공간';nav.innerHTML=views.map(([id,n])=>`<button type="button" data-view="${id}">${n}</button>`).join('');launcher.hidden=false;document.querySelectorAll('#rail-groups button').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.group)===index)));nav.querySelector('button')?.focus()}
   function openView(view){if(!names[view])return;state.view=view;workWindow.hidden=false;fitWindow();showShelf(false);launcher.hidden=true;render();location.hash=view;screen.focus()}
   bindWorkspaceView(openView);
@@ -146,9 +146,9 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
     // A fresh window requests its snapshot after loading; an existing named window receives it here.
     try{if(child.location.origin===location.origin&&child.document.readyState==='complete')child.postMessage(transferSnapshot(),location.origin);}catch{}
   });
-  document.getElementById('window-minimize').addEventListener('click',()=>{workWindow.hidden=true;showShelf(true);shelf.textContent=`${names[state.view]} 창 다시 열기`;shelf.focus()});
-  document.getElementById('window-close').addEventListener('click',()=>{if(isPopout){window.close();return;}workWindow.hidden=true;showShelf(false);document.querySelector('#rail-groups button')?.focus()});
-  shelf.addEventListener('click',()=>{workWindow.hidden=false;fitWindow();showShelf(false);document.getElementById('window-title').focus()});
+  document.getElementById('window-minimize').addEventListener('click',()=>{workWindow.hidden=true;restoreGlobeSurface();resizeWorkspaceGlobe();showShelf(true);shelf.textContent=`${names[state.view]} 창 다시 열기`;shelf.focus()});
+  document.getElementById('window-close').addEventListener('click',()=>{if(isPopout){window.close();return;}workWindow.hidden=true;restoreGlobeSurface();resizeWorkspaceGlobe();showShelf(false);document.querySelector('#rail-groups button')?.focus()});
+  shelf.addEventListener('click',()=>{workWindow.hidden=false;if(state.view==='wall')mountWorkspaceWall(document.getElementById('wall-globe'),document.getElementById('wall-globe-caption'));resizeWorkspaceGlobe();fitWindow();showShelf(false);document.getElementById('window-title').focus()});
   document.getElementById('launcher-close').addEventListener('click',()=>{launcher.hidden=true;document.querySelector('#rail-groups button[aria-pressed=true]')?.focus()});
   const dragTarget=document.getElementById('window-titlebar'),resizeTarget=document.getElementById('resize-handle');
   // Keep the entire window between the navigation rail, header and footer.
@@ -199,8 +199,9 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
   document.getElementById('window-title').addEventListener('keydown',e=>{const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!d||workWindow.classList.contains('expanded'))return;e.preventDefault();const b=bounds(),rect=workWindow.getBoundingClientRect(),step=e.shiftKey?32:8;workWindow.style.left=Math.max(b.minX,Math.min(b.maxX,rect.left+d[0]*step))+'px';workWindow.style.top=Math.max(b.minY,Math.min(b.maxY,rect.top+d[1]*step))+'px'});
   resizeTarget.addEventListener('keydown',e=>{const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(!d||workWindow.classList.contains('expanded'))return;e.preventDefault();const rect=workWindow.getBoundingClientRect(),step=e.shiftKey?32:8;workWindow.style.width=Math.max(460,Math.min(innerWidth-rect.left-8,rect.width+d[0]*step))+'px';workWindow.style.height=Math.max(360,Math.min(innerHeight-rect.top-29,rect.height+d[1]*step))+'px';fitWindow()});
   window.addEventListener('resize',()=>{finishGesture?.();fitWindow()});
-  document.addEventListener('click',e=>{const t=e.target.closest('[data-view],[data-sat],[data-follow],[data-reset],[data-case],[data-normal],[data-remove],[data-edit],[data-clear-events],[data-inject],[data-uninject],[data-run]');if(!t)return;
-    if(t.dataset.view){openView(t.dataset.view)}
+  document.addEventListener('click',e=>{const t=e.target.closest('[data-wall-scope],[data-view],[data-sat],[data-follow],[data-reset],[data-case],[data-normal],[data-remove],[data-edit],[data-clear-events],[data-inject],[data-uninject],[data-run]');if(!t)return;
+    if(t.dataset.wallScope){setWorkspaceWallScope(t.dataset.wallScope)}
+    else if(t.dataset.view){openView(t.dataset.view)}
     else if(t.dataset.sat){state.sat=t.dataset.sat;state.follow=false;openView('satellite')}
     else if(t.hasAttribute('data-follow')){state.follow=!state.follow;render()}
     else if(t.hasAttribute('data-reset')){state.sat='';state.follow=false;render()}
@@ -214,6 +215,9 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
   });
   document.getElementById('rail-groups').addEventListener('click',e=>{const b=e.target.closest('[data-group]');if(b)showGroup(Number(b.dataset.group))});
   document.getElementById('alert-open').addEventListener('click',()=>openView('operations'));
-  window.addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(names[v]&&v!==state.view)openView(v)});
-  const initialView=location.hash.slice(1);if(names[initialView])openView(initialView);else{showGroup(0);launcher.hidden=true}
+  window.addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(names[v]&&(v!==state.view||workWindow.hidden))openView(v)});
+  // A main document starts on its background even when its URL retains the last task.
+  // Only an explicitly requested popout opens its initial role window.
+  workWindow.hidden=true;
+  const initialView=location.hash.slice(1);if(isPopout&&names[initialView])openView(initialView);else{showGroup(0);launcher.hidden=true}
 })();

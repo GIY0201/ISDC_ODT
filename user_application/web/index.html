@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ISDC–ODT Satellite · V6 작업 창 시안</title>
+  <title>ISDC–ODT · 위성 디지털 트윈</title>
   <link rel="stylesheet" href="/static/styles/workspace.css?v=t135-r1">
   <link rel="stylesheet" href="/static/styles/satellite_nodes.css?v=t151-r1">
   <link rel="stylesheet" href="/static/styles/network_diagram.css">
@@ -17,29 +17,31 @@
     <aside class="rail" aria-label="AerODT 작업 영역">
       <a class="brand" href="#wall" aria-label="AerODT Satellite 상황판"><picture><source srcset="/static/assets/branding/aerodt-1520.webp" type="image/webp"><img src="/static/assets/branding/aerodt.png" width="1520" height="508" alt="AerODT"></picture></a>
       <span class="rail-domain">SATELLITE</span>
-      <nav id="rail-groups" aria-label="작업 종류"></nav>
-      <div class="rail-foot"><button type="button" class="button" data-view="settings">환경 설정</button></div>
+      <nav id="rail-groups" aria-label="작업 종류">
+        <button type="button" data-group="0" aria-label="공용 작업 목록 열기"><svg class="rail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 12 18.4 5.6M12 3v2M3 12h2M12 19v2M19 12h2"/><circle cx="8" cy="15" r="1"/></svg><span class="rail-label">관제</span></button>
+        <button type="button" data-group="1" aria-label="운용자 작업 목록 열기"><svg class="rail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 3v4m0 4v10M12 3v10m0 4v4M19 3v4m0 4v10"/><rect x="2.5" y="7" width="5" height="4" rx="1"/><rect x="9.5" y="13" width="5" height="4" rx="1"/><rect x="16.5" y="7" width="5" height="4" rx="1"/></svg><span class="rail-label">운용</span></button>
+        <button type="button" data-group="2" aria-label="DT 작업 목록 열기"><svg class="rail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m7 7 4 9m2 0 4-9M8 5h8"/><circle cx="5" cy="5" r="3"/><circle cx="19" cy="5" r="3"/><circle cx="12" cy="19" r="3"/></svg><span class="rail-label">DT</span></button>
+      </nav>
+      <div class="rail-foot"><button type="button" class="button" data-view="settings"><svg class="rail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m10 3-.6 2.5-2 .9-2.3-.8-2 3.4 1.8 1.7-.2 2.3L3 14.7l2 3.5 2.4-.7 2 .9.6 2.6h4l.6-2.6 2-.9 2.4.7 2-3.5-1.7-1.7-.2-2.3L21 9l-2-3.4-2.3.8-2-.9L14 3Z"/><circle cx="12" cy="12" r="3"/></svg><span class="rail-label">환경 설정</span></button></div>
     </aside>
     <div class="app">
-      <header class="topbar"><div class="title"><strong>ISDC–ODT</strong><span>Satellite 공간 상황</span></div><div class="top-meta"><span id="clock">2026-09-23 03:18 UTC</span><span class="badge gray">EM 미연동</span></div><div class="actions"><a href="/legacy" class="version">기존 콘솔</a></div></header>
+      <header class="topbar"><div class="title"><strong>ISDC–ODT</strong><span>Satellite 공간 상황</span></div><div class="top-meta"><span id="clock">2026-09-23 03:18 UTC</span><span class="badge gray">EM 미연동</span></div><div class="actions"></div></header>
       <div class="context"><div class="identity"><b id="context-id">E-014</b><span id="context-rel">SAT-A / M-204 / GS-02 / D-731</span></div><div class="provenance"><span><i class="key observed"></i>운용 예시</span><span><i class="key planned"></i>계획</span><span><i class="key assumed"></i>DT 가정</span><span><i class="key missing"></i>미연동·미확인</span></div></div>
-      <div class="alertline"><b>사건 예시</b><span id="alert-text">E-014 링크 품질 저하 · 실제 경보·우선순위 판정 없음</span><button id="alert-open" type="button">운용 창 열기</button></div>
+      <div class="alertline" hidden><b>사건 예시</b><span id="alert-text">E-014 링크 품질 저하 · 실제 경보·우선순위 판정 없음</span><button id="alert-open" type="button">운용 창 열기</button></div>
       <div class="desktop" id="desktop">
+        <div id="workspace-globe-surface">
         <div id="stored-orbit-globe" aria-label="저장 궤도 ITRF 지구"></div>
         <div id="orbit-solar-overlay" class="space-sun" hidden aria-hidden="true"></div>
-        <div class="orbit-globe-caption"><p id="orbit-globe-status" role="status">Cesium 준비 중</p><button id="orbit-globe-focus" type="button" disabled>계산 위치로 이동</button></div>
-        <div class="desktop-globe" aria-label="AerODT Satellite 지구 배경 · CSS 개념 시안"><div class="desktop-orbit one"></div><div class="desktop-orbit two"></div><div class="desktop-earth" aria-hidden="true"></div><button class="desktop-sat a" data-sat="SAT-A">SAT-A</button><button class="desktop-sat b" data-sat="SAT-B">SAT-B</button><button class="desktop-sat c" data-sat="SAT-C">SAT-C · DT</button><span class="desktop-station one">GS-01</span><span class="desktop-station two">GS-02</span></div>
-        <section class="glass overview" aria-label="선택 위성 빠른 상태"><div class="eyebrow">선택 위성 · 빠른 상태</div><strong id="desktop-sat-name">SAT-A</strong><div id="desktop-sat-status">운용 상태 예시 · 실측 없음</div><dl><div><dt>다음 접촉</dt><dd id="desktop-next">GS-02 · 03:24 UTC 계획</dd></div><div><dt>사건</dt><dd id="desktop-event">실제 사건 미확인</dd></div><div><dt>자료 시각</dt><dd id="desktop-data-utc">자료 시각 미확인</dd></div></dl><button type="button" data-view="satellite">위성 상태·궤도 열기</button></section>
-        <section class="glass contact" aria-label="접촉과 인계"><div class="eyebrow">다음 확인 · 계획</div><strong id="desktop-handoff">접촉 구간 미확인</strong><p id="desktop-handoff-state">실제 AOS·RF·수신 증거 없음</p><div class="actions"><button type="button" data-view="ground">지상국 창</button><button type="button" data-view="normal">정상 임무 창</button></div></section>
+        </div>
+        <section class="glass overview" aria-label="선택 위성 빠른 상태"><div class="eyebrow">선택 위성 · 빠른 상태</div><img id="desktop-sat-thumbnail" hidden alt="선택 위성의 연결된 3D 모델 미리보기"><strong id="desktop-sat-name">SAT-A</strong><div id="desktop-sat-status">운용 상태 예시 · 실측 없음</div><dl><div><dt>다음 접촉</dt><dd id="desktop-next">GS-02 · 03:24 UTC 계획</dd></div><div><dt>사건</dt><dd id="desktop-event">실제 사건 미확인</dd></div><div><dt>자료 시각</dt><dd id="desktop-data-utc">자료 시각 미확인</dd></div></dl><button id="orbit-globe-focus" type="button" disabled>계산 위치로 이동</button><details id="desktop-sat-details"><summary>상세정보</summary><div class="orbit-globe-caption"><p id="orbit-globe-status" role="status">Cesium 준비 중</p></div></details><button type="button" data-view="satellite">위성 상태·궤도 열기</button></section>
+        <section class="glass contact" aria-label="접촉과 인계"><div class="eyebrow">다음 확인 · 계획</div><strong id="desktop-handoff">접촉 구간 미확인</strong><p id="desktop-handoff-state">실제 AOS·RF·수신 증거 없음</p></section>
         <div class="scene-credit" id="desktop-scene-credit">NASA Blue Marble / Cesium WGS84 · 현재 계산 출처 미확인</div>
       </div>
-      <footer><span id="footer-view">공간 상황</span><span>창을 이동·크기 조절·확장할 수 있습니다. 작은 창과 확장 창은 같은 입력 상태를 사용합니다.</span></footer>
     </div>
   </div>
   <aside class="launcher glass" id="launcher" hidden aria-label="작업 창 열기"><header><strong id="launcher-title">작업공간</strong><button type="button" id="launcher-close" aria-label="작업 목록 닫기">×</button></header><nav id="nav" aria-label="Satellite 작업공간"></nav></aside>
   <section class="work-window" id="work-window" hidden aria-label="Satellite 작업 창">
     <header class="window-titlebar" id="window-titlebar"><span class="window-drag-label" id="window-title" tabindex="0" role="button" aria-label="작업 창 이동">공용 상황판</span><span id="popout-feedback" class="popout-feedback" role="status" hidden></span><div class="window-actions"><button type="button" id="window-minimize" aria-label="작업 창 최소화" title="최소화">−</button><button type="button" id="window-expand" aria-label="작업 창 확장" title="확장/복원">□</button><button type="button" id="window-popout" aria-label="별도 창으로 열기" title="별도 창으로 열기">↗</button><button type="button" id="window-close" aria-label="작업 창 닫기" title="닫기">×</button></div></header>
-    <div class="window-quick" id="window-quick" aria-label="현재 대상 빠른 상태"><strong id="view-name">공용 상황판</strong><span id="quick-sat">SAT-A · 운용 예시</span><span id="quick-pass">GS-02 03:24 계획</span><span id="quick-event">E-014 · 우선순위 미판정</span></div>
     <main class="window-content" id="screen" tabindex="-1"></main>
     <div class="resize-handle" id="resize-handle" role="button" tabindex="0" aria-label="작업 창 크기 조절" title="드래그 또는 방향키로 크기 조절"></div>
   </section>

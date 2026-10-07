@@ -207,6 +207,8 @@ export class SatelliteModelLayer {
     this.onStatus({phase, errorKind, error, ...(this.description?.pose_source ? {node_id:this.description.pose_source.node_definition?.id ?? null,definition_hash:this.description.pose_source.definition_hash,...NODE_POSE_METADATA} : {satelliteId:this.description?.satelliteId ?? null}), orientation:'display_approximation'});
   }
 
+  setRenderVisible(visible){if(this.disposed)return false;this.renderVisible=visible!==false;if(this.model&&!this.renderVisible)this.model.show=false;return this.renderVisible;}
+
   async retry() {
     if (this.disposed || this.phase !== 'error') return null;
     const description = this.description, sampler = this.sampleAt;
@@ -239,7 +241,7 @@ export class SatelliteModelLayer {
         this.model.show = false;
       } else {
         this.model.modelMatrix = this.bodyMatrix(Cesium, here, date);
-        this.model.show = true;
+        this.model.show = this.renderVisible!==false;
       }
     }
     if (this.tracking && here) {

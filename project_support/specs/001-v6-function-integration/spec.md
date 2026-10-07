@@ -297,3 +297,23 @@ U001 (2026-10-07 user browser comments): Ordinary UI must not automatically disp
 U001 latest comment adds an environment-settings entry at the old rail-foot location. Reuse existing settings view and existing globe_view owner for map/2D/3D/theme/satellite-emphasis/solar controls. Diagnostics access belongs there as an explicit action with one recorder across settings remounts. Existing satellite/ground controls and source calculation/runtime ownership remain unchanged; no duplicate settings store or Viewer.
 
 U001 user correction: Module connection settings and ICD belong under DT, not environment settings. Keep rail settings for globe display, attribution and explicit diagnostics; move original module editor/controller to DT entry with preserved drafts, link scopes and storage. User also requests default map theme light; explicit user-selected dark remains supported. T187 covers this correction without new state owners.
+
+U002 user wall correction (T188, R002/R003): Remove duplicate quickbar from all work windows. Common situation board uses the same real globe, not the conceptual image and fictional satellite buttons. Show project deployed satellites or the loaded catalogue through display-only controls, with 3D/2D switching. Keep the existing single Viewer and current display UTC/source; no implicit catalogue load on entering the board. Target selection, approved deployment, calculations and provenance must survive visibility changes. T189 corrects confirmed settings panel lifecycle leakage while preserving intended environment controls.
+
+U002 latest user removes topbar '기존 콘솔' entry. Remove only the visible legacy navigation link, preserving original legacy files and route for source comparison/regression; no console code deletion or runtime dependency change. Include in T188 and actual smoke.
+
+U002 latest three browser corrections: remove bottom window-guidance footer entirely; keep environment-settings at rail bottom without separate border/background compartment; retain desktop contact/handoff information but remove redundant ground/normal navigation buttons. Guard removed footer DOM access and preserve left navigation/window restoration. These are T188 presentation corrections, not backend changes or a reason to repeat completed feature validation.
+
+U002 common-board controls refinement: detailed shared-globe preferences stay in environmentsettings. Board shows compact3D/2D selector and a whole-catalog ON/OFF button; deployed-project nodes are baseline. ExplicitON may use existingload at currentdisplayUTC, OFF must retain calculations/context and only hidegraphics.
+## U003 관제센터의 독립 화면 (최신 사용자 정정)
+
+공용 상황판을 열어도 메인 지구는 계속 보여야 한다. 대형 화면의 메인과 상황판, 서버에 접속한 역할별 운용 창은 같은 서버 상태와 계산 결과를 표시하며 카메라는 독립적이다. 기존 지구 DOM 이동 방식은 이 요구를 충족하지 않는다. 같은 문서에서는 원본 계산 소유자의 검증된 읽기 전용 투영을 별도 렌더러에 전달한다. 별도 브라우저나 팝업은 서버의 현재 상태와 원본 출처를 다시 검증하며 UI 초안 BroadcastChannel을 명령 승인이나 서버 상태의 근거로 사용하지 않는다. 화면마다 표시 자원을 가질 수 있으나 시계, 계산 입력, 배포 수락과 명령 권한의 소유자를 늘리지 않는다.
+
+위성이 정지해 보이는 원인은 카탈로그의 고정 UTC 계산 결과와 기존 재생/서버 시간 상태를 구분하여 진단한다. 시간 진행은 기존 권한 있는 시간 소유자에 연결하고 다른 화면에도 같은 UTC 결과를 표시한다. 자료가 없는 시각에 임의 원형 공전이나 위치를 생성하지 않는다. 최소 반응속도 검증은 사용자의 요청대로 UI 조정과 PR 작업 이후에 수행한다.
+## U004 선택 위성 정보의 점진적 표시
+
+실제 경보가 없는데 사건 예시와 미연결 항목을 상시 경보 막대로 표시하지 않는다. 선택 위성의 긴 좌표, UTC, 원본 출처와 계산 상태는 우측 선택 위성 카드의 기본 접힌 상세 정보에 보존한다. 기본 카드에는 위성 이름과 핵심 상태를 표시한다. 이미 확인된 원본 모델의 thumbnail이 있으면 출처와 함께 표시하며 없는 위성의 사진을 임의로 대체하지 않는다. 지구 왼쪽에 긴 진단 텍스트 상자를 유지하지 않는다. 진단과 실제 상태의 구분 및 필수 지도 출처는 보존한다.
+원본 화면 편의 기능: 환경 설정에서 브라우저 전체화면과 전체 UI의 밝음/어두움 전환 및 저장 기능을 제공한다. 지도 밝기 설정과 구분하고 원본 저장 키 spacetwin-theme을 유지한다. 현재 UI 초기 어두움과 지도 초기 밝음은 각각 보존한다. 브라우저 지원과 실패를 사실대로 표시하며 서버 상태나 궤도 시각은 변경하지 않는다.
+
+## U004 initial workspace without automatic windows (2026-10-07)
+User request: starting the server/main page must show no mission-result or other task window. On a normal document load, preserve a valid hash as navigation context but do not open its window. Open task windows only after user navigation. Explicit popout=1 documents still open their requested role window, preserving the two-screen control-center workflow. Do not reset runtime, saved inputs, selections, or drafts.

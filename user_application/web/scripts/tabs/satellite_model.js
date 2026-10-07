@@ -60,7 +60,7 @@ export function createSatelliteModelPanel(globe) {
   }
   const remove = globe.observeModel(draw);
   return {
-    show(next) { view = next; draw(); }, update: draw,
+    show(next) { view = next;if(view!=='satellite'){unbind();document.getElementById('satellite-model-panel')?.remove();return;}draw(); }, update: draw,
     // Draft restoration is intentionally display-only, with no camera command.
     applyDraft() { draw(); },
     destroy() {

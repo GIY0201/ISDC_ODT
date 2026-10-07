@@ -70,3 +70,26 @@ test('settings attribution uses the existing Viewer original credit action and p
   await f.win.dispatch('pagehide',{persisted:false});assert.equal(classes.has('isdc-settings-attribution'),false);
  }finally{f.dispose();}
 });
+
+for(const view of ['settings','integration'])test(`${view} hides target quickbar and target route restore retains its provenance`,async()=>{
+ const f=fixture(1280,720,{hash:'#'+view});
+ try{
+  assert.equal(f.doc.getElementById('window-quick'),null);
+  f.evaluate("location.hash='#ground'");await f.win.dispatch('hashchange');assert.equal(f.doc.getElementById('window-quick'),null);
+  f.get('clock');f.get('desktop-handoff-state');f.evaluate('notifyWorkspaceContext()');const texts=['clock','desktop-handoff-state'].map(id=>f.get(id).textContent);
+  await f.get('window-minimize').dispatch('click');await f.get('shelf-restore').dispatch('click');assert.equal(f.doc.getElementById('window-quick'),null);
+  assert.deepEqual(['clock','desktop-handoff-state'].map(id=>f.get(id).textContent),texts);
+  f.evaluate(`location.hash='#${view}'`);await f.win.dispatch('hashchange');assert.equal(f.doc.getElementById('window-quick'),null);
+  await f.get('window-minimize').dispatch('click');await f.get('shelf-restore').dispatch('click');assert.equal(f.doc.getElementById('window-quick'),null);assert.equal(f.viewers.length,1);
+ }finally{f.dispose();}
+});
+
+test('satellite to environment route cannot recreate stale satellite panels during transition',async()=>{
+ const f=fixture(1280,720,{hash:'#satellite'});
+ try{
+  assert.ok(f.doc.getElementById('satellite-model-panel'));assert.ok(f.doc.getElementById('station-workspace'));assert.ok(f.doc.getElementById('catalog-workspace'));
+  f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');
+  for(const id of ['satellite-model-panel','station-workspace','catalog-workspace'])assert.equal(f.doc.getElementById(id)?.isConnected===true,false,id);
+  assert.ok(f.doc.getElementById('source-environment-settings'));assert.ok(f.doc.getElementById('globe-view'));assert.equal(f.viewers.length,1);
+ }finally{f.dispose();}
+});

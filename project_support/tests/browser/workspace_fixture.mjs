@@ -86,8 +86,8 @@ export function fixture(width=1280,height=720,options={}){
     set innerHTML(value){for(const child of this.descendants()){child.isConnected=false;if(elements.get(child.id)===child)elements.delete(child.id);}this.children=[];this._html=value;for(const match of value.matchAll(/<([a-z]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){const child=new Element(match[3],match[1]);child.value=match[2].match(/\bvalue="([^"]*)"/)?.[1]||'';child.checked=/\bchecked\b/.test(match[2]);this.prepend(child);}}
     get innerHTML(){return this._html;}
     *descendants(){for(const child of this.children){yield child;yield* child.descendants();}}
-    prepend(child){child.parent=this;child.isConnected=true;this.children.unshift(child);if(child.id)elements.set(child.id,child);}
-    append(...children){for(const child of children){child.parent=this;child.isConnected=true;this.children.push(child);}}
+    prepend(child){if(child.parent)child.parent.children=child.parent.children.filter(old=>old!==child);child.parent=this;child.isConnected=true;this.children.unshift(child);if(child.id)elements.set(child.id,child);}
+    append(...children){for(const child of children){if(child.parent)child.parent.children=child.parent.children.filter(old=>old!==child);child.parent=this;child.isConnected=true;this.children.push(child);}}
     remove(){this.isConnected=false;if(this.parent)this.parent.children=this.parent.children.filter(child=>child!==this);}
     get ownerDocument(){return doc;}
     querySelector(selector){if(selector.startsWith('#'))return [...this.descendants()].find(el=>el.id===selector.slice(1))||null;return [...this.descendants()].find(el=>el.tag===selector)||null;}
@@ -115,6 +115,7 @@ export function fixture(width=1280,height=720,options={}){
   const doc=new Element('document');doc.getElementById=id=>elements.get(id)||null;doc.createElement=tag=>new Element('',tag);doc.body=new Element('body');Object.defineProperty(doc,'activeElement',{get:()=>active});doc.querySelector=()=>null;doc.querySelectorAll=()=>[];
   for(const id of [...windowSource.matchAll(/getElementById\('([^']+)'\)/g)].map(match=>match[1]))get(id);
   for(const id of ['stored-orbit-globe','orbit-globe-status','orbit-globe-focus','orbit-solar-overlay'])get(id);
+  const surface=get('workspace-globe-surface');get('desktop').append(surface);surface.append(get('stored-orbit-globe'),get('orbit-solar-overlay'),get('orbit-globe-caption'));
   get('screen').tag='main';get('shelf-restore').hidden=true;
   const win=new Element('window');
   class Channel extends Element {constructor(name){super();this.name=name;channels.push(this);}postMessage(value){this.messages??=[];this.messages.push(structuredClone(value));options.channelSend?.(this,value);}close(){this.closed=true;}}
@@ -167,6 +168,9 @@ export function fixture(width=1280,height=720,options={}){
   if(options.groundNetworkPanelFactory)context.createGroundNetworkPanel=args=>options.groundNetworkPanelFactory(createGroundNetworkPanel,args);
   context.installOrbitUiMeasurement=options.installOrbitUiMeasurement??installOrbitUiMeasurement;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
+  // Ordinary feature fixtures represent an explicit user opening the requested task.
+  // Startup tests opt out so they inspect the untouched main-document boot policy.
+  if(options.openInitialView!==false&&!options.popout){const view=context.location.hash.slice(1);if(view){const target=new Element('', 'button');target.dataset.view=view;void doc.dispatch('click',{target});flush();}}
   function flush(){while(jobs.length)jobs.shift()();}
   const resize=async(w,h)=>{context.innerWidth=w;context.innerHeight=h;await win.dispatch('resize');};
   return {get,win,doc,context,resize,viewers,channels,streams,charts,timers,frames,pickHandlers,pickCatalog(number){viewers[0].scene.pick=()=>({id:{catalogNumber:number}});pickHandlers[0].click({position:{}});},evaluate:source=>vm.runInContext(source,context),snapshot:()=>structuredClone(snapshot),counts:()=>({commands,queries,clientDestroyed}),flush,dispose(){delete globalThis.document;}};

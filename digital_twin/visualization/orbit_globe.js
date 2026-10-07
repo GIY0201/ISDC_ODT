@@ -19,7 +19,7 @@ export class OrbitGlobe {
     });
     this.viewer.scene.globe.baseColor=Cesium.Color.fromCssColorString('#225c77');
     this.viewer.clock.shouldAnimate=false;
-    this.catalogVisuals=new Map();this.catalogLabelsVisible=true;
+    this.catalogVisuals=new Map();this.catalogLabelsVisible=true;this.catalogSceneVisible=true;this.selectedDisplayVisible=true;
     this.viewControls=new GlobeView(Cesium,this.viewer,options.createProvider,options.onStatus);
     this.modelLayer=options.modelLayer??null;
     this.cameraMotion=new CenteredCameraMotion(Cesium,this.viewer,{model:()=>this.modelLayer,now:options.motionNow});
@@ -27,6 +27,7 @@ export class OrbitGlobe {
   async setSatelliteModel(description,source){
     if(this.destroyed)return null;
     if(!this.modelLayer)this.modelLayer=new SatelliteModelLayer({viewer:this.viewer,cesium:this.C,isTransitioning:()=>Boolean(this.viewControls.cancelMorph),onCameraInput:()=>this.cameraMotion.cancel(),onFrame:()=>{if(this.modelLayer?.tracking)this.viewer.scene.requestRender();}});
+    this.modelLayer.setRenderVisible?.(this.selectedDisplayVisible);
     this.modelLayer.setTimeSource(source.timeSource);this.modelLayer.advanceUtc=source.advanceUtc;
     this.modelLayer.onStatus=source.onStatus??(()=>{});
     this.modelLayer.onTrackingChange=source.onTrackingChange??(()=>{});
@@ -83,6 +84,18 @@ export class OrbitGlobe {
     this.entity=null;this.position=null;
     this.selectedHover=null;this._refreshSatelliteHover();
   }
+  setDisplayVisibility({catalog=true,selected=true}={}){
+    if(this.destroyed)return false;if(typeof catalog!=='boolean'||typeof selected!=='boolean')return false;
+    this.catalogSceneVisible=catalog;this.selectedDisplayVisible=selected;this.applyDisplayVisibility();this.viewer.scene.requestRender();return true;
+  }
+  applyDisplayVisibility(){
+    if(this.catalogCollection)this.catalogCollection.show=this.catalogSceneVisible;
+    if(this.catalogLabelCollection)this.catalogLabelCollection.show=this.catalogSceneVisible;
+    if(this.entity)this.entity.show=this.selectedDisplayVisible;
+    if(this.observationLine)this.observationLine.show=this.selectedDisplayVisible;
+    for(const entity of this.trackEntities??[])entity.show=this.selectedDisplayVisible;
+    this.modelLayer?.setRenderVisible?.(this.selectedDisplayVisible);
+  }
   setCatalogLabels(visible){
     if(this.destroyed)return false;
     this.catalogLabelsVisible=Boolean(visible);
@@ -126,8 +139,8 @@ export class OrbitGlobe {
     C.JulianDate.fromIso8601(value.utc);
     if(this.catalogSignature!==value.scene_sha256){
       this.setCatalogScene(null,onSelect);
-      this.catalogCollection=viewer.scene.primitives.add(new C.PointPrimitiveCollection());
-      this.catalogLabelCollection=viewer.scene.primitives.add(new C.LabelCollection());
+      this.catalogCollection=viewer.scene.primitives.add(new C.PointPrimitiveCollection());this.catalogCollection.show=this.catalogSceneVisible;
+      this.catalogLabelCollection=viewer.scene.primitives.add(new C.LabelCollection());this.catalogLabelCollection.show=this.catalogSceneVisible;
       this.catalogSignature=value.scene_sha256;
     }
     this.catalogUtc=value.utc;

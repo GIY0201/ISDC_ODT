@@ -142,3 +142,11 @@ test('unchanged GP epoch parsing is reused across UTC refreshes but replaced epo
   const changed=scene(1);changed.scene_sha256='d'.repeat(64);changed.rows[0].epoch_utc='2020-07-16T21:16:01.000416000Z';changed.utc=changed.rows[0].epoch_utc;globe.setCatalogScene(changed);assert.equal(calls,3);assert.equal(globe.catalogPoints.get(1).color.alpha,.98);
  }finally{Date.parse=parse;globe.destroy();}
 });
+
+test('catalog render visibility preserves loaded catalog identity and native UTC while restoring owned collections',()=>{
+ const f=fixture();const points={show:true},labels={show:true},selected={show:true};
+ f.globe.catalogCollection=points;f.globe.catalogLabelCollection=labels;f.globe.entity=selected;f.globe.catalogUtc='2026-10-07T00:00:00.000000000Z';f.globe.catalogSignature='same-source';
+ f.globe.setDisplayVisibility({catalog:false,selected:false});assert.equal(points.show,false);assert.equal(labels.show,false);assert.equal(selected.show,false);
+ assert.equal(f.globe.catalogUtc,'2026-10-07T00:00:00.000000000Z');assert.equal(f.globe.catalogSignature,'same-source');
+ f.globe.setDisplayVisibility({catalog:true,selected:true});assert.equal(points.show,true);assert.equal(selected.show,true);f.globe.destroy();
+});

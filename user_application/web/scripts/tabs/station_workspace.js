@@ -34,5 +34,5 @@ export function createStationPanel(sites,groups,{select=()=>{},focus=()=>{},use=
   node('station-observation-status').textContent=card?`${card.state==='visible'?'최소각 충족':card.state==='hidden'?'최소각 미충족':card.state==='none'?'위성 미선택':'관측 표본 미확인'} · ${card.observationUtc?'관측 수치 UTC '+card.observationUtc:'현재 선택 지점의 관측 조건을 시간 탐색에서 적용·계산하세요.'} · 실제 통신 미확인`:'';
   node('station-live').innerHTML=card?`<dl>${card.live.map(([key,value])=>`<dt>${escape(key)}</dt><dd>${escape(value)}</dd>`).join('')}</dl><p>${escape(card.note)}</p>`:'';node('station-detail').innerHTML=card?`<h3>${escape(card.title)} · ${escape(card.subtitle)}</h3><p>${escape(card.kicker)} · 원본 대표 설정</p><dl>${card.facts.map(([key,value])=>`<dt>${escape(key==='고도'?'대표 프리셋 높이 · 실측 미확인':key)}</dt><dd>${escape(value)}</dd>`).join('')}</dl><p>자료 출처: 선배 프로토타입 고정 지상국 목록. 안테나·대역·최소 고각은 대표 설정입니다. 지도 선택만으로 계산 지점을 적용하지 않습니다. 계산 초안 버튼은 좌표·최소각만 가져오며 높이를 확인한 뒤 적용해야 합니다. 저장 궤도와 카탈로그 표시 위성은 별개입니다. 실제 수신 미확인.</p>`:'';
  }
- return{controller,show(next){view=next;draw();},update:draw,destroy:()=>controller.destroy()};
+ return{controller,show(next){view=next;if(!['satellite','ground'].includes(view)){document.getElementById('station-workspace')?.remove();return;}draw();},update:draw,destroy:()=>controller.destroy()};
 }

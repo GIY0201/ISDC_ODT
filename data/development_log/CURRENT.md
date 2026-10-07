@@ -1311,3 +1311,11 @@ User requested two actual browser workers in parallel: group1 c9FEqbhcJsTc9Nwn i
 U001 UI cleanup source/review complete: rail environment-settings entry, reused map display settings first, optional attribution and explicit diagnostics, obsoletelabels/emptyshelf removed. Author42PASS/reviewer47PASS CLEAN, syntax/diffPASS; actualbrowser smoke pending. No legacy.html/app.js/backend/native/clock/physics edits. Whole migration acceptance remains active.
 
 T187 user-directed UI correction: move module connection/ICD to DT integration view; environmentsettings globe/credits/diagnostics only. Defaultmaplight with explicitdark preserved. Existing settingscontroller/scoped drafts/singleViewer unchanged. Author35PASS/reviewer32PASS CLEAN/syntaxdiffPASS. ActualUI smoke and wholemigration remain active.
+
+Draft PR32 published and attached, existingbranch/history9489d04 intact, no merge. GCM per-command GIY0201 account selection resolves previous noninteractivepassword prompt. Actualbrowser/review continue; fullgoal remainsopen. PR https://github.com/GIY0201/ISDC_ODT/pull/32.
+
+User priority: minimum responsiveness verification/optimization deferred until PR and requested UI adjustments finish. SC006 remains unresolved, existing records retained; UI functional verification continues.
+
+2026-10-07 U004: normal main startup now shows no task window, including retained valid task hash; explicit popout opens requested role and later user task navigation works. Root closest review: 28 PASS/0 FAIL, actual public-server #mission and #satellite main startup closed with primary globe preserved; explicit satellite click opens. Existing shared runtime and inputs preserved. Overall T075-T083/PR acceptance and T193 full-scene time connection remain open; performance deferred by user.
+
+U003/U004 final combined Node regression: 2055 PASS / 0 FAIL / 1 SKIP, 29708.4283 ms, U003_U004_full_node_final.log. The skipped case is not performance acceptance. Earlier Python full result 957 PASS / 3 FAIL / 8 SKIP was repaired with existing supplied native-wheel path and intentional legacy-link presentation assertion update; failed scope 5 PASS. Full current Python all-green remains unclaimed. No response-speed benchmark performed.

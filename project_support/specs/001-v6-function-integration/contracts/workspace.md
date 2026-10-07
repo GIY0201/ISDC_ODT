@@ -17,3 +17,5 @@ CSS SHA256 c0ab17d9d496dd3eb78d984a661793d1cc266fde9c03ed7643dcc16b97a0e262
 JS SHA256 7301c5872fd19cb4260dca1424398f37605d425c31397f08022e97feba9fd2c6
 이번단계에서원본을수정하거나제품UI를교체하지않았다.
 
+
+2026-10-07 U004: A regular document load never automatically opens a work window, even with a retained valid task hash. The hash identifiers are preserved. Later user navigation/hashchange opens the window normally. Explicit popout=1 documents retain automatic requested role-window opening. No server/runtime/input/draft reset accompanies startup.
