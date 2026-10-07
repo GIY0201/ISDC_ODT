@@ -71,3 +71,13 @@ N017c–e에서 소유자 등록 증명과 기존 handler의 연결로 수정했
 승인 검증과 공유한다. 마지막 UI 단계에서 지상국 변경 즉시 갱신, 분석
 시각 차이 strict >60000ms 갱신, 위성별3개/전체 첫12개/현재 통과 표시를
 연결한다. 기존 승인 통과 조회를 자연 재생용 결과로 재해석하지 않는다.
+
+N017g/h 조사 확정: communication/browser/api.js의 nodeMissionWindows와
+contextHash 생략, mission_windows.py의 헤더 유무 분기 및 실제 route 시험을
+직접 대조했다. MissionWindowQuery는 deepcopied 전체 정의로 기존
+NativeMissionPasses와 NativeMissionWindows를 모두 계산하고 metadata/hash를
+대조한다. 새 query owner와 순수 contact validator를 사용하며 승인 service는
+contact helper만 재사용한다. Eclipse 필수는 새 표시 query에만 적용한다.
+Raw UTC는 기존9자리 codec으로 검증하고 표시 duration은 start/end에서 유도한다.
+별도 future-pass-* UI와 기존 pass-*50페이지를 보존하는 ADR0052/계약으로
+설계했다. 독립 분석과 RED 전까지 구현 완료라고 해석하지 않는다.

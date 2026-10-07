@@ -8,7 +8,7 @@
 
 ICD-08 1.0 경로는 observations POST, overview GET, events GET(after), status GET, dashboard GET(after)이다. 실행 변경 시 전환 이력과 순서를 초기화하고 이전 실행의 지연 관측은 무시한다. 같은/역순 SIM 표본은 중복 이벤트를 추가하지 않는다. 인증률 99% 기준 판정만 수행하며 무결성과 암호화는 항상 unknown이다. 이력은 메모리의 최근 200개이며 영구 기록이 아니다.
 
-V6 `createSourceSecurityPanel({api,document,host})`은 `security` 화면에서 명시적 조회를 제공한다. 원본 `securityView`와 `transportView`로 판정·SIM 자료·MOCK 장비·모듈 위치·endpoint·관측/수신 UTC·최근40개 전환 이력을 표시한다. 화면 이탈·폐기·실행 변경은 요청을 취소하며 늦은 응답이 새 실행을 덮지 않는다. 외부 모듈 오류는 fallback SIM 성공으로 바꾸지 않으며 503의 실제 위치/endpoint 진단을 보존하고 판정은 미확인으로 표시한다.
+V6 `createSourceSecurityPanel({api,document,host})`은 `security` 화면에서 명시적 조회와 활성·가시 상태의 자동 관측을 제공한다. 원본 `securityView`와 `transportView`로 판정·SIM 자료·MOCK 장비·모듈 위치·endpoint·관측/수신 UTC·최근40개 전환 이력을 표시한다. 화면 이탈·폐기·실행 변경은 요청을 취소하며 늦은 응답이 새 실행을 덮지 않는다. 외부 모듈 오류는 fallback SIM 성공으로 바꾸지 않으며 503의 실제 위치/endpoint 진단을 보존하고 판정은 미확인으로 표시한다.
 
 ## 검증
 
@@ -36,3 +36,7 @@ After the receipt aged beyond the presentation window, the same live pane change
 전체 회귀의 architecture 시험이 외부 transport에서 digital_twin.contracts 예외를 import하는 원본 의존성을 거부했다. 기준을 완화하지 않고 기존 ICD-01 방식과 같이 원본 SecurityUnavailable 클래스 본문을 foundation/security_errors.py로 그대로 추출했다. contracts/security.py는 같은 클래스를 재공개하며 external/security.py는 foundation에서 가져온다. Runtime/HTTP/transport의 예외 클래스 identity는 동일하다. 따라서 앞선 7개 파일의 바이트 동일 주장은 이 구조 보완 이전 상태를 설명한다. 현재는 5개 파일 바이트 동일, 2개 파일은 예외 위치/import만 변경했다. 골든 시험은 명시된 이 두 변경만 역변환하여 원본 SHA256을 검사하고 정책·schema·adapter의 다른 차이를 허용하지 않는다.
 
 The same tab's CDP Network.setBlockedURLs temporarily blocked only its `/api/security/dashboard` request. A visible query produced **조회 오류**, **미확인** and `Failed to fetch`, retaining the labelled last values rather than manufacturing a successful report. The URL block was immediately cleared, and the same visible query then received the actual SIM report at `2026-10-06T19:26:37.030Z`. No server or other browser was taken offline. Actual 1280×720 and 1920×1080 viewports both retained RUN-904CE008D00B and one canvas, with body width equal to the viewport; the 626-pixel content pane scrolls internally. The temporary viewport override was reset. This adds actual network-error→retry proof; remote-module 503 semantics and run-change races still require separate evidence.
+
+## 2026-10-07 원본 자동 관측 수명 복원
+
+기존 수동 조회 owner에서 활성·가시 화면 진입 즉시 조회, 완료 후2초 재조회,8초 abort,1초 freshness 재표시를 연결했다. 화면 가림·이탈·실행 변경·재마운트는 이전 generation을 취소한다. 초기3RED 및 ignored-abort timeout RED 후 관련18PASS296.1062ms. 독립 리뷰와 변경 후 전체 회귀/실제 브라우저 검증은 진행 중이다. 원본 SIM 관측이며 인증·암호화·보안 보증을 추가한 것이 아니다.

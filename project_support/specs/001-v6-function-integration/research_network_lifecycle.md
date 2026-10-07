@@ -86,3 +86,15 @@ N017f의 HTTP 응답과 실제 controller 반영 사이 해제 문제는 Context
 https://github.com/mdn/content/blob/main/files/en-us/web/javascript/reference/statements/try...catch/index.md,
 https://github.com/mdn/content/blob/main/files/en-us/web/javascript/reference/global_objects/promise/finally/index.md,
 https://github.com/mdn/content/blob/main/files/en-us/web/javascript/reference/operators/await/index.md.
+
+Repeated tiny-model GPU captures prompted a real Context7 Cesium ref-doc query:
+Viewer zoomTo/trackedEntity, ModelGraphics minimumPixelSize/maximumScale and camera
+bounding sphere. Official Model/ModelGraphics docs state minimumPixelSize is an
+approximate display size, maximumScale caps it, and Model.boundingSphere excludes
+minimumPixelSize. Camera.viewBoundingSphere frames a world-space sphere with an
+optional heading/pitch/range offset. These facts guide further diagnosis but do not
+prove the current model body/material rendering or justify changing source scale
+blindly. Tiny yellow markers remain unverified actual GPU acceptance.
+https://cesium.com/learn/cesiumjs/ref-doc/Model.html
+https://cesium.com/learn/cesiumjs/ref-doc/ModelGraphics.html
+https://cesium.com/learn/cesiumjs/ref-doc/Camera.html

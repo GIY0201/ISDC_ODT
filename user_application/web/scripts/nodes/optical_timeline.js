@@ -18,6 +18,8 @@ export function createNodeOpticalTimeline({resolver,requestCommunicationStates,r
   if((readContinuity===null)!==(verifyContinuity===null)||readContinuity!==null&&[readContinuity,verifyContinuity].some(value=>typeof value!=='function'))throw new TypeError('sampled optical continuity pair required');
   let scopeCache=null,presentationCache=null;
   const sampledProofs=new WeakMap();
+  const rawProofs=new WeakMap();let rawEpoch={};
+  const revokeRaw=()=>{rawEpoch={};};
   const presentationProofs=new WeakMap();
   const freezeScope=value=>{if(value&&typeof value==='object'&&!Object.isFrozen(value)){for(const child of Object.values(value))freezeScope(child);Object.freeze(value);}return value;};
   let disposed=false,generation=0,active=null,sampledDrain=null,last=null,failure=null,histories=new Map(),owners=new Map(),knownDefinitions=new Map(),knownHashes=new Map(),observerError='';
@@ -127,6 +129,27 @@ export function createNodeOpticalTimeline({resolver,requestCommunicationStates,r
       const after=context();return !disposed&&after.key===c.key&&last===proof.accepted&&active===proof.request&&failure===proof.failed&&generation===proof.ticket&&currentPermit(proof.permit,after.scope);
     }catch{return false;}
   }
+  // Command capability over the already accepted native record, never a UI projection.
+  function captureRawAnalysis(){
+    const accepted=last,epoch=rawEpoch;
+    try{
+      const c=context();if(disposed||!accepted||accepted.rawEpoch!==epoch||accepted.value.status!=='valid')return null;
+      if(accepted.scope!==c.scope||!(accepted.sampled?currentPermit(accepted.sampled,c.scope):accepted.key===c.key&&exactOriginCurrent(accepted))){revokeRaw();return null;}
+      const source=displaySource(),token=freezeScope({kind:'OPTICAL_RAW_ANALYSIS_V1',analysis_utc:accepted.value.utc,snapshot:structuredClone(accepted.value)});
+      if(disposed||last!==accepted||rawEpoch!==epoch)return null;
+      rawProofs.set(token,{accepted,epoch,scope:c.scope,source,hashes:signature(accepted.value.definition_hashes)});
+      return verifyRawAnalysis(token)?token:null;
+    }catch{revokeRaw();return null;}
+  }
+  function verifyRawAnalysis(token){
+    const proof=rawProofs.get(token);if(!proof||disposed||proof.epoch!==rawEpoch)return false;
+    try{
+      const c=context(),record=proof.accepted;
+      const valid=()=>!disposed&&proof.epoch===rawEpoch&&context().scope===proof.scope&&displaySource()===proof.source&&signature(Object.fromEntries(knownHashes))===proof.hashes&&(record.sampled?currentPermit(record.sampled,proof.scope):context().key===record.key);
+      if(c.scope!==proof.scope||!valid()||!valid())throw Error('raw optical authority revoked');
+      return !disposed&&proof.epoch===rawEpoch;
+    }catch{rawProofs.delete(token);revokeRaw();return false;}
+  }
   function begin(c,permit=null,draining=null){
     cancel();failure=null;
     const task={key:c.key,context:c,permit,generation,controller:new AbortController(),promise:null,sampledPromise:null};active=task;
@@ -158,9 +181,9 @@ export function createNodeOpticalTimeline({resolver,requestCommunicationStates,r
         const nextOwners=new Map();for(const terminal of result.terminals){const key=resolver.terminalKey(terminal.nodeId,terminal.equipmentId);if(nextOwners.has(key))throw new Error('ambiguous optical terminal identity');nextOwners.set(key,terminal.nodeId);}
         const value={...empty(c,'valid'),definition_hashes:Object.fromEntries(hashes),terminals:structuredClone(result.terminals),pairs:structuredClone(result.pairs)},proof=signature(value);
         if(!current())return null;
-        histories=new Map([...result.histories].map(([key,state])=>[key,structuredClone(state)]));owners=nextOwners;knownDefinitions=nodeKeys;knownHashes=hashes;last={key:c.key,scope:c.scope,value:freezeScope(value),proof,sampled:permit,task};failure=null;
+        histories=new Map([...result.histories].map(([key,state])=>[key,structuredClone(state)]));owners=nextOwners;knownDefinitions=nodeKeys;knownHashes=hashes;last={key:c.key,scope:c.scope,value:freezeScope(value),proof,sampled:permit,task,rawEpoch};failure=null;
         return structuredClone(value);
-      }catch(error){if(!current())return null;last=null;failure={key:c.key,error:error instanceof Error?error.message:String(error),sampled:permit,context:c};return snapshot();}
+      }catch(error){if(!current())return null;revokeRaw();last=null;failure={key:c.key,error:error instanceof Error?error.message:String(error),sampled:permit,context:c};return snapshot();}
       finally{if(active===task){active=null;notify();}}
     }
 
@@ -168,32 +191,32 @@ export function createNodeOpticalTimeline({resolver,requestCommunicationStates,r
   }
   function update(){
     if(disposed)return Promise.resolve(null);
-    let c;try{c=context();}catch(error){cancel();last=null;failure=null;notify();return Promise.resolve(snapshot());}
+    let c;try{c=context();}catch(error){revokeRaw();cancel();last=null;failure=null;notify();return Promise.resolve(snapshot());}
     if(active?.permit&&active.key===c.key){
       return active.promise.then(()=>{try{return !disposed&&context().key===c.key&&last?.key===c.key?snapshot():null;}catch{return null;}});
     }
     const draining=active?.permit?active.promise:sampledDrain;
-    if(!draining&&last?.key===c.key&&exactOriginCurrent(last))return Promise.resolve(structuredClone(last.value));
+    if(!draining&&last?.rawEpoch===rawEpoch&&last?.key===c.key&&exactOriginCurrent(last))return Promise.resolve(structuredClone(last.value));
     if(!draining&&active?.key===c.key)return active.promise;
     return begin(c,null,draining).promise;
   }
   function updateSampled(){
     if(disposed)return Promise.resolve(emptySampled('unavailable','disposed'));
-    let c,permit;try{c=context();permit=capturePermit();if(!currentPermit(permit,c.scope))throw new Error('sampled optical scope changed during read');}catch(error){if(active?.permit)cancel();return Promise.resolve(emptySampled('unavailable',String(error?.message??error)));}
+    let c,permit;try{c=context();permit=capturePermit();if(!currentPermit(permit,c.scope))throw new Error('sampled optical scope changed during read');}catch(error){revokeRaw();if(active?.permit)cancel();return Promise.resolve(emptySampled('unavailable',String(error?.message??error)));}
     if(active?.permit&&active.context.scope===c.scope&&active.permit.source===permit.source&&active.permit.lease===permit.lease&&currentPermit(active.permit,c.scope))return active.sampledPromise;
     if(active&&!active.permit)return active.promise.then(()=>updateSampled());
-    if(last?.key===c.key&&last.sampled&&last.sampled.lease===permit.lease&&currentPermit(last.sampled,c.scope))return Promise.resolve(sampledPresentation());
+    if(last?.rawEpoch===rawEpoch&&last?.key===c.key&&last.sampled&&last.sampled.lease===permit.lease&&currentPermit(last.sampled,c.scope))return Promise.resolve(sampledPresentation());
     const draining=active?.promise??sampledDrain,task=begin(c,permit,draining);
     task.sampledPromise=task.promise.then(result=>result===null?emptySampled('unavailable','sampled optical query invalidated'):sampledPresentation());return task.sampledPromise;
   }
   function cancelSampled(){
-    if(disposed)return;
+    if(disposed)return;revokeRaw();
     if(active?.permit)cancel();
     if(last?.sampled)last=null;
     if(failure?.sampled)failure=null;
   }
-  function resetHistories(){if(disposed)return;cancel();histories=new Map();owners=new Map();knownDefinitions=new Map();knownHashes=new Map();last=null;failure=null;notify();}
-  function pruneHistories(keep){if(disposed)return;const ids=keep instanceof Set?keep:new Set(keep??[]);cancel();for(const key of [...histories.keys()])if(!ids.has(owners.get(key))){histories.delete(key);owners.delete(key);}last=null;failure=null;notify();}
-  function destroy(){if(disposed)return;disposed=true;scopeCache=null;presentationCache=null;cancel();histories=new Map();owners=new Map();knownDefinitions=new Map();knownHashes=new Map();last=null;failure=null;}
-  return Object.freeze({update,updateSampled,cancelSampled,sampledPresentation,verifySampledPresentation,snapshot,presentation,verifyPresentation,verifyLinkSnapshot,resetHistories,pruneHistories,destroy,historyEntries:()=>structuredClone([...histories]),get observerError(){return observerError;}});
+  function resetHistories(){if(disposed)return;revokeRaw();cancel();histories=new Map();owners=new Map();knownDefinitions=new Map();knownHashes=new Map();last=null;failure=null;notify();}
+  function pruneHistories(keep){if(disposed)return;revokeRaw();const ids=keep instanceof Set?keep:new Set(keep??[]);cancel();for(const key of [...histories.keys()])if(!ids.has(owners.get(key))){histories.delete(key);owners.delete(key);}last=null;failure=null;notify();}
+  function destroy(){if(disposed)return;revokeRaw();disposed=true;scopeCache=null;presentationCache=null;cancel();histories=new Map();owners=new Map();knownDefinitions=new Map();knownHashes=new Map();last=null;failure=null;}
+  return Object.freeze({captureRawAnalysis,verifyRawAnalysis,update,updateSampled,cancelSampled,sampledPresentation,verifySampledPresentation,snapshot,presentation,verifyPresentation,verifyLinkSnapshot,resetHistories,pruneHistories,destroy,historyEntries:()=>structuredClone([...histories]),get observerError(){return observerError;}});
 }

@@ -1,8 +1,9 @@
 // Lifecycle scheduling only. The existing display and analytical owners retain
 // UTC, histories, full native proofs and the serial transport lane.
 export const OPTICAL_ANALYSIS_INTERVAL_MS=1000;
-export function createOpticalDisplayScheduler({readDisplay,readContinuity=null,verifyContinuity=null,requestSampled,requestExact,cancelSampled,onError=()=>{},setTimer=setTimeout,clearTimer=clearTimeout,queueMicrotask=globalThis.queueMicrotask}={}){
+export function createOpticalDisplayScheduler({readDisplay,readContinuity=null,verifyContinuity=null,requestSampled,requestExact,cancelSampled,onAnalysisTick=null,onError=()=>{},setTimer=setTimeout,clearTimer=clearTimeout,queueMicrotask=globalThis.queueMicrotask}={}){
   if([readDisplay,requestSampled,requestExact,cancelSampled,onError,setTimer,clearTimer,queueMicrotask].some(fn=>typeof fn!=='function'))throw new TypeError('optical display scheduler owner ports required');
+  if(onAnalysisTick!==null&&typeof onAnalysisTick!=='function')throw new TypeError('analytical completion callback required');
   if((readContinuity!==null||verifyContinuity!==null)&&[readContinuity,verifyContinuity].some(fn=>typeof fn!=='function'))throw new TypeError('complete display continuity bridge required');
   let started=false,enabled=true,disposed=false,timer=null,generation=0,queued=null,active=null,pending=false,controlPending=false,lastLease=null;
   const running=()=>started&&enabled&&!disposed;
@@ -17,9 +18,10 @@ export function createOpticalDisplayScheduler({readDisplay,readContinuity=null,v
     const display=readDisplay();
     return display?.utc&&verifyContinuity(lease)===true?{display,lease}:{display:null,lease:null};
   }
+  function analyticalTick(ticket=generation){if(!running()||controlPending||ticket!==generation||!onAnalysisTick)return;try{Promise.resolve(onAnalysisTick()).catch(report);}catch(error){report(error);}}
   function exact(display){
     const ticket=generation;
-    try{Promise.resolve(requestExact(display)).catch(error=>{if(running()&&ticket===generation)report(error);});}catch(error){if(ticket===generation)report(error);}
+    try{Promise.resolve(requestExact(display)).then(()=>analyticalTick(ticket)).catch(error=>{if(running()&&ticket===generation)report(error);});}catch(error){if(ticket===generation)report(error);}
   }
   function dispatch(){
     if(!running()||controlPending)return;
@@ -35,8 +37,8 @@ export function createOpticalDisplayScheduler({readDisplay,readContinuity=null,v
     const task={generation};active=task;
     let result;
     try{result=requestSampled(display,lease);}catch(error){result=Promise.reject(error);}
-    Promise.resolve(result).catch(error=>{if(running()&&task.generation===generation){cancel();report(error);}}).finally(()=>{
-      if(active!==task)return;active=null;
+    Promise.resolve(result).then(()=>{task.success=true;}).catch(error=>{if(running()&&task.generation===generation){cancel();report(error);}}).finally(()=>{
+      if(active!==task)return;active=null;if(task.success&&running()&&task.generation===generation)analyticalTick(task.generation);
       if(running()&&pending&&!controlPending)defer();
     });
   }
@@ -71,7 +73,7 @@ export function createOpticalDisplayScheduler({readDisplay,readContinuity=null,v
   function install(){
     if(!running()||timer!==null)return;
     const owned={id:null};timer=owned;
-    owned.id=setTimer(()=>{if(timer!==owned)return;timer=null;if(!running())return;install();if(lastLease&&!controlPending)force();},OPTICAL_ANALYSIS_INTERVAL_MS);
+    owned.id=setTimer(()=>{if(timer!==owned)return;timer=null;if(!running())return;install();if(!controlPending){if(lastLease)force();else analyticalTick();}},OPTICAL_ANALYSIS_INTERVAL_MS);
   }
   function removeTimer(){if(timer===null)return;const owned=timer;timer=null;clearTimer(owned.id);}
   return Object.freeze({

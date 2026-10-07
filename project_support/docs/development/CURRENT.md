@@ -1,3 +1,39 @@
+## 2026-10-07 N018 주기 통신 연결 변경 묶음 회귀 통과
+
+기존 raw 분석 owner/수락 배치/통신 command lane에서 원본1초·MIN900·동일UTC
+새 sequence 교환과 수락 후 선택 경로 갱신을 연결했다. UI는 분석 UTC를
+보존하는 등록된 결과로 전체 DTN/품질/custody/경로 상세를 표시하며 exact
+현재 승인으로 승격하지 않는다. 지상국과 위성 상세 초점·편집·링크 A/B,
+보안 자동 관측도 기존 owner에 연결했다. 독립 발견 callback/오류 복귀/
+불확실한 전송/교차-origin 반환 문제는 회귀 RED 후 수정했다.
+
+최종 전체 Node1767PASS0FAIL0SKIP23203.4191ms(exit0,99750), 전체 Python966PASS
+1기존PillowSKIP8기존ERFAwarnings249.33s(exit0,39805). Python 이후 변경은JS이다.
+validation/periodic_native_fabric_exchange.md와 실제 전체 로그 참조.
+
+움직이는 시각의 SVG·3D mixed route/품질/보관 표시가 아직 원본과 다르므로
+ADR0055/T166–T168로 연결한다. 실제8891/모든모델/두해상도/GPU/게임성능,
+전체T075–T084/T032 및 PR 미완료. 서버GET health는 기존RUN-904CE008D00B/
+paused/SDC_POC_01을 확인했다. 서버상태/8891/수락배치/브랜치를 보존했다.
+## 2026-10-07 N017 native 미래 통과 연결 및 병렬 이식 검증
+
+선배의 전체 수락 목록/선택 지상국/3시간/위성별 첫3/안정 AOS 정렬 첫12와
+엄격한 UTC 차이>60초 갱신을 기존 native 조회 및 ground UI에 연결했다.
+전체 응답 검증과 승인 경계는 유지한다. 실제 기본 Rust0.3.0/생산 API/
+JS owner 240개→135개 원시 통과 검증1PASS22.88초, 조회 전후 궤도 상태 동일.
+전체 Node1624PASS0FAIL0SKIP22504.7643ms, 전체 Python966PASS1기존PillowSKIP
+8기존ERFAwarnings270.32s exit0. 첫 Python의164setupERROR는 basetemp 상위
+폴더 부재로 재현했으며 원본 실패 로그와 수정 후 전체 로그를 함께 보존했다.
+validation/native_future_passes_connection.md 및 data/workspace/validation 참조.
+
+추가 연결: custody 전체 행 보존, 경로 출발·도착 선택과 3D 혼합 경로 강조는
+독립 검증 중이다. 경로 강조 최종 callback 이후 실제 Viewer/UTC/owner 변경
+문제를 발견해 회귀 수정 중이다. 변경 후 전체 회귀는 아직 수행 전이다.
+불변 네트워크 구조 검사 최적화는 CPU 증거이며 GPU 성능 통과를 뜻하지 않는다.
+N018 주기 통신 교환과 보안 live 관찰 연결, 실제 두 해상도/모델/GPU/성능,
+전체 T075–T084/T032와 PR은 미완료다. 정오 완료 목표로 병렬 진행한다.
+Git push dry-run은 비대화형 HTTPS 인증 부재로 실패했다. 변경/로컬 이력과
+기존 브랜치/8891/SIM/수락 배치를 보존하고 인증 우회나 이력 재생성을 하지 않았다.
 ## 2026-10-07 N017f 미래 통과 입력 경계
 
 기존 workspace owner에서 실제 전체 수락 명부·활성 지상국·분석 UTC를

@@ -256,3 +256,21 @@ can follow natural catalog UTC only with its actual owner-issued continuity;
 paused exact sources remain exact and projected SIM is rejected. Existing paused
 mission approval stays unchanged. No HTTP/current-state copy or implicit write.
 ADR0051; this does not close original3h/max3/12/>60s/live-pass or wholeN017 gates.
+
+N017g/h connects the original future-pass behavior: fullaccepted deployed roster,
+chosen enabled station, fixed3h, first3 pernode and stable AOS merged first12,
+inclusive current-pass marking. Station change refreshes immediately; natural
+display-UTC abs delta strictly>60000ms refreshes without an extra clock/timer.
+Readonly native query receipts never authorize mission/fabric actions. Preserve
+the existing approved allstation contact query and50-row pages. Failures and
+revoked inputs show unknown, and async responses cannot overwrite newer scope.
+
+N017 mixed route emphasis preserves original OISL plus ground3D emphasis (ADR0053): fullexact native/fabric/current scope, registered readonly UI proof, source color/width/material phase and selection. Sampled visuals never approve routes. N018 periodic exchange/DTN/route remains a separate unimplemented command-authority stage; full scope and acceptance criteria remain unchanged.
+
+## N018 주기적 native 분석 교환 추가 계약
+
+N018: 원본 통신 활성 화면의 1000ms/MIN900ms 반복 교환 및 선택 경로 재조회는 existing raw native analytical command capability를 사용한다. captured UTC를 현재 UTC로 바꾸지 않고 sampled UI가 command 권한이 되지 않는다. 전체 수락 배치와 full source/hash/station/fault/clock-control/endpoint/module 증명을 매 await 전후 확인한다. 구현 및 실제 검증 gate는 ADR0054와 T163–T165에 남긴다.
+
+## N018 analytical mixed route 시각 연결 잔여
+
+ADR0055/contracts/analytical_mixed_route_visual.md/T166–T168: historical captured native route를 exact approval로 승격하지 않고 별도 등록 UI proof로 같은 OISL/ground 현재 native primitive의 원본 purple/width/material을 표시한다. immutable route 분석 UTC와 current display UTC/age/incomplete-current를 구분한다. 현재 구현 전이며 전체 이식/실제 두 해상도/성능 gate는 보존한다.

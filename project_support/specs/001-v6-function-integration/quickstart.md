@@ -185,3 +185,25 @@ At terminal callbacks exercise actual owner control/store/display invalidation
 and changed returned running/readiness/lease values. Readers must remain
 observational; do not replace production ownership with secretly mutated raw
 arrays in a getter or claim finite reads prove all such unrelated mutations.
+
+N017g/h validation: node --test the native_contact_bundle, future_passes and
+ground_future_passes browser suites. Use realaccepted240 and actualcodec9digits,
+headerless realapi transport→native contact+eclipse envelope→wholevalidator→owner.
+Corrupt an invisiblefourth row/nonselectednode/reporthash/coverage and confirm
+no plausible result publishes. Preserve existing mission_services/ground_contact
+tests and50paging. Naturallease UTC at exact60s mustnotquery; +1ms and reverse61s
+mustquery, station change immediatelyquery. PendingmovingUTC must stayserial.
+At1920x1080 and2560x1440 verify new12rows/current flags/footnotes and independent
+OISLabsence, remount/leave/abort/dispose/editedfields/GP/UTC/SIM preservation.
+Run fullNode/Python and actual8891 normal controls; controlledHTTP/DOM/native
+fixtures do not substitute for liveGPU/gameperformance acceptance.
+
+N017 mixed-route follow-up (pending): run new mixed_route_emphasis owner/NodeScene/workspace tests after meaningful RED and clean analyze; compare source #a78bfa and widths4.5/4/2 with preserved flow material/time. Verify mixed OISL/ground route and stale/failed/sampled rejection, then full regression and actual8891 two-resolution/GPU/game-performance separately. No product implementation or acceptance is claimed by this design amendment.
+
+## N018 주기적 native 분석 교환 추가 계약
+
+N018 검증 예정: 활성 ground에서 전체 배치를 확인하고 1s cadence/fresh module sequence/DTN 보고 및 선택 route 재요청을 관찰한다. 자연 UTC가 진행해도 immutable analysis UTC를 유지하고 sameUTC pause/seek/fault/site/source 변경 시 이전 capability를 철회한다. pending/review/uncertain은 자동 대체 전송을 막아야 한다. ADR0054/T163–T165가 미완료일 때 이 경로를 완료로 보고하지 않는다.
+
+## N018 analytical mixed route 시각 연결 잔여
+
+ADR0055/contracts/analytical_mixed_route_visual.md/T166–T168: historical captured native route를 exact approval로 승격하지 않고 별도 등록 UI proof로 같은 OISL/ground 현재 native primitive의 원본 purple/width/material을 표시한다. immutable route 분석 UTC와 current display UTC/age/incomplete-current를 구분한다. 현재 구현 전이며 전체 이식/실제 두 해상도/성능 gate는 보존한다.

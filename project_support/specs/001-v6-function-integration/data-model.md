@@ -131,3 +131,25 @@ provenance is the whole exposed display context excludingUTC.
 Observational input ports return actual owner copies/proofs; allowed mutations
 publish existing invalidation events. Silent mutation of another private owner
 inside an arbitrary getter is outside this port contract.
+
+N017g/h NativeFuturePassQuery captures actual FuturePassInput and request identity,
+single site/start/end10800seconds and noacceptedcontext. Whole contact/eclipses
+bundle must validate before pernodefirst3/stableAOSfirst12 projection.
+FuturePassPresentation is a frozen privatelyregistered FUTURE_PASSES_UI_V1 with
+status/availability,analysis_utc,display_utc,end_utc,age_seconds,station,
+satellite_count,rows,coverage,communication_status:'unknown'. Each row includes
+node identity/name, canonical start/end/peak, elevation, derived duration and
+inclusive live flag. It is display history, never runtime/action/mission authority.
+FuturePassQueryState owns only current request, cancellation/generation and
+lastverified analysis, with active/idle/pending/valid/error/disposed transitions.
+Failure/cancel/control/source/config/leave irreversibly revoke old presentation.
+
+MIXED_ROUTE_EMPHASIS_UI_V1: privately registered deeply frozen analysis_utc/fullnode definitions/fullhashes/OISL IDs-endpoints/routed_ids/selected_id. Existing native/fabric owners retain authority; copies cannot approve, sampled scope cannot grant route truth. A single UI projection is cleared on changed proof/source/UTC/clear/dispose (ADR0053); no DTN or current runtime state is replicated.
+
+## N018 주기적 native 분석 교환 추가 계약
+
+Raw native command token: private registered frozen {kind,analysis_utc,snapshot}; optical/network 각각 기존 full raw accepted analytical payload. 다음 자연 분석은 token을 재라벨링하거나 자동 철회하지 않고 실제 continuity/full scope/control epoch로 검증한다. same fabric accepted record origin exact|captured_analysis; UI-only command provenance는 기존 exact approval로 승격하지 않는다.
+
+## N018 analytical mixed route 시각 연결 잔여
+
+ADR0055/contracts/analytical_mixed_route_visual.md/T166–T168: historical captured native route를 exact approval로 승격하지 않고 별도 등록 UI proof로 같은 OISL/ground 현재 native primitive의 원본 purple/width/material을 표시한다. immutable route 분석 UTC와 current display UTC/age/incomplete-current를 구분한다. 현재 구현 전이며 전체 이식/실제 두 해상도/성능 gate는 보존한다.

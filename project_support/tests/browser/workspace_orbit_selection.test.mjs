@@ -16,6 +16,7 @@ test('empty UI choice restores server selection without clearing its result or s
     // Model composition has dedicated real-assembly tests; this fixture isolates
     // the unchanged stored-orbit select handler and its no-command assertion.
     .replace(/import \{createMissionServices\} from [^;]+;/,'const createMissionServices=()=>({destroy(){}});')
+    .replace(/import \{createFuturePasses\} from [^;]+;/,'const createFuturePasses=()=>({observe(){},destroy(){}});')
     .replace(/import \{createSourceDataPanel\} from [^;]+;/,'const createSourceDataPanel=()=>({show(){},destroy(){}});')
     .replace(/import \{createSourceSecurityPanel\} from [^;]+;/,'const createSourceSecurityPanel=()=>({show(){},updateTelemetry(){},updateSocket(){},destroy(){}});')
     .replace(/import \{createSourceSettingsPanel\} from [^;]+;/,'const createSourceSettingsPanel=()=>({show(){},destroy(){}});')

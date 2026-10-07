@@ -9,13 +9,15 @@ const vector=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite);
 function signature(value){const ordered=v=>Array.isArray(v)?v.map(ordered):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,ordered(v[k])])):v;return JSON.stringify(ordered(value));}
 
 export class NodeScene{
-  constructor({viewer,cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry=null,sampledLinks=null,palette=()=>({}),tracksVisible=()=>true,isTransitioning=()=>false,onStatus=()=>{},verifyLinkSnapshot,animationNow=()=>0}={}){
+  constructor({viewer,cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry=null,sampledLinks=null,routeEmphasis=null,palette=()=>({}),tracksVisible=()=>true,isTransitioning=()=>false,onStatus=()=>{},verifyLinkSnapshot,animationNow=()=>0}={}){
     if(typeof advanceUtc!=='function'||typeof geometryFor!=='function'||typeof pathFor!=='function')throw new TypeError('node scene native display dependencies required');
     if(displayGeometry!==null&&['revision','viewFor','isCurrent','sampleAt','verifySample'].some(key=>typeof displayGeometry?.[key]!=='function'))throw new TypeError('registered readonly native display geometry port required');
     if(sampledLinks!==null&&['read','verify'].some(key=>typeof sampledLinks?.[key]!=='function'))throw new TypeError('registered sampled links read/verify port required');
+    if(routeEmphasis!==null&&['read','verify'].some(key=>typeof routeEmphasis?.[key]!=='function'))throw new TypeError('registered route emphasis read/verify port required');
     Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,advanceUtc,geometryFor,pathFor,pathRevisionFor,displayGeometry,sampledLinks,palette,tracksVisible,isTransitioning,onStatus,verifyLinkSnapshot,animationNow});
     this.links=new Map();this.linkPolylines=null;this.linkOwner=null;this.linkReceipt=null;this.definitionScope='[]';this.linksVisible=true;this.models=new Map();this.descriptions=new Map();this.paths=new Map();this.points=new Map();this.labels=new Map();this.selectedId=null;this.hoveredId=null;this.visibleIds=null;this.sdcMode=false;this.theme='dark';this.loadToken=0;this.modelsVisible=true;this.disposed=false;this.dataSource=null;this.dataSourceOwner=null;this.markerOwner=null;this.pointCollection=null;this.labelCollection=null;
     this.frameMemo=null;
+    this.routeEmphasis=routeEmphasis;this.routeGeneration=0;this.routeStyled=new Map();
     this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.linkGeneration=0;this.sampledFrozen=new WeakSet();this.sampledScopes=new WeakMap();this.sampledPairValidation=null;
   }
   get viewer(){return typeof this.viewerProvider==='function'?this.viewerProvider():this.viewerProvider;}
@@ -187,6 +189,7 @@ export class NodeScene{
 
   // The renderer consumes a T077 verified snapshot; it never calculates terminal success.
   setLinks(snapshot){
+    this.restoreRouteEmphasis();
     if(this.disposed)return false;
     if(snapshot?.presentation_kind==='OPTICAL_SAMPLED_UI_V1'){this.clearLinks();return false;}
     let captured;
@@ -212,7 +215,7 @@ export class NodeScene{
         entry.a=link.a;entry.b=link.b;entry.material=entry.line.material;delete entry.presentation_kind;delete entry.analysis_utc;
       }
       for(const key of [...this.links.keys()])if(!keep.has(key))this.removeLink(key);
-      this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.linkGeneration++;this.linkReceipt={utc:captured.utc,scope:signature(captured.node_definitions)};this.placeLinks(this.timeSource?.());return true;
+      this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.linkGeneration++;this.linkReceipt={utc:captured.utc,scope:signature(captured.node_definitions)};this.placeLinks(this.timeSource?.());this.applyRouteEmphasis(captured.utc);return true;
     }catch{this.clearLinks();return false;}
   }
   linkMaterial(C,state){
@@ -302,22 +305,50 @@ export class NodeScene{
     }catch{hide();return true;}
   }
   hideSampledLinks(){for(const entry of this.links.values())entry.line.show=false;this.sampledLinkReceipt=null;this.sampledFlowGuard=null;}
-  placeDisplayLinks(utc){if(!this.placeSampledLinks(utc))this.placeLinks(utc);}
+  restoreRouteEmphasis(){
+    for(const [entry,base]of this.routeStyled){entry.line.width=base.width;entry.line.material=base.material;if(base.uniforms)base.uniforms.color=base.color;}
+    this.routeStyled.clear();
+  }
+  applyRouteEmphasis(utc){
+    const ticket=++this.routeGeneration;this.restoreRouteEmphasis();if(this.disposed||!this.routeEmphasis||!this.linksVisible)return false;
+    const port=this.routeEmphasis,viewerProvider=this.viewerProvider,cesiumProvider=this.cesiumProvider,descriptions=this.descriptions,scope=this.definitionScope,links=this.links,generation=this.linkGeneration;
+    let viewer,C,view;
+    const bound=()=>!this.disposed&&ticket===this.routeGeneration&&this.routeEmphasis===port&&this.viewerProvider===viewerProvider&&this.cesiumProvider===cesiumProvider&&this.descriptions===descriptions&&this.definitionScope===scope&&this.links===links&&this.linkGeneration===generation&&this.linksVisible&&this.linkOwner===viewer;
+    const frame=()=>{const time=this.timeSource?.(),transition=this.isTransitioning(),v=this.viewer,c=this.cesium;return time===utc&&!transition&&v===viewer&&c===C&&(!c?.SceneMode||v?.scene?.mode!==c.SceneMode.MORPHING)&&bound();};
+    try{
+      const time=this.timeSource?.(),transition=this.isTransitioning();viewer=this.viewer;C=this.cesium;if(time!==utc||transition||C?.SceneMode&&viewer?.scene?.mode===C.SceneMode.MORPHING||!bound())return false;
+      view=port.read({utc});if(!view||view.presentation_kind!=='MIXED_ROUTE_EMPHASIS_UI_V1'||!Object.isFrozen(view)||view.analysis_utc!==utc||signature(view.node_definitions)!==scope||!Array.isArray(view.oisl_links)||!Array.isArray(view.routed_ids)||!frame()||port.verify(view,{utc,nodes:[...descriptions.values()].map(e=>e.definition)})!==true||!bound())return false;
+      if(!view.definition_hashes||Object.keys(view.definition_hashes).length!==descriptions.size||[...descriptions.keys()].some(id=>typeof view.definition_hashes[id]!=='string'||!/^[a-f0-9]{64}$/.test(view.definition_hashes[id])))return false;
+      const routed=new Set(view.routed_ids),selected=view.selected_id,prepared=[];
+      for(const [key,entry]of links){const native=view.oisl_links.find(l=>l.id===key&&(l.a===entry.a&&l.b===entry.b||l.b===entry.a&&l.a===entry.b));if(!native||!entry.line.show||!routed.has(key)&&selected!==key)continue;
+        if(this.geometryAt(entry.a,utc)?.definition_hash!==view.definition_hashes[entry.a]||this.geometryAt(entry.b,utc)?.definition_hash!==view.definition_hashes[entry.b])throw Error('route native endpoint hash changed');
+        const material=entry.line.material,uniforms=material?.uniforms&&'time'in material.uniforms?material.uniforms:null;
+        const color=routed.has(key)?C.Color.fromCssColorString('#a78bfa').withAlpha(uniforms?.55:.95):null;
+        const override=routed.has(key)&&!uniforms?C.Material.fromType('Color',{color}):material;
+        prepared.push({entry,base:{width:entry.line.width,material,uniforms,color:uniforms?.color},width:routed.has(key)?4.5:4,color,override});
+      }
+      if(!frame()||port.verify(view,{utc,nodes:[...descriptions.values()].map(e=>e.definition)})!==true||!bound())return false;
+      for(const item of prepared){this.routeStyled.set(item.entry,item.base);item.entry.line.width=item.width;item.entry.line.material=item.override;if(item.color&&item.base.uniforms)item.base.uniforms.color=item.color;}
+      if(!frame()||port.verify(view,{utc,nodes:[...descriptions.values()].map(e=>e.definition)})!==true||!frame()||port.verify(view,{utc,nodes:[...descriptions.values()].map(e=>e.definition)})!==true||!bound()){if(ticket===this.routeGeneration)this.restoreRouteEmphasis();return false;}return true;
+    }catch{if(ticket===this.routeGeneration)this.restoreRouteEmphasis();return false;}
+  }
+  placeDisplayLinks(utc){this.restoreRouteEmphasis();if(!this.placeSampledLinks(utc))this.placeLinks(utc);if(!this.frameMemo)this.applyRouteEmphasis(utc);}
   animateLinkFlow(nowMs,utc=this.timeSource?.()){
     if(this.disposed)return;
     // Always recheck scope and endpoints; direct animation calls cannot revive stale results.
     this.placeDisplayLinks(utc);
     const sampledGuard=this.sampledFlowGuard;
-    if(nowMs===undefined)try{nowMs=this.animationNow();}catch{if(sampledGuard)this.hideSampledLinks();return;}
+    if(nowMs===undefined)try{nowMs=this.animationNow();}catch{this.restoreRouteEmphasis();if(sampledGuard)this.hideSampledLinks();return;}
     if(sampledGuard&&!sampledGuard()){this.hideSampledLinks();return;}
-    if(!Number.isFinite(nowMs))return;
+    if(!Number.isFinite(nowMs)){if(!this.frameMemo)this.applyRouteEmphasis(utc);return;}
     const previous=sampledGuard?[]:null;
     for(const entry of this.links.values()){const uniforms=entry.line.material?.uniforms;if(entry.line.show&&entry.state==='locked'&&uniforms&&'time'in uniforms){previous?.push([uniforms,uniforms.time]);uniforms.time=nowMs/1000*OISL_FLOW_RATE;}}
     if(sampledGuard&&!sampledGuard()){for(const [uniforms,time]of previous)uniforms.time=time;this.hideSampledLinks();}
+    if(!this.frameMemo)this.applyRouteEmphasis(utc);
   }
   setLinksVisible(visible){if(this.disposed)return false;this.linksVisible=visible!==false;this.placeDisplayLinks(this.timeSource?.());return this.linksVisible;}
   removeLink(key){const entry=this.links.get(key);if(!entry)return;entry.line.show=false;try{this.linkPolylines?.remove(entry.line);}catch{/* Owned primitive already gone. */}this.links.delete(key);}
-  clearLinks(){this.linkGeneration++;for(const key of [...this.links.keys()])this.removeLink(key);this.linkReceipt=null;this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.sampledPairValidation=null;}
+  clearLinks(){this.routeGeneration++;this.restoreRouteEmphasis();this.linkGeneration++;for(const key of [...this.links.keys()])this.removeLink(key);this.linkReceipt=null;this.sampledLinkReceipt=null;this.sampledFlowGuard=null;this.sampledPairValidation=null;}
 
   select(id){if(this.disposed)return;this.selectedId=id==null?null:String(id);this.refreshMarkerStyles();this.placePoints(this.timeSource?.());this.placeModels(this.timeSource?.());for(const [key,p]of this.paths)p.entity.show=p.positions.length>1&&key!==this.selectedId&&this.tracksVisible()!==false;}
   setModelsVisible(visible){this.modelsVisible=visible!==false;this.placeModels(this.timeSource?.());return this.modelsVisible;}
@@ -339,7 +370,7 @@ export class NodeScene{
     finally{
       // A callback may replace a selection, Viewer or UTC within this frame.
       // Suppress every owned primitive rather than publish a mixture of scopes.
-      if(!this.frameCurrent(frame)){for(const p of this.points.values())p.show=false;for(const label of this.labels.values())label.show=false;for(const m of this.models.values())m.model.show=false;for(const link of this.links.values())link.line.show=false;}
+      if(!this.frameCurrent(frame)){this.restoreRouteEmphasis();for(const p of this.points.values())p.show=false;for(const label of this.labels.values())label.show=false;for(const m of this.models.values())m.model.show=false;for(const link of this.links.values())link.line.show=false;}else this.applyRouteEmphasis(utc);
       if(this.frameMemo===frame)this.frameMemo=null;
     }
   }

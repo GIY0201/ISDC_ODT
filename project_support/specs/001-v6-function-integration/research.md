@@ -152,3 +152,15 @@ registered readonly NETWORK_SAMPLED_UI_V1 and current native visualendpoints.
 Remaining source status30s/passes>=60s/quality48/OISLroute/3Dstation/periodicfabric
 are separatelytrackedN017/N018. Automaticexchange must use exactnative/module
 context ratherthan sampled visuals. ADR0048 declares the boundary; no newphysics.
+
+## N017g/h native future passes
+
+Decision: reuse headerless nodeMissionWindows + actual N017f token and existing
+display events, extract shared pure contact validation, separate readonly panel.
+Rationale: backend already owns complete contact/eclipse nativebatch and supports
+noacceptedheader without current-state publication; original3h/pernode3/12 and
+strictabsDateUTC>60s remain same. Preserve approvedservice/allsite/24h/50pages.
+Alternatives: reuse approved query (rejected, would require/modify approval and
+SIM/module calls); new JS propagation or timer clock (rejected, duplicates current
+owners and breaks Rust/native/source contracts). Existing eclipse cost retained.
+No unresolved technology choices; detailedsource evidence research_future_pass_connection.md.

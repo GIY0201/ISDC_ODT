@@ -31,6 +31,7 @@ import {createRfPanel} from '../../../user_application/web/scripts/tabs/rf_link_
 import {createWorkspacePlayback} from '../../../user_application/web/scripts/workspace_playback.js';
 import {LEAP_SHA256,createUtcCodec} from '../../../user_application/web/scripts/orbit_utc.js';
 import {createNodeClockControls} from '../../../user_application/web/scripts/nodes/clock_controls.js';
+import {createFuturePasses} from '../../../user_application/web/scripts/nodes/future_passes.js';
 import {createWorkspaceNodes} from '../../../user_application/web/scripts/workspace_nodes.js';
 import {createNodeLibrary} from '../../../digital_twin/model_library/browser/satellite_nodes.js';
 import {orbitElements,catalogElements} from '../../../digital_twin/simulation/browser/node_orbit_definition.js';
@@ -135,6 +136,7 @@ export function fixture(width=1280,height=720,options={}){
   api.satelliteModelManifest=options.satelliteModelManifest??(async()=>{throw new Error('Model manifest transport not supplied by fixture');});
   api.nodeSamples=options.nodeSamples??(async()=>{throw Error('Native node transport not supplied by fixture');});
   api.nodeTrack=options.nodeTrack??(async()=>{throw Error('Native node transport not supplied by fixture');});
+  api.nodeMissionWindows=options.nodeMissionWindows??(async()=>{throw Error('Native mission-window transport not supplied by fixture');});
   api.bootstrap=options.planningBootstrap??(async()=>{throw Error("Planning transport not supplied");});
   for(const key of ['runtimeControl','runtimeSpeed','selectScenario','injectFault','missionAction','missionTask','validateMission','replanMission'])api[key]=options[key];
   api.route=options.planningRoute;api.contacts=options.planningContacts;
@@ -152,11 +154,12 @@ export function fixture(width=1280,height=720,options={}){
   Object.assign(context,{createWorkspaceSolar:args=>createWorkspaceSolar({...args,host:win,createDisplay:()=>({setStyle(){},clear(){},update(){},destroy(){}})}),createSatelliteHover,createSatelliteModelPanel,createSatelliteModelSelection,createModelResolver,validateSatelliteManifest,createGlobeViewPanel,createCatalogTrack,createCatalogPasses,createCatalogPassPanel,createCatalogScenePanel,createCatalogScene:(api,display,notify,host)=>createCatalogScene(api,display,notify,{...host,now:()=>0,setTimer:schedule(timers),clearTimer:id=>timers.delete(id),requestId:()=>String(++nextId)})});
   // Imported ground UI uses the same adapted document as the VM assembly.
   Object.assign(context,{createBrowserId,createWorkspaceNodes,createNodeLibrary,orbitElements,catalogElements,nodeOisl,NodeScene,createSatelliteNodePanelTools,createNodeClockControls,createUtcCodec,LEAP_SHA256});
-  Object.assign(context,{projectWorkspaceContext,createAnalysisTransport,createAnalysisFollowCoordinator,createWorkspaceScenario,createSourceScenarioPanel,createScenarioAssembly,scenarioKpi,createSourceSettingsPanel,createSourceSecurityPanel,createSourceDataPanel,dataViewModel,createMissionServices,createSourceMissionPanel,createMissionTypes,createMissionConstraints,createOrchestrationClient,layoutTimeline,timelineMarkup,createGroundSegmentStore,createGroundNetworkPanel,networkDiagram,NativeNetworkScene,createFabricExchange,createDataFabricClient,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
+  Object.assign(context,{projectWorkspaceContext,createAnalysisTransport,createAnalysisFollowCoordinator,createWorkspaceScenario,createSourceScenarioPanel,createScenarioAssembly,scenarioKpi,createSourceSettingsPanel,createSourceSecurityPanel,createSourceDataPanel,dataViewModel,createMissionServices,createSourceMissionPanel,createMissionTypes,createMissionConstraints,createOrchestrationClient,layoutTimeline,timelineMarkup,createGroundSegmentStore,createGroundNetworkPanel,createFuturePasses,networkDiagram,NativeNetworkScene,createFabricExchange,createDataFabricClient,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
   globalThis.document=doc;
   // Optional factory injection keeps the real root assembly testable with its
   // actual controller owners; existing fixtures retain their defaults.
   if(options.orbitSelectionFactory)context.createOrbitSelection=options.orbitSelectionFactory;
+  if(options.futurePassesFactory)context.createFuturePasses=options.futurePassesFactory;
   if(options.simPanelFactory)context.createSimPanel=(...args)=>options.simPanelFactory(createSimPanel,...args);
   if(options.scenarioFactory)context.createWorkspaceScenario=args=>options.scenarioFactory(createWorkspaceScenario,args);
   if(options.nodeWorkspaceFactory)context.createWorkspaceNodes=args=>options.nodeWorkspaceFactory(createWorkspaceNodes,args);

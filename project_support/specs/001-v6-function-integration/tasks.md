@@ -656,3 +656,38 @@ actual exposed display provenance excludingUTC, not key alone.
 Repair3 requires actual observational owner ports and terminal actualowner/event
 reentry plus changed returnedvalues tests. Preserve meaningful failure cases;
 arbitrary unnotified cross-owner mutations are not a valid port implementation.
+
+## US20 follow-up: N017g/h native future-pass flow (P1)
+
+Goal: original fullfleet/onesite3h/first3pernode/first12/live/+60s behavior in V6,
+without changing approved contact/mission/SIM owners. Independent test criteria:
+headerless API→complete native envelope→validated registered readonly result→UI,
+including240/hidden malformed rows/oldscope and original approved50paging preserved.
+
+- [x] T156 [US20] Add missing pure-validator and fullbundle RED in project_support/tests/browser/native_contact_bundle.test.mjs and approved boundary regression in project_support/tests/browser/mission_services.test.mjs. Validate complete canonical9digitUTC, fullnode/hash echo, exact site/mask/conditions/native metadata/30s+0.1peak+1boundary sampling, allrows including invisiblefourth/nonselectednode, unique IDs and contact aggregate across reports<=20000. Eclipse independently<=20000, schema intentionally absent/60s+1s/allwindows for future only. Preserve current accepted_context/display_context/currentness/24h/allsite requirements.
+- [x] T157 [US20] After T156 RED implement pure user_application/web/scripts/missions/native_contact_bundle.js and reuse only its contact helper in user_application/web/scripts/missions/mission_services.js. No new eclipse requirement on existing service, no builder/access/crosslink or backend calculation/wire change; prove matching original approved behavior and shared validator before query implementation.
+- [x] T158 [US20] RED then user_application/web/scripts/nodes/future_passes.js and project_support/tests/browser/future_passes.test.mjs. createFuturePasses uses actual N017f fullaccepted input token/API/codec/display; fixed10800s/onesite/target-external-range null/headerless. Validate every contact/eclipse field before pernodefirst3/stableAOSfirst12. Registered frozen FUTURE_PASSES_UI_V1 with realdisplay/analysisUTC/age/wholecount/site/coverage/unknown and inclusive live. Active/firstfallback/selection/manual/strictabsDateUTC>60000 refresh, pausedfailures noauto-loop, serial pending natural latest, signal/generation/cancel/reentry/lateerror/finally/leave/dispose proof. No newclock/timer/HTTP/native solver/store or action approval; meaningful actual240 and actualcodec/lease regressions.
+- [ ] T159 [US20] After T157/T158 ports stable, RED then optional futurePasses in user_application/web/scripts/tabs/ground_network.js and DI/existing display/input observers in user_application/web/scripts/workspace_orbit.js. Add project_support/tests/browser/ground_future_passes.test.mjs plus actualroot/HTTP-native tests where needed. New future-pass-* area with station/refresh/first12/analysis-displayUTC/age/mask/sampling/RFunknown/current flags, independently verified from OISL geometry. Preserve original pass-*approved50pages/inputs/GP/UTC/SIM/otherwindows. Verify1920x1080/2560x1440/remount/leave/dispose/falsecloneproof/hiddencorruptrow, real route→native producer→owner, independent review/fullNode/Python/actual8891 and record validation/native_future_passes_connection.md + development/CURRENT.md/HISTORY.jsonl. Actual wholeN017 route/N018/GPU/gameperformance/T075–T084/T032/PR gates remain open if not separately verified.
+
+Dependencies: T154/T155[x]→T156RED→T157→T158RED/owner→T159RED/UI/fullvalidation.
+Readonly actualbrowser/source/independentreviews may run in parallel; don't edit
+shared service/query/UI files together before prerequisite port stability. Four
+new executable tasks, all US20, existingfeature/IDs/branches preserved. MVP here
+is fullnative validatedfuture flow then actual UI acceptance, not a physics stub.
+
+## N017 mixed route emphasis: ADR0053 prerequisite pending
+- [ ] T160 Meaningful RED for pure nodes/mixed_route_emphasis.js and new mixed_route_emphasis.test.mjs: full exact native/fabric scope, mixed OISL-ground complete hops, selected native link, copied/fake/sampled proof, current UTC/source/node/hash/station/fault/endpoint/instance/sequence/error/review/pending and irreversible revoke/clear/dispose/reentry. Analyze ADR0053/contract before code.
+- [ ] T161 After T160 RED implement the existing-owner readonly route projection and optional NodeScene read/verify port; new node_scene_route_emphasis.test.mjs must prove original #a78bfa/4.5/4/2, same material/time, no new links/Viewer/clock, actual native frame/visibility/morph/callback-final fences and default exact/sampled parity.
+- [ ] T162 Connect only existing workspace_nodes setNetworkScene/composite lifecycle, test actual mixed route assembly and cleanup; preserve NativeNetworkScene ground/SVG/fabric action contracts. Independently review, full regression and actual8891 two-resolution/GPU/game criteria evidence before closure. N018 separate captured native-analysis command authority remains pending; no automatic exchange in this renderer delivery.
+
+## N018 원본 periodic captured-native exchange
+
+- [ ] T163 Raw optical/network registered analytical capabilities RED/GREEN; full scopes/continuity/epoch.
+- [ ] T164 Existing fabric single lane analytical send/route plus source 1s/MIN900 scheduler RED/GREEN.
+- [ ] T165 Actual module/DTN/selected-route UI provenance and whole-source two-resolution/live/regression gates.
+
+## N018 analytical mixed route visual 잔여
+
+- [ ] T166 Registered analytical fabric/native full-hop visual projection RED/GREEN (ADR0055).
+- [ ] T167 Existing OISL+ground shared-Viewer route style connection and lifecycle/current-geometry regressions.
+- [ ] T168 Actual periodic accepted module→selected route→two-resolution mixed3D/UI/performance source parity proof.

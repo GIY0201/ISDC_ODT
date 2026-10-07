@@ -3,8 +3,11 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
  if(!/^[A-Za-z0-9_-]{1,80}$/.test(clientId??'')||['status','endpoint','guardedUpdate','guardedRoute'].some(key=>typeof client?.[key]!=='function')||['networkSnapshot','verifyNetworkSnapshot'].some(key=>typeof network?.[key]!=='function'))throw new TypeError('fabric exchange dependencies required');
  let dead=false,counter=0,active=null,command=null,accepted=null,routeResult=null,state='unavailable',error='',review=false;
  const copy=value=>value==null?null:structuredClone(value);
+ const freeze=value=>{if(value&&typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}return value;};
+ const analyticalViews=new WeakMap();
+ const hasRaw=typeof network.captureRawAnalysis==='function'&&typeof network.verifyRawAnalysis==='function';
  const signature=value=>JSON.stringify(value);
- let poll=null,pollEpoch={},pollCancellation=0,commandEpoch={},commandEntry=0,observation={endpoint:null,status:'unavailable',value:null,error:''},historyEndpoint=null,historyInstance=null;
+ let poll=null,pollEpoch={},pollCancellation=0,commandEpoch={},controlEpoch={},commandEntry=0,observation={endpoint:null,status:'unavailable',value:null,error:''},historyEndpoint=null,historyInstance=null;
  const histories=new Map();
  function cancelStatusPoll(){
   pollEpoch={};cancelPoll();
@@ -72,27 +75,35 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
   if(signature(finalProof)!==signature(proof)||!network.verifyNetworkSnapshot(proof))throw Error('현재 통신망 입력이 변경되었습니다.');
   return {proof:copy(proof),endpoint:copy(endpoint),key:signature({proof,endpoint})};
  }
- function matches(key){try{return !dead&&context().key===key;}catch{return false;}}
+ function rawContext(token,expectedEndpoint=null){
+  if(!hasRaw||!token||token.kind!=='NETWORK_RAW_ANALYSIS_V1'||!Object.isFrozen(token)||token.analysis_utc!==token.snapshot?.utc||token.snapshot?.status!=='valid'||token.snapshot.presentation_kind||Date.parse(token.analysis_utc)!==Date.parse(token.snapshot.network?.time)||network.verifyRawAnalysis(token)!==true)throw Error('registered raw native analysis required');
+  const endpoint=copy(client.endpoint());if(expectedEndpoint!==null&&signature(endpoint)!==signature(expectedEndpoint)||network.verifyRawAnalysis(token)!==true||dead)throw Error('analytical source or endpoint changed');
+  return {proof:copy(token.snapshot),token,endpoint,key:signature({proof:token.snapshot,endpoint}),origin:'captured_analysis'};
+ }
+ function matches(key,record=null){try{record??=[active,command,accepted].find(value=>value?.key===key);return !dead&&(record?.origin==='captured_analysis'?rawContext(record.token,record.endpoint).key:context().key)===key;}catch{return false;}}
  function reconcile(){
   const uncertain=!!command&&!accepted;
   if(accepted&&!matches(accepted.key)){accepted=null;routeResult=null;state='unavailable';}
   if(command&&!matches(command.key)){command=null;accepted=null;routeResult=null;state='unavailable';if(uncertain){review=true;error='이전 요청의 수락 여부가 미확인입니다. 모듈 상태를 조회한 뒤 다시 전송하세요.';}}
  }
- function snapshot(){reconcile();return {status:dead?'disposed':state,error,receipt:copy(accepted?.receipt),route:copy(routeResult),pending:!!active,retry_available:!dead&&!active&&!review&&!!command&&!accepted,refresh_required:review};}
+ function snapshot(){reconcile();const exact=accepted?.origin!=='captured_analysis';return {status:dead?'disposed':state==='accepted'&&!exact?'unavailable':state,error,receipt:copy(exact?accepted?.receipt:null),route:copy(exact?routeResult:null),pending:!!active,retry_available:!dead&&!active&&!review&&command?.origin!=='captured_analysis'&&!!command&&!accepted,refresh_required:review};}
  function notify(){try{onChange(snapshot());}catch{/* Presentation errors cannot publish or alter protocol state. */}}
  function capability(value){if(value?.exchange_contract!=='guarded-v1'||value.reachable!==true||typeof value.instance_id!=='string'||!value.instance_id||!Number.isSafeInteger(value.sequence)||value.sequence<0)throw Error('통신 모듈 상태가 미확인입니다.');return value;}
- function taskCurrent(task){if(dead||active!==task||task.abort.signal.aborted||!matches(task.key))return false;return !dead&&active===task&&!task.abort.signal.aborted;}
+ function taskCurrent(task){if(dead||active!==task||task.abort.signal.aborted||task.controlEpoch&&task.controlEpoch!==controlEpoch||!matches(task.key,task))return false;return !dead&&active===task&&!task.abort.signal.aborted;}
  function fail(cause){accepted=null;routeResult=null;error=String(cause?.message??cause);review=cause?.conflict===true;state=review?'conflict':'error';if(review)command=null;}
  function explicitCommand(action,args=[]){
   commandEpoch={};commandEntry++;cancelStatusPoll();
   try{return action(...args);}finally{commandEntry--;}
  }
  function send(){return explicitCommand(sendCommand);}
+ function sendAnalytical(token){return explicitCommand(sendAnalyticalCommand,[token]);}
+ function routeAnalytical(...args){return explicitCommand(routeCommand,[...args,true]);}
  function refresh(){return explicitCommand(refreshCommand);}
  function route(...args){return explicitCommand(routeCommand,args);}
  function sendCommand(){
-  if(dead)return Promise.resolve(null);cancelStatusPoll();observationScope();if(dead)return Promise.resolve(null);if(active)return active.promise;reconcile();if(review)return Promise.resolve(null);
+  if(dead)return Promise.resolve(null);cancelStatusPoll();observationScope();if(dead)return Promise.resolve(null);if(active)return active.origin==='captured_analysis'?Promise.resolve(null):active.promise;reconcile();if(review)return Promise.resolve(null);
   let c;try{c=context();}catch(cause){fail(cause);notify();return Promise.resolve(null);}if(dead)return Promise.resolve(null);
+  if(accepted?.origin==='captured_analysis'){accepted=null;command=null;routeResult=null;}
   if(accepted)return Promise.resolve(copy(accepted.receipt));
   const task={key:c.key,abort:new AbortController(),promise:null};active=task;state='pending';error='';
   task.promise=Promise.resolve().then(async()=>{
@@ -112,8 +123,40 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
    finally{if(active===task){active=null;reconcile();if(!matches(c.key)){command=null;accepted=null;routeResult=null;state='unavailable';}notify();}}
   });notify();return task.promise;
  }
+ function sendAnalyticalCommand(token){
+  const epoch=controlEpoch;if(dead)return Promise.resolve(null);cancelStatusPoll();observationScope();if(dead||epoch!==controlEpoch)return Promise.resolve(null);if(active)return active.origin==='captured_analysis'?active.promise:Promise.resolve(null);reconcile();if(review)return Promise.resolve(null);
+  if(command&&!accepted){review=true;notify();return Promise.resolve(null);}
+  let c;try{c=rawContext(token);}catch{return Promise.resolve(null);}if(dead||epoch!==controlEpoch)return Promise.resolve(null);
+  // Periodic exchanges are fresh commands even at the same analysis UTC.
+  command=null;accepted=null;routeResult=null;
+  const task={...c,controlEpoch:epoch,abort:new AbortController(),promise:null};active=task;state='pending';error='';
+  task.promise=Promise.resolve().then(async()=>{
+   try{
+    if(!taskCurrent(task))return null;
+    const status=capability(await client.status({signal:task.abort.signal,target:copy(c.endpoint)}));if(!taskCurrent(task))return null;
+    if(counter>=Number.MAX_SAFE_INTEGER)throw Error('통신 요청 번호 한도를 초과했습니다.');
+    const current=command={...c,body:copy(c.proof.network),guard:{instance_id:status.instance_id,expected_sequence:status.sequence,request_id:clientId+':'+(++counter)}};
+    if(!taskCurrent(task))return null;
+    task.posted=true;const receipt=await client.guardedUpdate(copy(current.body),copy(current.guard),{signal:task.abort.signal});
+    if(!taskCurrent(task)||command!==current)return null;
+    if(receipt?.instance_id!==current.guard.instance_id||receipt.sequence!==current.guard.expected_sequence+1||receipt.request_id!==current.guard.request_id||! /^[a-f0-9]{64}$/.test(receipt.network_hash??''))throw Error('통신 수락 응답 불일치');
+    accepted={...c,receipt:copy(receipt)};routeResult=null;state='accepted';rememberQuality(receipt,c.proof,c.endpoint);return copy(receipt);
+   }catch(cause){if(taskCurrent(task)){fail(cause);review=true;}return null;}
+   finally{if(active===task){active=null;reconcile();if(!matches(c.key,c)){const uncertain=!!command&&!accepted;command=null;accepted=null;routeResult=null;state='unavailable';if(uncertain)review=true;}notify();}}
+  });notify();return task.promise;
+ }
+ function analyticalPresentation(){
+  reconcile();if(dead||!accepted||accepted.origin!=='captured_analysis'||active||review||state!=='accepted')return null;
+  const record=accepted,route=routeResult,value=freeze({presentation_kind:'FABRIC_ANALYTICAL_UI_V1',analysis_utc:record.proof.utc,receipt:copy(record.receipt),route:copy(route),network:copy(record.proof.network),source:'captured_native_analysis',current_analysis:false});
+  analyticalViews.set(value,{record,route});return verifyAnalyticalPresentation(value)?value:null;
+ }
+ function verifyAnalyticalPresentation(value){
+  const registration=analyticalViews.get(value);if(!registration)return false;
+  const current=()=>!dead&&!active&&!review&&state==='accepted'&&accepted===registration.record&&routeResult===registration.route;
+  if(!current()||!matches(registration.record.key,registration.record)||!current()){analyticalViews.delete(value);return false;}return true;
+ }
  function refreshCommand(){
-  if(dead)return Promise.resolve(null);cancelStatusPoll();observationScope();if(dead)return Promise.resolve(null);if(active)return active.promise;
+  if(dead)return Promise.resolve(null);cancelStatusPoll();observationScope();if(dead)return Promise.resolve(null);if(active)return active.origin==='captured_analysis'?Promise.resolve(null):active.promise;
   // Review refresh is explicit; it never sends a replacement network command.
   const task={abort:new AbortController(),promise:null};active=task;
   task.promise=Promise.resolve().then(async()=>{
@@ -127,12 +170,13 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
    finally{if(active===task){active=null;notify();}}
   });notify();return task.promise;
  }
- function routeCommand(source,target,objective='balanced'){
-  if(dead)return Promise.reject(Error('통신 화면이 종료됐습니다.'));cancelStatusPoll();observationScope();if(dead)return Promise.reject(Error('통신 화면이 종료됐습니다.'));reconcile();
-  if(!accepted||review||active)return Promise.reject(Error('현재 통신망 전송 수락을 먼저 확인하세요.'));
-  const receipt=copy(accepted.receipt),key=accepted.key,c=context(),ids=new Set(c.proof.network.nodes.map(node=>node.id));
+ function routeCommand(source,target,objective='balanced',analytical=false){
+  const epoch=controlEpoch;if(dead)return Promise.reject(Error('통신 화면이 종료됐습니다.'));cancelStatusPoll();observationScope();if(dead)return Promise.reject(Error('통신 화면이 종료됐습니다.'));reconcile();
+  if(!accepted||review||active||((accepted.origin==='captured_analysis')!==analytical))return Promise.reject(Error('현재 통신망 전송 수락을 먼저 확인하세요.'));
+  const receipt=copy(accepted.receipt),key=accepted.key,c=analytical?rawContext(accepted.token,accepted.endpoint):context(),ids=new Set(c.proof.network.nodes.map(node=>node.id));
   if(!ids.has(source)||!ids.has(target)||!['balanced','latency','reliability'].includes(objective))return Promise.reject(Error('경로 입력을 확인하세요.'));
-  const task={key,abort:new AbortController(),promise:null};active=task;routeResult=null;error='';
+  if(analytical&&(dead||epoch!==controlEpoch))return Promise.resolve(null);
+  const task={...c,key,...(analytical?{controlEpoch:epoch}:{}),abort:new AbortController(),promise:null};active=task;routeResult=null;error='';
   task.promise=Promise.resolve().then(async()=>{
    try{
     if(!taskCurrent(task))return null;
@@ -144,5 +188,5 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
    finally{if(active===task){active=null;reconcile();notify();}}
   });notify();return task.promise;
  }
- return Object.freeze({send,refresh,route,snapshot,pollStatus,cancelStatusPoll,moduleStatus,qualityHistory,invalidate(){if(dead)return;pollCancellation++;try{cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();active=null;command=null;accepted=null;routeResult=null;state='unavailable';error='';notify();}finally{pollCancellation--;}},destroy(){if(dead)return;dead=true;cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();active=null;command=null;accepted=null;routeResult=null;}});
+ return Object.freeze({send,sendAnalytical,routeAnalytical,analyticalPresentation,verifyAnalyticalPresentation,refresh,route,snapshot,pollStatus,cancelStatusPoll,moduleStatus,qualityHistory,invalidate(){if(dead)return;commandEpoch={};controlEpoch={};const uncertainAnalytical=active?.origin==='captured_analysis'&&active.posted===true&&!accepted;pollCancellation++;try{cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();command=null;accepted=null;routeResult=null;state='unavailable';error=uncertainAnalytical?'이전 분석 통신 요청의 수락이 미확인입니다. 모듈 상태를 명시적으로 검토하세요.':'';review=uncertainAnalytical||review;notify();}finally{pollCancellation--;}},destroy(){if(dead)return;dead=true;cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();active=null;command=null;accepted=null;routeResult=null;}});
 }

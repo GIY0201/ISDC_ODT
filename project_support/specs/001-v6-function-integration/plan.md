@@ -633,3 +633,36 @@ or private proofs; authorized mutations publish existing control/config/display/
 store/continuity invalidations. Tests retain changed returnedvalues and terminal
 actualowner reentry. No finite-read claim for arbitrary silent cross-owner getter
 mutation, no unbounded repeat loop/new authority.
+
+### N017g/h complete native future-pass flow
+
+Technical context unchanged: JavaScript ES modules/Cesium1.143, Python FastAPI,
+installed Rust native node lane, no new framework/storage/clock/Viewer/wire.
+ADR0052 + contracts/native_future_passes.md reuse headerless nodeMissionWindows.
+Extract pure missions/native_contact_bundle.js contact/eclipsereport validators;
+mission_services reuses contact-only helper preserving accepted_context/current/
+24h/allstations, builder/access/crosslink untouched. Future owner in nodes/
+future_passes.js uses actual N017f input token, original fixed3h/pernode3/first12,
+inclusive currentpass and strict DateUTCabs>60000ms. Native error/busy stays
+unknown, previousnatural result can be historical pending only when verified.
+Active/selection/refresh/observe lifecycle is serial, lateabort/reentry/disposal
+fenced; no hidden automatic action approval or server cancellation promise.
+
+ground_network optional futurePasses section independently verifies registered
+visual results; existing pass-* manual approval/50paging/editing untouched.
+workspace_orbit owns DI and existing display/input change observation. Independent
+analysis before RED/implementation; validator→queryowner→panel/root→fulltests+
+HTTP/native/actualtworesolution validation. Full240/hiddencorruptrow and primitive
+copyfakes mustfail before displayprojection. Gamecriteria/whole75–84 stayintact.
+Constitution1.2.0 rechecked: all same owners/layers/source preserved, no violations.
+
+## N017 mixed route follow-up (implementation pending)
+ADR0053/contracts/mixed_route_emphasis.md define a bounded readonly helper plus optional NodeScene port and existing workspace_nodes composition. Reuse existing ground/SVG and fabric owners; no new runtime/clock/Viewer/timer or automatic command. Analyze before regression-first implementation. Retain full exact current scope, callback/lease/late guards and all T075-T084/T032/game-performance acceptance. N018 requires a separate registered captured native-analysis command design, not sampled visual approval.
+
+## N018 주기적 native 분석 교환 추가 계약
+
+N018 ADR0054: 기존 optical/network native owner의 raw registered analysis를 같은 fabric active/command/accepted lane에 origin-discriminated 전송한다. 기존 1000ms scheduler에 optional onAnalysisTick을 추가하여 모든 mode에서 같은 timer를 사용하고 paused cached exact 분석은 재사용하되 wire exchange는 fresh request/sequence로 반복한다. exact API/mission 권한, retry/review/uncertain 및 provenance는 보존한다.
+
+## N018 analytical mixed route 시각 연결 잔여
+
+ADR0055/contracts/analytical_mixed_route_visual.md/T166–T168: historical captured native route를 exact approval로 승격하지 않고 별도 등록 UI proof로 같은 OISL/ground 현재 native primitive의 원본 purple/width/material을 표시한다. immutable route 분석 UTC와 current display UTC/age/incomplete-current를 구분한다. 현재 구현 전이며 전체 이식/실제 두 해상도/성능 gate는 보존한다.

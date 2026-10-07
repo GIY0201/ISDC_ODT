@@ -16,6 +16,7 @@ export function createNodeNetworkTimeline({model,optical,requestCommunicationSta
  if(nodeScopeRevision!==null&&typeof nodeScopeRevision!=='function')throw new TypeError('trusted network node revision callback required');
  if((readContinuity===null)!==(verifyContinuity===null)||readContinuity!==null&&[readContinuity,verifyContinuity].some(fn=>typeof fn!=='function'))throw new TypeError('complete sampled network continuity pair required');
  let nodeScopeCache=null,intrinsicCache=null;const sampledProofs=new WeakMap();
+ const rawProofs=new WeakMap();let rawEpoch={};const revokeRaw=()=>{rawEpoch={};};
  const freezeScope=value=>{if(value&&typeof value==='object'&&!Object.isFrozen(value)){for(const child of Object.values(value))freezeScope(child);Object.freeze(value);}return value;};
  let disposed=false,generation=0,active=null,sampledDrain=null,last=null,failure=null,observerError='';
  function freshContext(){
@@ -95,11 +96,11 @@ export function createNodeNetworkTimeline({model,optical,requestCommunicationSta
  }
  function update(){
   if(disposed)return Promise.resolve(null);
-  let c;try{c=context();}catch(error){cancel();last=null;failure=null;notify();return Promise.resolve(snapshot());}
+  let c;try{c=context();}catch(error){revokeRaw();cancel();last=null;failure=null;notify();return Promise.resolve(snapshot());}
   if(active?.permit&&active.key===c.key)return active.promise.then(()=>{try{return !disposed&&context().key===c.key&&validLast(c)?snapshot():null;}catch{return null;}});
   if(active&&!active.permit&&active.key===c.key)return active.promise;
   const draining=active?.permit?active.promise:sampledDrain;
-  if(!draining&&validLast(c))return Promise.resolve(structuredClone(last.value));
+  if(!draining&&last?.rawEpoch===rawEpoch&&validLast(c))return Promise.resolve(structuredClone(last.value));
   if(!draining&&active?.key===c.key)return active.promise;
   return begin(c,null,draining).promise;
  }
@@ -113,6 +114,7 @@ export function createNodeNetworkTimeline({model,optical,requestCommunicationSta
     const links=permit?c.links:structuredClone(await optical.update());
     if(!current())return null;
     if(links?.status!=='valid'||links.utc!==c.utc||signature(links.node_definitions)!==c.scope||!(permit?currentPermit(permit):optical.verifyLinkSnapshot(links,{nodes:c.nodes,utc:c.utc})))throw new Error('verified optical network input unavailable');
+    const rawOptical=typeof optical.captureRawAnalysis==='function'?optical.captureRawAnalysis():null;
     const receipt=c.nodes.length?structuredClone(await requestCommunicationStates(c.utc,{signal:task.controller.signal})):{utc:c.utc,node_definitions:[],states:[]};
     if(!current())return null;
     if(receipt?.utc!==c.utc||signature(receipt.node_definitions)!==c.scope||!Array.isArray(receipt.states)||receipt.states.length!==c.nodes.length)throw new Error('native network scope mismatch');
@@ -126,8 +128,8 @@ export function createNodeNetworkTimeline({model,optical,requestCommunicationSta
     const network=model.buildNetworkSnapshot({date:Date.parse(c.utc),nodes:c.nodes,states,pairs:links.pairs,stations:c.stations.filter(station=>station.enabled),faults:c.faults});
     const value={...empty(c,'valid'),definition_hashes:Object.fromEntries(hashes),network:structuredClone(network)},proof=signature(value);
     if(!current()||!(permit?currentPermit(permit):optical.verifyLinkSnapshot(links,{nodes:c.nodes,utc:c.utc})))return null;
-    last={key:c.key,value:permit?freezeScope(value):value,proof,optical:links,sampled:permit,context:c};failure=null;return structuredClone(value);
-   }catch(error){if(!current())return null;last=null;failure={key:c.key,error:String(error?.message??error),sampled:permit,context:c};return snapshot();}
+    last={key:c.key,value:permit?freezeScope(value):value,proof,optical:links,rawOptical,sampled:permit,context:c,rawEpoch};failure=null;return structuredClone(value);
+   }catch(error){if(!current())return null;revokeRaw();last=null;failure={key:c.key,error:String(error?.message??error),sampled:permit,context:c};return snapshot();}
    finally{if(active===task){active=null;notify();}}
   }
   task.promise=Promise.resolve(draining??sampledDrain).then(run);if(permit)task.sampledPromise=task.promise.then(value=>value===null?emptySampled('unavailable','sampled network query invalidated'):sampledPresentation());notify();return task;
@@ -181,15 +183,33 @@ export function createNodeNetworkTimeline({model,optical,requestCommunicationSta
  }
  function updateSampled(){
   if(disposed)return Promise.resolve(emptySampled('unavailable','disposed'));
-  let c,permit;try{c=context();permit=capturePermit(c);if(!currentPermit(permit))throw Error('sampled network context changed during capture');c={...c,utc:permit.analysisUtc,links:readOptical(c)};c.key=signature({utc:c.utc,nodes:c.nodes,stations:c.stations,faults:c.faults});if(nodeScopeRevision)c.key=`{\"faults\":${signature(c.faults)},\"nodes\":${c.scope},\"stations\":${signature(c.stations)},\"utc\":${JSON.stringify(c.utc)}}`;}catch(error){if(active?.permit)cancel();if(last?.sampled)last=null;return Promise.resolve(emptySampled('unavailable',String(error?.message??error)));}
+  let c,permit;try{c=context();permit=capturePermit(c);if(!currentPermit(permit))throw Error('sampled network context changed during capture');c={...c,utc:permit.analysisUtc,links:readOptical(c)};c.key=signature({utc:c.utc,nodes:c.nodes,stations:c.stations,faults:c.faults});if(nodeScopeRevision)c.key=`{\"faults\":${signature(c.faults)},\"nodes\":${c.scope},\"stations\":${signature(c.stations)},\"utc\":${JSON.stringify(c.utc)}}`;}catch(error){revokeRaw();if(active?.permit)cancel();if(last?.sampled)last=null;return Promise.resolve(emptySampled('unavailable',String(error?.message??error)));}
   if(active?.permit&&active.permit.lease===permit.lease&&active.permit.input===permit.input&&active.permit.content===permit.content&&currentPermit(active.permit))return active.sampledPromise;
   if(active&&!active.permit)return active.promise.then(()=>updateSampled());
-  if(last?.sampled&&last.sampled.lease===permit.lease&&last.sampled.input===permit.input&&last.sampled.content===permit.content&&currentPermit(last.sampled))return Promise.resolve(sampledPresentation());
+  if(last?.rawEpoch===rawEpoch&&last?.sampled&&last.sampled.lease===permit.lease&&last.sampled.input===permit.input&&last.sampled.content===permit.content&&currentPermit(last.sampled))return Promise.resolve(sampledPresentation());
   const task=begin(c,permit,active?.promise??sampledDrain);return task.sampledPromise;
  }
- function cancelSampled(){if(disposed)return;if(active?.permit)cancel();if(last?.sampled)last=null;if(failure?.sampled)failure=null;}
+ // Registered raw native analysis retained across natural successful samples only.
+ function captureRawAnalysis(){
+  const accepted=last,epoch=rawEpoch;
+  try{
+   const c=context();if(accepted&&inputKey(c)!==inputKey(accepted.context)){revokeRaw();return null;}if(disposed||!accepted||accepted.rawEpoch!==epoch||accepted.value.status!=='valid'||!accepted.rawOptical||typeof optical.verifyRawAnalysis!=='function'||optical.verifyRawAnalysis(accepted.rawOptical)!==true||inputKey(c)!==inputKey(accepted.context)||!(accepted.sampled?currentPermit(accepted.sampled):validLast(c)))return null;
+   const token=freezeScope({kind:'NETWORK_RAW_ANALYSIS_V1',analysis_utc:accepted.value.utc,snapshot:structuredClone(accepted.value)}),source=displaySource();
+   if(disposed||last!==accepted||rawEpoch!==epoch)return null;
+   rawProofs.set(token,{accepted,epoch,source,input:inputKey(c),hashes:signature(accepted.value.definition_hashes)});
+   return verifyRawAnalysis(token)?token:null;
+  }catch{revokeRaw();return null;}
+ }
+ function verifyRawAnalysis(token){
+  const proof=rawProofs.get(token);if(!proof||disposed||proof.epoch!==rawEpoch)return false;
+  try{
+   const record=proof.accepted,valid=()=>{const c=context();return !disposed&&proof.epoch===rawEpoch&&inputKey(c)===proof.input&&displaySource()===proof.source&&optical.verifyRawAnalysis(record.rawOptical)===true&&(record.sampled?verifyContinuity?.(record.sampled.lease)===true:record.key===c.key)&&(!last||signature(last.value.definition_hashes)===proof.hashes);};
+   if(!valid()||!valid())throw Error('raw network authority revoked');return !disposed&&proof.epoch===rawEpoch;
+  }catch{rawProofs.delete(token);revokeRaw();return false;}
+ }
+ function cancelSampled(){if(disposed)return;revokeRaw();if(active?.permit)cancel();if(last?.sampled)last=null;if(failure?.sampled)failure=null;}
 
- function clear(){if(disposed)return;cancel();last=null;failure=null;notify();}
- function destroy(){if(disposed)return;disposed=true;nodeScopeCache=null;intrinsicCache=null;cancel();last=null;failure=null;}
- return Object.freeze({update,updateSampled,sampledPresentation,verifySampledPresentation,cancelSampled,snapshot,presentation,verifySnapshot,clear,destroy,get observerError(){return observerError;}});
+ function clear(){if(disposed)return;revokeRaw();cancel();last=null;failure=null;notify();}
+ function destroy(){if(disposed)return;revokeRaw();disposed=true;nodeScopeCache=null;intrinsicCache=null;cancel();last=null;failure=null;}
+ return Object.freeze({captureRawAnalysis,verifyRawAnalysis,update,updateSampled,sampledPresentation,verifySampledPresentation,cancelSampled,snapshot,presentation,verifySnapshot,clear,destroy,get observerError(){return observerError;}});
 }

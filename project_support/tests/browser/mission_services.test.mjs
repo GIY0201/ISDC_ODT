@@ -32,6 +32,17 @@ test('mission service requires real owners and preserves unknown context',()=>{
  const s=setup();s.nodes.missionInputs=()=>{throw Error('deployment unconfirmed');};
  assert.throws(()=>s.service.context(),/unconfirmed/);s.service.destroy();
 });
+test('approved contacts retain original eclipse independence and reject malformed hidden contact rows',async()=>{
+ const s=setup();try{s.data.bundle.eclipse_report=null;const receipt=await s.service.queryContactWindows({hours:2});assert.equal(s.service.verifyContactWindows(receipt),true);const g=receipt.contact_reports[0].geometry,row=g.passes[0];g.passes=Array.from({length:4},(_,i)=>({...row,id:'hidden-'+i}));g.passes[3].satellite='foreign';assert.equal(s.service.verifyContactWindows(receipt),false);}finally{s.service.destroy();}
+});
+test('approved contact service preserves24h and every enabled site with unchanged context authority',async()=>{
+ const s=setup();try{
+  const station={...structuredClone(s.data.context.stations[0]),id:'second-site',latitude:35};s.data.context.stations.push(station);
+  const end=codec.advance(s.data.context.utc,86400),sites=s.data.context.stations.map(v=>({station_id:v.id,ground_point:{latitude_deg:v.latitude,longitude_deg:v.longitude,ellipsoid_height_m:(v.altitude_km??0)*1000},minimum_elevation_deg:v.min_elevation_deg??0}));
+  const original=s.data.bundle.contact_reports[0];s.data.bundle.contact_reports=sites.map(site=>({station_id:site.station_id,geometry:{...structuredClone(original.geometry),site:site.ground_point,minimum_elevation_deg:site.minimum_elevation_deg,coverage:{...original.geometry.coverage,end_utc:end}}}));s.data.bundle.conditions.sites=sites;s.data.bundle.eclipse_report=null;
+  const receipt=await s.service.queryContactWindows({hours:24});assert.equal(receipt.contact_reports.length,2);assert.equal(receipt.conditions.end_utc,end);assert.equal(s.service.verifyContactWindows(receipt),true);receipt.accepted_context.context_hash='invalid';assert.equal(s.service.verifyContactWindows(receipt),false);assert.deepEqual(s.counts(),{nativeCalls:1,acceptCalls:1});
+ }finally{s.service.destroy();}
+});
 test('source store is loaded independently; native approval binds exact whole scope before query',async()=>{
  const s=setup();assert.equal(s.service.store.ready,true);const added=s.service.store.add(s.data.mission,{satellites:s.data.context.nodes,stations:s.data.context.stations});assert.equal(added.errors.length,0);
  // Use actual recorded optical receipt, not a fabricated link network.

@@ -1,4 +1,4 @@
-import {NODE_COMMUNICATION_METADATA} from '../nodes/node_timeline.js';
+import {createNativeContactBundleValidator} from './native_contact_bundle.js';
 import {createMissionStore} from './mission_store.js';
 import {createNativeMissionRequestBuilder} from './mission_request.js';
 import {createMissionExecution} from './mission_execution.js';
@@ -11,6 +11,7 @@ const requireValue=(v,message)=>{if(!v)throw Error(message);};
 export function createMissionServices({api,nodes,ground,readRuntime,readExternal=()=>null,module,library,groundLinks,model,codec,constraints,storage=null,nextRequestId,onChange=()=>{}}={}){
  if(!api||!nodes||!ground||!module||!library||!groundLinks||!model||!codec||!constraints||typeof readRuntime!=='function'||typeof nextRequestId!=='function')throw TypeError('existing mission owners required');
  let dead=false,status=null;
+ const contactValidator=createNativeContactBundleValidator({advanceUtc:codec.advance,differenceUtc:codec.difference});
  const store=createMissionStore({model,storage});store.load();
  const client={endpoint:()=>module.endpoint(),status:async options=>{status=copy(await module.status(options));return copy(status);},guardedPlan:(...args)=>module.guardedPlan(...args),guardedCommit:(...args)=>module.guardedCommit(...args)};
  function context(){
@@ -39,22 +40,9 @@ export function createMissionServices({api,nodes,ground,readRuntime,readExternal
   requireValue(value?.schema_version===1&&value.status==='sampled'&&value.communication_status==='unknown'&&same(value.display_context,physical(c)),'contact window context changed');
   const accepted=value.accepted_context,conditions=value.conditions,hashes=accepted?.definition_hashes;
   requireValue(accepted?.status==='verified_analysis_inputs'&&/^[a-f0-9]{64}$/.test(accepted.context_hash??'')&&accepted.utc===c.utc&&same(accepted.nodes,c.nodes)&&same(accepted.stations,c.stations)&&same(accepted.faults,c.faults)&&same(accepted.deployment,c.deployment)&&accepted.module_instance===c.module.instance&&accepted.external===null,'contact approval scope changed');
-  requireValue(same(value.node_definitions,c.nodes)&&same(value.definition_hashes,hashes)&&same(Object.keys(hashes??{}).sort(),c.nodes.map(n=>n.id).sort())&&Object.values(hashes??{}).every(v=>/^[a-f0-9]{64}$/.test(v)),'contact definition scope changed');
   const sites=c.stations.map(s=>({station_id:s.id,ground_point:{latitude_deg:s.latitude,longitude_deg:s.longitude,ellipsoid_height_m:(s.altitude_km??0)*1000},minimum_elevation_deg:s.min_elevation_deg??0}));
   requireValue(conditions?.start_utc===c.utc&&codec.advance(conditions.end_utc,0)===conditions.end_utc&&codec.difference(conditions.end_utc,c.utc)>0&&codec.difference(conditions.end_utc,c.utc)<=86400&&same(conditions.sites,sites)&&conditions.target===null&&conditions.external===null&&conditions.max_external_range_km===null,'contact query conditions changed');
-  requireValue(Array.isArray(value.contact_reports)&&value.contact_reports.length===sites.length&&new Set(value.contact_reports.map(r=>r.station_id)).size===sites.length,'contact site scope changed');
-  let count=0;
-  for(const item of value.contact_reports){
-   const site=sites.find(s=>s.station_id===item.station_id),g=item.geometry,coverage=g?.coverage;
-   requireValue(site&&g?.schema_version===1&&g.status==='sampled'&&Object.entries(NODE_COMMUNICATION_METADATA).every(([k,v])=>g[k]===v)&&same(g.definition_hashes,hashes)&&same(g.site,site.ground_point)&&g.minimum_elevation_deg===site.minimum_elevation_deg,'contact geometry scope changed');
-   requireValue(coverage?.start_utc===c.utc&&coverage.end_utc===conditions.end_utc&&coverage.resolution_seconds===30&&coverage.peak_bracket_seconds===0.1&&coverage.boundary_bracket_seconds===1&&coverage.short_intervals_may_be_missed===true,'contact sampling contract changed');
-   requireValue(Array.isArray(g.passes)&&((count+=g.passes.length)<=20000),'contact pass capacity invalid');
-   const ids=new Set();
-   for(const row of g.passes){
-    requireValue(typeof row.id==='string'&&row.id&&!ids.has(row.id)&&c.nodes.some(n=>n.id===row.satellite)&&['start','end','peak'].every(k=>codec.advance(row[k],0)===row[k])&&codec.difference(row.start,c.utc)>=0&&codec.difference(conditions.end_utc,row.end)>=0&&codec.difference(row.end,row.start)>=0&&codec.difference(row.peak,row.start)>=0&&codec.difference(row.end,row.peak)>=0&&Number.isFinite(row.max_elevation_deg)&&row.max_elevation_deg>=0&&row.max_elevation_deg<=90&&typeof row.in_progress==='boolean'&&typeof row.truncated==='boolean','contact pass record invalid');ids.add(row.id);
-   }
-  }
-  return true;
+  return contactValidator.validateContacts(value,{query:{request_id:value.request_id,nodes:c.nodes,sites,start_utc:c.utc,end_utc:conditions.end_utc,target:null,external:null,max_external_range_km:null},definitionHashes:hashes});
  }
  async function queryContactWindows({hours=3,signal}={}){
   const active=()=>{requireValue(!dead,'mission services disposed');if(signal?.aborted)throw new DOMException('contact query cancelled','AbortError');};active();

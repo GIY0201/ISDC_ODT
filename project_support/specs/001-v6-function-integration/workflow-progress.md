@@ -1416,3 +1416,57 @@ plan for geometry-only nativefuturequery, then originalsource lifecycle/display.
 Current Aside remainslive60951, actualoperatorfocus unsupportedUTC after3bounded
 tries, noauthoritybypass/SIMreset; modelcapturescontinuebuttinybody screenshots
 are not actualmaterial GPU success. Same branch/8891/currentrun preserved.
+
+2026-10-07 next boundary: previous goalturn is progress commit2740307, actualclean
+tree verified. Aside60951 confirmedlive; tiny-body GPU screenshots not accepted,
+normal focus/zoom boundedretries continues. Selected earliest plan for N017g/h.
+Actual speckit-plan read/setup preservedfeature/template, constitution1.2.0 and
+existing stack/owner boundaries; extensionsabsent before/after. Senior source and
+existing headerless API/native batch/approved50page UI directly researched.
+ADR0052/native_future_passes contract/spec/plan/model/quickstart/research updated
+precode. Actualtasks skill/setup/template read; T156–T159 appended underUS20,
+four executable sequentialtasks. Requirement-quality existing8/8 sufficient,
+not rerun asexecution evidence. No unanswered material technology choice; affected
+analysis/implementation verification stale. Next actual independent analyze before
+regression-first implementation; nativequery+fulloriginal UI intended, whole75–84
+N017mixedroute/N018/T032/GPU/PR scope unchanged. N017g/h analysisrepair0.
+
+N017g/h independent precode analysis CLEAN HIGH0/CRITICAL0. Separate native
+capacity clarified contact aggregate across reports<=20000, eclipse independently
+<=20000; no combined restriction. Implement bootstrap/prereqs PASS, checklist
+requirements8/8 read-only PASS (quality not execution), extensionsabsent and existing
+ignore coverage checked. T156/T157 sharedvalidator and T158 queryowner delegated
+with disjoint files; root owns T159 panel/root/native/live acceptance. Root panel
+3 meaningful RED then22focusedGREEN including existing approved50page/editor and
+sampled-network lifecycle; isolated panel fixture is not actual native/live proof.
+Whole goal open; no reset/branch/server/port changes.
+User explicitly requested tracks1–3 concurrently. Running disjoint tracks now:
+security_migration: source mixed-route emphasis/N018 command-input design, owns
+new route helper/tests+NodeScene+workspace_nodes only after precode design gate;
+model_display_research: NativeNetworkScene immutable-structure CPU profiling,
+meaningfulRED before optimization, no private/currentness cache or GPU pass;
+performance_acceptance: readonly UI/model focus and fullsource→V6 gap audit;
+Aside HRcJMUPbXDTsJAAN actual visible two-resolution/nativefuture/model diagnosis.
+Root owns integration/evidence/whole validation, no newbranch/server/port/reset.
+Current future flow stable Node1624PASS0FAIL0SKIP22504.7643ms. Fresh actual HTTP/
+Rust0.3 full2403h135raw→12rows1PASS22.88s, actual orbitstate unchanged. Whole live
+acceptance pending. Pythonfirst802PASS164fixtureERROR1skip8warnings229.86s;
+missingbasetemp parent independentlyreproduced WinError3; correctedfull88131 exit0:966PASS1existingPillowSKIP8existingERFAwarnings270.32s.
+Evidence validation/native_future_passes_connection.md. No whole-goal completion.
+2026-10-07 N018 implementation boundary: ADR0054/contracts/spec/plan/model/quickstart
+and T163165 authored before code, independent precode analyze HIGH0/CRITICAL0.
+Implement bootstrap/prereqs PASS, requirementquality8/8 not execution proof;
+extensions absent, existing ignore retained. Missing raw16RED→final28PASS4552ms,
+independent28PASS4355ms. Native full240/all24 and gap recovery/epoch/natural next
+analysis covered without sampledUI command promotion. Fabric/scheduler/workspace
+single mutating lane/review/origin/actualdeployment ports reviewed, last scoped150PASS.
+Root actual tworesolution binding/read-only fullanalyticalDTN/quality/custody/route
+fields5PASS279ms. Groundlink/station/sat focus44PASS548ms. Security21PASS278ms.
+Full final Node1767PASS0FAIL0SKIP23203.4191ms(exit0,99750); Python966PASS1existing
+PillowSKIP8existingERFAwarnings249.33s(exit0,39805) before later JS-only N018 changes.
+Logs full_migration_node_N018_periodic_routes_security.log and
+full_N017_routes_security_20261007_1043/python.log. All current code authors stopped.
+Whole source N018 moving analytical SVG/3D mixedroute still missing: ADR0055/T166168
+precode design in progress, not closed by tables. Actual8891 tworesolution/model/GPU/
+gameperformance/full75–84/PR stillOPEN. Git HTTPS push dry-run lackscredentials;
+no remotebranch/history reconstruction or resets. Fixed8891 originalrun/40deployed heldmissions preserved.

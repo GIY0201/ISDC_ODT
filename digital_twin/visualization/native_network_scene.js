@@ -9,10 +9,18 @@ const stationPickOwners=new WeakMap();
 function freezeStation(value){if(value&&typeof value==='object'){Object.values(value).forEach(freezeStation);Object.freeze(value);}return value;}
 const NATIVE_PROFILE=Object.freeze({frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',model_profile:'SOURCE_KEPLER_J2_V1',source_commit:'1a1e00297a0301637455b0ef2cf48b2e74576b07',quality:'engineering_assumption'});
 const nativeProfile=value=>Object.entries(NATIVE_PROFILE).every(([key,v])=>value?.[key]===v);
-function deeplyFrozen(value,seen=new Set()){
- if(!value||typeof value!=='object')return true;if(seen.has(value))return true;seen.add(value);
- const descriptors=Object.values(Object.getOwnPropertyDescriptors(value));
- return Object.isFrozen(value)&&descriptors.every(d=>'value'in d&&deeplyFrozen(d.value,seen));
+const immutableStructures=new WeakSet();
+function deeplyFrozen(value){
+ const seen=new Set();
+ const visit=item=>{
+  if(!item||typeof item!=='object'||immutableStructures.has(item)||seen.has(item))return true;seen.add(item);
+  const descriptors=Object.values(Object.getOwnPropertyDescriptors(item));
+  return Object.isFrozen(item)&&descriptors.every(d=>'value'in d&&visit(d.value));
+ };
+ const valid=visit(value);
+ // Commit only a complete successful traversal: a cyclic child's ancestor can
+ // still contain a mutable or accessor sibling. Weak identities retain no DTOs.
+ if(valid)for(const item of seen)immutableStructures.add(item);return valid;
 }
 // Structural display checks supplement, never replace, the injected private owner proof.
 function sampledScope(value,utc){
