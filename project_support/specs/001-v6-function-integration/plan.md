@@ -705,3 +705,6 @@ T195 scoped original shell parity: restore the senior app's requestFullscreen/ex
 
 ## U004 startup policy amendment
 Initial regular-document startup closes the work window and launcher/shelf regardless of the existing valid URL hash; the initial hash is retained as context, not a window-open instruction. Existing user hashchange and navigation actions remain functional. Only explicit popout=1 role documents automatically open their requested window. This supersedes automatic initial hash opening and requires a focused regression for /, #mission, #wall, #satellite and popout.
+
+## U006 parallel presentation repair
+Root owns single main status header, integration duplicate title, mode projection and requirement records. Separate implementation owns security cards and product wording. Shared layout implementation owns UI-only section navigation/container reflow, preserving controllers, inputs, source identities and command semantics. Aside exclusively validates actual size/navigation; current source-less wall blue map and missing original summaries are tracked as explicit remaining defects. No performance criterion is run or closed.

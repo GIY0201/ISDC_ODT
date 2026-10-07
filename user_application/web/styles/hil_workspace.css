@@ -1,0 +1,18 @@
+#hil-workspace .hil-simulation-notice {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:0 0 14px;
+  padding:9px 12px;
+  color:var(--amber,#f0b86d);
+  border-left:3px solid currentColor;
+  background:rgba(240,184,109,.08);
+  font-size:13px;
+  line-height:1.5;
+}
+#hil-workspace .hil-simulation-notice > span {
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.04em;
+}

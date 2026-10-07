@@ -7,6 +7,7 @@ function fixture(readSocket=()=>null,attribution={}){
  const elements=new Map(),records=new Map(),events=new Map();let requests=0;
  class Element{
   constructor(){this.listeners=new Map();this.hidden=false;this.value='';this.checked=false;this.html='';}
+  setAttribute(name,value){this[name]=String(value);}
   set innerHTML(html){this.html=html;for(const m of html.matchAll(/\bid="([^"]+)"/g))elements.set(m[1],new Element());}get innerHTML(){return this.html;}
   prepend(child){elements.set(child.id,child);}querySelector(q){return elements.get(q.slice(1));}
   addEventListener(e,fn){this.listeners.set(e,fn);}removeEventListener(e){this.listeners.delete(e);}remove(){elements.delete(this.id);}
@@ -19,6 +20,11 @@ function fixture(readSocket=()=>null,attribution={}){
  const panel=createSourceSettingsPanel({document,host,storage,readSocket,...attribution,probe:async body=>{requests++;return{checked_at:'2026-10-06T16:00:00Z',results:Object.fromEntries(body.links.map(l=>[l.id,{state:'unverified',method:'in-process',detail:'original planned component'}]))};}});
  return{panel,elements,records,events,get requests(){return requests;},get:id=>elements.get('st-'+id)};
 }
+test('integration area buttons preserve the actual editor draft and controller while all four areas remain accessible',async()=>{
+ const f=fixture();f.panel.show('integration');const editor=f.get('editor'),host=f.get('host');host.value='unapplied.example';await editor.dispatch('input');const before=f.panel.controller.snapshot(),writes=f.records.size;
+ assert.equal(f.get('region-topology').hidden,false);for(const key of ['links','modules','icd','topology']){await f.get('area-'+key).dispatch('click');assert.equal(f.get('region-'+key).hidden,false);assert.equal(f.get('host'),host);assert.equal(f.get('editor'),editor);assert.equal(host.value,'unapplied.example');}
+ assert.equal(f.requests,0);assert.equal(f.records.size,writes);assert.deepEqual(f.panel.controller.snapshot(),before);f.panel.show('settings');f.panel.show('integration');assert.equal(f.get('host'),host);assert.equal(host.value,'unapplied.example');f.panel.destroy();
+});
 test('V6 settings presents original modules, topology and all ICD message histories with explicit probe',async()=>{
  const f=fixture();f.panel.show('integration');const root=f.elements.get('source-module-settings');assert.ok(root);assert.equal(f.requests,0);
  for(const i of ICDS){assert.ok(root.innerHTML.includes(i.id));for(const m of i.messages)assert.ok(root.innerHTML.includes(m.id));}

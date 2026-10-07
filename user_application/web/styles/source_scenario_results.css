@@ -1,0 +1,23 @@
+/* Read-only scenario event records and captured phase comparison. */
+#source-scenario-services #sc-events,#source-scenario-services #sc-compare{margin:16px 0;min-width:0}
+#source-scenario-services #sc-events h3,#source-scenario-services #sc-compare h3{margin:0 0 9px;font-size:15px}
+#source-scenario-services .scenario-event-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;padding:0;margin:0;list-style:none}
+#source-scenario-services .scenario-event-cards li{display:flex;flex-direction:column;gap:7px;padding:12px;border:1px solid var(--line,#638293);border-radius:7px;min-width:0;background:color-mix(in srgb,var(--text,#edf4ff) 4%,transparent)}
+#source-scenario-services .scenario-event-cards span{font-size:12px;line-height:1.4}
+#source-scenario-services .scenario-event-cards strong{font-size:18px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#source-scenario-services .scenario-event-cards small{font-size:11px;overflow-wrap:anywhere}
+#source-scenario-services .scenario-event-cards .recorded{border-top:3px solid #3d99b0}
+#source-scenario-services .scenario-event-cards .missing strong{font-size:14px;font-weight:500}
+#source-scenario-services .scenario-comparison-table{width:100%;min-width:560px;border-collapse:separate;border-spacing:0;table-layout:fixed;border:1px solid var(--line,#638293);border-radius:6px;overflow:hidden;font-size:13px}
+#source-scenario-services .scenario-comparison-table caption{text-align:left;padding:0 0 8px;font-size:12px}
+#source-scenario-services .scenario-comparison-table th,#source-scenario-services .scenario-comparison-table td{padding:11px 12px;border-right:1px solid var(--line,#638293);border-bottom:1px solid var(--line,#638293);line-height:1.5;overflow-wrap:anywhere;vertical-align:middle}
+#source-scenario-services .scenario-comparison-table thead th{font-weight:700;text-align:center;background:color-mix(in srgb,var(--text,#edf4ff) 10%,transparent)}
+#source-scenario-services .scenario-comparison-table thead th:first-child{width:28%;text-align:left}
+#source-scenario-services .scenario-comparison-table tbody th{text-align:left;font-weight:600}
+#source-scenario-services .scenario-comparison-table tbody th small{white-space:nowrap;font-size:11px;font-weight:400}
+#source-scenario-services .scenario-comparison-table tbody tr:nth-child(even){background:color-mix(in srgb,var(--text,#edf4ff) 4%,transparent)}
+#source-scenario-services .scenario-comparison-table .numeric{text-align:right;font-variant-numeric:tabular-nums}
+#source-scenario-services .scenario-comparison-table .category{text-align:center}
+#source-scenario-services .scenario-comparison-table .unmeasured{text-align:center;font-size:12px;font-weight:400}
+#source-scenario-services .scenario-comparison-table tr>*:last-child{border-right:0}
+#source-scenario-services .scenario-comparison-table tbody tr:last-child>*{border-bottom:0}

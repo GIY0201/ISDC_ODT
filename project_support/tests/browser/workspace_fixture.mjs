@@ -1,4 +1,7 @@
+import {createWorkspaceTimeDock} from '../../../user_application/web/scripts/workspace_time_dock.js';
+import {wallSummaryMarkup} from '../../../user_application/web/scripts/workspace_wall_summary.js';
 import {createBrowserId} from '../../../user_application/web/scripts/browser_identity.js';
+import {createWorkWindowLayout} from '../../../user_application/web/scripts/work_window_layout.js';
 import {installOrbitUiMeasurement} from '../../../user_application/web/scripts/orbit_ui_measurement.js';
 import {createGlobeViewPanel} from '../../../user_application/web/scripts/tabs/globe_view.js';
 import {createSatelliteModelPanel} from '../../../user_application/web/scripts/tabs/satellite_model.js';
@@ -71,7 +74,7 @@ const orchestrationSource=(await readFile(new URL('../../../communication/browse
 const {createOrchestrationClient}=await import(`data:text/javascript;base64,${Buffer.from(orchestrationSource).toString('base64')}`);
 const web=new URL('../../../user_application/web/scripts/',import.meta.url);
 const windowSource=(await readFile(new URL('workspace.js',web),'utf8')).replace(/^import .*;\r?\n/gm,'');
-const orbitSource=(await readFile(new URL('workspace_orbit.js',web),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/export function /g,'function ');
+const orbitSource=(await readFile(new URL('workspace_orbit.js',web),'utf8')).replace(/^import .*;\r?\n/gm,'').replace(/export (function|const) /g,'$1 ');
 const globeSource=(await readFile(new URL('workspace_globe.js',web),'utf8')).replace(/'\/static\/visualization\/orbit_globe\.js(?:\?[^']*)?'/,JSON.stringify(new URL('../../../digital_twin/visualization/orbit_globe.js',import.meta.url).href)).replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href));
 const {createWorkspaceGlobe}=await import(`data:text/javascript;base64,${Buffer.from(globeSource).toString('base64')}`);
 const solarSource=(await readFile(new URL('workspace_solar.js',web),'utf8')).replace("'/static/visualization/solar_display.js'",JSON.stringify(new URL('../../../digital_twin/visualization/solar_display.js',import.meta.url).href)).replace("'./solar_timeline.js'",JSON.stringify(new URL('../../../user_application/web/scripts/solar_timeline.js',import.meta.url).href));
@@ -83,14 +86,17 @@ export function fixture(width=1280,height=720,options={}){
   class Element {
     constructor(id='',tag='div'){this.id=id;this.tag=tag;this.style={};this.dataset={};this.attributes={};this.listeners=new Map();this.children=[];this.hidden=false;this.isConnected=true;this._value='';this._html='';this.textContent='';this.scrollTop=0;this.capture=null;const classes=new Set();this.classList={contains:v=>classes.has(v),add:v=>classes.add(v),remove:v=>classes.delete(v)};}
     set value(value){this._value=String(value??'');}get value(){return this._value;}
-    set innerHTML(value){for(const child of this.descendants()){child.isConnected=false;if(elements.get(child.id)===child)elements.delete(child.id);}this.children=[];this._html=value;for(const match of value.matchAll(/<([a-z]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){const child=new Element(match[3],match[1]);child.value=match[2].match(/\bvalue="([^"]*)"/)?.[1]||'';child.checked=/\bchecked\b/.test(match[2]);this.prepend(child);}}
+    set className(value){this._className=String(value);for(const name of this._className.split(/\s+/).filter(Boolean))this.classList.add(name);}get className(){return this._className||'';}
+    get parentElement(){return this.parent;}
+    replaceChildren(...items){this.innerHTML='';this.append(...items);}
+    set innerHTML(value){for(const child of this.descendants()){child.isConnected=false;if(elements.get(child.id)===child)elements.delete(child.id);}this.children=[];this._html=value;for(const match of value.matchAll(/<([a-z]+)\b([^>]*\bid="([^"]+)"[^>]*)>/g)){const child=new Element(match[3],match[1]);child.value=match[2].match(/\bvalue="([^"]*)"/)?.[1]||'';child.checked=/\bchecked\b/.test(match[2]);this.prepend(child);}for(const match of value.matchAll(/<([a-z]+)\b([^>]*\bdata-time-[^>]*)>/g)){const child=new Element('',match[1]);for(const attr of match[2].matchAll(/\b(data-time-[\w-]+)/g))child.setAttribute(attr[1],'');this.append(child);}}
     get innerHTML(){return this._html;}
     *descendants(){for(const child of this.children){yield child;yield* child.descendants();}}
     prepend(child){if(child.parent)child.parent.children=child.parent.children.filter(old=>old!==child);child.parent=this;child.isConnected=true;this.children.unshift(child);if(child.id)elements.set(child.id,child);}
     append(...children){for(const child of children){if(child.parent)child.parent.children=child.parent.children.filter(old=>old!==child);child.parent=this;child.isConnected=true;this.children.push(child);}}
     remove(){this.isConnected=false;if(this.parent)this.parent.children=this.parent.children.filter(child=>child!==this);}
     get ownerDocument(){return doc;}
-    querySelector(selector){if(selector.startsWith('#'))return [...this.descendants()].find(el=>el.id===selector.slice(1))||null;return [...this.descendants()].find(el=>el.tag===selector)||null;}
+    querySelector(selector){if(selector.startsWith('#'))return [...this.descendants()].find(el=>el.id===selector.slice(1))||null;if(selector.startsWith('['))return [...this.descendants()].find(el=>el.hasAttribute(selector.slice(1,-1)))||null;return [...this.descendants()].find(el=>el.tag===selector)||null;}
     querySelectorAll(selector){return [...this.descendants()].filter(el=>selector.includes('input')?['input','select','textarea'].includes(el.tag):el.tag==='button');}
     addEventListener(name,fn){if(!this.listeners.has(name))this.listeners.set(name,new Set());this.listeners.get(name).add(fn);}
     removeEventListener(name,fn){this.listeners.get(name)?.delete(fn);}
@@ -101,7 +107,8 @@ export function fixture(width=1280,height=720,options={}){
     focus(){active=this;}
     setPointerCapture(id){this.capture=id;}releasePointerCapture(){this.capture=null;}
     getBoundingClientRect(){
-      const number=(value,fallback)=>value?.startsWith('calc')?Number(value.includes('100vw')?context.innerWidth:context.innerHeight)-Number(value.match(/- (\d+)px/)?.[1]||0):value?parseFloat(value):fallback;
+      if(this.id==='desktop')return {left:76,top:38,width:context.innerWidth-76,height:context.innerHeight-38,right:context.innerWidth,bottom:context.innerHeight};
+      const number=(value,fallback)=>value?.startsWith('calc')?Number(value.includes('100vw')?context.innerWidth:context.innerHeight)-Number(value.match(/- (\d+)px/)?.[1]||0):value?.endsWith('vw')?parseFloat(value)*context.innerWidth/100:value?.endsWith('vh')?parseFloat(value)*context.innerHeight/100:value?parseFloat(value):fallback;
       const expanded=this.classList.contains('expanded');
       let w=number(this.style.width,Math.min(760,context.innerWidth-110)),h=number(this.style.height,Math.min(560,context.innerHeight-160));
       if(!expanded){w=Math.max(460,Math.min(context.innerWidth-90,w));h=Math.max(360,Math.min(context.innerHeight-130,h));}
@@ -167,6 +174,7 @@ export function fixture(width=1280,height=720,options={}){
   if(options.nodeWorkspaceFactory)context.createWorkspaceNodes=args=>options.nodeWorkspaceFactory(createWorkspaceNodes,args);
   if(options.groundNetworkPanelFactory)context.createGroundNetworkPanel=args=>options.groundNetworkPanelFactory(createGroundNetworkPanel,args);
   context.installOrbitUiMeasurement=options.installOrbitUiMeasurement??installOrbitUiMeasurement;
+  context.createWorkWindowLayout=createWorkWindowLayout;context.wallSummaryMarkup=wallSummaryMarkup;context.createWorkspaceTimeDock=createWorkspaceTimeDock;
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   // Ordinary feature fixtures represent an explicit user opening the requested task.
   // Startup tests opt out so they inspect the untouched main-document boot policy.

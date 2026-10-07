@@ -141,6 +141,37 @@ html[data-theme="light"] .mt .mt-task.running rect { stroke: #10213c; }
 .work-window.expanded #wall-globe-slot{height:min(55vh,650px)}
 
 .alertline[hidden]{display:none!important}
+
+/* Work-window sections preserve mounted controller DOM; only their presentation changes. */
+.work-window[data-work-layout]{container-type:inline-size}
+.work-section-nav{flex:0 0 auto;display:flex;gap:5px;padding:6px 8px;max-height:76px;overflow:auto;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.work-section-nav[hidden]{display:none!important}
+.work-section-nav button{font:inherit;font-size:12px;max-width:100%;padding:5px 9px;border:1px solid var(--line);border-radius:5px;background:transparent;color:inherit;cursor:pointer;overflow-wrap:anywhere}
+.work-section-nav button[aria-pressed=true]{background:var(--accent,#237285);color:var(--text,#fff)}
+.work-section-nav button:focus-visible{outline:2px solid #83d9ef;outline-offset:1px}
+.work-window[data-work-layout] #screen{display:flex;flex-direction:column;gap:7px;overflow:hidden;min-height:0;min-width:0}
+.work-window[data-work-layout] #screen>[data-work-section-hidden=true]{display:none!important}
+.work-window[data-work-layout] #screen>[data-work-section-hidden=false]{flex:1;min-height:0;min-width:0;max-width:100%;margin:0;overflow:hidden}
+.work-window[data-work-layout] #screen>.panel[data-work-section-hidden=false]{display:flex;flex-direction:column}
+.work-window[data-work-layout] #screen>.panel>header,.work-window[data-work-layout] #screen>.panel>.panel-title{flex:0 0 auto;overflow-wrap:anywhere}
+.work-window[data-work-layout] #screen>.panel>.body,.work-window[data-work-layout] #screen>.panel>.panel-body{flex:1;min-height:0;min-width:0;height:auto;overflow:auto;overscroll-behavior:contain}
+.work-window[data-work-layout] #screen>.view[data-work-section-hidden=false]{display:flex!important;flex-direction:column;height:auto!important;min-height:0;overflow:auto;overscroll-behavior:contain}
+.work-window[data-work-layout] #source-scenario-dock{flex:0 0 auto;max-height:30%;overflow:auto}
+.work-window[data-work-layout] .headrow{flex-wrap:wrap;height:auto;min-height:0}
+.work-window[data-work-layout] label,.work-window[data-work-layout] input,.work-window[data-work-layout] select,.work-window[data-work-layout] textarea{min-width:0;max-width:100%;box-sizing:border-box}
+.work-window[data-work-layout] .actions,.work-window[data-work-layout] .catalog-controls{flex-wrap:wrap}
+.work-window[data-work-layout] .role .bottom,.work-window[data-work-layout] .studio .bottom,.work-window[data-work-layout] .exception .lower,.work-window[data-work-layout] .step-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+.work-window[data-work-layout] #screen[data-work-layout=wall]>.wall-live{overflow:hidden!important}
+.work-window[data-work-layout] .wall-live>.headrow{flex:0 0 auto}
+.work-window[data-work-layout] .wall-live>.wall-globe-panel{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+.work-window[data-work-layout] .wall-live>.wall-globe-panel>.body{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+.work-window[data-work-layout] #wall-globe-slot{flex:1;height:auto;min-height:0}
+.work-window[data-work-layout] .wall-live>.panel:not(.wall-globe-panel){flex:0 0 auto;max-height:25%;overflow:auto}
+@container (max-width:640px){
+ .work-window[data-work-layout] .rf-fields,.work-window[data-work-layout] .ground-fields,.work-window[data-work-layout] .form .pair{grid-template-columns:minmax(0,1fr)}
+ .work-window[data-work-layout] .orbit-playback-controls input,.work-window[data-work-layout] .catalog-controls input{min-width:0;width:100%}
+ .work-window[data-work-layout] .headrow h1{font-size:18px}
+}
 .desktop .overview{max-height:calc(100% - 24px);overflow:auto}
 #desktop-sat-thumbnail{display:block;width:100%;height:108px;object-fit:contain;margin:8px 0;background:#071923;border-radius:5px}
 #desktop-sat-thumbnail[hidden]{display:none}
@@ -158,3 +189,21 @@ html[data-theme="light"] .mt .mt-task.running rect { stroke: #10213c; }
 :root[data-theme="light"] .scene-credit{color:#fff}
 :root[data-theme="light"] :focus-visible{outline-color:#07576d}
 .desktop .overview strong,.desktop .overview dd,.desktop .overview #desktop-sat-status{overflow-wrap:anywhere;min-width:0}
+
+/* One main status row; selected UTC remains in the satellite details. */
+.app{grid-template-rows:auto minmax(0,1fr)}
+.context{min-height:38px;gap:12px;flex-wrap:wrap;padding-block:6px}
+.context .identity{min-width:0;flex:1;flex-wrap:wrap;overflow-wrap:anywhere}
+#current-mode{white-space:nowrap}
+
+/* Expanded fills the current desktop rectangle; rail/status stay accessible. */
+.work-window.expanded{inset:auto;min-width:0;min-height:0;max-width:none;max-height:none;border-radius:0;border:0}
+
+/* Task windows have one frame; mounted feature panels are content, not nested windows. */
+.work-window[data-work-layout] #screen .panel{border:0;border-radius:0;box-shadow:none;background:transparent}
+.work-window[data-work-layout] #screen .panel>header,.work-window[data-work-layout] #screen .panel>.panel-title{border:0;border-radius:0;background:transparent;box-shadow:none;padding:3px 8px;min-height:0}
+.work-window[data-work-layout] #screen>.panel>header h2{display:none}
+.work-window[data-work-layout] #screen .panel>header small{font-size:11px;color:var(--muted)}
+
+/* Bodyless feature sections keep all native controls reachable within their own content area. */
+.work-window[data-work-layout] #screen>.panel[data-work-section-hidden=false]:not(:has(>.body,>.panel-body)){display:block;overflow:auto;overscroll-behavior:contain}

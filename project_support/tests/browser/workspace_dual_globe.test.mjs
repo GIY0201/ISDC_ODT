@@ -1,6 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fixture} from './workspace_fixture.mjs';
+test('source-less replica initializes geographic imagery and style while refusing satellite proof and retaining local 2D control',async()=>{
+ const f=fixture(1280,720,{hash:'#settings'});try{
+  f.evaluate("globe.catalog(null);globe.catalogScene(null);globe.update({status:'empty',state:null,result:null});globalThis.mapRequests=0;window.Cesium.SingleTileImageryProvider.fromUrl=async()=>{mapRequests++;return {};};globalThis.blankCaption=document.createElement('p');globalThis.blankReplica=globe.createDisplayReplica(document.createElement('div'),blankCaption);");
+  const replica=f.context.blankReplica,wall=f.viewers.at(-1),before=f.snapshot(),counts=f.counts();
+  assert.equal(f.evaluate('globe.displayContext()'),null);assert.equal(f.context.mapRequests,1);assert.equal(String(wall.scene.globe.baseColor),'#c9d6e3');
+  const proof=replica.readProjection();assert.equal(proof.context,null);assert.equal(replica.verifyProjection(proof),false);assert.match(f.context.blankCaption.textContent,/위성 위치 자료/);
+  assert.equal(replica.setMode('2d'),true);await Promise.resolve();assert.equal(wall.scene.mode,2);assert.equal(f.context.mapRequests,1);assert.equal(replica.verifyProjection(proof),false);
+  f.evaluate("globe.changeView({theme:'dark'});");replica.sync();assert.equal(String(wall.scene.globe.baseColor),'#07111d');assert.equal(wall.scene.mode,2);assert.equal(f.context.mapRequests,1);assert.equal(replica.verifyProjection(proof),false);
+  assert.deepEqual(f.snapshot(),before);assert.deepEqual(f.counts(),counts);replica.destroy();assert.equal(wall.destroyCount,1);assert.equal(f.viewers[0].destroyCount,undefined);
+ }finally{f.dispose();}
+});
 import {readFile} from 'node:fs/promises';
 test('primary boot uses the permanent desktop status before any dynamic wall exists',async()=>{
  const source=await readFile(new URL('../../../user_application/web/scripts/workspace_orbit.js',import.meta.url),'utf8');

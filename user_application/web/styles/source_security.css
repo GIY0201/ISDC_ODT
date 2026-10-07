@@ -1,0 +1,26 @@
+.source-security .security-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px; }
+.source-security .security-heading h2 { margin:0; font-size:18px; }
+.source-security .security-heading p { margin:6px 0 0; opacity:.75; }
+.source-security .security-body { display:grid; gap:16px; padding:16px; }
+.source-security .security-body p { margin:0; line-height:1.6; }
+.source-security .security-disclosure { padding:12px; border:1px solid var(--line,#70849c); border-radius:8px; }
+.source-security .security-verdict { display:grid; gap:6px; padding:14px; border-left:3px solid currentColor; }
+.source-security .security-verdict strong { font-size:20px; }
+.source-security .security-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:12px; }
+.source-security .security-metric { padding:14px; border:1px solid var(--line,#70849c); border-radius:8px; }
+.source-security .security-metric > div { display:flex; align-items:baseline; gap:6px; margin-top:8px; }
+.source-security .security-metric strong { font-size:24px; font-variant-numeric:tabular-nums; }
+.source-security .security-evidence { opacity:.8; }
+.source-security .security-checks,.source-security .security-technical dl { margin:0; display:grid; gap:10px; }
+.source-security .security-checks > div,.source-security .security-technical dl > div { display:grid; grid-template-columns:minmax(100px,1fr) minmax(0,2fr); gap:10px; }
+.source-security dt { opacity:.75; }
+.source-security dd { margin:0; overflow-wrap:anywhere; }
+.source-security .security-history h3 { margin:0 0 10px; font-size:15px; }
+.source-security .security-table { overflow-x:auto; }
+.source-security .security-table table { width:100%; border-collapse:collapse; text-align:left; }
+.source-security .security-table th,.source-security .security-table td { padding:9px; border-bottom:1px solid var(--line,#70849c); }
+.source-security .security-history > p { margin-top:10px; opacity:.75; font-size:12px; }
+.source-security .security-technical { border-top:1px solid var(--line,#70849c); padding-top:12px; }
+.source-security .security-technical summary { cursor:pointer; }
+.source-security .security-technical dl { margin:14px 0; }
+@media(max-width:640px) { .source-security .security-metrics { grid-template-columns:1fr; } .source-security .security-heading { align-items:flex-start; flex-direction:column; } }

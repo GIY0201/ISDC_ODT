@@ -741,3 +741,9 @@ is fullnative validatedfuture flow then actual UI acceptance, not a physics stub
 - [ ] T195 Complete original shell convenience parity: browser fullscreen toggle and persisted overall UI light/dark theme in environment settings. Keep existing V6 dark initial shell and user-selected light map independently; preserve original spacetwin-theme key, no UI clock or server setting change. Focused unsupported/fullscreen-rejection/storage/lifecycle tests and normal UI verification.
 
 - [x] T196 Start normal main documents with no task window, including retained mission/wall/satellite hash; preserve explicit popout role opening and user navigation/hashchange. Do not clear inputs/runtime/state. Focused startup RED/GREEN and actual normal main-page smoke.
+
+## U006 responsive role windows and readable product presentation
+- [ ] T197 Shared responsive section navigation in every role window; preserve all controls/inputs and asynchronous panels, no outer scrolling, actual small/expanded/popout evidence.
+- [ ] T198 Single current-target status row and configured-mode label; remove duplicated header/UTC unknown badge, duplicate integration heading and personal-author wording throughout UI.
+- [ ] T199 Readable simulated security verdict/cards/history/details with original API and status semantics preserved.
+- [ ] T200 Restore situation-board functional overview from existing current owners; repair blank-blue source-less 2D Earth and explain missing data accurately without invented UTC/positions.

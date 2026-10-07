@@ -22,12 +22,10 @@ test('environment settings stays at the rail bottom without its own bordered com
  assert.doesNotMatch(rail,/border(?:-top)?:[^;]+|background:[^;]+|display:none/);
 });
 
-test('contact card retains current handoff content without duplicate navigation actions',()=>{
+test('unused contact card is removed while the primary globe remains mounted',()=>{
  const card=html.match(/<section class="glass contact"[\s\S]*?<\/section>/)?.[0];
- assert.ok(card);
- assert.match(card,/id="desktop-handoff"/);
- assert.match(card,/id="desktop-handoff-state"/);
- assert.doesNotMatch(card,/<button\b/);
+ assert.equal(card,undefined);
+ assert.doesNotMatch(html,/id="desktop-handoff(?:-state)?"/);
  assert.match(html,/<div id="workspace-globe-surface">[\s\S]*?id="stored-orbit-globe"[\s\S]*?id="orbit-solar-overlay"[\s\S]*?class="orbit-globe-caption"/);
  assert.match(declarations('#wall-globe-slot #workspace-globe-surface'),/position:absolute;inset:0/);
 });

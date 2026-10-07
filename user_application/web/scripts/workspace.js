@@ -1,11 +1,17 @@
-import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceContext,observeWorkspaceContext,observeWorkspaceModel,setWorkspaceWallScope,setWorkspaceWallMode,mountWorkspaceWall,detachWorkspaceWall,resizeWorkspaceGlobe} from './workspace_orbit.js?v=t151-r1';
+import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceContext,observeWorkspaceContext,observeWorkspaceModel,setWorkspaceWallScope,setWorkspaceWallMode,mountWorkspaceWall,detachWorkspaceWall,resizeWorkspaceGlobe,readWorkspaceClock,observeWorkspaceClock,workspaceClockActions} from './workspace_orbit.js?v=t151-r1';
+import {createWorkWindowLayout} from './work_window_layout.js';
+import {wallSummaryMarkup} from './workspace_wall_summary.js';
+import {createWorkspaceTimeDock} from './workspace_time_dock.js';
 (() => {
   const screen = document.getElementById('screen');
+  const timeDock=createWorkspaceTimeDock({document,root:document.getElementById('workspace-time-dock'),read:readWorkspaceClock,observe:observeWorkspaceClock,actions:workspaceClockActions});window.addEventListener('pagehide',event=>{if(!event.persisted)timeDock.destroy();});
+  const workLayout=createWorkWindowLayout({screen,navigation:document.getElementById('work-section-nav'),windowElement:document.getElementById('work-window'),host:window,onResize:resizeWorkspaceGlobe});
+  window.addEventListener('pagehide',event=>{if(!event.persisted)workLayout.destroy();});
   let failedThumbnail=null,activeThumbnail=null;
   const thumbnail=document.getElementById('desktop-sat-thumbnail'),hideThumbnail=()=>{failedThumbnail=activeThumbnail;if(thumbnail){thumbnail.hidden=true;thumbnail.removeAttribute('src');}};thumbnail?.addEventListener('error',hideThumbnail);
   const removeThumbnail=observeWorkspaceModel(value=>{const image=document.getElementById('desktop-sat-thumbnail');if(!image)return;const preview=value.selected&&value.match?.thumbnail;activeThumbnail=preview||null;if(!preview)failedThumbnail=null;image.hidden=!preview||failedThumbnail===preview;if(!image.hidden){image.src=preview;image.alt='선택 위성에 연결된 3D 모델의 미리보기';}else image.removeAttribute('src');});window.addEventListener('pagehide',event=>{if(!event.persisted){removeThumbnail();thumbnail?.removeEventListener('error',hideThumbnail);}});
   function restoreGlobeSurface(){detachWorkspaceWall();}
-  function applySharedContext(value=readWorkspaceContext()){const t=value.text;for(const [id,text] of Object.entries({'desktop-handoff':t.next,'desktop-handoff-state':t.status,'desktop-scene-credit':('NASA Blue Marble / Cesium WGS84 · '+t.satellite+' · '+t.clock+' · 모델 계산 / 실제 RF 미확인'),'clock':t.clock,'desktop-event':t.event,'desktop-data-utc':t.clock,'quick-sat':t.satellite,'quick-pass':t.next,'quick-event':t.event,'desktop-sat-name':t.satellite,'desktop-sat-status':t.status,'desktop-next':t.next,'context-id':t.contextId,'context-rel':t.contextRelated,'alert-text':t.alert})){const el=document.getElementById(id);if(el&&el.textContent!==text)el.textContent=text;}}
+  function applySharedContext(value=readWorkspaceContext()){const summary=document.getElementById('wall-summary');if(summary){const markup=wallSummaryMarkup(value);if(summary.innerHTML!==markup)summary.innerHTML=markup;}const t=value.text;for(const [id,text] of Object.entries({'desktop-scene-credit':('NASA Blue Marble / Cesium WGS84 · '+t.satellite+' · '+t.clock+' · 모델 계산 / 실제 RF 미확인'),'current-mode':t.mode,'desktop-event':t.event,'desktop-data-utc':t.clock,'quick-sat':t.satellite,'quick-pass':t.next,'quick-event':t.event,'desktop-sat-name':t.satellite,'desktop-sat-status':t.status,'desktop-next':t.next,'context-id':t.contextId,'context-rel':t.contextRelated,'alert-text':t.alert})){const el=document.getElementById(id);if(el&&el.textContent!==text)el.textContent=text;}}
   const stopSharedContext=observeWorkspaceContext(applySharedContext);window.addEventListener('pagehide',event=>{if(!event.persisted)stopSharedContext();});
   const groups = [
     ['공용', [['wall','공용 상황판'],['normal','정상 임무 흐름'],['initial','초기 운용 흐름'],['exception','장애·복구 흐름']]],
@@ -17,7 +23,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
   const isPopout=new URLSearchParams(location.search).get('popout')==='1';
   const windowId=`${Date.now()}-${Math.random().toString(36).slice(2)}`;
   let applyingRemote=false,pendingWorkspaceDraft=[],pendingWorkspaceDraftRemote=false;
-  const childWindows=new Set();
+  const childWindows=new Map();
   let awaitingInitial=isPopout&&Boolean(window.opener);
   const syncChannel='BroadcastChannel' in window?new BroadcastChannel('isdc-odt-v6-mock'):null;
   const cases = {
@@ -44,7 +50,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
   const btn=(label,view,cl='')=>`<button type="button" class="button ${cl}" data-view="${view}">${label}</button>`;
   const globe=()=>`<div class="globe ${state.follow?'follow':''}" aria-label="지구와 위성 위치의 개념 시안"><div class="orbit"></div><div class="orbit secondary"></div><div class="earth" aria-hidden="true"></div><button class="sat a" data-sat="SAT-A" aria-pressed="${state.sat==='SAT-A'}">SAT-A</button><button class="sat b" data-sat="SAT-B" aria-pressed="${state.sat==='SAT-B'}">SAT-B</button><button class="sat c" data-sat="SAT-C" aria-pressed="${state.sat==='SAT-C'}" style="left:${Math.max(8,Math.min(78,50+state.satLon/5))}%;top:${Math.max(10,Math.min(78,50-state.satLat/3))}%;right:auto;bottom:auto">SAT-C</button><span class="ground-pin one">GS-01</span><span class="ground-pin two">GS-02</span><span class="ground-pin virtual" style="left:${Math.max(8,Math.min(82,50+state.gsLon/5))}%;top:${Math.max(12,Math.min(80,50-state.gsLat/3))}%">가상 ${esc(state.station)}</span><div class="globe-caption"><span>NASA Blue Marble · 마커는 좌표 입력의 2D 개념 위치</span><span>실제 3D 투영·가시 계산 없음</span></div></div>`;
   function wall(){
-    screen.innerHTML=`<div class="view wall-live"><div class="headrow"><h1>공용 상황판</h1><p>같은 표시 UTC와 Cesium 지구를 사용합니다.</p></div>${panel('군집 공간 상황','현재 계산 자료 · 실측 아님',`<div class="wall-scope-controls"><label>표시 방식 <select id="wall-mode"><option value="3d">3D 지구</option><option value="2d">2D 지도</option></select></label><button type="button" id="wall-whole" class="button" data-wall-scope="toggle">전체 위성 OFF</button></div><p id="wall-scope-status" role="status"></p><div id="wall-globe-slot" aria-label="상황판 Cesium 지구"><div id="wall-globe" style="position:absolute;inset:0"></div><div id="wall-solar-overlay" class="space-sun" hidden aria-hidden="true"></div><p id="wall-globe-caption" role="status" style="position:absolute;left:12px;top:12px"></p></div>`,'wall-globe-panel')}${panel('현재 자료와 표시 경계','기존 소유자 상태',`<p id="wall-current-status" role="status"></p><div class="actions">${btn('위성 상태·궤도','satellite')}${btn('지상국·통신','ground')}${btn('환경 설정','settings')}</div>`)}</div>`;
+    screen.innerHTML=`<div class="view wall-live" aria-label="공용 상황판">${panel('군집 공간 상황','현재 계산 자료 · 실측 아님',`<div class="wall-scope-controls"><label>표시 방식 <select id="wall-mode"><option value="3d">3D 지구</option><option value="2d">2D 지도</option></select></label><button type="button" id="wall-whole" class="button" data-wall-scope="toggle">전체 위성 OFF</button></div><p id="wall-scope-status" role="status"></p><div id="wall-globe-slot" aria-label="상황판 Cesium 지구"><div id="wall-globe" style="position:absolute;inset:0"></div><div id="wall-solar-overlay" class="space-sun" hidden aria-hidden="true"></div><p id="wall-globe-caption" hidden></p></div>`,'wall-globe-panel')}<div id="wall-summary" aria-label="운용 요약">${wallSummaryMarkup(readWorkspaceContext())}</div></div>`;
     mountWorkspaceWall(document.getElementById('wall-globe'),document.getElementById('wall-globe-caption'));document.getElementById('wall-mode').addEventListener('change',event=>setWorkspaceWallMode(event.target.value));
   }
   function normal(){
@@ -85,6 +91,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
     if(!pendingWorkspaceDraft.length)pendingWorkspaceDraft=draftValues();
     queueMicrotask(()=>{
       showWorkspaceOrbit(state.view);
+      workLayout.setView(state.view);
       if(pendingWorkspaceDraft.length){
         applyWorkspaceDraft(pendingWorkspaceDraft,pendingWorkspaceDraftRemote);
         for(const item of pendingWorkspaceDraft){if(item.id.startsWith('st-')||(item.id.startsWith('cat-')||item.id.startsWith('kpi-')||item.id.startsWith('hil-'))||item.id.startsWith('sim-')||item.id.startsWith('mw-')||item.id.startsWith('series-')||item.id.startsWith('radio-')||item.id.startsWith('cp-')||item.id.startsWith('rf-')||item.id.startsWith('ground-')||item.id.startsWith('visibility-')||item.id==='orbit-utc'||['orbit-input','orbit-rate'].includes(item.id))continue;const field=document.getElementById(item.id);if(field&&'value' in field)field.value=item.value;}
@@ -116,7 +123,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
   function draftScope(id){if(id.startsWith('st-'))return {settings_link:document.getElementById('st-link')?.value};return id.startsWith('mw-')?{mission_id:document.getElementById('mw-mission')?.value,task_id:document.getElementById('mw-task')?.value}:{};}
   function draftChecked(field){return ['st-enabled','st-reconnect'].includes(field.id)?{checked:!!field.checked}:{};}
   function draftValues(){return [...screen.querySelectorAll('input[id],select[id],textarea[id]')].filter(el=>isDraftField(el.id)).map(el=>({id:el.id,value:el.value,...draftChecked(el),...draftScope(el.id)}));}
-  function transferSnapshot(){return {type:'isdc-v6-snapshot',state:{...state},view:state.view,draft:draftValues()};}
+  function transferSnapshot(target=state.view){return {type:'isdc-v6-snapshot',state:{...state,view:target},view:target,draft:target===state.view?draftValues():[]};}
   function applySnapshot(data){
     if(!data||!names[data.view]||!data.state)return;
     applyingRemote=true;Object.assign(state,data.state,{view:data.view});
@@ -131,29 +138,36 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
   });
   screen.addEventListener('input',event=>{const field=event.target;if(!applyingRemote&&field.id&&isDraftField(field.id)&&'value' in field)syncChannel?.postMessage({type:'draft',sender:windowId,view:state.view,id:field.id,value:field.value,...draftChecked(field),...draftScope(field.id)});});
   screen.addEventListener('change',event=>{const field=event.target;if(!applyingRemote&&field.id&&isDraftField(field.id)&&'value' in field)syncChannel?.postMessage({type:'draft',sender:windowId,view:state.view,id:field.id,value:field.value,...draftChecked(field),...draftScope(field.id)});});
-  window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const data=event.data;if(data?.type==='isdc-v6-ready'&&!isPopout&&childWindows.has(event.source)){event.source.postMessage(transferSnapshot(),event.origin);}else if(data?.type==='isdc-v6-snapshot'&&isPopout&&event.source===window.opener){applySnapshot(data);}});
+  window.addEventListener('message',event=>{if(ended||event.origin!==location.origin)return;const data=event.data;if(data?.type==='isdc-v6-ready'&&childWindows.has(event.source)){if(event.source.closed){childWindows.delete(event.source);return;}event.source.postMessage(transferSnapshot(childWindows.get(event.source)),event.origin);}else if(data?.type==='isdc-v6-snapshot'&&isPopout&&event.source===window.opener){applySnapshot(data);}});
   if(isPopout){document.body.classList.add('popup-mode');workWindow.classList.add('expanded');window.addEventListener('load',()=>window.opener?.postMessage({type:'isdc-v6-ready'},location.origin));}
   let savedRect=null;
-  function expand(){const button=document.getElementById('window-expand');if(!workWindow.classList.contains('expanded')){savedRect={left:workWindow.style.left,top:workWindow.style.top,width:workWindow.style.width,height:workWindow.style.height};workWindow.classList.add('expanded');Object.assign(workWindow.style,{left:'84px',top:'118px',width:'calc(100vw - 92px)',height:'calc(100vh - 149px)'});button.setAttribute('aria-label','작업 창 작은 크기로 복원');button.title='작은 크기로 복원'}else{workWindow.classList.remove('expanded');Object.assign(workWindow.style,savedRect||{left:'',top:'',width:'',height:''});button.setAttribute('aria-label','작업 창 확장');button.title='확장';fitWindow()}document.getElementById('window-title').focus()}
+  function expand(){const button=document.getElementById('window-expand');if(!workWindow.classList.contains('expanded')){savedRect={left:workWindow.style.left,top:workWindow.style.top,width:workWindow.style.width,height:workWindow.style.height};workWindow.classList.add('expanded');fitExpandedWindow();button.setAttribute('aria-label','작업 창 작은 크기로 복원');button.title='작은 크기로 복원'}else{workWindow.classList.remove('expanded');Object.assign(workWindow.style,savedRect||{left:'',top:'',width:'',height:''});button.setAttribute('aria-label','작업 창 확장');button.title='확장';fitWindow()}document.getElementById('window-title').focus()}
   document.getElementById('window-expand').addEventListener('click',expand);
-  document.getElementById('window-popout').addEventListener('click',()=>{
-    const url=new URL(location.href);url.searchParams.set('popout','1');url.hash=state.view;
+  function openTaskWindow(target){
+    if(ended||!Object.hasOwn(names,target))return;
+    const url=new URL(location.href);url.searchParams.set('popout','1');url.hash=target;
     const feedback=document.getElementById('popout-feedback');
     let child=null;
-    try{child=window.open(url.href,`isdc-odt-v6-${state.view}`,'popup=yes,width=1280,height=800,resizable=yes,scrollbars=no');}catch{}
+    for(const [candidate,view]of childWindows){if(candidate.closed)childWindows.delete(candidate);else if(view===target)child=candidate;}
+    try{child??=window.open(url.href,`isdc-odt-v6-${target}`,'popup=yes,width=1280,height=800,resizable=yes,scrollbars=no');}catch{}
+    if(ended)return;
     if(!child){feedback.hidden=false;feedback.textContent='브라우저에서 별도 창 열기가 차단되었습니다.';return;}
-    childWindows.add(child);feedback.hidden=true;try{child.focus();}catch{}
+    childWindows.set(child,target);feedback.hidden=true;try{child.focus();}catch{}
+    if(ended)return;
     // A fresh window requests its snapshot after loading; an existing named window receives it here.
-    try{if(child.location.origin===location.origin&&child.document.readyState==='complete')child.postMessage(transferSnapshot(),location.origin);}catch{}
-  });
+    try{if(child.location.origin===location.origin&&child.document.readyState==='complete')child.postMessage(transferSnapshot(target),location.origin);}catch{}
+  }
+  document.getElementById('window-popout').addEventListener('click',()=>openTaskWindow(state.view));
   document.getElementById('window-minimize').addEventListener('click',()=>{workWindow.hidden=true;restoreGlobeSurface();resizeWorkspaceGlobe();showShelf(true);shelf.textContent=`${names[state.view]} 창 다시 열기`;shelf.focus()});
   document.getElementById('window-close').addEventListener('click',()=>{if(isPopout){window.close();return;}workWindow.hidden=true;restoreGlobeSurface();resizeWorkspaceGlobe();showShelf(false);document.querySelector('#rail-groups button')?.focus()});
   shelf.addEventListener('click',()=>{workWindow.hidden=false;if(state.view==='wall')mountWorkspaceWall(document.getElementById('wall-globe'),document.getElementById('wall-globe-caption'));resizeWorkspaceGlobe();fitWindow();showShelf(false);document.getElementById('window-title').focus()});
   document.getElementById('launcher-close').addEventListener('click',()=>{launcher.hidden=true;document.querySelector('#rail-groups button[aria-pressed=true]')?.focus()});
   const dragTarget=document.getElementById('window-titlebar'),resizeTarget=document.getElementById('resize-handle');
   // Keep the entire window between the navigation rail, header and footer.
+  function fitExpandedWindow(){if(isPopout)return;const area=document.getElementById('desktop').getBoundingClientRect();Object.assign(workWindow.style,{left:area.left+'px',top:area.top+'px',width:area.width+'px',height:area.height+'px'});}
+  const desktopSizeObserver=window.ResizeObserver?new window.ResizeObserver(()=>{if(!workWindow.hidden&&workWindow.classList.contains('expanded'))fitExpandedWindow();}):null;desktopSizeObserver?.observe(document.getElementById('desktop'));window.addEventListener('pagehide',event=>{if(!event.persisted)desktopSizeObserver?.disconnect();});
   function fitWindow(){
-    if(workWindow.hidden||workWindow.classList.contains('expanded'))return;
+    if(workWindow.hidden)return;if(workWindow.classList.contains('expanded')){fitExpandedWindow();return;}
     const rect=workWindow.getBoundingClientRect();
     const width=Math.min(rect.width,Math.max(0,innerWidth-88));
     const height=Math.min(rect.height,Math.max(0,innerHeight-145));
@@ -201,7 +215,7 @@ import {showWorkspaceOrbit,applyWorkspaceDraft,bindWorkspaceView,readWorkspaceCo
   window.addEventListener('resize',()=>{finishGesture?.();fitWindow()});
   document.addEventListener('click',e=>{const t=e.target.closest('[data-wall-scope],[data-view],[data-sat],[data-follow],[data-reset],[data-case],[data-normal],[data-remove],[data-edit],[data-clear-events],[data-inject],[data-uninject],[data-run]');if(!t)return;
     if(t.dataset.wallScope){setWorkspaceWallScope(t.dataset.wallScope)}
-    else if(t.dataset.view){openView(t.dataset.view)}
+    else if(t.dataset.view){let parent=t,linked=false;while(parent){if(parent===screen){linked=true;break;}parent=parent.parentElement;}if(linked){e.preventDefault();openTaskWindow(t.dataset.view);}else openView(t.dataset.view)}
     else if(t.dataset.sat){state.sat=t.dataset.sat;state.follow=false;openView('satellite')}
     else if(t.hasAttribute('data-follow')){state.follow=!state.follow;render()}
     else if(t.hasAttribute('data-reset')){state.sat='';state.follow=false;render()}

@@ -1,0 +1,29 @@
+/* Integration presentation areas reuse the mounted settings form and its controller. */
+.work-window[data-work-layout] #screen>#source-module-settings>.integration-body{display:flex;flex-direction:column;gap:8px;overflow:hidden;padding:10px}
+#source-module-settings .integration-disclosure{flex:0 0 auto;max-height:22%;overflow:auto;font-size:12px}
+#source-module-settings .integration-disclosure p{margin:6px 0;overflow-wrap:anywhere}
+#source-module-settings .integration-controls{display:flex;flex:0 0 auto;flex-wrap:wrap;align-items:center;gap:6px}
+#source-module-settings .integration-controls label{display:flex;gap:6px;align-items:center}
+#source-module-settings .integration-controls p{flex-basis:100%;margin:0;font-size:12px;overflow-wrap:anywhere;max-height:64px;overflow:auto}
+#source-module-settings .integration-areas{display:flex;flex:0 0 auto;flex-wrap:wrap;gap:6px}
+#source-module-settings button{padding:6px 9px;border:1px solid var(--line);border-radius:5px;background:transparent;color:inherit;cursor:pointer}
+#source-module-settings button[aria-pressed=true]{background:var(--accent,#237285);color:var(--text,#fff)}
+#source-module-settings button:focus-visible{outline:2px solid #83d9ef;outline-offset:1px}
+#source-module-settings .integration-region{flex:1;min-height:0;min-width:0;overflow:auto;overscroll-behavior:contain}
+#source-module-settings .integration-region[hidden]{display:none!important}
+#source-module-settings .integration-region h3{margin:0 0 8px}
+#source-module-settings .integration-region details{padding:8px;margin-bottom:6px;border:1px solid var(--line);border-radius:5px}
+#source-module-settings .integration-links-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:12px;height:100%;min-height:0}
+#source-module-settings #st-links,#source-module-settings .integration-link-editor{min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain}
+#source-module-settings #st-editor{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#source-module-settings #st-editor label{display:flex;flex-direction:column;gap:4px;min-width:0}
+#source-module-settings #st-editor input,#source-module-settings #st-editor select{width:100%;min-width:0;max-width:100%}
+#source-module-settings #st-editor input[type=checkbox]{width:auto;align-self:flex-start}
+#source-module-settings table{width:100%;border-collapse:collapse;font-size:12px}
+#source-module-settings th,#source-module-settings td{padding:7px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+#source-module-settings .integration-link-editor p{font-size:12px;overflow-wrap:anywhere}
+@container (max-width:720px){
+ #source-module-settings .integration-links-layout{grid-template-columns:minmax(0,1fr);height:auto}
+ #source-module-settings #st-links{max-height:240px}
+ #source-module-settings .integration-link-editor{overflow:visible}
+}

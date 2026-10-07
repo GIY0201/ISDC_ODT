@@ -1,6 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fixture} from './workspace_fixture.mjs';
+test('linked task opens its own named target without replacing the current DOM or sending a foreign form draft',async()=>{
+ let opened;const messages=[],child={location:{origin:'http://localhost'},document:{readyState:'complete'},focus(){},postMessage:(value,origin)=>messages.push({value,origin})};const f=fixture(1280,720,{open:(url,name)=>{opened={url,name};return child;}});try{
+  const field=f.get('ground-height'),viewer=f.viewers[0],title=f.get('window-title').textContent;field.value='unsaved source';field.focus();const target=f.doc.createElement('button');target.dataset.view='mission';f.get('screen').append(target);const counts=f.counts();await f.doc.dispatch('click',{target});
+  assert.equal(new URL(opened.url).hash,'#mission');assert.equal(opened.name,'isdc-odt-v6-mission');assert.equal(f.get('window-title').textContent,title);assert.equal(f.get('ground-height'),field);assert.equal(field.value,'unsaved source');assert.equal(f.viewers[0],viewer);assert.deepEqual(f.counts(),counts);assert.equal(messages[0].value.view,'mission');assert.equal(messages[0].value.state.view,'mission');assert.deepEqual(structuredClone(messages[0].value.draft),[]);
+  await f.win.dispatch('message',{origin:'http://localhost',source:child,data:{type:'isdc-v6-ready'}});assert.equal(messages.at(-1).value.view,'mission');assert.deepEqual(structuredClone(messages.at(-1).value.draft),[]);
+ }finally{f.dispose();}
+});
+test('blocked linked task stays in its current window and closed child readiness cannot resurrect delivery',async()=>{
+ let child=null;const messages=[],f=fixture(1280,720,{open:()=>child});try{const target=f.doc.createElement('button');target.dataset.view='mission';f.get('screen').append(target);const field=f.get('ground-height');field.value='321';await f.doc.dispatch('click',{target});assert.match(f.get('popout-feedback').textContent,/차단/);assert.equal(f.get('window-title').textContent,'지상국·통신');assert.equal(f.get('ground-height'),field);
+  child={closed:false,location:{origin:'http://localhost'},document:{readyState:'loading'},focus(){},postMessage:value=>messages.push(value)};await f.doc.dispatch('click',{target});child.closed=true;await f.win.dispatch('message',{origin:'http://localhost',source:child,data:{type:'isdc-v6-ready'}});assert.equal(messages.length,0);
+ }finally{f.dispose();}
+});
+test('linked target reuses its owned live window and popup roles can parent a further linked task',async()=>{
+ let opens=0;const messages=[],child={location:{origin:'http://localhost'},document:{readyState:'complete'},focus(){},postMessage:value=>messages.push(value)},f=fixture(1280,720,{popout:true,opener:{postMessage(){}},open:()=>{opens++;return child;}});try{
+  const target=f.doc.createElement('button');target.dataset.view='mission';f.get('screen').append(target);await f.doc.dispatch('click',{target});await f.doc.dispatch('click',{target});assert.equal(opens,1);assert.equal(messages.length,2);
+  await f.win.dispatch('message',{origin:'http://localhost',source:child,data:{type:'isdc-v6-ready'}});assert.equal(messages.at(-1).view,'mission');assert.deepEqual(structuredClone(messages.at(-1).draft),[]);const count=messages.length;await f.win.dispatch('pagehide',{persisted:false});await f.win.dispatch('message',{origin:'http://localhost',source:child,data:{type:'isdc-v6-ready'}});assert.equal(messages.length,count);assert.notEqual(child.closed,true);
+ }finally{f.dispose();}
+});
+test('page exit during child focus cannot publish or register late popup drafts',async()=>{
+ const messages=[];let f;const child={location:{origin:'http://localhost'},document:{readyState:'complete'},focus(){void f.win.dispatch('pagehide',{persisted:false});},postMessage:value=>messages.push(value)};f=fixture(1280,720,{open:()=>child});try{await f.get('window-popout').dispatch('click');assert.equal(messages.length,0);await f.win.dispatch('message',{origin:'http://localhost',source:child,data:{type:'isdc-v6-ready'}});assert.equal(messages.length,0);assert.notEqual(child.closed,true);}finally{f.dispose();}
+});
 
 test('restore shelf is absent without a minimized target and restores the same window when present',async()=>{
  const f=fixture();try{

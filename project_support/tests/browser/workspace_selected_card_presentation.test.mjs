@@ -8,7 +8,7 @@ test('example alert is initially hidden and reserves no app row',()=>{
  assert.match(html,/<div[^>]*class="alertline"[^>]*hidden/);
  const rows=[...css.matchAll(/\.app\{[^}]*grid-template-rows:([^;}]+)/g)].map(match=>match[1].trim());
  assert.ok(rows.length>=2);
- for(const row of rows)assert.match(row,/^(?:50|44)px 32px minmax\(0,1fr\)$/);
+ assert.equal(rows.at(-1),'auto minmax(0,1fr)');
  assert.match(css,/\.alertline\[hidden\]\{display:none!important\}/);
  assert.match(html,/id="alert-text"/);
  assert.match(html,/id="alert-open"/);
