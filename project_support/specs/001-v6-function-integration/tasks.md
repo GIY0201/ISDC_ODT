@@ -620,3 +620,5 @@ quality → independentreviews/fullsuites/actualtworesolutionmount/liveGPU. Befo
 implementation reconcile ADR0048 and network_timeline contract; no code changes
 against stale design. N017/N018 can proceed separately only after their exact
 contracts/source behaviors are verified. Optical-only N012-N014do notcloseN016.
+- [ ] N017a Meaningful RED then existingfabric-owner readonly pollStatus/cancelStatusPoll/moduleStatus and bounded48 qualityHistory; preserve exact snapshot/command/review, endpoint/instance/late/disposal guards. ADR0049; independent review before UI assembly.
+- [ ] N017b Meaningful RED then activeground-only30second status poll and original sparkline with historical UTC/provenance, scoped cleanup and exactapproval unchanged. Fullfuturepass/station/route items of N017 remain open after these subtasks.

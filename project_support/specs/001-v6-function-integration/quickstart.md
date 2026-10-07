@@ -151,3 +151,9 @@ config/failure/disposal revocation, and unchanged exactsend/route/action rejecti
 RunfullNode andpytest plus actual8891tworesolution/GPUchecks; no source reset or
 clock/Viewer/nativeinstall/portchange. At this designcheckpoint N016 is notready
 forlive successclaims, and N017/N018 remainexplicit sourcefunction residuals.
+N017 status/history validation: test active-only30second timers, duplicate status
+dedupe, hidden/late/endpoint/command/disposal cancellation and uncertain-review
+preservation. Compare49 verified quality receipts→48 samples, unknown vs unusable,
+natural UTC historical retention and foreigninstance scope pruning. Confirm source
+sparkline/labels and exact action buttons in two resolutions. Fullfuturepass and
+station/route/GPU gates remain separate. See contracts/network_lifecycle.md.

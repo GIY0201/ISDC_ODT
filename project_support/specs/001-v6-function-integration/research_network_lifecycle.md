@@ -38,4 +38,28 @@ pushHistory에는 삭제 계약이 없어 scope가 섞일 수 있으므로 소�
 
 권장 구현 순서: 상태 조회와 품질 이력, 표시 전용 미래 통과 소유자,
 기존 3D 지상국 선택/초점과 OISL·ground 경로 강조. N018의 주기적 guarded
-교환/DTN은 정확 권한 계약을 별도로 설계한다. 전체 T077을 완료로 닫지 않는다.
+ 교환/DTN은 정확 권한 계약을 별도로 설계한다. 전체 T077을 완료로 닫지 않는다.
+
+## 반복 취소 문제의 Context7 확인
+
+설치된 Context7 CLI로 /mdn/content의 공식 AbortSignal 및 Fetch 문서를 조회했다.
+이미 취소된 신호의 초기 확인, await 경계의 취소 확인, fetch 완료 뒤 본문
+소비 전 취소가 별도 실패 경계임을 대조했다. 현재 signal.aborted 판정과
+AbortController 연결은 이 의미와 일치한다. 페이지/endpoint의 현재 소유권은
+애플리케이션 계약이므로 추가 ticket/endpoint 검증을 유지한다. 문서 조회만으로
+source 권한의 재진입 문제가 해결됐거나 실제 운용 검증됐다고 주장하지 않는다.
+참고: https://github.com/mdn/content/blob/main/files/en-us/web/api/abortsignal/index.md
+및 https://github.com/mdn/content/blob/main/files/en-us/web/api/fetch_api/using_fetch/index.md.
+
+추가 원본 직접 대조: communication.js 64행의 satellites()는
+constellation.deployed를 사용한다. 263행 computePasses는 선택 지상국, 현재
+분석 UTC, 3시간과 node별 maxPasses:3을 사용한다. 표시 전용 future port도
+전체 수락 배치를 유지하며 node별 첫3구간의 원본 표시 제한을 대조한다.
+현재 초안의 임의 일부나 카탈로그 선택만으로 배치 명부를 대체하지 않는다.
+
+추가 취소 회귀에서 abort 이벤트의 외부 리스너가 조회를 다시 시작하는
+경우를 확인했다. Context7의 MDN AbortSignal abort-event 문서를 다시 대조했고,
+취소 중 새 조회의 시작을 막는 애플리케이션 경계와 종료 후 소유권 확인을
+함께 검증한다. 문서가 보장하는 취소 이벤트와 실제 제품의 상태 소유권을
+구분한다. 공식 참고:
+https://github.com/mdn/content/blob/main/files/en-us/web/api/abortsignal/abort_event/index.md.

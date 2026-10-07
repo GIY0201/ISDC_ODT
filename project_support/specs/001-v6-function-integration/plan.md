@@ -576,3 +576,14 @@ NativeNetworkScene receives optional sampledNetwork read/verify ports with curre
 native endpoints, final ownerproof aftercallbacks and Viewer ownership. Contract:
 contracts/network_timeline.md. Independent design review is running before code.
 No newnative/history/clock/backendmath; N017/N018remain original lifecycle residuals.
+
+### N017 status and quality history implementation prerequisite
+
+ADR0049 defines readonly pollStatus/cancelStatusPoll/moduleStatus/qualityHistory in
+the same fabric owner; existing snapshot and explicit command/review behavior stay
+unchanged. Active ground UI owns one30second status timer, scoped cancellation and
+original drawSparkline. Only actually verified guarded sends add up to48 past link
+quality points; no sampled view or status response grants new current authority.
+Research: research_network_lifecycle.md; contract: contracts/network_lifecycle.md.
+Fullfuturepass visual authority and station/route interactions remain later N017
+subtasks; N018 exchange and whole T075–T084/T032 acceptance are not closed.

@@ -104,3 +104,11 @@ pending retains still-valid analysis with availability=pending. Failure, invalid
 authority, changed source/config/node/station/fault scope, command and disposal
 invalidate at existing boundaries; pending alone never clears accepted analysis.
 Exact network/fabric/action DTOs are unchanged. See ADR0048/network_timeline contract.
+N017 readonly status is a copied observation separate from the existing command
+snapshot. Bounded quality samples are historical presentation records owned by the
+existing fabric exchange, with quality/UTC/instance/sequence/hash/request/link
+provenance. Maximum48 per accepted link identity; endpoint/module instance changes
+clear history and new accepted membership prunes removed links. UTC/hash/sequence/
+request change records another past sample rather than clearing all history.
+No parallel mutable current-state owner.
+ADR0049 and contracts/network_lifecycle.md define lifecycle and failure behavior.

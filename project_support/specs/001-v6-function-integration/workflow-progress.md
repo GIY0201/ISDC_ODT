@@ -1291,3 +1291,29 @@ opaque current display authority and complete source/hash/station checks, retain
 exactmission approval untouched. Automatic module status polling must not invoke
 explicit review refresh that clears an uncertain mutation. Owner stage=plan before
 dependent N017 implementation; no API/contract weakening or automatic pause.
+
+2026-10-07 N017a/b prerequisite: actualspeckit-plan read/setup preservedplan,
+extensionsabsent, constitution1.2.0 andrequirementsquality8/8 unchanged. ADR0049,
+spec/plan/data-model/contracts/quickstart/tasks amended. Independent read-only
+speckit-analyze found ambiguous historyscope; repaired endpoint/moduleinstance/
+membership boundaries consistently and rereview found no blocking finding.
+Captureendpoint must be passed asclient.status target; completion-only comparison
+is insufficient. Selectedstage implement N017a/b after meaningfulRED. FullN017
+futurepasses/OISLroute/station andN018/alloriginalrequirements remainopen.
+
+N017a/b product checkpoint under verification: existing fabric owner has readonly
+poll/status and accepted48-sample history; active ground-only30second timer and
+original sparkline are connected. Meaningful missing-API/UI RED plus independent
+command-entry, disposal/native-input and abort-listener reentry RED were repaired.
+Final independent owner review35PASS; related UI/owner/API focus58PASS.
+FullNode1465PASS0FAIL0SKIP25136.1955ms exit0 (handle77220). FullPython handle49293
+was still running at that record; final result965PASS1existingPillowSKIP8existing
+ERFAwarnings237.35s. Context7 actual MDN AbortSignal,
+fetch and abort-event queries are recorded in research_network_lifecycle.md.
+Actual8891 readonly two-resolution validation was queued to the existing Aside
+session; no new server/SIM/deployment reset or fabricated accepted quality.
+New research_future_pass_connection.md records fullacceptedroster/source3h/max3,
+strictanalysisUTC>60000 and original12display, station ownership and mixedroute
+styles. Next earliest owner stage is plan for these remaining internal contracts;
+actualsetup-plan preservedexistingplan, extensionsabsent, constitution1.2.0.
+N017a/b actualscreen acceptance and wholeN017/N018/T075–T084/T032 remain OPEN.

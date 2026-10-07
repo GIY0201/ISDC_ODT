@@ -249,3 +249,23 @@ validation/sampled_optical_connection.md에 기록했다. 실제 GPU 성능이�
 조회/통과/품질 이력, N018 정확 권한의 교환, 전체 T075–T084는 계속 열려 있다.
 고정8891 서버, 사용자 실행과 초안, 원본 참조, 같은 Git 브랜치를 보존했다.
 검증 문서: project_support/specs/001-v6-function-integration/validation/sampled_network_connection.md.
+
+## 2026-10-07 통신 모듈 조회와 과거 품질 이력 연결
+
+선배의 활성 화면 30초 조회와 48개 품질 이력을 기존 fabric 소유자와
+지상 UI에 연결했다. GET 조회는 미확인 요청의 검토 상태를 해제하거나
+전송하지 않는다. 실제 수락된 링크 품질만 원본 drawSparkline으로 표시하며
+분석 UTC와 과거 출처를 남긴다. 이력이 없으면 미확인이다.
+
+조회 취소, 명령 시작, 종료, endpoint 확인 중 native 입력 변경과 abort
+콜백 재진입을 실패 시험으로 재현하고 수정했다. 독립 소유자 검토35개와
+관련 조립 시험58개 통과. 전체 Node1465PASS0FAIL0SKIP25136.1955ms,
+Python965PASS1기존PillowSKIP8기존ERFA경고237.35s. Context7의 공식 MDN
+AbortSignal/fetch/abort-event 문서를 조회해 취소 의미를 대조했다.
+
+실제 8891 화면 검증은 기존 Aside 세션에서 병렬 진행 중이다. 고정 포트,
+서버, 사용자 SIM 실행과 원본 입력은 이 코드 변경으로 재시작하거나
+초기화하지 않았다. N017 전체 미래 통과/3D 선택/경로와 N018, 실제 화면,
+GPU 및 전체 T075–T084 수용은 미완료이다. 다음 원본 조사 결과는
+research_future_pass_connection.md에 보존했다. 연결 증거:
+project_support/specs/001-v6-function-integration/validation/network_status_history_connection.md.

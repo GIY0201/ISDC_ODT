@@ -2,14 +2,48 @@ import {createGroundStationEditorTools} from './ground_station_editor.js';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const numeric=['latitude','longitude','altitude_km','dish_m','min_elevation_deg'];
 // Reuses original ground store and station editor; no native/clock/Viewer/transport owner.
-export function createGroundNetworkPanel({store,model,network,fabric=null,diagram=null,networkScene=null,contactWindows=null,document,host,refreshRuntime}={}) {
+export function createGroundNetworkPanel({store,model,network,fabric=null,diagram=null,networkScene=null,contactWindows=null,document,host,refreshRuntime,drawSparkline=null}={}) {
  let root=null,view=null,dead=false,editorId=null,externalPending=false,message='',busy=false,page=0;
  const editor=createGroundStationEditorTools({model,escape}),removers=[];
  const routeChoice={source:'',target:'',objective:'balanced'};
  let passReceipt=null,passAbort=null,passGeneration=0,passBusy=false,passError='',passStation='',passPage=0;
  let selection=null,groundLinksVisible=true,coverageVisible=true,paintGeneration=0;
  const hasSampled=typeof network.networkSampledPresentation==='function'&&typeof network.verifySampledNetworkPresentation==='function';
+ const hasObservation=typeof fabric?.pollStatus==='function'&&typeof fabric?.cancelStatusPoll==='function'&&typeof fabric?.moduleStatus==='function';
+ let statusTimer=null,statusActive=false,statusGeneration=0,statusCompletedAt='',statusError='';
  const get=id=>root?.querySelector('#ground-node-'+id);
+ function clearObservations(){const label=get('module-status'),quality=get('quality-status'),canvas=get('quality-history');if(label)label.textContent='';if(quality)quality.textContent='';if(canvas)canvas.hidden=true;}
+ function stopStatusPolling(){if(!statusActive)return;statusActive=false;statusGeneration++;if(statusTimer!==null){host.clearTimeout(statusTimer.id);statusTimer=null;}fabric.cancelStatusPoll();clearObservations();}
+ function installStatusTimer(){
+  if(!statusActive||dead||statusTimer!==null)return;
+  const owned={id:null,generation:statusGeneration};statusTimer=owned;
+  owned.id=host.setTimeout(()=>{if(statusTimer!==owned||!statusActive||dead||view!=='ground'||owned.generation!==statusGeneration)return;statusTimer=null;installStatusTimer();void pollStatus();},30000);
+ }
+ async function pollStatus(){
+  if(!statusActive||dead||view!=='ground')return;const generation=statusGeneration;
+  try{const result=await fabric.pollStatus();if(dead||!statusActive||view!=='ground'||statusGeneration!==generation)return;if(result!==null)statusCompletedAt=new Date().toISOString();statusError='';}
+  catch(error){if(dead||!statusActive||statusGeneration!==generation)return;statusError=String(error?.message??error);}
+  if(!dead&&statusActive&&view==='ground'&&statusGeneration===generation)update();
+ }
+ function startStatusPolling(){if(!hasObservation||statusActive||dead||view!=='ground')return;statusActive=true;statusGeneration++;statusCompletedAt='';statusError='';installStatusTimer();void pollStatus();}
+ function renderObservations(visual,valid,current){
+  if(!current())return false;
+  let moduleSignature=null;
+  if(hasObservation){try{const state=fabric.moduleStatus();if(!current())return false;moduleSignature=JSON.stringify(state);get('module-status').textContent=state.status==='valid'?`모듈 상태 조회 · ${statusCompletedAt||'조회 중'} · 실행 ${state.value?.instance_id??'미확인'} · 응답 번호 ${state.value?.sequence??'미확인'} · 통신망 수락과 별개`:state.status==='pending'?'모듈 상태 조회 중 · 통신망 수락과 별개':`모듈 상태 조회 미확인 · ${statusError||state.error||'자료 없음'}`;}catch{if(current())get('module-status').textContent='모듈 상태 조회 미확인';}}
+  const label=get('quality-status'),canvas=get('quality-history');if(!label||!canvas)return current();label.textContent='';canvas.hidden=true;
+  if(!valid||selection?.type!=='link'||!visual?.network?.links?.some(link=>link.id===selection.id))return current();
+  try{
+   const history=fabric?.qualityHistory?.(selection.id)??[];if(!current())return false;
+   if(!Array.isArray(history)||history.length>48||history.some(p=>!Number.isFinite(p.quality)||p.quality<0||p.quality>100||typeof p.utc!=='string'||!Number.isFinite(Date.parse(p.utc))))throw Error('history unavailable');
+   if(!history.length||typeof drawSparkline!=='function'){label.textContent='과거 모의 링크 품질 이력 미확인';return current();}
+   const captured=JSON.stringify(history);canvas.hidden=false;drawSparkline(canvas,history.map(p=>p.quality));if(!current())return false;
+   if(moduleSignature!==null){const status=fabric.moduleStatus();if(!current())return false;if(JSON.stringify(status)!==moduleSignature)get('module-status').textContent='모듈 상태 조회 미확인 · 표시 중 상태 변경';}
+   const fresh=fabric.qualityHistory(selection.id);if(!current())return false;
+   if(JSON.stringify(fresh)!==captured)throw Error('history scope changed');
+   const last=history.at(-1);label.textContent=`과거 모의 링크 품질 · ${history.length}개 · 마지막 분석 UTC ${last.utc} · 실행 ${last.instance_id} · 응답 ${last.sequence} · 현재 품질·실제 RF 미확인`;
+  }catch{if(current()){canvas.hidden=true;label.textContent='과거 모의 링크 품질 이력 미확인';}}
+  return current();
+ }
  function clearSampledUi(){
   if(!hasSampled||!root)return;
   for(const id of ['diagram','diagram-detail','results','fabric-results','fabric-custody','fabric-hops']){const item=get(id);if(item){item.textContent='';item.innerHTML='';}}
@@ -80,6 +114,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   root=document.createElement('section');root.id='ground-node-network';root.className='panel';
   root.innerHTML='<header><h2>노드 통신망과 지상국 편집</h2></header><div class="body"><p>선배 프로토타입의 지상국 설정과 Kepler+J2 통신 기하입니다. 안테나·대역은 대표 설정이며 실제 수신 미확인입니다. 저장 궤도 RF/접촉 계획과 별개입니다. 계산 전 표시 시계를 정지하면 같은 UTC의 결과를 확인할 수 있습니다.</p><label>추가 지상국 <select id="ground-node-preset"></select></label><button type="button" id="ground-node-add">지상국 추가</button><label>편집 지상국 <select id="ground-node-select"></select></label><button type="button" id="ground-node-edit">선택 지상국 편집</button><button type="button" id="ground-node-reload">저장 설정 다시 불러오기</button><button type="button" id="ground-node-reset">기본 지상국으로 초기화</button><form id="ground-node-editor" class="form"></form><p id="ground-node-status" role="status"></p><button type="button" id="ground-node-calculate">SIM 상태 조회 후 노드 통신망 계산</button><p id="ground-node-summary"></p><h3>배치 위성의 미래 지상국 통과 · SIM</h3><p>서버 수락 배치와 정지한 표시 UTC가 필요합니다. 통과는 고각 마스크에 따른 기하이며 실제 RF 수신 가능 여부는 미확인입니다.</p><label>표시 지상국 <select id="ground-node-pass-station"></select></label><button type="button" id="ground-node-pass-query">앞으로 3시간 native 통과 조회</button><button type="button" id="ground-node-pass-cancel">조회 취소</button><p id="ground-node-pass-status" role="status"></p><div id="ground-node-pass-results"></div><button type="button" id="ground-node-pass-prev">이전 통과</button><button type="button" id="ground-node-pass-next">다음 통과</button><button type="button" id="ground-node-scene-links" aria-pressed="true">지상 링크 3D</button><button type="button" id="ground-node-scene-coverage" aria-pressed="true">대표 고도 마스크 커버리지 3D · SIM</button><p id="ground-node-diagram-status"></p><div id="ground-node-diagram" style="max-height:420px;overflow:auto"></div><div id="ground-node-diagram-detail"></div><div id="ground-node-results"></div><button type="button" id="ground-node-prev">이전 링크</button><button type="button" id="ground-node-next">다음 링크</button></div>';
   document.getElementById('screen').prepend(root);close();
+  const observation=document.createElement('section');observation.innerHTML='<p id="ground-node-module-status" role="status"></p><p id="ground-node-quality-status" role="status"></p><canvas id="ground-node-quality-history" width="320" height="80" aria-label="선택 링크의 과거 모의 품질" hidden></canvas>';root.append(observation);
   const controls=document.createElement('section');controls.id='ground-node-fabric';
   controls.innerHTML='<h3>모의 통신 경로와 DTN</h3><p>선배 프로토타입의 통신 모듈에 계산된 통신망을 명시적으로 전송합니다. DTN은 연결이 없을 때 데이터를 저장했다가 전달하는 모의 계산이며 실제 패킷·장비 전송은 미확인입니다.</p><button type="button" id="ground-node-fabric-send">계산된 통신망 전송</button><button type="button" id="ground-node-fabric-refresh">모듈 상태 조회</button><p id="ground-node-fabric-status" role="status"></p><label>출발 노드 <select id="ground-node-fabric-source"></select></label><label>목적 노드 <select id="ground-node-fabric-target"></select></label><label>경로 목적 <select id="ground-node-fabric-objective"><option value="balanced">균형</option><option value="latency">지연 최소</option><option value="reliability">신뢰도</option></select></label><button type="button" id="ground-node-fabric-route">경로 조회</button><p id="ground-node-fabric-dtn"></p><div id="ground-node-fabric-results"></div><div id="ground-node-fabric-custody"></div><p id="ground-node-fabric-path"></p><div id="ground-node-fabric-hops"></div>';
   (root.querySelector('.body')||root).append(controls);
@@ -124,6 +159,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   try{
   if(!renderFabric(snapshot,valid,visual,visualValid,sampled!==null,visualCurrent)){if(current())clearSampledUi();return;}
   if(!visualCurrent()){if(current())clearSampledUi();return;}renderContacts();if(!visualCurrent()){if(current())clearSampledUi();return;}
+  if(!renderObservations(visual,visualValid,visualCurrent)){if(current()){clearObservations();clearSampledUi();}return;}
   get('results').textContent='';get('results').innerHTML='';
   if(!visualValid){get('summary').textContent=snapshot?.error||'현재 UTC·입력의 검증된 노드 통신망 결과 없음';get('prev').disabled=true;get('next').disabled=true;return;}
   const links=visual.network.links;page=Math.min(page,Math.max(0,Math.ceil(links.length/50)-1));
@@ -219,6 +255,6 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   else{store.load();network.clearNetwork();update();}
  };
  host.addEventListener('storage',external);
- return Object.freeze({show(next){paintGeneration++;view=next;if(next!=='ground'){cancelContacts();networkScene?.setActive?.(false);networkScene?.clear();clearSampledUi();}else networkScene?.setActive?.(true);update();},update,hasExternalChange:()=>externalPending,
-  destroy(){if(dead)return;paintGeneration++;clearSampledUi();dead=true;cancelContacts();networkScene?.setActive?.(false);networkScene?.clear();unsubscribe();host.removeEventListener('storage',external);for(const remove of removers.splice(0))remove();root?.remove();root=null;}});
+ return Object.freeze({show(next){paintGeneration++;view=next;if(next!=='ground'){stopStatusPolling();clearObservations();cancelContacts();networkScene?.setActive?.(false);networkScene?.clear();clearSampledUi();}else networkScene?.setActive?.(true);update();if(next==='ground')startStatusPolling();},update,hasExternalChange:()=>externalPending,
+  destroy(){if(dead)return;paintGeneration++;stopStatusPolling();clearObservations();clearSampledUi();dead=true;cancelContacts();networkScene?.setActive?.(false);networkScene?.clear();unsubscribe();host.removeEventListener('storage',external);for(const remove of removers.splice(0))remove();root?.remove();root=null;}});
 }

@@ -235,4 +235,11 @@ unknowncurrentfabricquality. Leaveground/explicitclear disable publication until
 explicitreactivation; stillvalidoldownerlease cannot revivehiddenresources.
 Ordinaryperiodicpending retains verifiedanalysis; failures/invalidauthority clear.
 Currentexactaction/fabric/mission/data checks and wholeT032/tworesolution gates are
-unchanged. N016 is designonly untilits implementation/verification; N017/N018remain.
+unchanged. N016 implementation is checkpointed in a9a5495 with full regression
+evidence; actual screen/GPU acceptance and N017/N018 remain open.
+
+N017 partial contract: source30second readonly module status and48 past quality
+points connect through ADR0049 without clearing explicit review or changing exact
+command approval. History is past verified module simulation, never actualRF or
+current sampled quality. Full futurepass, station focus and route emphasis remain
+required N017 items; this partial delivery cannot close whole T077 or T075–T084.
