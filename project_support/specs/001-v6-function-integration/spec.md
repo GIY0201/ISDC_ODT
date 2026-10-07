@@ -278,3 +278,7 @@ ADR0055/contracts/analytical_mixed_route_visual.md/T166–T168: historical captu
 ADR0056/contracts/selected_link_rf_prefill.md: missing original selected ground-link -> existing RF calculator draft flow, T169–T171. Current geometry registration/ID/endpoints only; explicit copy cancels obsolete result, all11 editable labelled source representative assumptions. No formula/API/clock/automatic query change. Precode independent analysis required; whole live/performance gates unchanged.
 
 N020: preserve original scenario:route choice handoff into existing ground panel without extra commands or approval; ADR0057 governs stale origin and hidden draft.
+
+N022: 재접속 후 저장 배치를 명시적으로 재확인할 수 있어야 한다. 기존 전체
+receipt 검증만 재사용하고 현재 초안/배치/서버 기록이 정확히 일치할 때만 기존
+수락 확인을 복구한다. 차이는 오류와 미확인으로 남긴다. ADR0059를 따른다.

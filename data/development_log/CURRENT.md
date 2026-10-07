@@ -1243,3 +1243,21 @@ feature, analyzeprerequisite RequireSpec/RequireTasks passed. ActualGitbranch st
 codex/satellite-node-integration despiteSpecKitlogicalfeature001. Code beginsonly
 againstthese stablecontracts withmeaningfulRED anddisjointownership. No newbranch,
 serverrestart/nativeinstall/source reset/GP-SIM mutation orPRwait.
+
+
+## N022 saved deployment review checkpoint
+
+ADR0059 and cached_deployment_review contract passed independent precode
+HIGH0/CRITICAL0 review. Actual547 full40 drafts/deployed definitions match but
+543 future query refuses missing accepted capability. Existing workspace now
+exposes explicit saved review through unchanged GET/private restore path.
+Meaningful missingbutton8 RED and subsequent timestamp/remount2 RED fixed before
+final12 PASS; combined closest120 PASS10454.3843ms. Independent final CLEAN:
+34 PASS1043.6703ms and existing scenario_resume53 PASS1221.3164ms. Full suite
+handles46848 Python and59088 Node running, actual isolated UI review queued.
+No server/SIM/UTC/port/branch/reset change. Whole75-84/model/twores/GPU/game/PR
+remain open. Evidence validation/cached_deployment_review.md.
+
+N022 final fullNode1943PASS0FAIL0SKIP27616.8538ms exit0 (59088), log full_N022_node.log. Python46848 and actualbutton/native flows pending.
+
+N022 final fullPython967PASS1SKIP8warnings314.65s exit0; Node1943PASS0FAIL0SKIP27616.8538ms exit0. Actual554/555 one reload/one review confirms server acceptance; complete definitions/session/savedISS exact. Local deployed record revision9->10 only (existing store confirmation persistence), not wholelocal byteexact. Browserrequestcallback empty; GET method direct measurement unproven. Original stoppedRUN health reverified12:22:07KST. T178/future/module/whole75-84/model/twores/GPU/performance/PR open.

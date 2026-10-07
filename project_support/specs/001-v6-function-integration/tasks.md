@@ -705,3 +705,7 @@ is fullnative validatedfuture flow then actual UI acceptance, not a physics stub
 ## N021 validated source clock label
 - [x] T175 ADR0058 then meaningful RED for source clock labels in existing satellite_nodes.js; keep legacy/unknown/owner/clock/button guards unchanged.
 - [x] T176 Independent scoped review/full changed JS and actual normal catalogue label before closure; whole75-84/model/GPU acceptance stays separate.
+
+## N022 explicit cached deployment review
+- [x] T177 ADR0059 independent gate then RED-first existing workspace_nodes explicit button/operation to existing reacceptCachedDeployment; exactfullcache guard retained; no mutatingAPI/scenario command.
+- [ ] T178 Independent review/full changed JS/actual reload receipt-matching or refusal evidence and current future/module native flows; whole acceptance remains separate.

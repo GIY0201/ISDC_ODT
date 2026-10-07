@@ -17,6 +17,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  let dead=false,started=false,root=null,panel=null,scene=null,display=null,deployment=null,activeSelection=false,selectedSignature=null,definitionsSignature=null,error='';
  let networkScene=null,networkSceneInput=null,groundLinksVisible=true,coverageVisible=true,networkVisualActive=false,network=null,networkComposition=0,displayLease=null;
  let tracks=true,links=true,modelsVisible=true;const readiness=new Map(),removers=[];
+ let savedRecheckJob=null,savedRecheckPromise=null,savedReceiptKnown=null;
  let restorePromise=null,scenarioReceipt=null,networkFaultSignature=null,mixedRoute=null,periodicFabric=null,analyticalFabricBinding=null;
  let futureEpoch={},futureControlDepth=0;const futureInputs=new WeakMap();const rawInputs=new WeakMap();
  const revokeFuturePassInputs=()=>{futureEpoch={};mixedRoute?.clear();};
@@ -87,7 +88,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  const verifyContinuity=hasContinuity?value=>!dead&&globe.verifyDisplayContinuity(value)===true:null;
  let storage=null;const storagePort={getItem:key=>host.localStorage.getItem(key),setItem:(key,value)=>host.localStorage.setItem(key,value)};
  try{if(host.localStorage)storage=storagePort;}catch{storage=storagePort;}
- const store=createConstellationStore({library,storage,now,verifyAcceptance:(...args)=>deployment?.verifyAcceptance(...args)===true});
+ const store=createConstellationStore({library,storage,now,verifyAcceptance:(...args)=>deployment?.verifyAcceptance(...args)===true&&(!savedRecheckJob||args[2]!=='restore'||savedRecheckCurrent(savedRecheckJob))});
  // HTTP source track grids use the source three-decimal-minute n0 period.
  const timeline=createNodeDisplayTimeline({api,periodFor:node=>Math.round(orbitElements(node.orbit)?.period/60*1000)/1000,requestId:id,yieldControl:()=>new Promise(resolve=>host.setTimeout(resolve,0)),onChange:(_snapshot,reason)=>{if(dead)return;if(reason?.kind==='communication'){refreshPanel({metadataOnly:true});return;}refreshPose();scene?.update(display?.utc??null);refreshPanel();},onError:report});
  let opticalScopeRevision=Object.freeze({});
@@ -162,6 +163,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   const native=root.querySelector('#node-native-state'),retry=root.querySelector('#nodes-retry'),calculation=timeline.snapshot();
   if(native)native.textContent=calculation.error||(!display?.utc?'공용 표시 UTC를 먼저 선택하세요.':calculation.pending?'Rust 노드 계산 중':metadata.draft_count?'Kepler+J2 모의 계산 · 실제 통신 미확인':'작업 세트에 노드가 없습니다.');
   if(retry)retry.disabled=!display?.utc||metadata.draft_count===0||calculation.pending;
+  const recheck=root.querySelector('#nodes-recheck-saved');if(recheck)recheck.disabled=!canRecheckSaved()||!!savedRecheckPromise;
   const restore=root.querySelector('#nodes-restore');if(restore)restore.disabled=!!restorePromise||(store.loaded&&state.server!==null&&!state.syncRequired&&!state.error);
   const summary=root.querySelector('#node-scene-summary');if(summary)summary.textContent=`공유 작업 세트 · 초안 ${metadata.draft_count}개 · 수락 배치 ${metadata.deployed_count}개 · ${store.deploymentConfirmed?'서버 수락 확인':'배치 수락 미확인'} · 표시 UTC ${display?.utc??'미제공'} · 실제 통신 미확인`;
   const definitions=root.querySelector('#node-scene-definitions');if(definitions&&reviewedRevision!==store.revision){reviewedRevision=store.revision;const roster=store.presentationRoster();definitions.textContent=JSON.stringify({drafts:roster.drafts,deployed:roster.deployed,selected_id:roster.selected_id},null,2);}
@@ -178,7 +180,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  }
  const editorTools=createNodeEditorTools({library,catalogElements,now});
  deployment=createDataDeployment({constellation:store,fetchImpl,createId:id,setTimer:host.setTimeout.bind(host),clearTimer:host.clearTimeout.bind(host),onChange:()=>{revokeFuturePassInputs();refreshPanel();}});
- const removeStore=store.subscribe(()=>{revokeFuturePassInputs();opticalScopeRevision=Object.freeze({});syncDefinitions();});
+ const removeStore=store.subscribe(()=>{savedReceiptKnown=null;if(savedRecheckJob)savedRecheckJob.invalidated=true;revokeFuturePassInputs();opticalScopeRevision=Object.freeze({});syncDefinitions();});
  const removeDisplay=globe.observeDisplayContext(value=>{
   if(dead)return;const previousUtc=display?.utc??null,wasProjected=projectedSim(display),previousSource=display?{...display}:null;if(previousSource)delete previousSource.utc;display=value?structuredClone(value):null;
   const lease=readContinuity?.()??null,sameContinuous=lease!==null&&lease===displayLease&&verifyContinuity?.(lease)===true;displayLease=lease;
@@ -261,14 +263,24 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   if(!['satellite','scene','composer'].includes(view)){if(root)root.hidden=true;return;}
   if(root&&!document.getElementById('satellite-nodes')){panel?.destroy();root=null;panel=null;reviewedRevision=null;for(const remove of removers.splice(0))remove();}
   if(!root){
-   root=document.createElement('section');root.id='satellite-nodes';root.className='panel';root.innerHTML=tools.workPanelMarkup({sampledLinks:true})+'<p role="status" id="node-native-state"></p><button type="button" id="nodes-retry">노드 계산 다시 시도</button><button type="button" id="nodes-restore">초안 복원·서버 조회 재시도</button><p role="status" id="node-scene-summary"></p><details><summary>공유 노드 정의 확인 · 초안과 수락 배치</summary><pre id="node-scene-definitions" style="max-height:24rem;overflow:auto;white-space:pre-wrap"></pre></details><pre id="node-server-configuration" aria-label="조회한 서버 배치 구성" style="max-height:16rem;overflow:auto"></pre><button type="button" id="nodes-reapply">서버 구성 확인 후 초안 재적용</button><button type="button" id="nodes-recall-reviewed">서버 구성 확인 후 배치 회수</button>';document.getElementById('screen').prepend(root);
+   root=document.createElement('section');root.id='satellite-nodes';root.className='panel';root.innerHTML=tools.workPanelMarkup({sampledLinks:true})+'<p role="status" id="node-native-state"></p><button type="button" id="nodes-retry">노드 계산 다시 시도</button><button type="button" id="nodes-restore">초안 복원·서버 조회 재시도</button><button type="button" id="nodes-recheck-saved">저장 배치 재확인</button><p role="status" id="node-scene-summary"></p><details><summary>공유 노드 정의 확인 · 초안과 수락 배치</summary><pre id="node-scene-definitions" style="max-height:24rem;overflow:auto;white-space:pre-wrap"></pre></details><pre id="node-server-configuration" aria-label="조회한 서버 배치 구성" style="max-height:16rem;overflow:auto"></pre><button type="button" id="nodes-reapply">서버 구성 확인 후 초안 재적용</button><button type="button" id="nodes-recall-reviewed">서버 구성 확인 후 배치 회수</button>';document.getElementById('screen').prepend(root);
    panel=tools.createNodeWorkPanel({root,store,readPresentation:()=>dead?null:store.presentationRoster(),editorTools,now,timers:{set:host.setTimeout.bind(host),clear:host.clearTimeout.bind(host)},createFormationId:id,readDisplay,viewport:()=>({width:host.innerWidth,height:host.innerHeight}),scrollTarget:host,geometryFor,linksFor:()=>optical.snapshot(),linksPresentationFor:()=>dead?null:optical.presentation(),verifyLinkPresentation:optical.verifyPresentation,sampledLinksPresentationFor:()=>dead?null:optical.sampledPresentation(),verifySampledLinkPresentation:(value,options)=>!dead&&optical.verifySampledPresentation(value,options)===true,verifyLinkSnapshot:optical.verifyLinkSnapshot,oislPresentation:oisl,modelFor,modelReadinessFor:node=>readiness.get(node.id)??null,models,onModelChange:key=>resolveModel({model_key:key}),confirmClear:()=>host.confirm('작업 세트의 모든 노드를 삭제할까요?'),onDefinitionsChanged:syncDefinitions,onResetTerminals:optical.resetHistories,onSelected:select,onFocus:focus,onError:report,
     readScene:()=>({ready:globe.nodeRendererState().phase==='ready',cameraReady:globe.cameraState?.().ready===true,lighting:solar?.state().enabled,zoom:globe.cameraState?.().zoom??null,tracks,links,models:modelsVisible}),actions:{...clockActions,setLighting:value=>!dead&&(solar?.setEnabled(value)??false),home:()=>!dead&&globe.home?.(),zoomBy:value=>!dead&&globe.zoomBy?.(value),setZoom:value=>!dead&&globe.setZoom?.(value),untrack:options=>!dead&&globe.releaseSatelliteModel(options),toggleTracks:()=>{tracks=!tracks;scene?.update(display?.utc??null);refreshPanel();},setLinksVisible:value=>{const next=Boolean(value);if(next!==links)mixedRoute.clearAnalytical();links=next;scene?.setLinksVisible(value);refreshPanel();},setModelsVisible:value=>{modelsVisible=value;scene?.setModelsVisible(value);refreshPose();refreshPanel();}}});
    for(const [key,action]of [['nodes-deploy',()=>deployment.deploy()],['nodes-recall',()=>deployment.recall()],['nodes-reapply',()=>deployment.deploy()],['nodes-recall-reviewed',()=>deployment.recall()]]){const button=root.querySelector('#'+key),handler=()=>{if(dead||button.disabled)return;error='';void action().catch(report);};button.addEventListener('click',handler);removers.push(()=>button.removeEventListener('click',handler));}
    const restore=root.querySelector('#nodes-restore');if(restore){const handler=()=>{if(dead||restore.disabled)return;void retryRestore();};restore.addEventListener('click',handler);removers.push(()=>restore.removeEventListener('click',handler));}
+   const recheck=root.querySelector('#nodes-recheck-saved');if(recheck){const handler=()=>{if(dead||recheck.disabled||root?.hidden)return;void recheckSavedDeployment();};recheck.addEventListener('click',handler);removers.push(()=>recheck.removeEventListener('click',handler));}
    const retry=root.querySelector('#nodes-retry');if(retry){const handler=()=>{if(dead||retry.disabled)return;error='';optical.resetHistories();void timeline.retry().then(()=>optical.update()).catch(report);};retry.addEventListener('click',handler);removers.push(()=>retry.removeEventListener('click',handler));}
   }
   root.hidden=false;refreshPanel();
+ }
+ const savedSignature=value=>JSON.stringify(value,(_,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.keys(item).sort().map(key=>[key,item[key]])):item);
+ function savedLocalScope(){const value=store.snapshot();return savedSignature({drafts:value.drafts,deployed:value.deployed,receipt:value.receipt});}
+ function canRecheckSaved(){try{const local=store.contextPresentation(),state=deployment.contextPresentation();if(dead||!started||!local.loaded||local.error||local.deployment_confirmed||!local.drafts_equal_deployed||state.busy||state.syncRequired||state.error||state.server===null||!local.deployed_count)return false;if(savedReceiptKnown===null)savedReceiptKnown=store.snapshot().receipt!==null;return savedReceiptKnown;}catch{return false;}}
+ function savedRecheckCurrent(job){return !dead&&!job.invalidated&&savedRecheckJob===job&&job.root.isConnected!==false&&root===job.root&&document.getElementById('satellite-nodes')===job.root&&!store.error&&store.loaded&&savedLocalScope()===job.scope;}
+ function recheckSavedDeployment(){
+  if(savedRecheckPromise)return savedRecheckPromise;if(!canRecheckSaved()||!root||root.hidden)return Promise.resolve(null);
+  const local=store.snapshot(),job={root,scope:savedLocalScope()};savedRecheckJob=job;error='';
+  savedRecheckPromise=deployment.reacceptCachedDeployment(structuredClone(local.receipt),structuredClone(local.deployed)).catch(cause=>{if(savedRecheckCurrent(job))report(cause);return null;}).finally(()=>{if(savedRecheckJob===job){savedRecheckJob=null;savedRecheckPromise=null;if(!dead&&root===job.root)refreshPanel();}});refreshPanel();return savedRecheckPromise;
  }
  function retryRestore(){
   if(dead)return Promise.resolve(null);if(restorePromise)return restorePromise;

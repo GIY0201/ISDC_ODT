@@ -672,3 +672,5 @@ ADR0056/contracts/selected_link_rf_prefill.md: missing original selected ground-
 N020 ADR0057 precode independent HIGH0/CRITICAL0. Adapter and ground ports are disjoint; root DI follows both. Regression-first, actual current input/run fences; existing source calculations unchanged.
 
 N021 ADR0058 repairs actual normal catalogue mode label only, with regression-first existing owner guards unchanged.
+
+N022 ADR0059 exposes existing cached deployment readonly review from node workspace; no receipt builder/API/schema/automaticapproval changes. Regression-first actualworkspace/cache/lifecycle tests.

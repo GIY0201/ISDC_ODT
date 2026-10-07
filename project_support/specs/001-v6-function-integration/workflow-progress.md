@@ -1497,6 +1497,31 @@ N021 actualcatalog native API/clockprobe proved validsource; source mode label g
 
 Actual526 after normal isolated reload/select still reads old unknown clock label; savedISS/local/session bytes exact. Do NOT record N021 real screen PASS. HTTP served satellite_nodes.js equals local bytes SHA256fef82ae9dd8f90690a72edb98e7abf52d6cb33868e675e2494ecd102213d3c61 with no-cache, so source-file deployment is current. Fresh distinct-document navigation and actualroot/display-owner diagnosis in progress; no authority bypass.
 
+## N022 explicit cached deployment review in progress
+
+ADR0059/contracts/cached_deployment_review.md/T177178 prerequisite independently
+reviewed: HIGH0/CRITICAL0, closest restore/scenario tests29PASS. Existing restore
+owner reused unchanged. Additional full canonical draft/deployed guard includes
+updated_at to match workspace_context; isDirty alone is insufficient. Controller
+and implement instructions reread, existing bootstrap/prerequisites PASS,
+requirements-quality checklist8/8 PASS (not implementation evidence), extensions
+absent. Product author owns workspace_nodes plus mounted tests only, RED-first.
+Root owns evidence/docs; no reset, new branch, server/port/UTC change.
+
+Actual Aside542543 normal geometry calculation reports43nodes/183links but future
+query refuses unconfirmed deployment. This is not native future PASS or fabric
+acceptance. Actual547 public complete drafts/deployed40 definitions including
+timestamps are serialized-equal; this alone grants no approval. Independent
+readonly actual GET full server receipt matches stored artifact524 receipt, while
+current isolated cache receipt must be checked through existing owner operation.
+Whole75–84/model/twores/GPU/gameperformance/PR remain open.
+
+N022 T177 implementation verified: initial8 missing-button RED and subsequent2
+timestamp/remount RED fixed; final12 newPASS/closest120PASS. Independent final
+CLEAN34PASS + originalscenario_resume53PASS. Product authors STOPPED. FullNode
+1943PASS0FAIL0SKIP27616.8538ms exit0handle59088, log full_N022_node.log. Python
+46848 and actual isolated reload/button/future/module flow pending; T178 OPEN.
+
 ## Actual settled catalogue clock verification
 
 Aside534 records pre-calculation mode=카탈로그 분석 시각 · 재생 샘플 미계산 and after ordinaryreadonly observation calculation mode=카탈로그 분석 시각 · 정지 with playback enabled. Root independently viewed535 actual1440x900 screenshot and read534/535 JSON; savedISS/local/session bytes exact. One existing calculate action, no SIM/storedUTC/fabric send. Original paused RUN-904CE008D00B/SIM/speed5/elapsed884.681/SDC_POC_01/faults[]/recordingtrue reverified GET health at02:57:42UTC.
