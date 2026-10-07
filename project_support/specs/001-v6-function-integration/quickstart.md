@@ -157,3 +157,10 @@ preservation. Compare49 verified quality receipts→48 samples, unknown vs unusa
 natural UTC historical retention and foreigninstance scope pruning. Confirm source
 sparkline/labels and exact action buttons in two resolutions. Fullfuturepass and
 station/route/GPU gates remain separate. See contracts/network_lifecycle.md.
+For N017c–e, open the existing8891 ground view with verified native/sampled ground
+geometry. Click an owned operator station: only its existing editor selection
+changes. Double-click or use explicit focus: camera releases model tracking and
+flies to source2400000m/1.4s. GP reference selection, display UTC and runtime remain.
+Hidden/removed/changed station, fake properties IDs, morph and external edit conflict
+must not select/fly. Repeat both resolutions; preserve original parent/SIM inputs.
+Run station interaction focused Node tests, full Node and full Python before review.

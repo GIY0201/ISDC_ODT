@@ -162,6 +162,29 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
    onHover(node&&screen&&[screen.x,screen.y].every(Number.isFinite)?structuredClone({kind:'source_node',id:validId,item:library.nodeCatalogItem(node),node_geometry:geometry,screen}):null);
   },
  });
+ function verifyGroundStation(value){
+  const owner=networkScene,generation=networkComposition;
+  const current=()=>!dead&&started&&networkVisualActive&&networkScene===owner&&generation===networkComposition;
+  try{
+   if(!current()||!owner||typeof owner.verifyStationPick!=='function'||typeof networkInputs?.stationInteractionReady!=='function'||networkInputs.stationInteractionReady()!==true||!current())return false;
+   if(owner.verifyStationPick(value)!==true||!current())return false;
+   const stations=networkInputs.readStations(),station=stations?.find(s=>s.id===value?.id);
+   if(!current()||!station||station.enabled!==true||JSON.stringify(station)!==JSON.stringify(value.station))return false;
+   if(owner.verifyStationPick(value)!==true||!current())return false;
+   return networkInputs.stationInteractionReady()===true&&current();
+  }catch{return false;}
+ }
+ function captureGroundStation(id){try{if(dead||!started||!networkVisualActive)return null;const value=networkScene?.captureStationPick?.(id);return verifyGroundStation(value)?value:null;}catch{return null;}}
+ function focusGroundStation(value){
+  if(!verifyGroundStation(value)||typeof globe.focusGroundNetworkStation!=='function')return false;
+  try{return globe.focusGroundNetworkStation(structuredClone(value.station),{verify:()=>verifyGroundStation(value)})===true;}catch{return false;}
+ }
+ const removeGroundInteraction=globe.bindGroundNetworkInteraction?.({
+  read:picked=>{try{if(dead||!networkVisualActive)return null;const value=networkScene?.stationPick?.(picked);return verifyGroundStation(value)?value:null;}catch{return null;}},
+  verify:verifyGroundStation,
+  onSelect:value=>{if(!verifyGroundStation(value)||typeof networkInputs?.selectStation!=='function')return false;try{return networkInputs.selectStation(value.id)===value.id;}catch(cause){report(cause);return false;}},
+  onFocus:focusGroundStation,
+ })??(()=>{});
  const external=event=>{if(!dead&&event.key===DRAFT_KEY)store.receiveExternalDraft(event.newValue);};host.addEventListener('storage',external);
  function show(view){
   if(dead||!started)return;
@@ -241,6 +264,8 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   setNetworkScene:value=>{if(dead)return false;networkSceneInput=value?structuredClone(value):null;return networkScene?.setSnapshot(networkSceneInput??{})??false;},
   setGroundLinksVisible:value=>{if(dead)return;groundLinksVisible=Boolean(value);networkScene?.setGroundLinksVisible(groundLinksVisible);},
   setCoverageVisible:value=>{if(dead)return;coverageVisible=Boolean(value);networkScene?.setCoverageVisible(coverageVisible);},
+  canFocusGroundNetworkStation:id=>captureGroundStation(id)!==null,
+  focusGroundNetworkStation:id=>{const value=captureGroundStation(id);return value!==null&&focusGroundStation(value);},
   setNetworkVisualActive:value=>{if(dead)return;const active=value===true;if(networkVisualActive===active)return;networkVisualActive=active;networkComposition++;networkScene?.setSampledActive?.(active);if(active)opticalScheduler.force();else network?.cancelSampled();},
   clearNetworkScene:()=>{networkVisualActive=false;networkComposition++;network?.cancelSampled();networkScene?.setSampledActive?.(false);networkSceneInput=null;networkScene?.clear();},
   updateNetwork:()=>dead?Promise.resolve(null):network?.update()??Promise.resolve(null),
@@ -263,6 +288,6 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
    if(previous===null)return;
    networkComposition++;network.clear();if(networkVisualActive)opticalScheduler.force();
   },
-  destroy(){if(dead)return;dead=true;scenarioReceipt=null;opticalScheduler.destroy();removeContinuity();try{onHover(null);}catch{/* Scoped presentation cleanup. */}for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeModel();removeInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();network?.destroy();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
+  destroy(){if(dead)return;dead=true;scenarioReceipt=null;opticalScheduler.destroy();removeContinuity();try{onHover(null);}catch{/* Scoped presentation cleanup. */}for(const remove of removers.splice(0))remove();removeStore();removeDisplay();removeStatus();removeView();removeLighting();removeCamera();removeModel();removeInteraction();removeGroundInteraction();removeRenderer();host.removeEventListener('storage',external);panel?.destroy();root?.remove();network?.destroy();optical.destroy();timeline.destroy();deployment.destroy();if(activeSelection)globe.clearSatelliteModel();scene=null;panel=null;root=null;},
  });
 }

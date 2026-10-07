@@ -5,6 +5,8 @@ export const GROUND_LINK_COLORS=Object.freeze({usable:'#4ac4ee',visible:'#7a95ab
 export const ROUTE_COLOR='#a78bfa',STATION_COLOR='#ffbf47';
 const ROUTE_WIDTH=4.5,SELECTED_WIDTH=4,BASE_WIDTH=2;
 const signature=value=>JSON.stringify(value);
+const stationPickOwners=new WeakMap();
+function freezeStation(value){if(value&&typeof value==='object'){Object.values(value).forEach(freezeStation);Object.freeze(value);}return value;}
 const NATIVE_PROFILE=Object.freeze({frame:'EARTH_FIXED_GMST_UTC_APPROX',inertial_frame:'SOURCE_MEAN_EQUATOR_EQUINOX_APPROX',time_model:'unix_ms_utc_approx',model_profile:'SOURCE_KEPLER_J2_V1',source_commit:'1a1e00297a0301637455b0ef2cf48b2e74576b07',quality:'engineering_assumption'});
 const nativeProfile=value=>Object.entries(NATIVE_PROFILE).every(([key,v])=>value?.[key]===v);
 function deeplyFrozen(value,seen=new Set()){
@@ -35,6 +37,7 @@ export class NativeNetworkScene {
   Object.assign(this,{viewerProvider:viewer,cesiumProvider:cesium,timeSource,geometryFor,verifyNetworkSnapshot,readFabricState,coverageRadiusKm,isTransitioning});
   this.stations=new Map();this.groundLinks=new Map();this.routeIds=new Set();this.selectedLinkId=null;this.groundLinksVisible=true;this.coverageVisible=true;this.disposed=false;this.snapshot=null;this.dataSource=null;this.linkPolylines=null;
   this.sampledNetwork=sampledNetwork;this.sampledActive=false;this.sampledSnapshot=null;this.sampledGeneration=0;this.sampledFrame=0;
+  stationPickOwners.set(this,{epoch:{},tokens:new WeakMap()});
  }
  get viewer(){return typeof this.viewerProvider==='function'?this.viewerProvider():this.viewerProvider;}
  get cesium(){return typeof this.cesiumProvider==='function'?this.cesiumProvider():this.cesiumProvider;}
@@ -114,6 +117,7 @@ export class NativeNetworkScene {
         if(prepared&&!prepared.bound()){entities.remove(entry.entity);entities.remove(entry.coverage);return;}
         this.stations.set(id, entry);
       } else {
+        if(signature(entry.station)!==signature(station))this.revokeStationPicks();
         entry.station = station;
         entry.entity.position = position;
         entry.coverage.position = position;
@@ -129,20 +133,58 @@ export class NativeNetworkScene {
   removeStation(id) {
     const entry = this.stations.get(id);
     if (!entry) return;
-    entry.entity.show=false;entry.coverage.show=false;
+    this.revokeStationPicks();entry.entity.show=false;entry.coverage.show=false;
     const entities = this.dataSource?.entities;
     try { entities?.remove(entry.entity); entities?.remove(entry.coverage); } catch { /* already gone */ }
     this.stations.delete(id);
   }
 
   // Station id under a screen position, or null. The caller owns the input handler.
+  revokeStationPicks(){stationPickOwners.get(this).epoch={};}
+  stationPickScope(id,entity=null){
+   const registry=stationPickOwners.get(this),epoch=registry.epoch,entry=this.stations.get(id);if(!entry)return null;
+   let viewer,C;const viewerProvider=this.viewerProvider,cesiumProvider=this.cesiumProvider,timeSource=this.timeSource,transition=this.isTransitioning;
+   const bound=()=>!this.disposed&&registry.epoch===epoch&&this.stations.get(id)===entry&&this.viewerProvider===viewerProvider&&this.cesiumProvider===cesiumProvider&&this.timeSource===timeSource&&this.isTransitioning===transition&&this.sourceOwner===viewer&&entry.entity.show===true&&(!entity||entity===entry.entity||entity===entry.coverage)&&(!entity||entity.show===true);
+   try{
+    viewer=this.viewer;C=this.cesium;
+    if(!bound()||!entry.station?.enabled||this.isTransitioning()||C?.SceneMode&&viewer?.scene?.mode===C.SceneMode.MORPHING)throw Error('station unavailable');
+    const utc=this.timeSource();let scope;
+    if(this.sampledActive&&!(this.snapshot?.utc===utc&&this.valid(utc))){
+     const port=this.sampledNetwork,read=port?.read,verify=port?.verify;
+     if(typeof read!=='function'||typeof verify!=='function'||!this.sampledSnapshot||verify(this.sampledSnapshot,{utc})!==true)throw Error('sampled scope unavailable');
+     scope=read({utc});
+     if(!sampledScope(scope,utc)||signature(scope.stations)!==signature(this.sampledSnapshot.stations)||verify(scope,{utc})!==true||this.sampledNetwork!==port||port.read!==read||port.verify!==verify)throw Error('sampled scope changed');
+     const station=scope.stations.find(s=>s.id===id);
+     if(!station?.enabled||signature(station)!==signature(entry.station)||!bound()||this.viewer!==viewer||this.cesium!==C||this.timeSource()!==utc||this.isTransitioning()||C?.SceneMode&&viewer?.scene?.mode===C.SceneMode.MORPHING||this.viewer!==viewer||this.cesium!==C||this.timeSource()!==utc||!bound()||verify(scope,{utc})!==true||!bound())throw Error('station ownership changed');
+    }else{
+     scope=this.snapshot;
+     const station=scope?.stations?.find(s=>s.id===id);
+     if(!station?.enabled||signature(station)!==signature(entry.station)||!this.valid(utc)||!bound()||this.viewer!==viewer||this.cesium!==C||this.timeSource()!==utc||this.isTransitioning()||C?.SceneMode&&viewer?.scene?.mode===C.SceneMode.MORPHING||this.viewer!==viewer||this.cesium!==C||this.timeSource()!==utc||!bound()||this.verifyNetworkSnapshot(structuredClone(scope))!==true||!bound())throw Error('station ownership changed');
+    }
+    return {entry,viewer,epoch,station:entry.station};
+   }catch{this.revokeStationPicks();return null;}
+  }
+  captureStationPick(id){
+   if(typeof id!=='string')return null;const scope=this.stationPickScope(id);if(!scope)return null;
+   const token=freezeStation({id,station:structuredClone(scope.station)});stationPickOwners.get(this).tokens.set(token,{...scope,definition:signature(scope.station)});return token;
+  }
+  stationPick(picked){
+   const entity=picked?.id;if(!entity)return null;
+   for(const [id,entry]of this.stations)if(entity===entry.entity||entity===entry.coverage){
+    const scope=this.stationPickScope(id,entity);if(!scope)return null;
+    const token=freezeStation({id,station:structuredClone(scope.station)});stationPickOwners.get(this).tokens.set(token,{...scope,entity,definition:signature(scope.station)});return token;
+   }
+   return null;
+  }
+  verifyStationPick(token){
+   const registry=stationPickOwners.get(this),record=registry.tokens.get(token);if(!record||record.epoch!==registry.epoch)return false;
+   const scope=this.stationPickScope(token.id,record.entity);
+   return !!scope&&record.epoch===registry.epoch&&scope.entry===record.entry&&scope.viewer===record.viewer&&signature(scope.station)===record.definition;
+  }
   stationAt(screenPosition) {
-    const viewer = this.viewer;
-    if (!viewer?.scene?.pick || !screenPosition) return null;
-    const picked = viewer.scene.pick(screenPosition, 7, 7);
-    const value = picked?.id?.properties?.stationId;
-    const id = typeof value?.getValue === 'function' ? value.getValue() : value;
-    return id == null ? null : String(id);
+    try{const viewer=this.viewer;if(!viewer?.scene?.pick||!screenPosition)return null;
+     const picked=viewer.scene.pick(screenPosition,7,7),token=this.stationPick(picked);return token&&this.verifyStationPick(token)?token.id:null;
+    }catch{this.revokeStationPicks();return null;}
   }
 
   groundMaterial(Cesium, state) {
@@ -206,19 +248,21 @@ export class NativeNetworkScene {
   // for everything else so a route that moves on does not leave thick lines behind.
   setGroundLinksVisible(visible) {
     this.groundLinksVisible = visible !== false;
-    if(this.sampledActive)this.placeSampledNetwork(this.timeSource());else this.placeGroundLinks(this.timeSource());
+    this.syncFrame(this.timeSource());
     return this.groundLinksVisible;
   }
 
   setCoverageVisible(visible) {
+    if(visible===false&&this.coverageVisible)this.revokeStationPicks();
     this.coverageVisible = visible !== false;
     for (const entry of this.stations.values()) entry.coverage.show = this.coverageVisible && (entry.coverage.ellipse?.semiMajorAxis ?? 0) > 1;
-    if(this.sampledActive)this.placeSampledNetwork(this.timeSource());else this.placeGroundLinks(this.timeSource());
+    this.syncFrame(this.timeSource());
     return this.coverageVisible;
   }
 
   placeGroundLinks(utc){
  const current=this.valid(utc)&&!this.isTransitioning()&&!(this.cesium?.SceneMode&&this.viewer?.scene?.mode===this.cesium.SceneMode.MORPHING);
+ if(!current)this.revokeStationPicks();
  for(const entry of this.stations.values()){entry.entity.show=current;entry.coverage.show=current&&this.coverageVisible&&(entry.coverage.ellipse?.semiMajorAxis??0)>1;}
  const positions=current?new Map([...this.stations].map(([id,entry])=>[id,this.stationPosition(entry.station)])):new Map();
  const endpoints=new Map();
@@ -227,10 +271,10 @@ export class NativeNetworkScene {
   const drawable=!!a&&!!b&&this.groundLinksVisible&&entry.state!=='unusable';if(drawable){entry.positions=[a,b];entry.line.positions=entry.positions;}entry.line.show=drawable;
  }
  // Proof checks bound the synchronous frame instead of serializing the whole graph per endpoint.
- if(current&&!this.valid(utc)){for(const entry of this.stations.values()){entry.entity.show=false;entry.coverage.show=false;}for(const entry of this.groundLinks.values())entry.line.show=false;}
+ if(current&&!this.valid(utc)){this.revokeStationPicks();for(const entry of this.stations.values()){entry.entity.show=false;entry.coverage.show=false;}for(const entry of this.groundLinks.values())entry.line.show=false;}
  }
  applyEmphasis(){const C=this.cesium;if(!C?.Color)return;for(const [key,entry]of this.groundLinks){const routed=this.routeIds.has(key);if(entry.material?.uniforms&&'time'in entry.material.uniforms){entry.material.uniforms.color=C.Color.fromCssColorString(routed?ROUTE_COLOR:GROUND_LINK_COLORS.usable).withAlpha(.55);entry.line.material=entry.material;}else entry.line.material=routed?C.Material.fromType('Color',{color:C.Color.fromCssColorString(ROUTE_COLOR).withAlpha(.95)}):entry.material;entry.line.width=routed?ROUTE_WIDTH:key===this.selectedLinkId?SELECTED_WIDTH:BASE_WIDTH;}}
- hideSampledNetwork(){for(const e of this.stations.values()){e.entity.show=false;e.coverage.show=false;}for(const e of this.groundLinks.values())e.line.show=false;this.sampledSnapshot=null;}
+ hideSampledNetwork(){this.revokeStationPicks();for(const e of this.stations.values()){e.entity.show=false;e.coverage.show=false;}for(const e of this.groundLinks.values())e.line.show=false;this.sampledSnapshot=null;}
  setSampledActive(active){this.sampledGeneration++;this.sampledActive=active===true&&!this.disposed;this.sampledSnapshot=null;if(!this.sampledActive)this.hideSampledNetwork();return this.sampledActive;}
  placeSampledNetwork(utc){
   const frame=++this.sampledFrame,generation=this.sampledGeneration,port=this.sampledNetwork,read=port?.read,verify=port?.verify;
@@ -277,7 +321,7 @@ export class NativeNetworkScene {
    return true;
   }catch{return fail();}
  }
- syncFrame(utc,nowMs=0){if(this.disposed)return;if(this.sampledActive){this.placeSampledNetwork(utc);return;}if(this.valid(utc))this.refreshGroundLinks();else this.placeGroundLinks(utc);if(Number.isFinite(nowMs))for(const e of this.groundLinks.values())if(e.line.show&&e.state==='usable'&&e.line.material?.uniforms&&'time'in e.line.material.uniforms)e.line.material.uniforms.time=nowMs/1000*1.4;}
+ syncFrame(utc,nowMs=0){if(this.disposed)return;const exact=this.snapshot?.utc===utc&&this.valid(utc);if(this.sampledActive&&!exact){this.placeSampledNetwork(utc);return;}if(exact)this.refreshGroundLinks();else this.placeGroundLinks(utc);if(Number.isFinite(nowMs))for(const e of this.groundLinks.values())if(e.line.show&&e.state==='usable'&&e.line.material?.uniforms&&'time'in e.line.material.uniforms)e.line.material.uniforms.time=nowMs/1000*1.4;}
  clear(){this.setSampledActive(false);for(const id of [...this.stations.keys()])this.removeStation(id);for(const id of [...this.groundLinks.keys()])this.removeGroundLink(id);this.snapshot=null;this.receipt=null;this.route=null;this.routeIds=new Set();this.selectedLinkId=null;}
  destroy(){if(this.disposed)return;this.clear();this.disposed=true;if(this.linkPolylines)this.linkOwner?.scene?.primitives?.remove?.(this.linkPolylines);if(this.dataSource)this.sourceOwner?.dataSources?.remove?.(this.dataSource,true);this.linkPolylines=null;this.dataSource=null;}
 }

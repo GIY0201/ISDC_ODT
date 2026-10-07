@@ -15,9 +15,27 @@ function setup(width=1280,height=720){
  const fabric={snapshot:()=>({status:'unavailable',receipt:null,route:null,pending:false,refresh_required:true}),pollStatus(){calls++;return pollHook?.()??Promise.resolve(null);},cancelStatusPoll(){canceled++;},moduleStatus:()=>{statusHook?.();return{status:'valid',value:{reachable:true,instance_id:'one',sequence:2},error:''};},qualityHistory:id=>id==='L'?structuredClone(history):[],send:async()=>{throw Error('must not send');},refresh:async()=>{throw Error('must not review');}};
  const host={innerWidth:width,innerHeight:height,setTimeout:(fn,ms)=>{const id=++next;timers.set(id,{fn,ms});return id;},clearTimeout:id=>timers.delete(id),addEventListener:f.win.addEventListener.bind(f.win),removeEventListener:f.win.removeEventListener.bind(f.win)};
  const panel=createGroundNetworkPanel({store,model,network,fabric,diagram,document:f.doc,host,refreshRuntime:async()=>{},drawSparkline:(canvas,values)=>{draws.push({canvas,values});drawHook?.();}});
- return{f,panel,timers,draws,history,get calls(){return calls;},get canceled(){return canceled;},poll(fn){pollHook=fn;},draw(fn){drawHook=fn;},status(fn){statusHook=fn;},select:()=>f.get('ground-node-diagram').dispatch('click',{target:{closest:()=>({getAttribute:k=>k==='data-diagram-link'?'L':null})}})};
+ return{f,panel,timers,draws,history,networkValue,get calls(){return calls;},get canceled(){return canceled;},poll(fn){pollHook=fn;},draw(fn){drawHook=fn;},status(fn){statusHook=fn;},select:()=>f.get('ground-node-diagram').dispatch('click',{target:{closest:()=>({getAttribute:k=>k==='data-diagram-link'?'L':null})}})};
 }
 const settle=async()=>{for(let i=0;i<15;i++)await Promise.resolve();};
+for(const reason of ['network','selection','history','removed-link'])test(`quality unavailable explicitly explains ${reason} without drawing or approving fabric`,async()=>{
+ const s=setup();try{
+  s.panel.show('ground');
+  if(reason!=='selection')await s.select();
+  const draws=s.draws.length;
+  if(reason==='network')s.networkValue.status='unavailable';
+  if(reason==='history')s.history.splice(0);
+  if(reason==='removed-link')s.networkValue.network.links=[];
+  s.panel.update();
+  const text=s.f.get('ground-node-quality-status').textContent;
+  assert.match(text,/미확인/);
+  assert.match(text,reason==='network'?/검증된.*통신망.*없음/:reason==='selection'?/링크.*선택/:reason==='history'?/수락.*이력.*없음/:/선택.*링크.*없음/);
+  assert.equal(s.f.get('ground-node-quality-history').hidden,true);
+  assert.equal(s.draws.length,draws);
+  assert.equal(s.f.get('ground-node-fabric-send').disabled,true);
+  assert.equal(s.f.get('ground-node-fabric-route').disabled,true);
+ }finally{s.panel.destroy();s.f.dispose();}
+});
 for(const [width,height]of [[1280,720],[1920,1080]])test(`ground status polls only while active and never clears explicit review ${width}x${height}`,async()=>{
  const s=setup(width,height);try{
   s.panel.show('ground');await settle();assert.equal(s.calls,1);assert.equal(s.timers.size,1);assert.equal([...s.timers.values()][0].ms,30000);

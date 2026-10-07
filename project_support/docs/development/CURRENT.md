@@ -269,3 +269,29 @@ AbortSignal/fetch/abort-event 문서를 조회해 취소 의미를 대조했다.
 GPU 및 전체 T075–T084 수용은 미완료이다. 다음 원본 조사 결과는
 research_future_pass_connection.md에 보존했다. 연결 증거:
 project_support/specs/001-v6-function-integration/validation/network_status_history_connection.md.
+
+## 2026-10-07 운영 지상국 선택·초점 연결 검증
+
+선배의 단일 클릭 선택과 명시 초점을 기존 sourceGround, renderer와 하나의
+globe handler에 연결했다. 카메라는 원본 높이2400000m/duration1.4s를 사용한다.
+숨김·변경·검증 실패·편집 충돌·종료는 선택 증명을 철회한다. 기존 GP/UTC/SIM
+입력은 선택이나 초점 때문에 바꾸지 않는다. active 소비자와 sampled 지원을
+구분하고 유효한 현재 exact geometry를 유지한다.
+
+실제 조립에서 sampled 미확인 조회가 정상 exact 결과를 삭제하는 null permit
+문제를 RED로 재현하고 수정했다. 실제 화면 품질 빈칸도 원인을 명시하는
+미확인 설명으로 바꿨다. Context7의 Cesium 공식 docs로 handler/pick/entity/
+datasource 의미를 대조했고 의존성을 임의 업그레이드하지 않았다.
+
+명령 `node --test project_support/tests/browser/*.test.mjs`: 1529PASS0FAIL0SKIP,
+23850.9712ms exit0. 동일 native evidence/wheel 환경의 `python -m pytest -q`:
+965PASS1기존PillowSKIP8기존ERFA경고239.50s exit0. 독립 renderer38/globe29/
+최종36 focused PASS, 실제 workspace 조립 두 해상도 PASS. 어댑터 조립 시험은
+실제 GPU 증거와 구분한다. 실제1440×900 Aside DOM receipt357에서 새 미확인
+설명과 전송 비활성을 확인했으나 screenshot/두 해상도/실제 station 초점은
+진행 중이다. 기존8891 서버와 사용자 SIM 실행/원본 입력은 보존했다.
+
+다음 연결은 전체 수락 배치의 미래 통과 표시용 포트, native 조회와 원본
+지상국 변경/분석시각 >60초 갱신/위성별3개/첫12개 표시이다. N017e 실제 화면,
+미래 통과·mixed route·N018·GPU 및 전체T075–T084 수용은 계속 열려 있다.
+증거: project_support/specs/001-v6-function-integration/validation/operator_station_connection.md.

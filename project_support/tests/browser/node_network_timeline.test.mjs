@@ -106,6 +106,15 @@ test('network presentation retains pending error clear fields and fails closed o
  let mutate=false,s;const mutateStation=setup(undefined,undefined,{opticalFacade:owner=>({update:owner.update,verifyLinkSnapshot:(...args)=>{const result=owner.verifyLinkSnapshot(...args);if(mutate){mutate=false;mutateStation.stations=mutateStation.stations.map(st=>({...st,dish_m:st.dish_m+1}));}return result;}})});await mutateStation.network.update();mutate=true;assert.equal(mutateStation.network.presentation().verified,false);mutateStation.network.destroy();mutateStation.optical.destroy();
  s=setup(undefined,undefined,{opticalFacade:owner=>({update:owner.update,verifyLinkSnapshot:(...args)=>{const result=owner.verifyLinkSnapshot(...args);if(mutate)s.network.destroy();return result;}})});await s.network.update();mutate=true;assert.deepEqual(s.network.presentation(),{proof:{status:'unavailable',utc:null,error:'disposed',network:null},verified:false});s.optical.destroy();
 });
+test('unavailable sampled observation cannot revoke an accepted exact network receipt',async()=>{
+ const s=setup();
+ try{
+  const receipt=await s.network.update();assert.equal(receipt.status,'valid');
+  const sampled=s.network.sampledPresentation();assert.equal(sampled.status,'unavailable');
+  assert.equal(s.network.verifySnapshot(receipt),true);
+  assert.equal(s.network.snapshot().status,'valid');
+ }finally{s.network.destroy();s.optical.destroy();}
+});
 
 test('trusted network cache rejects owner drift and still validates fresh station collisions and runtime faults',()=>{
  const library=createNodeLibrary({orbitElements,catalogElements,createEquipmentId:()=>{throw Error('no equipment');}}),nodes=structuredClone(scenario.rows[0].input.nodes),utc=codec.advance(new Date(fixture.epoch).toISOString(),0);

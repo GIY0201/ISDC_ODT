@@ -529,3 +529,36 @@ test('mounted node renderer and panels borrow separately verified sampled views 
   f.workspace.destroy();assert.equal(scene.options.sampledLinks.read({utc}),null);assert.equal(scene.options.sampledLinks.verify(view,{utc}),false);assert.equal(f.options.sampledLinksPresentationFor(),null);
  }finally{f.workspace.destroy();}
 });
+test('operator station assembly uses registered renderer picks and source store without node or GP selection',async()=>{
+ let binding,selected=null,ready=true,alive=true,scene,removed=0,focuses=0;
+ const stations=stationModel.DEFAULT_STATION_KEYS.map(preset=>stationModel.createStation({preset})),tokens=new WeakSet();
+ const NetworkScene=class{constructor(){scene=this;}setSampledActive(){}setGroundLinksVisible(){}setCoverageVisible(){}clear(){}destroy(){alive=false;}syncFrame(){}
+  captureStationPick(id){const station=stations.find(s=>s.id===id);if(!station)return null;const value=Object.freeze({id,station:Object.freeze(structuredClone(station))});tokens.add(value);return value;}
+  stationPick(picked){return tokens.has(picked?.token)?picked.token:null;}
+  verifyStationPick(value){return alive&&tokens.has(value)&&JSON.stringify(stations.find(s=>s.id===value.id))===JSON.stringify(value.station);}};
+ const f=fixture({networkSceneClass:NetworkScene,networkInputs:{readStations:()=>stations,readFaults:()=>[],stationInteractionReady:()=>ready,selectStation:id=>{selected=id;return id;}},view:{bindGroundNetworkInteraction(value){binding=value;return()=>removed++;},focusGroundNetworkStation(station,{verify}){if(!verify())return false;focuses++;return true;}}});
+ try{await f.workspace.start();f.context({utc:'2026-10-04T22:01:12.000000000Z'});f.attach();f.workspace.setNetworkVisualActive(true);
+  assert.equal(typeof binding?.read,'function');assert.equal(typeof f.workspace.focusGroundNetworkStation,'function');const token=scene.captureStationPick(stations[0].id),baseline=f.calls.length;
+  assert.equal(binding.read({token}),token);assert.equal(binding.verify(token),true);assert.equal(binding.verify(structuredClone(token)),false);
+  binding.onSelect(token);assert.equal(selected,stations[0].id);assert.equal(focuses,0);assert.equal(f.calls.slice(baseline).some(c=>['model','select','focus','release'].includes(c[0])),false);
+  binding.onFocus(token);assert.equal(focuses,1);assert.equal(f.workspace.focusGroundNetworkStation(stations[1].id),true);assert.equal(focuses,2);
+  ready=false;binding.onSelect(token);binding.onFocus(token);assert.equal(focuses,2);assert.equal(f.workspace.focusGroundNetworkStation(stations[1].id),false);
+  ready=true;stations[0].longitude+=1;assert.equal(binding.verify(token),false);f.workspace.setNetworkVisualActive(false);assert.equal(f.workspace.focusGroundNetworkStation(stations[1].id),false);
+  f.workspace.destroy();assert.equal(removed,1);assert.equal(binding.read({token}),null);assert.equal(binding.verify(token),false);
+ }finally{f.workspace.destroy();}
+});
+
+test('operator station external readiness callback cannot focus after nested disposal',async()=>{
+ let binding,f,dispose=false,focuses=0;const station=stationModel.createStation({preset:'daejeon'}),token=Object.freeze({id:station.id,station:Object.freeze(station)});
+ const NetworkScene=class{setSampledActive(){}setGroundLinksVisible(){}setCoverageVisible(){}clear(){}destroy(){}syncFrame(){}captureStationPick(){return token;}stationPick(){return token;}verifyStationPick(v){return v===token;}};
+ f=fixture({networkSceneClass:NetworkScene,networkInputs:{readStations:()=>[station],readFaults:()=>[],stationInteractionReady(){if(dispose)f.workspace.destroy();return true;},selectStation:()=>{throw Error('disposed selection must not run');}},view:{bindGroundNetworkInteraction(value){binding=value;return()=>{};},focusGroundNetworkStation(){focuses++;return true;}}});
+ try{await f.workspace.start();f.context({utc:'2026-10-04T22:01:12.000000000Z'});f.attach();f.workspace.setNetworkVisualActive(true);assert.equal(typeof binding?.verify,'function');dispose=true;assert.equal(f.workspace.focusGroundNetworkStation(station.id),false);assert.equal(focuses,0);assert.equal(binding.verify(token),false);}finally{f.workspace.destroy();}
+});
+
+for(const boundary of ['stations','final renderer verifier'])test(`operator station ${boundary} callback cannot revoke readiness and retain focus authority`,async()=>{
+ let binding,ready=true,armed=false,reads=0,focuses=0;
+ const station=stationModel.createStation({preset:'daejeon'}),token=Object.freeze({id:station.id,station:Object.freeze(station)});
+ const NetworkScene=class{setSampledActive(){}setGroundLinksVisible(){}setCoverageVisible(){}clear(){}destroy(){}syncFrame(){}captureStationPick(){return token;}stationPick(){return token;}verifyStationPick(v){if(armed&&boundary==='final renderer verifier'&&++reads===2)ready=false;return v===token;}};
+ const f=fixture({networkSceneClass:NetworkScene,networkInputs:{readStations:()=>{if(armed&&boundary==='stations')ready=false;return[station];},readFaults:()=>[],stationInteractionReady:()=>ready,selectStation:()=>{throw Error('revoked selection must not run');}},view:{bindGroundNetworkInteraction(value){binding=value;return()=>{};},focusGroundNetworkStation(){focuses++;return true;}}});
+ try{await f.workspace.start();f.context({utc:'2026-10-04T22:01:12.000000000Z'});f.attach();f.workspace.setNetworkVisualActive(true);armed=true;assert.equal(f.workspace.canFocusGroundNetworkStation(station.id),false);assert.equal(ready,false);assert.equal(binding.verify(token),false);assert.equal(f.workspace.focusGroundNetworkStation(station.id),false);assert.equal(focuses,0);}finally{f.workspace.destroy();}
+});

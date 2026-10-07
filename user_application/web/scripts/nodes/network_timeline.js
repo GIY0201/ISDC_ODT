@@ -156,7 +156,7 @@ export function createNodeNetworkTimeline({model,optical,requestCommunicationSta
    const after=context();return !disposed&&after.key===c.key&&inputKey(after)===permit.input&&displaySource()===permit.source&&verifyContinuity(permit.lease)===true;
   }catch{return false;}
  }
- function currentPermit(permit){const valid=permitMatches(permit);if(!valid&&last?.sampled===permit)last=null;return valid;}
+ function currentPermit(permit){const valid=permitMatches(permit);if(!valid&&permit&&last?.sampled===permit)last=null;return valid;}
  function emptySampled(status='unavailable',error='sampled network analysis unavailable'){
   let utc=null;try{utc=context().utc;}catch{}return freezeScope({...empty(null,status,error),presentation_kind:'NETWORK_SAMPLED_UI_V1',analysis_utc:null,display_utc:utc,age_seconds:null,current_analysis:false,availability:status,reason:error});
  }

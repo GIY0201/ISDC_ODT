@@ -112,3 +112,8 @@ clear history and new accepted membership prunes removed links. UTC/hash/sequenc
 request change records another past sample rather than clearing all history.
 No parallel mutable current-state owner.
 ADR0049 and contracts/network_lifecycle.md define lifecycle and failure behavior.
+N017c–e OperatorStationPick is a renderer-issued deeply-frozen {id,station} value
+registered privately against actual entity/coverage, entry definition and Viewer.
+It is current presentation capability only; copied JSON is invalid. ground active,
+native/sampled display ownership and current sourceGround definition must match.
+clear/hide/morph/dispose/replacement revokes it. No current runtime duplication.

@@ -1317,3 +1317,31 @@ strictanalysisUTC>60000 and original12display, station ownership and mixedroute
 styles. Next earliest owner stage is plan for these remaining internal contracts;
 actualsetup-plan preservedexistingplan, extensionsabsent, constitution1.2.0.
 N017a/b actualscreen acceptance and wholeN017/N018/T075–T084/T032 remain OPEN.
+2026-10-07 N017c–e prerequisite: previous goal turn was authoritative progress,
+commit e66b50f fullNode1465/Python965PASS1skip. Current git clean before new design;
+Aside handle53586 verified live. Whole75–84 and T032 remain intact. Actual plan
+skill read/setup preservedfeature; extensionsabsent, constitution1.2.0. Source
+station height/duration and single/double click directly verified. ADR0050 and
+spec/plan/model/contracts/quickstart/tasks amended before code; affected station
+implementation verification stale until independent analysis. Selectednextstage
+analyze then regression-first implement; no newfeature/branch/port/runtime reset.
+
+Independent station analysis found2interface gaps: explicit button needs an owner
+captureStationPick(id) method ratherthan borrowed renderer entities; rejected
+operator candidates must be distinguishable from ordinary null picks. ADR0050/
+contract/tasks repaired with capture method and candidate property hint used only
+to suppress fallback. Unchanged valid station redraw can preserve token while
+clear/hidden/invalid/replacement irrevocably revokes. Analysisrepair1, rereview pending.
+
+N017c–e analysis repair1 rereview CLEAN before implementation. Regression-first
+owner/globe/panel implementation and independent review completed. Renderer38,
+globe29 and final exact-nullpermit/quality36 focused PASS. Actual workspace with
+normal calculate button, current native owner and real renderer/globe passes
+1920x1080 and2560x1440 selection/focus preservation; controlled Cesium/HTTP/DOM,
+not actual GPU acceptance. Null sampled permit deleting exact result reproduced
+RED and repaired; explicit unknown quality explanations repair actual receipt349
+blank label. FullNode1529PASS0FAIL0SKIP23850.9712ms exit0. FullPython965PASS,
+1existingPillowSKIP8existingERFAwarnings239.50s exit0.
+Context7 actual Cesium latest reference queried and recorded. Same branch/8891,
+original SIM/inputs retained; Aside follow-up actual validation queued/running.
+WholeN017/N018/T075–T084/T032 and actual two-resolution screen acceptance OPEN.

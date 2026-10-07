@@ -243,3 +243,9 @@ points connect through ADR0049 without clearing explicit review or changing exac
 command approval. History is past verified module simulation, never actualRF or
 current sampled quality. Full futurepass, station focus and route emphasis remain
 required N017 items; this partial delivery cannot close whole T077 or T075–T084.
+
+N017c–e preserves original operator-station single-click selection and explicit
+double-click/button camera focus via the same Viewer and camera owner. Only actual
+owned visible station primitives and registered renderer pick proofs are accepted;
+GP reference sites remain separate. Source focus is2400000m/duration1.4s. Selection
+does not alter UTC/GP/runtime or invalidate unchanged station inputs. ADR0050.

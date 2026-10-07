@@ -59,3 +59,15 @@ OISL ID 대응은 현재 `digital_twin/simulation/browser/network_snapshot.js`�
 - 전체 명부의 OISL 및 ground mixed route 강조, 이전 강조 정리, 원본 선 굵기와 색, flow material time 위상 보존을 확인한다. sampled-only 링크와 stale receipt는 경로 강조 승인에 사용할 수 없다. geometry 조회 또는 native 계산을 강조 때문에 추가하지 않는다.
 
 이 목록은 후속 구현을 위한 시험 설계이며 실행 결과가 아니다. 내부 포트가 확정되면 ADR과 Spec Kit 계약을 검토한 뒤 제한된 파일 소유권 아래에서 RED부터 진행한다.
+
+2026-10-07 후속 상태: 위의 stationAt/raw stationId 및 운영 선택·초점 누락은
+N017c–e에서 소유자 등록 증명과 기존 handler의 연결로 수정했다. 세부 시험과
+실제 화면 수용 범위는 validation/operator_station_connection.md에 기록한다.
+이 문서의 다른 미래 통과/경로 누락까지 해결됐다는 뜻은 아니다.
+
+다음 최소 단계는 workspace owner의 전체 수락 배치와 실제 선택 지상국을
+캡처/검증하는 읽기 전용 future-pass 포트의 계약이다. 기존 missionInputs의
+정지·수락 경계를 유지하고, 그 다음 native geometry-only 검증을 기존 임무
+승인 검증과 공유한다. 마지막 UI 단계에서 지상국 변경 즉시 갱신, 분석
+시각 차이 strict >60000ms 갱신, 위성별3개/전체 첫12개/현재 통과 표시를
+연결한다. 기존 승인 통과 조회를 자연 재생용 결과로 재해석하지 않는다.

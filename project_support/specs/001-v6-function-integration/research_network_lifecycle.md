@@ -63,3 +63,15 @@ constellation.deployed를 사용한다. 263행 computePasses는 선택 지상국
 함께 검증한다. 문서가 보장하는 취소 이벤트와 실제 제품의 상태 소유권을
 구분한다. 공식 참고:
 https://github.com/mdn/content/blob/main/files/en-us/web/api/abortsignal/abort_event/index.md.
+
+N017 지상국 연결에서도 Context7의 Cesium 공식 ref-doc을 조회했다. 질의는
+`ScreenSpaceEventHandler LEFT_CLICK LEFT_DOUBLE_CLICK Scene pick Entity show
+CustomDataSource lifecycle requestRender`이다. Scene.pick, 단일 canvas handler,
+CustomDataSource.entities와 Entity.show의 소유/표시 의미를 대조한다. 현재
+Cesium 버전을 임의로 올리지 않고 기존 handler와 datasource 경계를 재사용한다.
+이 문서는 애플리케이션의 exact/sampled 증명이나 편집 충돌 권한을 보장하지
+않으므로 해당 경계는 실제 소유자 회귀시험과 별도 UI 증거로 검증한다.
+공식 참고: https://cesium.com/learn/cesiumjs/ref-doc/Scene.html,
+https://cesium.com/learn/cesiumjs/ref-doc/ScreenSpaceEventHandler.html,
+https://cesium.com/learn/cesiumjs/ref-doc/CustomDataSource.html,
+https://cesium.com/learn/cesiumjs/ref-doc/Entity.html.

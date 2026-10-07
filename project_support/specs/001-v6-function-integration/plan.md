@@ -587,3 +587,17 @@ quality points; no sampled view or status response grants new current authority.
 Research: research_network_lifecycle.md; contract: contracts/network_lifecycle.md.
 Fullfuturepass visual authority and station/route interactions remain later N017
 subtasks; N018 exchange and whole T075–T084/T032 acceptance are not closed.
+
+### N017c–e operator station interaction prerequisite
+
+Research: research_future_pass_connection.md; ADR0050; optional UI contract:
+contracts/operator_station_interaction.md. Existing NativeNetworkScene issues
+registered immutable owned-station pick proofs; existing OrbitGlobe handler and
+workspace_globe optional scoped binding route selection and explicit focus through
+the same camera owner. workspace_nodes joins activeground/readStations identity/
+external-conflict proof to existing sourceGround selection. No new handler, Viewer,
+clock, state store, native calculation or protocol. selection-only store changes
+retain native inputs. Renderer/globe RED precede independent owned-file edits;
+root assembly RED before UI/DI edits. Independent analysis/review, full regressions
+and actual two-resolution8891 verification required. Constitution1.2.0 unchanged.
+N017 future passes/mixed route and N018 remain open; no whole acceptance claim.
