@@ -625,3 +625,34 @@ contracts/source behaviors are verified. Optical-only N012-N014do notcloseN016.
 - [x] N017c RED then NativeNetworkScene actual-owned stationPick/captureStationPick/verifyStationPick and safe stationAt; registration/definition/display/Viewer/callback/clear/dispose fences, independent review. Evidence validation/operator_station_connection.md; whole screen acceptance remains N017e.
 - [x] N017d RED then existing OrbitGlobe/workspace_globe scoped operator-station binding in same handler and source explicit camera focus; no node/GP/reference interference, independent review. Evidence validation/operator_station_connection.md; whole screen acceptance remains N017e.
 - [ ] N017e RED then workspace_nodes/sourceGround/root DI and panel selection/focus button, unchanged-input selection notification preservation; actual assembly two resolutions, full regressions and live8891 evidence. N017 future passes/mixed route/N018 remain open.
+
+## US20 follow-up: N017f whole accepted future-pass input (P1)
+
+Goal: readonly fullaccepted input capture in the existing workspace owner before
+native visual query. Independent proof: actual accepted240 roster+station, no new
+HTTP/write and unchanged paused mission approval. ADR0051 and future_pass_inputs
+contract; existing N017g/h native/lifecycle/12rows and whole acceptance remain open.
+
+- [x] T154 [US20] N017f add missing-port RED and full actual accepted store/deployment regression in project_support/tests/browser/workspace_nodes.test.mjs: "whole deployed <=240", "analysis_utc", "FUTURE_PASS_INPUT_V1", deeply-frozen private registration, null-ID first enabled vs invalid/disabled ID, dirty/load/busy/error/server mismatch, forged/copy and callback invalidation, stationary exactUTC vs catalog natural lease, sameUTC pause/seek/source/clear/hide/dispose irreversibility and unchanged missionInputs playing rejection. No fabricated acceptance flag or native geometry bypass.
+- [x] T155 [US20] After T154 RED and clean independent analysis, implement optional captureFuturePassInputs/verifyFuturePassInputs in user_application/web/scripts/workspace_nodes.js using current constellation/deployment/globe owners and networkInputs station readiness. Full actual receipt+whole node+station/source checks and callback/epoch fences, no new HTTP/native/UI timer/store. Independently review, run full Node/Python, record commands/results/limits in validation/future_pass_inputs_connection.md and development/CURRENT.md/HISTORY.jsonl; leave full N017/N018/T075–T084/T032 open.
+
+Dependencies: T154→T155; N017g geometry-only native query depends T155 and its
+own reviewed design; N017h source refresh/display depends N017g. Parallel examples:
+readonly existing browser verification and design analysis can run alongside these
+owned files; no simultaneous workspace_nodes/test edits. Deliver this input port
+first; it cannot substitute for the full original future-pass UI implementation.
+
+T154/T155 analysis repair2 also requires beginFuturePassControl pending-depth
+entry/finally proof and root actual sameUTCstored/SIM/scenario-control RED in
+project_support/tests/browser/workspace_future_pass_control_assembly.test.mjs.
+T155 adds optional owner-scope observer ports in user_application/web/scripts/
+orbit_selection.js, tabs/sim_workspace.js and scenario/workspace_adapter.js, with
+closest original owner tests plus new actual control assembly RED. Root composition
+user_application/web/scripts/workspace_orbit.js injects begin callback into actual
+owners. Pending spans API reply→state adoption/cleanup, not only raw API completion.
+No original calculation or wire protocol changes; no new request. Root DI is sequential after owner port
+stability; readonly review/browser can run in parallel. Same source is whole
+actual exposed display provenance excludingUTC, not key alone.
+Repair3 requires actual observational owner ports and terminal actualowner/event
+reentry plus changed returnedvalues tests. Preserve meaningful failure cases;
+arbitrary unnotified cross-owner mutations are not a valid port implementation.

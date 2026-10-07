@@ -154,6 +154,12 @@ export function fixture(width=1280,height=720,options={}){
   Object.assign(context,{createBrowserId,createWorkspaceNodes,createNodeLibrary,orbitElements,catalogElements,nodeOisl,NodeScene,createSatelliteNodePanelTools,createNodeClockControls,createUtcCodec,LEAP_SHA256});
   Object.assign(context,{projectWorkspaceContext,createAnalysisTransport,createAnalysisFollowCoordinator,createWorkspaceScenario,createSourceScenarioPanel,createScenarioAssembly,scenarioKpi,createSourceSettingsPanel,createSourceSecurityPanel,createSourceDataPanel,dataViewModel,createMissionServices,createSourceMissionPanel,createMissionTypes,createMissionConstraints,createOrchestrationClient,layoutTimeline,timelineMarkup,createGroundSegmentStore,createGroundNetworkPanel,networkDiagram,NativeNetworkScene,createFabricExchange,createDataFabricClient,sourceStationModel,createGroundLinkModel,createNetworkSnapshotModel});
   globalThis.document=doc;
+  // Optional factory injection keeps the real root assembly testable with its
+  // actual controller owners; existing fixtures retain their defaults.
+  if(options.orbitSelectionFactory)context.createOrbitSelection=options.orbitSelectionFactory;
+  if(options.simPanelFactory)context.createSimPanel=(...args)=>options.simPanelFactory(createSimPanel,...args);
+  if(options.scenarioFactory)context.createWorkspaceScenario=args=>options.scenarioFactory(createWorkspaceScenario,args);
+  if(options.nodeWorkspaceFactory)context.createWorkspaceNodes=args=>options.nodeWorkspaceFactory(createWorkspaceNodes,args);
   vm.runInContext(orbitSource,context,{filename:'workspace_orbit.js'});vm.runInContext(windowSource,context,{filename:'workspace.js'});flush();
   function flush(){while(jobs.length)jobs.shift()();}
   const resize=async(w,h)=>{context.innerWidth=w;context.innerHeight=h;await win.dispatch('resize');};

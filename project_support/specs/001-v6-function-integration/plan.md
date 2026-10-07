@@ -601,3 +601,35 @@ retain native inputs. Renderer/globe RED precede independent owned-file edits;
 root assembly RED before UI/DI edits. Independent analysis/review, full regressions
 and actual two-resolution8891 verification required. Constitution1.2.0 unchanged.
 N017 future passes/mixed route and N018 remain open; no whole acceptance claim.
+
+### N017f future-pass whole accepted input prerequisite
+
+ADR0051/contracts/future_pass_inputs.md: optional capture/verify on existing
+workspace_nodes, frozen private registration and existing deployment/store/globe
+proofs. Full<=240 deployed and one enabled station, no native/HTTP/UI timer. Paused
+source exactUTC vs actual catalog continuous lease; projectedSIM rejected. Existing
+missionInputs approval unchanged. Epoch/current callbacks fence store/config/source/
+visibility/control/disposal. Regression-first fullactualroster/copy/dirty/server/
+readiness/reentry/lifecycle guards, independent analysis before implementation.
+Constitution1.2.0 gates pass: same layers/language/owners/source/function scope.
+Following native geometry validation/query and original visual lifecycle remain
+pending N017g/h design, then whole fulltests/actualtworesolution acceptance.
+
+N017f analysis repair2: sameUTC stored/SIM control needs actual entry notification,
+and pending must span API reply through actual state adoption. workspace_orbit
+injects begin callback into optional onControl/observers.control of existing
+orbit_selection.js, tabs/sim_workspace.js and scenario/workspace_adapter.js.
+Stored select spans pending/adopt/fail; SIM command spans bootstrap adoption and
+busy cleanup; scenario existing runtime adapter spans refreshRuntime verification.
+beginFuturePassControl increments epoch/pending depth; idempotent finally release
+fences completion/failure/throw. No new HTTP/wire/state/clock/bus. Optional internal
+observer extension is recorded in ADR0051. GET/telemetry remain read-only events.
+Whole exposed display provenance exceptUTC defines same source. Add actual source
+control assembly RED in workspace_future_pass_control_assembly.test.mjs, then
+root DI after owner ports stabilize; independent rereview before implementation.
+
+Repair3 clarifies observational DI contracts: actual owners return current copies
+or private proofs; authorized mutations publish existing control/config/display/
+store/continuity invalidations. Tests retain changed returnedvalues and terminal
+actualowner reentry. No finite-read claim for arbitrary silent cross-owner getter
+mutation, no unbounded repeat loop/new authority.

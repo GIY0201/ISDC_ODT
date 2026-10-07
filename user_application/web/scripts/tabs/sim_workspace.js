@@ -20,6 +20,8 @@ function number(value, low, high, integer=false) {
 export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()=>{}, timers={setTimer:(fn,ms)=>setTimeout(fn,ms),clearTimer:id=>clearTimeout(id)}, observers={}) {
   let state={runtime:null,scenarios:[],events:[],metrics:null,wallTime:'',busy:false,stale:true,connection:'idle',status:'서버 SIM 연결 대기',error:'',draft:{speed:'',scenario_id:'',target:'',kind:'link_loss',severity:'medium',duration_seconds:'60'}};
   let ended=false,close=null,connected=false,timer=null,barrier=null,received=0,initialized=false,receivedAtMs=null;
+  let controlEntering=false;const controlReleases=new Set();
+  function beginControl(){controlEntering=true;let cleanup;try{cleanup=observers.control?.();}finally{controlEntering=false;}let released=false;const release=()=>{if(released)return;released=true;controlReleases.delete(release);try{cleanup?.();}catch{/* Cleanup cannot replace command results. */}};controlReleases.add(release);if(ended)release();return release;}
   const receiptNow=typeof timers.now==='function'?timers.now:Date.now;
   function watch() { timers.clearTimer(timer); timer=timers.setTimer(()=>{if(!ended){state.stale=true;observers.status?.('stale');changed('stream');}},3500);timer?.unref?.(); }
   function installBootstrap(value, keepStream=false) {
@@ -48,7 +50,9 @@ export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()
     } catch(error) {state.stale=true;state.error=error.message;observers.status?.('invalid');changed('stream');}
   }
   async function command(work,label) {
-    if(ended || state.busy)return;
+    if(ended || state.busy||controlEntering)return;
+    const release=beginControl();if(ended){release();return;}
+    try{
     state.busy=true;state.error='';changed('controls');
     try {
       const result=await work();if(ended)return;
@@ -58,6 +62,7 @@ export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()
       const r=installBootstrap(boot);barrier={runtime:r,fault};state.metrics=null;state.wallTime='';state.stale=true;state.status=label+' · 스트림 동기화 대기';watch();
     } catch(error) {if(!ended){state.stale=true;state.error=`${error.message} · 명령 적용 여부는 서버 새로고침으로 확인하세요.`;state.status='요청 실패';}}
     finally {if(!ended){state.busy=false;changed('controls');}}
+    }finally{release();}
   }
   const controller={
     snapshot:()=>copy(state),
@@ -73,7 +78,7 @@ export function createSimWorkspace(api, connector, changed=()=>{}, onMissions=()
     speed(){return command(()=>api.runtimeSpeed(number(state.draft.speed,.1,128)),'배속 응답');},
     scenario(){return command(()=>{const id=state.draft.scenario_id;if(!state.scenarios.some(s=>s.id===id))throw Error('서버 시나리오를 선택하세요.');return api.selectScenario(id);},'시나리오 응답');},
     fault(){return command(()=>{const d=state.draft,target=d.target.trim();if(!target || [...target].length>80 || !kinds.includes(d.kind) || !severities.includes(d.severity))throw Error('장애 대상·유형·심각도를 확인하세요.');return api.injectFault({target,kind:d.kind,severity:d.severity,duration_seconds:number(d.duration_seconds,1,3600,true)});},'장애 주입 응답');},
-    destroy(){if(ended)return;ended=true;receivedAtMs=null;timers.clearTimer(timer);close?.();}
+    destroy(){if(ended)return;ended=true;receivedAtMs=null;for(const release of [...controlReleases])release();timers.clearTimer(timer);close?.();}
   };
   return controller;
 }

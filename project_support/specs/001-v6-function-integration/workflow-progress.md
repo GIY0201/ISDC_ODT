@@ -1345,3 +1345,74 @@ blank label. FullNode1529PASS0FAIL0SKIP23850.9712ms exit0. FullPython965PASS,
 Context7 actual Cesium latest reference queried and recorded. Same branch/8891,
 original SIM/inputs retained; Aside follow-up actual validation queued/running.
 WholeN017/N018/T075–T084/T032 and actual two-resolution screen acceptance OPEN.
+
+2026-10-07 next controller boundary: previous goal turn progress f8ae85c, clean tree
+verified before new design. Existing Aside handle60951 confirmed live. Actual
+workbench receipt360 quality blank differs from popout; current source fixture
+both modes retains explicit label, HTTP bothorigins serves identical current SHA
+d69b632e68de4f5920d25d578ccf3381939972a4be790c400a0e26b473c4ee02 withno-cache.
+No cause inferred/no blind code repair. Browser actual DOM diagnosis continues.
+Selected earliest prerequisite plan for N017f: actual plan skill/setup preserved
+existingfeature and constitution1.2.0, extensions absent before/after. ADR0051,
+future_pass_inputs contract and spec/plan/model/quickstart amended before code;
+affected analysis/implementation verification stale. Actual tasks skill/setup
+read existing template; T154/T155 appended under US20 preserving all prior IDs.
+Two new executable tasks, RED→implementation/review/fulltest; no parallel ownedfile
+edits. Checklist8/8 existing requirement-quality not rerun as execution evidence.
+Next analyze N017f then regression-first implement after clean review. Nativequery/
+source lifecycle N017g/h, mixedroute/N018 and whole75–84/T032 remain OPEN.
+
+N017f independent analysis HIGH1: sameUTC paused stored control can finish between
+verifications while display JSON notification is suppressed; scope equality alone
+cannot prove absence of control. Authoring repair1 chooses actual minimal control
+entry/finally observation bridge, preserving paused stored/SIM support ratherthan
+excluding it. ADR0051/contract/plan/tasks updated with beginFuturePassControl depth
+and root api adapter plus actual controller assembly RED. Full exposed source
+provenance excludingUTC explicit. Rereview pending; dependent code not started.
+
+N017f repair2 resolves implementation-order concern before code: API response
+finally would release earlier than controller state adoption. Use optional actual
+owner-scope observer callbacks in stored select/SIM command/scenario existing
+runtime adapter, holding pending through adopt/bootstrap/refreshRuntime/cleanup.
+Root injects begin callback; no guessed microtask/timer delay and no new API calls.
+ADR/contract/plan/tasks/quickstart updated; owner callback assembly regression
+required. Rereview pending, affected implementation not started.
+
+N017f repair2 independent analyze rereview CLEAN: actual owner insertion points,
+task coverage and absent-observer compatibility verified; no HIGH/CRITICAL.
+Implementation prerequisites rerun PASS; requirement-quality checklist8/8,
+extensions absent, existing ignore rules preserved. T154 actual accepted240 owner
+regressions RED15/15 missing methods. Separate stored/SIM observer regressions
+RED→focused21PASS; scenario observer work ongoing. Root actual assembly test
+factory setup corrected for frozen owner and pagehide cleanup before authoritative
+RED; no product root DI edited yet. Whole acceptance stays OPEN.
+
+Root composition regression now meaningful RED missing injectedcallbacks→GREEN:
+actual stored owner seek/request and actual SIM pause hold pending through deferred
+bootstrap/adoption. Spy delegates actual begin/release functions (no optional fake
+authority). Independent root review clean for bounded DI/stored/SIM claim; scenario
+operation lifetime separately covered by owner tests. Observer independent28PASS,
+author85PASS including resume/drain/default behavior. Scenario existing fault/data
+commands conservatively revoke; documented contract. Future-owner callback review
+ongoing; fullPython started session95620, not yet passed. No runtime reset.
+
+N017f repair3 clarifies observational port assumption after terminal audit:
+actual owner copies/proofs and event-emitting authorized changes; no impossible
+finite-read guarantee for getters silently mutating unrelated private owners.
+Terminal actualstore/display/control events and changed mode/readiness/lease
+tests retained (8 focusedPASS). No unbounded extra reads/new authority. ADR/
+contract/plan/model/quickstart/tasks aligned; independent repair3 gate pending.
+FullPython session95620 exit0:965PASS1existingPillowSKIP8existingERFAwarnings233.65s.
+
+N017f final: repair3 independent analysis CLEAN. Station validator returnederrors
+MEDIUM reproducedRED→fixed for whole roster, final focusedworkspace87PASS and
+independent27PASS+invalidstation1PASS, no remaining scopedblocker. Root actual
+stored/SIM DI proof supplements originalscenario owneroperationtests. Finalfull
+Node1565PASS0FAIL0SKIP23841.0923ms session93803 exit0; Python965PASS1existingPillow
+SKIP8ERFAwarnings233.65s session95620 exit0 (beforefinalJS-onlyvalidationfix).
+Whitespacepass/extensionsabsent. validation/future_pass_inputs_connection.md;
+T154/T155 complete, N017g/h/wholeN017/N018/T075–T084/T032 OPEN. Selectednextstage
+plan for geometry-only nativefuturequery, then originalsource lifecycle/display.
+Current Aside remainslive60951, actualoperatorfocus unsupportedUTC after3bounded
+tries, noauthoritybypass/SIMreset; modelcapturescontinuebuttinybody screenshots
+are not actualmaterial GPU success. Same branch/8891/currentrun preserved.

@@ -1,3 +1,22 @@
+## 2026-10-07 N017f 미래 통과 입력 경계
+
+기존 workspace owner에서 실제 전체 수락 명부·활성 지상국·분석 UTC를
+등록된 불변 값으로 읽고 검증하는 포트를 연결했다. 저장/SIM/시나리오
+제어 진입부터 실제 상태 반영과 정리까지 scope를 유지한다. 기존 정지
+임무 승인 조건과 서버/SIM/배치/8891/브랜치를 유지하며 새 HTTP·계산·시계를
+추가하지 않았다. Context7 공식 MDN 비동기 정리 문서를 대조했다.
+
+입력15개/관찰5개/rootDI/invalidstation RED 후 수정, workspace87PASS,
+독립 최종27PASS 및 invalidstation1PASS. 전체 Node1565PASS0FAIL0SKIP
+23841.0923ms exit0, Python965PASS1기존PillowSKIP8기존ERFAwarnings233.65s exit0.
+Python은 마지막 JavaScript validator 반환 수정 전 실행했고 Python 변경은
+없다. whitespace 통과. 증거 validation/future_pass_inputs_connection.md와
+data/workspace/validation/full_migration_{node,python}_N017_future_inputs.log.
+
+입력 포트는 실제 owner의 관찰 사본·증명 및 기존 무효화 이벤트를 요구한다.
+미래 통과 native 조회/UI3h/max3/12/>60s/current 표시와 mixed route/N018,
+실제두해상도/GPU/성능/T075–T084/T032 및 PR은 계속 미완료다.
+
 ## 2026-10-06 T151 shared node renderer binding partial
 Continue T075–T084 on the same codex/satellite-node-integration branch. Add explicit bindNodeRenderer/readonly status observer to the existing workspace globe; bind the existing Viewer and preRender event, read its common canonical display UTC, and use monotonic performance only for qualitative animation phase. Missing common UTC passes null and hides actual NodeScene points. No Viewer, analysis clock, native query, background timer, storage or server command is created by this binding. Preserve GP/catalog/stations/solar owners. Rebinding, preboot, factory/frame errors, reentrant replacement, queued callbacks, global render failure and disposal release only owned node listeners/resources. Focused10PASS172.2181ms including actual NodeScene/source-captured metre positions/common UTC/foreign primitive preservation, rather than only accepting a permissive renderer callback. Initial4missingmethod RED; test doubles repaired to include the existing globe focus and canonical source-time input; product UTC guard unchanged. FullNode622PASS4001.0294ms; fullPython649PASS8existingwarnings164.41s(session94084exit0); syntax/whitespace PASS. Evidence validation/t151_node_renderer.md. No live8891/native installation/browser/remotePR/merge/branch change.
 N005 OPEN: existing SatelliteModelLayer.nativeAt requires ITRF/catalog_number/normalized_gp_sha256, while source NodeScene suppresses its selected fleet model and delegates the selected model to that layer. Native source node geometry has EARTH_FIXED_GMST_UTC_APPROX/node_id/definition_hash. A direct sampler connection would be rejected; relabeling native coordinates as precise ITRF is forbidden. Owner T151 selected model/pose composition; trigger before selecting node/focus/full UI assembly. Add explicitly validated source-node pose/domain support to the same selected-model/camera lifecycle, preserve all original GP checks, current complete definitions/hash/UTC/profile/frame/source/quality and display-orientation approximation, then verify native and GP cases. No second selected-model renderer or copied pose authority. Keep N005 open until that actual implementation/verification exists.

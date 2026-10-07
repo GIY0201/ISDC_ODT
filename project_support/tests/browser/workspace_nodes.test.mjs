@@ -12,6 +12,77 @@ import * as stationModel from '../../../digital_twin/model_library/browser/groun
 import {createGroundLinkModel} from '../../../digital_twin/simulation/browser/ground_links.js';
 import {createNetworkSnapshotModel} from '../../../digital_twin/simulation/browser/network_snapshot.js';
 
+async function futurePassFixture({count=2,natural=false}={}){
+ let running=natural,ready=true,readyHook=null,continuityHook=null,stationHook=null,clockHook=null,leaseValid=true,lease=Object.freeze({}),holdPost=false,releasePost;const stations=stationModel.DEFAULT_STATION_KEYS.map(preset=>stationModel.createStation({preset}));
+ let server={revision:0,run_id:'run',scope_id:'run:unconfigured',deployment_id:null,nodes:[]},continuityObserver;
+ const f=fixture({readClock:()=>{clockHook?.();return {running};},networkInputs:{readStations:()=>{stationHook?.();return stations;},readFaults:()=>[],stationInteractionReady:()=>{readyHook?.();return ready;}},view:{captureDisplayContinuity:()=>natural&&leaseValid?lease:null,verifyDisplayContinuity:value=>{continuityHook?.();return leaseValid&&value===lease;},observeDisplayContinuity(fn){continuityObserver=fn;return()=>{};}},fetchOverride:async(url,options)=>{if(options.method==='POST'){if(holdPost)await new Promise(resolve=>releasePost=resolve);const p=JSON.parse(options.body);server={revision:server.revision+1,run_id:'run',scope_id:`run:deployment:${p.deployment_id}`,deployment_id:p.deployment_id,nodes:p.nodes};}return {ok:true,json:async()=>structuredClone(server)};}});
+ await f.workspace.start();f.workspace.show('satellite');for(let i=0;i<count;i++)f.options.store.add({name:'Accepted '+i});f.buttons.get('nodes-deploy').fn();for(let i=0;i<200&&f.workspace.snapshot().deployment.busy;i++)await new Promise(r=>setTimeout(r,1));
+ f.context({utc:'2026-10-04T22:01:12.000000000Z',key:natural?'catalog:accepted':'stored:accepted',source:natural?'catalog':'stored',leap_sha256:LEAP_SHA256,eop_sha256:null});f.workspace.setNetworkVisualActive(true);
+ return {...f,stations,get server(){return server;},set holdPost(v){holdPost=v;},releasePost:()=>releasePost?.(),set running(v){running=v;},set ready(v){ready=v;},set readyHook(v){readyHook=v;},set continuityHook(v){continuityHook=v;},set stationHook(v){stationHook=v;},set clockHook(v){clockHook=v;},revokeContinuity(){leaseValid=false;continuityObserver({phase:'invalidated'});},restoreContinuity(){leaseValid=true;},move(value){f.context({utc:value,key:natural?'catalog:accepted':'stored:accepted',source:natural?'catalog':'stored',leap_sha256:LEAP_SHA256,eop_sha256:null});}};
+}
+test('future pass inputs use full actual accepted240 and selected enabled station without queries or mission approval',async()=>{
+ const f=await futurePassFixture({count:240});try{
+  assert.equal(typeof f.workspace.captureFuturePassInputs,'function');const calls=f.calls.length;
+  const value=f.workspace.captureFuturePassInputs(f.stations[1].id);assert.equal(value.presentation_kind,'FUTURE_PASS_INPUT_V1');assert.equal(value.nodes.length,240);assert.deepEqual(value.nodes,f.options.store.deployed);assert.deepEqual(value.deployment,f.server);assert.deepEqual(value.station,f.stations[1]);assert.equal(value.analysis_utc,'2026-10-04T22:01:12.000000000Z');assert.equal(Object.isFrozen(value),true);assert.equal(Object.isFrozen(value.nodes[0].equipment),true);assert.equal(f.workspace.verifyFuturePassInputs(value),true);assert.equal(f.workspace.verifyFuturePassInputs(structuredClone(value)),false);assert.equal(f.calls.length,calls);
+  assert.equal(f.workspace.captureFuturePassInputs().station.id,f.stations[0].id);assert.equal(f.workspace.captureFuturePassInputs('unknown'),null);f.stations[1].enabled=false;assert.equal(f.workspace.captureFuturePassInputs(f.stations[1].id),null);
+ }finally{f.workspace.destroy();}
+});
+test('catalog natural continuity fixes analysisUTC while preserving paused mission restriction and irreversible lease revocation',async()=>{
+ const f=await futurePassFixture({natural:true});try{
+  const value=f.workspace.captureFuturePassInputs();assert.ok(value);assert.throws(()=>f.workspace.missionInputs(),/정지/);f.move('2026-10-04T22:02:13.000000000Z');assert.equal(f.workspace.verifyFuturePassInputs(value),true);assert.equal(value.analysis_utc,'2026-10-04T22:01:12.000000000Z');f.revokeContinuity();assert.equal(f.workspace.verifyFuturePassInputs(value),false);f.restoreContinuity();assert.equal(f.workspace.verifyFuturePassInputs(value),false);
+ }finally{f.workspace.destroy();}
+});
+for(const change of ['dirty','server','station','ready','hide','clear','source','utc','projected','leap','dispose'])test(`future pass ${change} revokes full owner input`,async()=>{
+ const f=await futurePassFixture();try{const value=f.workspace.captureFuturePassInputs();assert.ok(value);
+  if(change==='dirty')assert.deepEqual(f.options.store.update(f.options.store.selectedId,{...f.options.store.selected,name:'Edited'}),[]);if(change==='server'){f.server.nodes[0].name='Other window';await f.workspace.retryRestore();}
+  if(change==='station')f.stations[0].latitude++;if(change==='ready')f.ready=false;if(change==='hide')f.workspace.setNetworkVisualActive(false);if(change==='clear')f.workspace.clearNetwork();
+  if(change==='source')f.context({utc:value.analysis_utc,key:'stored:foreign',source:'stored'});if(change==='utc')f.move('2026-10-04T22:01:13.000000000Z');if(change==='projected')f.context({utc:value.analysis_utc,key:'sim:R',source:'sim',projected:true});if(change==='leap')f.move('2016-12-31T23:59:60.000000000Z');if(change==='dispose')f.workspace.destroy();
+  assert.equal(f.workspace.verifyFuturePassInputs(value),false);assert.equal(f.workspace.verifyFuturePassInputs(value),false);
+ }finally{f.workspace.destroy();}});
+test('sameUTC explicit control blocks nested pending and never restores old token after idempotent release',async()=>{
+ const f=await futurePassFixture();try{const old=f.workspace.captureFuturePassInputs(),a=f.workspace.beginFuturePassControl(),b=f.workspace.beginFuturePassControl();assert.equal(f.workspace.verifyFuturePassInputs(old),false);assert.equal(f.workspace.captureFuturePassInputs(),null);a();a();assert.equal(f.workspace.captureFuturePassInputs(),null);b();assert.ok(f.workspace.captureFuturePassInputs());assert.equal(f.workspace.verifyFuturePassInputs(old),false);
+ }finally{f.workspace.destroy();}
+});
+test('external clock or station callback control-entry cannot publish captured approval',async()=>{
+ for(const field of ['clockHook','stationHook']){const f=await futurePassFixture();try{let once=true;f[field]=()=>{if(once){once=false;f.workspace.beginFuturePassControl()();}};assert.equal(f.workspace.captureFuturePassInputs(),null);}finally{f.workspace.destroy();}}
+});
+test('natural catalog lease cannot excuse complete station definition changes',async()=>{
+ const f=await futurePassFixture({natural:true});try{const value=f.workspace.captureFuturePassInputs();f.stations[0].dish_m++;assert.equal(f.workspace.verifyFuturePassInputs(value),false);}finally{f.workspace.destroy();}
+});
+test('future inputs reject invalid selected and nonselected stations from the full returned roster',async()=>{
+ const f=await futurePassFixture();try{
+  for(const index of [0,1]){const original=f.stations[index].latitude;f.stations[index].latitude=100;assert.equal(f.workspace.captureFuturePassInputs(f.stations[0].id),null);f.stations[index].latitude=original;}
+ }finally{f.workspace.destroy();}
+});
+test('future inputs require loaded confirmed nonempty actual deployment and reject busy or failed readers',async()=>{
+ const cold=fixture({readClock:()=>({running:false}),networkInputs:{readStations:()=>[],readFaults:()=>[],stationInteractionReady:()=>true}});try{assert.equal(cold.workspace.captureFuturePassInputs(),null);await cold.workspace.start();cold.workspace.setNetworkVisualActive(true);assert.equal(cold.workspace.captureFuturePassInputs(),null);}finally{cold.workspace.destroy();}
+ const f=await futurePassFixture();try{const old=f.workspace.captureFuturePassInputs();f.holdPost=true;f.buttons.get('nodes-recall').fn();await new Promise(r=>setTimeout(r,1));assert.equal(f.workspace.snapshot().deployment.busy,true);assert.equal(f.workspace.captureFuturePassInputs(),null);assert.equal(f.workspace.verifyFuturePassInputs(old),false);f.releasePost();for(let i=0;i<60&&f.workspace.snapshot().deployment.busy;i++)await new Promise(r=>setTimeout(r,1));assert.equal(f.workspace.captureFuturePassInputs(),null);}finally{f.releasePost();f.workspace.destroy();}
+ const g=await futurePassFixture();try{const old=g.workspace.captureFuturePassInputs();g.stationHook=()=>{throw Error('configuration unavailable');};assert.equal(g.workspace.verifyFuturePassInputs(old),false);assert.equal(g.workspace.captureFuturePassInputs(),null);g.stationHook=null;assert.equal(g.workspace.verifyFuturePassInputs(old),false);}finally{g.workspace.destroy();}
+});
+test('paused sameUTC full display provenance change cannot retain registered input',async()=>{
+ const f=await futurePassFixture();try{const old=f.workspace.captureFuturePassInputs();f.context({utc:old.analysis_utc,key:'stored:accepted',source:'stored',leap_sha256:LEAP_SHA256,eop_sha256:'f'.repeat(64)});assert.equal(f.workspace.verifyFuturePassInputs(old),false);f.move(old.analysis_utc);assert.equal(f.workspace.verifyFuturePassInputs(old),false);}finally{f.workspace.destroy();}
+});
+for(const change of ['utc','source'])test(`observed ${change} away-and-back revokes old future token before verification`,async()=>{
+ const f=await futurePassFixture();try{const old=f.workspace.captureFuturePassInputs();if(change==='utc')f.move('2026-10-04T22:01:13.000000000Z');else f.context({utc:old.analysis_utc,key:'stored:other',source:'stored',leap_sha256:LEAP_SHA256,eop_sha256:null});f.move(old.analysis_utc);assert.equal(f.workspace.verifyFuturePassInputs(old),false);assert.ok(f.workspace.captureFuturePassInputs());}finally{f.workspace.destroy();}
+});
+for(const port of ['clock','readiness','continuity','stations'])test(`terminal ${port} changed live owner value cannot publish future input`,async()=>{
+ const f=await futurePassFixture({natural:port==='continuity'});try{let reads=0;
+  if(port==='clock')f.clockHook=()=>{if(++reads===3)f.running=true;};
+  if(port==='readiness')f.readyHook=()=>{if(++reads===6)f.ready=false;};
+  if(port==='continuity')f.continuityHook=()=>{if(++reads===4)f.revokeContinuity();};
+  if(port==='stations')f.stationHook=()=>{if(++reads===3)f.running=true;};
+  assert.equal(f.workspace.captureFuturePassInputs(),null);
+ }finally{f.workspace.destroy();}
+});
+for(const port of ['clock','readiness','continuity'])test(`terminal ${port} real owner event revokes captured future input`,async()=>{
+ const f=await futurePassFixture({natural:port==='continuity'});try{let reads=0;
+  if(port==='clock')f.clockHook=()=>{if(++reads===3)assert.deepEqual(f.options.store.update(f.options.store.selectedId,{...f.options.store.selected,name:'Changed by owner'}),[]);};
+  if(port==='readiness')f.readyHook=()=>{if(++reads===6)f.context({utc:'2026-10-04T22:01:12.000000000Z',key:'stored:foreign',source:'stored',leap_sha256:LEAP_SHA256,eop_sha256:null});};
+  if(port==='continuity')f.continuityHook=()=>{if(++reads===4)f.workspace.beginFuturePassControl()();};
+  assert.equal(f.workspace.captureFuturePassInputs(),null);
+ }finally{f.workspace.destroy();}
+});
+
 test('mounted network consumer shares sampled analysis cadence and explicit activation authority',async()=>{
  const codec=createUtcCodec(LEAP_SHA256),start=codec.advance('2026-10-04T22:01:12Z',0),lease=Object.freeze({});
  let valid=true,listener,rendererOptions,sequence=0,faults=[];const scheduled=new Map(),activation=[];

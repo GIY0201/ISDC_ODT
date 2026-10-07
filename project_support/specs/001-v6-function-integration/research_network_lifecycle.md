@@ -75,3 +75,14 @@ Cesium 버전을 임의로 올리지 않고 기존 handler와 datasource 경계�
 https://cesium.com/learn/cesiumjs/ref-doc/ScreenSpaceEventHandler.html,
 https://cesium.com/learn/cesiumjs/ref-doc/CustomDataSource.html,
 https://cesium.com/learn/cesiumjs/ref-doc/Entity.html.
+
+N017f의 HTTP 응답과 실제 controller 반영 사이 해제 문제는 Context7의
+`/mdn/content`에서 async/await 및 try/finally를 조회해 대조했다. finally는
+감싼 작업이 끝난 뒤 실행되므로 HTTP만 감싸면 후속 상태 반영까지 보장하지
+않는다. 실제 owner의 adopt/bootstrap/refreshRuntime까지 await하는 scope를
+사용하고 정리 오류가 기존 결과·오류를 대체하지 않도록 회귀시험한다.
+이는 최신 문법으로의 무조건적인 교체나 문서만으로 앱 검증을 대신하는
+변경이 아니다. 공식 참고:
+https://github.com/mdn/content/blob/main/files/en-us/web/javascript/reference/statements/try...catch/index.md,
+https://github.com/mdn/content/blob/main/files/en-us/web/javascript/reference/global_objects/promise/finally/index.md,
+https://github.com/mdn/content/blob/main/files/en-us/web/javascript/reference/operators/await/index.md.

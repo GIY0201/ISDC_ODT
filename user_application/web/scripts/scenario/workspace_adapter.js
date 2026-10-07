@@ -4,7 +4,7 @@ import {createScenarioRunner} from './runner.js';
 import {createScenarioClock} from './clock.js';
 import {NODE_COMMUNICATION_METADATA} from '../nodes/node_timeline.js';
 const requireValue=(value,message)=>{if(!value)throw Error(message);};
-export function createWorkspaceScenario({api,nodeWorkspace,ground,missionServices,fabric,simController,nodeLibrary,missionTypes,stationModel,assemblyFactory,kpi,storage=null,onChange=()=>{},switchTab=()=>{},clockOwners={},affectedTasks=null}={}){
+export function createWorkspaceScenario({api,nodeWorkspace,ground,missionServices,fabric,simController,nodeLibrary,missionTypes,stationModel,assemblyFactory,kpi,storage=null,onChange=()=>{},switchTab=()=>{},clockOwners={},affectedTasks=null,onControl=null}={}){
  requireValue(api&&nodeWorkspace&&ground&&missionServices&&fabric&&simController&&missionTypes&&stationModel&&typeof assemblyFactory==='function'&&kpi,'existing scenario workspace owners required');
  const ports=typeof nodeWorkspace.scenarioPorts==='function'?nodeWorkspace.scenarioPorts():null;
  const library=nodeLibrary??ports?.nodeLibrary;
@@ -12,6 +12,8 @@ export function createWorkspaceScenario({api,nodeWorkspace,ground,missionService
  const assembly=assemblyFactory({nodeLibrary:library,stationModel,missionTypes});
  const readRuntime=()=>simController.snapshot().runtime;
  let dead=false,prepared=false,lastNativeHashes=null,resumeCounter=0;
+ const controlReleases=new Set();
+ function controlled(work){if(onControl==null)return work();return (async()=>{requireValue(!dead,'scenario workspace disposed');const cleanup=onControl?.();let released=false;const release=()=>{if(released)return;released=true;controlReleases.delete(release);try{cleanup?.();}catch{/* Cleanup cannot replace command results. */}};controlReleases.add(release);try{requireValue(!dead,'scenario workspace disposed');return await work();}finally{release();}})();}
  const clock=createScenarioClock({runtime:readRuntime,...clockOwners,control:{pause:()=>runner.pause(),play:()=>runner.play(),setSpeed:n=>runner.setSpeed(n),advance:n=>runner.advance(n),refuse:message=>{throw Error(message);}}});
  async function refreshRuntime(status){await simController.load();const actual=readRuntime();requireValue(actual?.run_id===status.run_id&&actual.running===status.running,'SIM owner did not accept current runtime response');return actual;}
  async function preflight(definition){
@@ -63,11 +65,11 @@ export function createWorkspaceScenario({api,nodeWorkspace,ground,missionService
  const readFabric=()=>typeof fabric.snapshot==='function'?fabric.snapshot():{status:'unavailable',error:'기존 통신 모듈 owner가 연결되지 않았습니다.',receipt:null};
  let pendingNetwork=null;
  const networkTwin={resetHistories:()=>{nodeWorkspace.clearNetwork?.();fabric.invalidate?.();},tick(){pendingNetwork=prepare().then(()=>nodeWorkspace.updateNetwork());return pendingNetwork;},async exchange(){await pendingNetwork;const answer=await fabric.send();requireValue(answer&&readFabric().status==='accepted','current native network was not accepted');return answer;},route:(...args)=>fabric.route(...args),reachable:()=>readFabric().status==='accepted',get report(){return readFabric().receipt;},get fabricState(){const value=readFabric();return {reachable:value.status==='accepted',error:value.error,sequence:value.receipt?.sequence};},get last(){return nodeWorkspace.networkSnapshot?.()??null;}};
- async function beginTick(){commandReady();const state=readRuntime();requireValue(state?.mode==='SIM','actual SIM owner unavailable');const lease={running:state.running,run_id:state.run_id};if(state.running)await refreshRuntime(await api.runtimeControl('pause'));return lease;}
- async function endTick(lease,succeeded,phase){if(!dead&&succeeded&&phase==='finished'&&prepared){try{requireValue(readRuntime()?.running===false&&readRuntime()?.run_id===lease?.run_id,'완료 checkpoint의 실제 SIM 실행을 확인하세요.');await checkpoint();}finally{prepared=false;}return;}if(!dead&&succeeded&&phase==='playing'&&lease?.running&&readRuntime()?.run_id===lease.run_id){await refreshRuntime(await api.runtimeControl('start'));}}
- const sourceApi={...api};for(const name of ['runtimeControl','runtimeSpeed','selectScenario','scenarioAdvance'])sourceApi[name]=async(...args)=>{commandReady();return refreshRuntime(await api[name](...args));};
- sourceApi.injectFault=async(...args)=>{commandReady();const result=await api.injectFault(...args);await simController.load();return result;};
- sourceApi.dataManagementRequest=async(...args)=>{commandReady();return api.dataManagementRequest(...args);};
+ function beginTick(){return controlled(async()=>{commandReady();const state=readRuntime();requireValue(state?.mode==='SIM','actual SIM owner unavailable');const lease={running:state.running,run_id:state.run_id};if(state.running)await refreshRuntime(await api.runtimeControl('pause'));return lease;});}
+ function endTick(lease,succeeded,phase){if(dead)return Promise.resolve();return controlled(async()=>{if(!dead&&succeeded&&phase==='finished'&&prepared){try{requireValue(readRuntime()?.running===false&&readRuntime()?.run_id===lease?.run_id,'완료 checkpoint의 실제 SIM 실행을 확인하세요.');await checkpoint();}finally{prepared=false;}return;}if(!dead&&succeeded&&phase==='playing'&&lease?.running&&readRuntime()?.run_id===lease.run_id){await refreshRuntime(await api.runtimeControl('start'));}});}
+ const sourceApi={...api};for(const name of ['runtimeControl','runtimeSpeed','selectScenario','scenarioAdvance'])sourceApi[name]=(...args)=>controlled(async()=>{commandReady();return refreshRuntime(await api[name](...args));});
+ sourceApi.injectFault=(...args)=>controlled(async()=>{commandReady();const result=await api.injectFault(...args);await simController.load();return result;});
+ sourceApi.dataManagementRequest=(...args)=>controlled(async()=>{commandReady();return api.dataManagementRequest(...args);});
  const unavailable={};
  const runner=createScenarioRunner({assembly,missionTypes,kpi,pairKey,api:sourceApi,constellation:ports?.store??unavailable,groundSegment:ground,missionStore,dataDeployment:ports?.deployment?{async deploy(){await ports.deployment.refresh();return ports.deployment.deploy();}}:unavailable,planner,networkTwin,clock,storage,runtime:readRuntime,now:()=>clock.now(),applyRuntime:()=>{},switchTab,emit:()=>onChange(),preflight,beginTick,endTick,wait:async()=>{}});
  const originalStop=runner.stop;runner.stop=(...args)=>{const result=originalStop(...args);ports?.releaseDisplay?.();prepared=false;return result;};
@@ -139,5 +141,5 @@ export function createWorkspaceScenario({api,nodeWorkspace,ground,missionService
  async function stopReviewed(options){await releaseAnalysis();runner.stop(options);}
  for(const key of ['setup','pause','advance','skipToNextStep']){const original=runner[key];runner[key]=async(...args)=>{if(key==='setup')await releaseAnalysis();const result=await original(...args);await checkpoint();return result;};}
  const off=runner.subscribe(onChange);
- return Object.freeze({runner,clock,assembly,kpi,preflight,resumePreflight,reviewFinishedInputs,followAnalysis,releaseAnalysis,stopReviewed,destroy(){if(dead)return;dead=true;runner.suspend();off();}});
+ return Object.freeze({runner,clock,assembly,kpi,preflight,resumePreflight,reviewFinishedInputs,followAnalysis,releaseAnalysis,stopReviewed,destroy(){if(dead)return;dead=true;for(const release of [...controlReleases])release();runner.suspend();off();}});
 }

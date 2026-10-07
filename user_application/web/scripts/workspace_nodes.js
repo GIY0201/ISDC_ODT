@@ -16,6 +16,43 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  let networkScene=null,networkSceneInput=null,groundLinksVisible=true,coverageVisible=true,networkVisualActive=false,network=null,networkComposition=0,displayLease=null;
  let tracks=true,links=true,modelsVisible=true;const readiness=new Map(),removers=[];
  let restorePromise=null,scenarioReceipt=null,networkFaultSignature=null;
+ let futureEpoch={},futureControlDepth=0;const futureInputs=new WeakMap();
+ const revokeFuturePassInputs=()=>{futureEpoch={};};
+ function beginFuturePassControl(){revokeFuturePassInputs();futureControlDepth++;let released=false;return()=>{if(released)return;released=true;futureControlDepth--;};}
+ function futurePassScope(stationId){
+  if(dead||!started||!networkVisualActive||futureControlDepth||typeof networkInputs?.stationInteractionReady!=='function'||networkInputs.stationInteractionReady()!==true)throw Error('future pass configuration unavailable');
+  const state=deployment.state,local=store.snapshot();
+  if(!store.loaded||!store.deploymentConfirmed||store.error||store.isDirty()||state.disposed||state.error||state.busy||state.syncRequired||!state.server||!local.deployed.length||local.deployed.length>240||!deployment.matchesServer(local.receipt))throw Error('whole accepted deployment required');
+  const stations=structuredClone(networkInputs.readStations());
+  if(!Array.isArray(stations)||stations.length>24||new Set(stations.map(s=>s.id)).size!==stations.length)throw Error('complete station definitions required');
+  for(const station of stations)if(networkInputs.validateStation(station).length)throw Error('invalid station definition');
+  const station=stationId===null?stations.find(s=>s.enabled):stations.find(s=>s.id===stationId&&s.enabled);if(!station)throw Error('enabled station required');
+  const context=structuredClone(typeof globe.displayContext==='function'?globe.displayContext():display);if(!context||projectedSim(context))throw Error('actual display required');
+  const utc=advanceUtc(context.utc,0);if(utc!==context.utc||/T\d{2}:\d{2}:60/.test(utc)||!Number.isFinite(Date.parse(utc)))throw Error('unsupported analysis UTC');
+  const clock=readClock(context),source={...context};delete source.utc;
+  const lease=readContinuity?.()??null,natural=clock?.running===true;
+  if(natural&&((context.source??context.key?.split(':')[0])!=='catalog'||!lease||verifyContinuity?.(lease)!==true)||!natural&&clock?.running!==false)throw Error('actual stopped clock or catalog continuity required');
+  if(networkInputs.stationInteractionReady()!==true)throw Error('configuration changed');
+  return {utc,nodes:local.deployed,station,deployment:state.server,source,natural,lease,key:JSON.stringify({nodes:local.deployed,receipt:local.receipt,deployment:state.server,stations,source})};
+ }
+ function verifyFuturePassInputs(value){
+  const record=futureInputs.get(value);if(!record||record.revoked)return false;
+  try{
+   if(record.epoch!==futureEpoch||dead||futureControlDepth)throw Error('scope revoked');
+   const a=futurePassScope(record.stationId),b=futurePassScope(record.stationId);
+   if(a.key!==record.key||b.key!==record.key||a.natural!==record.natural||b.natural!==record.natural)throw Error('future inputs changed');
+   if(record.natural?(a.lease!==record.lease||b.lease!==record.lease||verifyContinuity?.(record.lease)!==true):(a.utc!==record.utc||b.utc!==record.utc))throw Error('future display changed');
+   if(record.epoch!==futureEpoch||dead||futureControlDepth)throw Error('scope revoked');return true;
+  }catch{record.revoked=true;return false;}
+ }
+ function captureFuturePassInputs(stationId=null){
+  if(stationId!==null&&typeof stationId!=='string')return null;const epoch=futureEpoch;
+  try{const scope=futurePassScope(stationId);if(dead||futureControlDepth||epoch!==futureEpoch)return null;
+   const freeze=v=>{if(v&&typeof v==='object'){Object.values(v).forEach(freeze);Object.freeze(v);}return v;};
+   const value=freeze(structuredClone({presentation_kind:'FUTURE_PASS_INPUT_V1',analysis_utc:scope.utc,nodes:scope.nodes,station:scope.station,deployment:scope.deployment}));
+   futureInputs.set(value,{epoch,stationId,key:scope.key,natural:scope.natural,lease:scope.lease,utc:scope.utc,revoked:false});return verifyFuturePassInputs(value)?value:null;
+  }catch{return null;}
+ }
  let applyingSelectedPose=false;
  let reviewedRevision=null,refreshingPanel=false;
  const id=()=>createBrowserId(host.crypto);
@@ -37,7 +74,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   requestSampled:async(_display,lease)=>{const ticket=networkComposition;if(verifyContinuity?.(lease)===true)displayLease=lease;await optical.updateSampled();if(!dead&&networkVisualActive&&ticket===networkComposition&&verifyContinuity?.(lease)===true)return network?.updateSampled();},
   requestExact:async value=>{const ticket=networkComposition;await optical.update();if(!dead&&networkVisualActive&&ticket===networkComposition&&display?.utc===value?.utc)return network?.update();},
   cancelSampled:()=>{networkComposition++;optical.cancelSampled();network?.cancelSampled();if(networkVisualActive&&!dead)networkInputs?.onChange?.();},onError:report,setTimer:host.setTimeout.bind(host),clearTimer:host.clearTimeout.bind(host)});
- const removeContinuity=hasContinuity&&typeof globe.observeDisplayContinuity==='function'?globe.observeDisplayContinuity(event=>{if(!dead)opticalScheduler.continuityEvent(event);}):()=>{};
+ const removeContinuity=hasContinuity&&typeof globe.observeDisplayContinuity==='function'?globe.observeDisplayContinuity(event=>{if(!dead){if(event?.phase==='invalidated')revokeFuturePassInputs();opticalScheduler.continuityEvent(event);}}):()=>{};
  // Communication consumers use these existing owners; no mutable owner escapes this port.
  network=networkInputs===null?null:createNodeNetworkTimeline({model:networkInputs.model,optical,
   requestCommunicationStates:timeline.requestCommunicationStates,readNodes:()=>{
@@ -116,11 +153,13 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   return {...local,contract:'node-workspace-presentation-v1',server:accepted.server,error:error||local.error||accepted.error||'',nodeForSelection:store.nodeForPresentation,matchesDeployed:store.matchesDeployed,matchesServer:deployment.matchesServer,matchesServerNodes:deployment.matchesServerNodes};
  }
  const editorTools=createNodeEditorTools({library,catalogElements,now});
- deployment=createDataDeployment({constellation:store,fetchImpl,createId:id,setTimer:host.setTimeout.bind(host),clearTimer:host.clearTimeout.bind(host),onChange:refreshPanel});
- const removeStore=store.subscribe(()=>{opticalScopeRevision=Object.freeze({});syncDefinitions();});
+ deployment=createDataDeployment({constellation:store,fetchImpl,createId:id,setTimer:host.setTimeout.bind(host),clearTimer:host.clearTimeout.bind(host),onChange:()=>{revokeFuturePassInputs();refreshPanel();}});
+ const removeStore=store.subscribe(()=>{revokeFuturePassInputs();opticalScopeRevision=Object.freeze({});syncDefinitions();});
  const removeDisplay=globe.observeDisplayContext(value=>{
-  if(dead)return;const previousUtc=display?.utc??null,wasProjected=projectedSim(display);display=value?structuredClone(value):null;
+  if(dead)return;const previousUtc=display?.utc??null,wasProjected=projectedSim(display),previousSource=display?{...display}:null;if(previousSource)delete previousSource.utc;display=value?structuredClone(value):null;
   const lease=readContinuity?.()??null,sameContinuous=lease!==null&&lease===displayLease&&verifyContinuity?.(lease)===true;displayLease=lease;
+  const nextSource=display?{...display}:null;if(nextSource)delete nextSource.utc;
+  if(JSON.stringify(previousSource)!==JSON.stringify(nextSource)||previousUtc!==(display?.utc??null)&&!sameContinuous)revokeFuturePassInputs();
   if(previousUtc!==(display?.utc??null)&&!sameContinuous)network?.clear();
   if(display?.utc){void timeline.observe(display.utc);if(projectedSim(display)){if(!wasProjected)optical.resetHistories();}else if(hasContinuity)opticalScheduler.observe();else void optical.update();}else{timeline.clear();optical.resetHistories();opticalScheduler.observe();}
   refreshPose();refreshPanel();
@@ -251,7 +290,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
  return Object.freeze({
   async start(){if(dead||started)return;started=true;const result=await retryRestore();if(!dead&&hasContinuity)opticalScheduler.start();return result;},retryRestore,
   scenarioPorts:()=>scenarioPorts,
-  show,refresh:refreshPanel,refreshModels,sceneSnapshot,contextPresentation,selection,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
+  show,refresh:refreshPanel,refreshModels,sceneSnapshot,contextPresentation,selection,captureFuturePassInputs,verifyFuturePassInputs,beginFuturePassControl,snapshot:()=>({display:display?structuredClone(display):null,timeline:timeline.snapshot(),deployment:deployment.state,error}),
   missionInputs(){
    const state=deployment.state;
    if(dead||!started||!store.loaded||!store.deploymentConfirmed||store.deployed.length===0||store.error||state.server===null||state.syncRequired||state.busy||store.isDirty())throw Error('위성 설정을 불러오고 현재 초안을 서버에 배치하세요.');
@@ -266,8 +305,8 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   setCoverageVisible:value=>{if(dead)return;coverageVisible=Boolean(value);networkScene?.setCoverageVisible(coverageVisible);},
   canFocusGroundNetworkStation:id=>captureGroundStation(id)!==null,
   focusGroundNetworkStation:id=>{const value=captureGroundStation(id);return value!==null&&focusGroundStation(value);},
-  setNetworkVisualActive:value=>{if(dead)return;const active=value===true;if(networkVisualActive===active)return;networkVisualActive=active;networkComposition++;networkScene?.setSampledActive?.(active);if(active)opticalScheduler.force();else network?.cancelSampled();},
-  clearNetworkScene:()=>{networkVisualActive=false;networkComposition++;network?.cancelSampled();networkScene?.setSampledActive?.(false);networkSceneInput=null;networkScene?.clear();},
+  setNetworkVisualActive:value=>{if(dead)return;const active=value===true;if(networkVisualActive===active)return;revokeFuturePassInputs();networkVisualActive=active;networkComposition++;networkScene?.setSampledActive?.(active);if(active)opticalScheduler.force();else network?.cancelSampled();},
+  clearNetworkScene:()=>{revokeFuturePassInputs();networkVisualActive=false;networkComposition++;network?.cancelSampled();networkScene?.setSampledActive?.(false);networkSceneInput=null;networkScene?.clear();},
   updateNetwork:()=>dead?Promise.resolve(null):network?.update()??Promise.resolve(null),
   // UI status/time only; full receipts remain on the original action/render ports.
   networkPresentation:()=>{
@@ -279,7 +318,7 @@ export function createWorkspaceNodes({api,globe,solar=null,library,orbitElements
   networkSampledPresentation:()=>dead?null:network?.sampledPresentation()??null,
   verifySampledNetworkPresentation:(value,options)=>!dead&&network?.verifySampledPresentation(value,options)===true,
   verifyNetworkSnapshot:value=>!dead&&network?.verifySnapshot(value)===true,
-  clearNetwork:()=>{if(dead)return;networkComposition++;network?.clear();if(networkVisualActive)opticalScheduler.force();},
+  clearNetwork:()=>{if(dead)return;revokeFuturePassInputs();networkComposition++;network?.clear();if(networkVisualActive)opticalScheduler.force();},
   observeNetworkInputs(){
    if(dead||!network)return;
    let signature;try{signature=JSON.stringify({faults:networkInputs.readFaults()});}catch{signature='unavailable';}

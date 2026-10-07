@@ -117,3 +117,17 @@ registered privately against actual entity/coverage, entry definition and Viewer
 It is current presentation capability only; copied JSON is invalid. ground active,
 native/sampled display ownership and current sourceGround definition must match.
 clear/hide/morph/dispose/replacement revokes it. No current runtime duplication.
+
+N017f FuturePassInput is a deeply-frozen registered readonly analysis input with
+presentation_kind FUTURE_PASS_INPUT_V1, analysis_utc, whole nodes, station and
+actual deployment receipt. Private record binds owner epoch/fullaccepted scope/
+display source and optional actual catalog continuity. It is not a current runtime
+store or mission/fabric approval. Any observed failure revokes registration.
+
+FuturePassControlEntry is a scoped private pending depth and epoch increment,
+not a clock/runtime state. Actual existing controller API-entry begins it and
+finally releases it once. Pending blocks all capture/verification; source
+provenance is the whole exposed display context excludingUTC.
+Observational input ports return actual owner copies/proofs; allowed mutations
+publish existing invalidation events. Silent mutation of another private owner
+inside an arbitrary getter is outside this port contract.

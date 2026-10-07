@@ -164,3 +164,24 @@ flies to source2400000m/1.4s. GP reference selection, display UTC and runtime re
 Hidden/removed/changed station, fake properties IDs, morph and external edit conflict
 must not select/fly. Repeat both resolutions; preserve original parent/SIM inputs.
 Run station interaction focused Node tests, full Node and full Python before review.
+
+N017f input port validation requires a clean actually accepted full deployment and
+enabled station. Capture while paused, then check same source/UTC validity and
+copy rejection. On actual catalog continuity, natural UTC movement preserves the
+original analysisUTC; pause/seek/source/config/dirty/clear/hide/disposal revoke it.
+Verify missionInputs still rejects playing clocks. No new HTTP or SIM commands
+should occur from capture/verify. Run the new actualowner RED/green coverage and
+whole Node/Python; future query/12row/growth/real screen evidence remains later.
+
+Complete a sameUTC stored seek/pause between two verifications: the old token must
+remain revoked even though the displayed context is identical. Exercise actual
+SIM/scenario API-entry pending, nested requests, error/synchronous throw and late
+finally release; no capture while pending and no resurrection afterwards. Normal
+GET/telemetry must not introduce a synthetic control. Optional actual owner
+observers preserve existing request arguments, result/error and request count.
+Attempt capture after HTTP resolution before controller adoption/cleanup; pending
+must still reject it. No timeout/microtask delay guesses may replace owner scope.
+At terminal callbacks exercise actual owner control/store/display invalidation
+and changed returned running/readiness/lease values. Readers must remain
+observational; do not replace production ownership with secretly mutated raw
+arrays in a getter or claim finite reads prove all such unrelated mutations.
