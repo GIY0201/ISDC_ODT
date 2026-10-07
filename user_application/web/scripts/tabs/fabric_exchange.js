@@ -4,7 +4,10 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
  let dead=false,counter=0,active=null,command=null,accepted=null,routeResult=null,state='unavailable',error='',review=false;
  const copy=value=>value==null?null:structuredClone(value);
  const freeze=value=>{if(value&&typeof value==='object'){Object.values(value).forEach(freeze);Object.freeze(value);}return value;};
- const analyticalViews=new WeakMap();let analyticalCache=null;
+ const analyticalViews=new WeakMap();let analyticalCache=null,displayRecord=null,displayEpoch={};
+ const clearDisplay=()=>{displayEpoch={};displayRecord=null;analyticalCache=null;};
+ const inputAuthority=record=>signature({endpoint:record.endpoint,...Object.fromEntries(Object.entries(record.proof).filter(([key])=>!['utc','network'].includes(key)))});
+ const displayAvailability=()=>active?'pending':'settled';
  const hasRaw=typeof network.captureRawAnalysis==='function'&&typeof network.verifyRawAnalysis==='function';
  const signature=value=>JSON.stringify(value);
  let poll=null,pollEpoch={},pollCancellation=0,commandEpoch={},controlEpoch={},commandEntry=0,observation={endpoint:null,status:'unavailable',value:null,error:''},historyEndpoint=null,historyInstance=null;
@@ -58,6 +61,7 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
     if(!current())return null;
     const value=copy(capability(await client.status({signal:task.abort.signal,target:copy(task.endpoint)})));if(!current())return null;
     reconcile();if(!current())return null;observeInstance(value.instance_id);
+    if(displayRecord&&(displayRecord.record.receipt.instance_id!==value.instance_id||displayRecord.record.receipt.sequence!==value.sequence||displayRecord.record.receipt.network_hash!==value.network_hash))clearDisplay();
     if(accepted&&(accepted.receipt.instance_id!==value.instance_id||accepted.receipt.sequence!==value.sequence||accepted.receipt.network_hash!==value.network_hash)){
      accepted=null;routeResult=null;command=null;state='unavailable';
     }else if(command&&!accepted&&command.guard.instance_id!==value.instance_id){
@@ -90,16 +94,16 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
  function notify(){try{onChange(snapshot());}catch{/* Presentation errors cannot publish or alter protocol state. */}}
  function capability(value){if(value?.exchange_contract!=='guarded-v1'||value.reachable!==true||typeof value.instance_id!=='string'||!value.instance_id||!Number.isSafeInteger(value.sequence)||value.sequence<0)throw Error('통신 모듈 상태가 미확인입니다.');return value;}
  function taskCurrent(task){if(dead||active!==task||task.abort.signal.aborted||task.controlEpoch&&task.controlEpoch!==controlEpoch||!matches(task.key,task))return false;return !dead&&active===task&&!task.abort.signal.aborted;}
- function fail(cause){accepted=null;routeResult=null;error=String(cause?.message??cause);review=cause?.conflict===true;state=review?'conflict':'error';if(review)command=null;}
+ function fail(cause){clearDisplay();accepted=null;routeResult=null;error=String(cause?.message??cause);review=cause?.conflict===true;state=review?'conflict':'error';if(review)command=null;}
  function explicitCommand(action,args=[]){
   commandEpoch={};commandEntry++;cancelStatusPoll();
   try{return action(...args);}finally{commandEntry--;}
  }
- function send(){return explicitCommand(sendCommand);}
+ function send(){clearDisplay();return explicitCommand(sendCommand);}
  function sendAnalytical(token){return explicitCommand(sendAnalyticalCommand,[token]);}
  function routeAnalytical(...args){return explicitCommand(routeCommand,[...args,true]);}
- function refresh(){return explicitCommand(refreshCommand);}
- function route(...args){return explicitCommand(routeCommand,args);}
+ function refresh(){clearDisplay();return explicitCommand(refreshCommand);}
+ function route(...args){clearDisplay();return explicitCommand(routeCommand,args);}
  function sendCommand(){
   if(dead)return Promise.resolve(null);cancelStatusPoll();observationScope();if(dead)return Promise.resolve(null);if(active)return active.origin==='captured_analysis'?Promise.resolve(null):active.promise;reconcile();if(review)return Promise.resolve(null);
   let c;try{c=context();}catch(cause){fail(cause);notify();return Promise.resolve(null);}if(dead)return Promise.resolve(null);
@@ -124,38 +128,46 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
   });notify();return task.promise;
  }
  function sendAnalyticalCommand(token){
-  const epoch=controlEpoch;if(dead)return Promise.resolve(null);cancelStatusPoll();observationScope();if(dead||epoch!==controlEpoch)return Promise.resolve(null);if(active)return active.origin==='captured_analysis'?active.promise:Promise.resolve(null);reconcile();if(review)return Promise.resolve(null);
+  const epoch=controlEpoch;if(dead)return Promise.resolve(null);cancelStatusPoll();observationScope();if(dead||epoch!==controlEpoch)return Promise.resolve(null);if(active)return active.origin==='captured_analysis'?active.promise:Promise.resolve(null);reconcile();if(review){clearDisplay();return Promise.resolve(null);}
   if(command&&!accepted){review=true;notify();return Promise.resolve(null);}
-  let c;try{c=rawContext(token);}catch{return Promise.resolve(null);}if(dead||epoch!==controlEpoch)return Promise.resolve(null);
+  let c;try{c=rawContext(token);}catch{clearDisplay();return Promise.resolve(null);}if(dead||epoch!==controlEpoch)return Promise.resolve(null);
+  const held=displayRecord,displayTicket=displayEpoch;if(held){const eligible=matches(held.record.key,held.record)&&inputAuthority(held.record)===inputAuthority(c);if(displayRecord===held&&displayEpoch===displayTicket&&!eligible)clearDisplay();}
+  if(dead||epoch!==controlEpoch)return Promise.resolve(null);
   // Periodic exchanges are fresh commands even at the same analysis UTC.
   command=null;accepted=null;routeResult=null;
-  const task={...c,controlEpoch:epoch,abort:new AbortController(),promise:null};active=task;state='pending';error='';
+  displayEpoch={};analyticalCache=null;
+  const task={...c,controlEpoch:epoch,displayEpoch,abort:new AbortController(),promise:null};active=task;state='pending';error='';
   task.promise=Promise.resolve().then(async()=>{
    try{
     if(!taskCurrent(task))return null;
     const status=capability(await client.status({signal:task.abort.signal,target:copy(c.endpoint)}));if(!taskCurrent(task))return null;
+    if(displayRecord&&(displayRecord.record.receipt.instance_id!==status.instance_id||displayRecord.record.receipt.sequence!==status.sequence)){clearDisplay();task.displayEpoch=displayEpoch;}
     if(counter>=Number.MAX_SAFE_INTEGER)throw Error('통신 요청 번호 한도를 초과했습니다.');
     const current=command={...c,body:copy(c.proof.network),guard:{instance_id:status.instance_id,expected_sequence:status.sequence,request_id:clientId+':'+(++counter)}};
     if(!taskCurrent(task))return null;
     task.posted=true;const receipt=await client.guardedUpdate(copy(current.body),copy(current.guard),{signal:task.abort.signal});
     if(!taskCurrent(task)||command!==current)return null;
     if(receipt?.instance_id!==current.guard.instance_id||receipt.sequence!==current.guard.expected_sequence+1||receipt.request_id!==current.guard.request_id||! /^[a-f0-9]{64}$/.test(receipt.network_hash??''))throw Error('통신 수락 응답 불일치');
-    accepted={...c,receipt:copy(receipt)};routeResult=null;state='accepted';rememberQuality(receipt,c.proof,c.endpoint);return copy(receipt);
+    accepted={...c,receipt:copy(receipt)};routeResult=null;state='accepted';if(task.displayEpoch===displayEpoch){displayEpoch={};displayRecord={record:accepted,route:null};analyticalCache=null;}rememberQuality(receipt,c.proof,c.endpoint);return copy(receipt);
    }catch(cause){if(taskCurrent(task)){fail(cause);review=true;}return null;}
    finally{if(active===task){active=null;reconcile();if(!matches(c.key,c)){const uncertain=!!command&&!accepted;command=null;accepted=null;routeResult=null;state='unavailable';if(uncertain)review=true;}notify();}}
   });notify();return task.promise;
  }
  function analyticalPresentation(){
-  reconcile();if(dead||!accepted||accepted.origin!=='captured_analysis'||active||review||state!=='accepted')return null;
-  const record=accepted,route=routeResult;if(analyticalCache?.record===record&&analyticalCache.route===route&&analyticalViews.has(analyticalCache.value))return verifyAnalyticalPresentation(analyticalCache.value)?analyticalCache.value:null;
-  const native=freeze(copy(record.proof)),value=freeze({presentation_kind:'FABRIC_ANALYTICAL_UI_V1',analysis_utc:record.proof.utc,receipt:copy(record.receipt),route:copy(route),native_snapshot:native,network:native.network,source:'captured_native_analysis',current_analysis:false});
-  analyticalCache={record,route,value};
-  analyticalViews.set(value,{record,route});return verifyAnalyticalPresentation(value)?value:null;
+  reconcile();if(dead||review||!displayRecord)return null;
+  const held=displayRecord,availability=displayAvailability();
+  if(analyticalCache?.held===held&&analyticalCache.epoch===displayEpoch&&analyticalCache.availability===availability)return verifyAnalyticalPresentation(analyticalCache.value)?analyticalCache.value:null;
+  const native=freeze(copy(held.record.proof)),value=freeze({presentation_kind:'FABRIC_ANALYTICAL_UI_V1',analysis_utc:held.record.proof.utc,receipt:copy(held.record.receipt),route:copy(held.route),native_snapshot:native,network:native.network,source:'captured_native_analysis',current_analysis:false,availability});
+  const registration={held,epoch:displayEpoch,availability};analyticalCache={...registration,value};analyticalViews.set(value,registration);return verifyAnalyticalPresentation(value)?value:null;
  }
  function verifyAnalyticalPresentation(value){
   const registration=analyticalViews.get(value);if(!registration)return false;
-  const current=()=>!dead&&!active&&!review&&state==='accepted'&&accepted===registration.record&&routeResult===registration.route;
-  if(!current()||!matches(registration.record.key,registration.record)||!current()){analyticalViews.delete(value);if(analyticalCache?.value===value)analyticalCache=null;return false;}return true;
+  const current=()=>!dead&&!review&&displayRecord===registration.held&&displayEpoch===registration.epoch&&displayAvailability()===registration.availability&&(!active||active.origin==='captured_analysis');
+  if(!current()){analyticalViews.delete(value);return false;}
+  if(!matches(registration.held.record.key,registration.held.record)||!current()){
+   analyticalViews.delete(value);if(displayRecord===registration.held&&displayEpoch===registration.epoch)clearDisplay();return false;
+  }
+  return true;
  }
  function refreshCommand(){
   if(dead)return Promise.resolve(null);cancelStatusPoll();observationScope();if(dead)return Promise.resolve(null);if(active)return active.origin==='captured_analysis'?Promise.resolve(null):active.promise;
@@ -178,17 +190,18 @@ export function createFabricExchange({client,network,clientId,onChange=()=>{}}={
   const receipt=copy(accepted.receipt),key=accepted.key,c=analytical?rawContext(accepted.token,accepted.endpoint):context(),ids=new Set(c.proof.network.nodes.map(node=>node.id));
   if(!ids.has(source)||!ids.has(target)||!['balanced','latency','reliability'].includes(objective))return Promise.reject(Error('경로 입력을 확인하세요.'));
   if(analytical&&(dead||epoch!==controlEpoch))return Promise.resolve(null);
-  const task={...c,key,...(analytical?{controlEpoch:epoch}:{}),abort:new AbortController(),promise:null};active=task;routeResult=null;error='';
+  if(analytical){displayEpoch={};analyticalCache=null;}
+  const task={...c,key,...(analytical?{controlEpoch:epoch,displayEpoch}:{}),abort:new AbortController(),promise:null};active=task;routeResult=null;error='';
   task.promise=Promise.resolve().then(async()=>{
    try{
     if(!taskCurrent(task))return null;
     const result=await client.guardedRoute(source,target,objective,{instance_id:receipt.instance_id,expected_sequence:receipt.sequence},{signal:task.abort.signal});
     if(!taskCurrent(task))return null;
     if(result.instance_id!==receipt.instance_id||result.sequence!==receipt.sequence||result.network_hash!==receipt.network_hash||result.source!==source||result.target!==target||result.objective!==objective)throw Error('경로가 수락된 통신망과 일치하지 않습니다.');
-    routeResult=copy(result);return copy(result);
+    routeResult=copy(result);if(analytical&&task.displayEpoch===displayEpoch){displayEpoch={};displayRecord={record:accepted,route:routeResult};analyticalCache=null;}return copy(result);
    }catch(cause){if(taskCurrent(task))fail(cause);return null;}
    finally{if(active===task){active=null;reconcile();notify();}}
   });notify();return task.promise;
  }
- return Object.freeze({send,sendAnalytical,routeAnalytical,analyticalPresentation,verifyAnalyticalPresentation,refresh,route,snapshot,pollStatus,cancelStatusPoll,moduleStatus,qualityHistory,invalidate(){if(dead)return;analyticalCache=null;commandEpoch={};controlEpoch={};const uncertainAnalytical=active?.origin==='captured_analysis'&&active.posted===true&&!accepted;pollCancellation++;try{cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();command=null;accepted=null;routeResult=null;state='unavailable';error=uncertainAnalytical?'이전 분석 통신 요청의 수락이 미확인입니다. 모듈 상태를 명시적으로 검토하세요.':'';review=uncertainAnalytical||review;notify();}finally{pollCancellation--;}},destroy(){if(dead)return;dead=true;analyticalCache=null;cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();active=null;command=null;accepted=null;routeResult=null;}});
+ return Object.freeze({send,sendAnalytical,routeAnalytical,analyticalPresentation,verifyAnalyticalPresentation,refresh,route,snapshot,pollStatus,cancelStatusPoll,moduleStatus,qualityHistory,invalidate(){if(dead)return;clearDisplay();commandEpoch={};controlEpoch={};const uncertainAnalytical=active?.origin==='captured_analysis'&&active.posted===true&&!accepted;pollCancellation++;try{cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();command=null;accepted=null;routeResult=null;state='unavailable';error=uncertainAnalytical?'이전 분석 통신 요청의 수락이 미확인입니다. 모듈 상태를 명시적으로 검토하세요.':'';review=uncertainAnalytical||review;notify();}finally{pollCancellation--;}},destroy(){if(dead)return;dead=true;clearDisplay();cancelStatusPoll();histories.clear();historyInstance=null;observation={endpoint:null,status:'unavailable',value:null,error:''};active?.abort.abort();active=null;command=null;accepted=null;routeResult=null;}});
 }

@@ -165,3 +165,6 @@ N023 no new state: current catalog_time draft strings retain ownership. Identica
 supported incoming values are a no-op; changed strings use the existing draft,
 utcDirty, follow detachment and timeline invalidation states. No buffer cloning,
 new clock, inferred stopped state or duplicate runtime is introduced.
+
+
+N024 ADR0061/contracts/periodic_analytical_display_retention.md restores original lastaccepted analytical report while same-fullscope periodic refresh pending, with explicit historical/pending label. Existing fabricowner only, boundedone readonlyrecord/privateepoch; no exact command approval, timers/API/physics changes. Sourcefailure/control/fullscope invalidation clears. Precode independent review and meaningful240/owner RED precede implementation. Whole75-84/T032/game/model/PR gates unchanged.

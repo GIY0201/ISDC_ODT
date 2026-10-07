@@ -1570,3 +1570,14 @@ Actual572 settles the single legacy native query: fullaccepted40, same exact 3h 
 
 
 Fabric follow-up: current agent/read-only tests reproduce healthy status GET concurrent with a held network POST;55 focused PASS379.7496ms. This is fake transport diagnostic, not live acceptance. Actual574 bounded39s Page request/response/terminal listeners register but return empty arrays; public UI remainspending. ResourceTiming count250 is full; last03:38 entry cannot prove request absence. The one normal retry produced a transient analytical receipt72/DTN display in freshsnapshot, but later sampledstatespending: source lifecycle/route acceptance stillunproven. No producttimeout/bypass/repeatedPOST added. Evidence fabric_pending_readonly_probe.log, fabric_pending_readonly_focused.log and live_N023_20261007_1239/574*.
+
+
+Actual575 preserved then closed exactly3 obsolete agent validation tabs; original parent/currentN023/currentISS/unrelatedtab remain. Actual576 explicitsendguard disabled so manualsend0. Actual577 visible routechoice NODE0041->NODE0042 balanced accepted in controls, modulepoll sameinstance sequence95; routecompletion notyetproven. The async PerformanceObserver evaluation serialized as emptyobject {}, not absenceproof; timing outcomeunusable. Ground3D toggle was restored through secondnormalclick. Readonly source-parity review now checks whether analytical display disappears unnecessarily during eachperiodic pending; no productchanges/guardrelaxation made.
+
+
+N024 ADR0061/contracts/periodic_analytical_display_retention.md restores original lastaccepted analytical report while same-fullscope periodic refresh pending, with explicit historical/pending label. Existing fabricowner only, boundedone readonlyrecord/privateepoch; no exact command approval, timers/API/physics changes. Sourcefailure/control/fullscope invalidation clears. Precode independent review and meaningful240/owner RED precede implementation. Whole75-84/T032/game/model/PR gates unchanged.
+
+N024 precode independentHIGH0/CRITICAL0; two MEDIUM call-origin/rendereravailability clarifications written into ADR0061+contract before code. Existingbootstrap/prerequisites PASS, requirementschecklist8/8, noextensions. T181 RED-first implementation next; no broadacceptanceclosure.
+
+
+N024 T181 RED12/4PASS->21new+2panel labels; closest81PASS497.7682ms. IndependentCLEAN94PASS551.3386ms. AuthorSTOP4files. FullNode1976PASS0FAIL0SKIP27319.4184ms exit0handle34908; fullPython99041running. Existingfabric owner retains bounded historical display during samefullscopeautomatic pending, commandauthorityunchanged. Actualpatchedreload/sourceflows/T182/whole75-84/model/GPU/game/PR remainopen. Evidence validation/periodic_analytical_display_retention.md.

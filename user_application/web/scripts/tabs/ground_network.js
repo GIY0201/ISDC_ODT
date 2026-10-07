@@ -314,7 +314,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   try{
    const value=fabric.analyticalPresentation();if(!current()||!value||value.presentation_kind!=='FABRIC_ANALYTICAL_UI_V1'||fabric.verifyAnalyticalPresentation(value)!==true||!current())return;
    const snapshot=network.networkSnapshot();if(!current())return;const receipt=value.receipt,summary=receipt?.summary,route=value.route;
-   const label=`과거 분석 UTC ${value.analysis_utc} · 표시 UTC ${snapshot?.utc??'미확인'} · 모듈 ${receipt.instance_id} · 응답 ${receipt.sequence} · 현재 UTC 통신 승인·실제 RF 미확인`;
+   const label=`과거 분석 UTC ${value.analysis_utc} · 표시 UTC ${snapshot?.utc??'미확인'} · 모듈 ${receipt.instance_id} · 응답 ${receipt.sequence}${value.availability==='pending'?' · 갱신 중':''} · 현재 UTC 통신 승인·실제 RF 미확인`;
    const format=v=>Number.isFinite(v)?String(v):'미확인';
    const table=(heads,rows)=>'<table><thead><tr>'+heads.map(h=>'<th>'+escape(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(cell=>'<td>'+escape(cell)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
    const html='<p>모의 DTN 저장 '+escape(format(summary?.stored_mb))+' MB · 누적 전달 '+escape(format(summary?.delivered_mb))+' MB · 누적 폐기 '+escape(format(summary?.dropped_mb))+' MB</p>'+

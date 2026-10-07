@@ -221,3 +221,6 @@ record stopped clock and exact UTC, then navigate normally to ground. Identical
 draft handoff must retain the actual buffer/owner; query future contacts normally.
 Changed remote observer/UTC strings must still revoke old results and require
 explicit recalculation. No forced pause, saved ISS UTC rewrite or proof injection.
+
+
+N024 ADR0061/contracts/periodic_analytical_display_retention.md restores original lastaccepted analytical report while same-fullscope periodic refresh pending, with explicit historical/pending label. Existing fabricowner only, boundedone readonlyrecord/privateepoch; no exact command approval, timers/API/physics changes. Sourcefailure/control/fullscope invalidation clears. Precode independent review and meaningful240/owner RED precede implementation. Whole75-84/T032/game/model/PR gates unchanged.

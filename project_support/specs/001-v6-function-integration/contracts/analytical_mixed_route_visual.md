@@ -17,3 +17,5 @@ Both existing renderers optionally borrow same projection, proof before/post cal
 Whole source actual240/two-resolution/module/native/periodic-selected-route/render/currentness/performance gates remain required. T166–T168 unimplemented when this design is recorded.
 
 같은 historical registered proof를 original pure SVG diagram/nodeStates/link quality 및 선택상세에도 조립한다. 현재 native layout/link존재와 fullproof를 유지하고 missingIDs생성/현재commandapproval금지, historicalanalysisUTC를 표시한다. exact SVG/detail 경로 그대로이며 T168은 SVG+상세+table+OISL+ground 전체 실제 증거를 요구한다.
+
+ADR0061 supersedes blanket !active display exclusion only for privately registered lastaccepted historical report during same-fullscope automatic pending; command/action authority remains unchanged. Exact guards and all source/control/error/uncertain invalidations stay required. See periodic_analytical_display_retention.md.

@@ -713,3 +713,7 @@ is fullnative validatedfuture flow then actual UI acceptance, not a physics stub
 ## N023 identical catalogue draft handoff
 - [x] T179 ADR0060 independent gate then meaningful actual-root-navigation RED and existing catalog_time.applyDraft exact no-op; preserve changed-input invalidation and all owner/clock/follow guards.
 - [ ] T180 Independent review/changed JS full regression and actual paused catalogue→ground→future/module flow; retain whole acceptance gates.
+
+## N024 original lastaccepted analytical display retention
+- [x] T181 ADR0061 independent precode gate then meaningful full240 actual-owner RED for previousaccepted samefullscope automatic pending status/POST/route display retention. Existing fabric_exchange owner only bounded one historical record/epoch; optional availability label in existing ground panel. Exact receipt/route/action authority unchanged; full native/deployment/source/control/endpoint/instance/failure/uncertain/reentry/late/drain/clone/disposal guards.
+- [ ] T182 Independent review, closest and full changed JavaScript/Python regressions, actual normal periodic DTN/route/RF flow evidence. Whole75-84/T032/tworesolution/GPU/model/PR acceptance remains separate and open.

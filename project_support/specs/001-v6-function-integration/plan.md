@@ -679,3 +679,6 @@ N023 ADR0060/contracts/catalog_draft_noop_handoff.md repairs V6 self-navigation
 discarding a valid catalogue buffer when identical draft fields are reapplied.
 Existing catalogue panel only; compare actual string draft values before detach.
 No clock/buffer creation or source calculation change; T179–T180 RED-first.
+
+
+N024 ADR0061/contracts/periodic_analytical_display_retention.md restores original lastaccepted analytical report while same-fullscope periodic refresh pending, with explicit historical/pending label. Existing fabricowner only, boundedone readonlyrecord/privateepoch; no exact command approval, timers/API/physics changes. Sourcefailure/control/fullscope invalidation clears. Precode independent review and meaningful240/owner RED precede implementation. Whole75-84/T032/game/model/PR gates unchanged.

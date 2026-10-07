@@ -285,3 +285,6 @@ receipt 검증만 재사용하고 현재 초안/배치/서버 기록이 정확�
 
 N023: 값이 동일한 카탈로그 관측 초안의 화면 인계는 현재 유효 계산을 지우지
 않아야 한다. 실제 입력 변경은 기존 무효화와 명시 재계산을 유지한다(ADR0060).
+
+
+N024 ADR0061/contracts/periodic_analytical_display_retention.md restores original lastaccepted analytical report while same-fullscope periodic refresh pending, with explicit historical/pending label. Existing fabricowner only, boundedone readonlyrecord/privateepoch; no exact command approval, timers/API/physics changes. Sourcefailure/control/fullscope invalidation clears. Precode independent review and meaningful240/owner RED precede implementation. Whole75-84/T032/game/model/PR gates unchanged.
