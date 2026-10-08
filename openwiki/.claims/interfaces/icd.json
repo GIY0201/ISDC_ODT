@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:3615c0acd3a3892df81996f142b7e023b0b9779b897c52b58e84f2bd5d3599c8",
+  "claims": [
+    {
+      "id": "claim_b984d28ed7b548259479d87a8e6fa70f",
+      "statement": "ICD 카탈로그는 01~08의 메시지 상태를 구현·모의·계획으로 구분하며 DF-06, OR-05, VF-04는 계획이다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/settings/topology.js",
+          "version": "repo-file-v1:sha256:e42d2debfc82bd326f74566cf8070d3135857f6f1706bb0d208c65c46498eadd"
+        }
+      ]
+    },
+    {
+      "id": "claim_7a1e3815c65246de9dea7bb97091f4f3",
+      "statement": "ICD-01 직접 HTTP 요청은 scope_id가 필요하며 데이터 대시보드와 console 명령은 별도 경로다.",
+      "evidence": [
+        {
+          "resource": "repo://communication/http/data_management.py",
+          "version": "repo-file-v1:sha256:00d43eb912ed76c6dfd24abe22c9418c68208da7c018d51aba9a21a53f3729c3"
+        }
+      ]
+    },
+    {
+      "id": "claim_e15fcd6d35b3433897603ca6d71d9c54",
+      "statement": "Fabric network와 route는 선택적 instance·sequence 헤더로 guarded 교환하며 원본 호환 호출도 유지한다.",
+      "evidence": [
+        {
+          "resource": "repo://communication/http/data_fabric.py",
+          "version": "repo-file-v1:sha256:356bbae78e59f45c53691bffade8d3b4b8f93cb4d73141ce64e9fcab1a1fdf54"
+        }
+      ]
+    },
+    {
+      "id": "claim_44c4e0a2e7fb4c0fa1a2d7cbf579d9de",
+      "statement": "Orchestration guarded 헤더 일부만 제공하면 legacy로 내려가지 않으며 계획과 확정은 별도의 계약과 문맥 검사로 처리한다.",
+      "evidence": [
+        {
+          "resource": "repo://communication/http/orchestration.py",
+          "version": "repo-file-v1:sha256:59c31f4791464fcd9e56145c84a1e0294e36547787b909673b825fef64d1cffa"
+        },
+        {
+          "resource": "repo://communication/http/orchestration_schemas.py",
+          "version": "repo-file-v1:sha256:cf791b03fc489049eff6b2b0043cfe7eda86b3fba535f8fc97cc5fb0dde96125"
+        }
+      ]
+    },
+    {
+      "id": "claim_a8e870f15ade43ac9da8515aa88e36fb",
+      "statement": "보안 dashboard는 SIM 관측과 모듈 상태·이력의 run_id 일치를 검사하며 불일치는 정상 보고로 합치지 않는다.",
+      "evidence": [
+        {
+          "resource": "repo://communication/http/security.py",
+          "version": "repo-file-v1:sha256:b43935252bd64a3f6d07cb4598509e121092e14c5144110711fbbdac9e6540ea"
+        },
+        {
+          "resource": "repo://communication/http/security_schemas.py",
+          "version": "repo-file-v1:sha256:073a427c5778fe314e425c7abdc61ba982b62529b4754781f965e99a6b5cb6be"
+        }
+      ]
+    },
+    {
+      "id": "claim_974b90ca21a043d8a2849232e8e9cda4",
+      "statement": "연동 probe는 로컬 내장 상태, 원격 TCP 접속, UDP 주소해석을 구분하며 외부 보안 TCP 성공을 프로토콜 검증으로 표시하지 않는다.",
+      "evidence": [
+        {
+          "resource": "repo://communication/http/integration.py",
+          "version": "repo-file-v1:sha256:c1f0bba2cb2c81948fb4900349cca50c4630addc0deb2aaa002dafece5a13665"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-08T08:27:37.110Z"
+  }
+}

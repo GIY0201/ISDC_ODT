@@ -6,7 +6,7 @@ const m={id:'M',name:'Server mission',status:'planned',progress:0,plan_version:1
 const metrics=Object.fromEntries(['power','temperature','attitude_error','storage','link_quality','delay_ms','loss_percent','throughput_mbps','ber','auth_percent'].map(k=>[k,7]));
 const tick=async f=>{await Promise.resolve();await Promise.resolve();f.flush();};
 for(const [w,h] of [[1280,720],[1920,1080]])test(`actual SIM assembly preserves form nodes, window drafts and orbit ${w}x${h}`,async()=>{
-  const calls=[];const f=fixture(w,h,{hash:'#operations',planningBootstrap:async()=>({runtime:r,scenarios:[{id:'A',name:'Server'}],events:[],missions:[m]}),runtimeSpeed:async speed=>{calls.push(speed);return {...r,speed};}});
+  const calls=[];const f=fixture(w,h,{hash:'#run',planningBootstrap:async()=>({runtime:r,scenarios:[{id:'A',name:'Server'}],events:[],missions:[m]}),runtimeSpeed:async speed=>{calls.push(speed);return {...r,speed};}});
   try{
     await tick(f);assert.ok(f.doc.getElementById('sim-workspace'));assert.equal(f.streams.length,1);
     const input=f.get('sim-speed');input.value='2.5';await input.dispatch('input');assert.equal(f.get('sim-speed'),input);
@@ -24,7 +24,7 @@ test('mission telemetry changes readonly status without replacing an edited task
  const f=fixture(1280,720,{hash:'#mission',planningBootstrap:async()=>({missions:[m]})});
  try{await tick(f);const input=f.get('mw-name');input.value='local draft';await input.dispatch('input');
  f.streams[0].message({type:'telemetry',runtime:r,telemetry:metrics,events:[],missions:[{...m,status:'running',progress:10}],wall_time:'2026-10-04T00:00:00Z',data_quality:{mode:'SIM',source:'deterministic-sim'}});
- assert.equal(f.get('mw-name'),input);assert.equal(input.value,'local draft');assert.match(f.get('mw-summary').textContent,/running.*10%/);
+ assert.equal(f.get('mw-name'),input);assert.equal(input.value,'local draft');assert.match(f.get('mw-summary').innerHTML,/수행 중.*10%/);
  await f.win.dispatch('pagehide',{persisted:false});assert.equal(f.streams[0].closed,1);
  }finally{f.dispose();}
 });

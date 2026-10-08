@@ -87,9 +87,9 @@ for(const view of ['settings','integration'])test(`${view} hides target quickbar
 test('satellite to environment route cannot recreate stale satellite panels during transition',async()=>{
  const f=fixture(1280,720,{hash:'#satellite'});
  try{
-  assert.ok(f.doc.getElementById('satellite-model-panel'));assert.equal(f.doc.getElementById('station-workspace'),null);assert.ok(f.doc.getElementById('catalog-workspace'));
+  assert.equal(f.doc.getElementById('satellite-model-panel').parentElement.id,'desktop-model-info');assert.equal(f.doc.getElementById('station-workspace'),null);assert.ok(f.doc.getElementById('catalog-workspace'));
   f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');
-  for(const id of ['satellite-model-panel','station-workspace','catalog-workspace'])assert.equal(f.doc.getElementById(id)?.isConnected===true,false,id);
+  assert.ok(f.doc.getElementById('satellite-model-panel'));for(const id of ['station-workspace','catalog-workspace'])assert.equal(f.doc.getElementById(id)?.isConnected===true,false,id);
   assert.ok(f.doc.getElementById('source-environment-settings'));assert.ok(f.doc.getElementById('globe-view'));assert.equal(f.viewers.length,1);
  }finally{f.dispose();}
 });

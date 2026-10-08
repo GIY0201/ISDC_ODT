@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:e1f0ecd9077b027d31b9ae77948bfed00253cb28ae103eee46367140579c25a4",
+  "claims": [
+    {
+      "id": "claim_3d85c133bb354ef29a79e13f6d00a614",
+      "statement": "데이터 패널은 배치 조회 전후의 일치와 isolated-v1 범위 계약을 검증하고 클릭 시 운영 명령 입력을 고정한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/tabs/source_data.js",
+          "version": "repo-file-v1:sha256:11aa321ed25257da934a06b70a120969e70d9d678bfcae9d4d52e45a8606accb"
+        }
+      ]
+    },
+    {
+      "id": "claim_bbb2dad6a6d24f66b4155f1e58414b08",
+      "statement": "데이터 HTTP 콘솔은 scope_id와 현재 실행 배치의 범위를 검증한 뒤 데이터 모듈의 요청 또는 작업 메서드를 호출한다.",
+      "evidence": [
+        {
+          "resource": "repo://communication/http/data_management.py",
+          "version": "repo-file-v1:sha256:00d43eb912ed76c6dfd24abe22c9418c68208da7c018d51aba9a21a53f3729c3"
+        }
+      ]
+    },
+    {
+      "id": "claim_86fe6ddfc5954f5b85d592bc87eb54f8",
+      "statement": "보안 패널은 SIM 모의 지표와 관측/수신 시각을 구분하고 실제 인증·암호화·파일 무결성을 검증하지 않음을 표시한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/tabs/source_security.js",
+          "version": "repo-file-v1:sha256:4d969f2899aea5b3c225473e2e95c56a5a791169fc2d7cba323c6fd130c1e5ff"
+        }
+      ]
+    },
+    {
+      "id": "claim_bdb6584909f34326b9099a4ccab59215",
+      "statement": "SecurityBridge는 SIM 관측 사본을 모듈에 전달하는 조회 트랜잭션이며 별도 DT 상태 소유자나 백그라운드 서비스가 아니다.",
+      "evidence": [
+        {
+          "resource": "repo://communication/http/security.py",
+          "version": "repo-file-v1:sha256:b43935252bd64a3f6d07cb4598509e121092e14c5144110711fbbdac9e6540ea"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba62bfde2f7f4d8b91b9b1a0ec424832",
+      "statement": "데이터 패널은 모듈 보고와 현재 정책을 details로 제공하며 운영 scope와 현재 배치 검사를 유지한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/tabs/source_data.js",
+          "version": "repo-file-v1:sha256:11aa321ed25257da934a06b70a120969e70d9d678bfcae9d4d52e45a8606accb"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-08T08:27:37.110Z"
+  }
+}

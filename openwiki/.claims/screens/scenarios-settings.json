@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:617c380974619af3e2641baaf1f2f4028f4af0136b0485dc778c46d68824253b",
+  "claims": [
+    {
+      "id": "claim_1cda145fc72e405fb20a5db9974df341",
+      "statement": "현재 SIM 작업 패널의 소유 화면은 run이며 KPI 작업 패널의 소유 화면은 compare다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/tabs/kpi_workspace.js",
+          "version": "repo-file-v1:sha256:37276d072e31e1a00165add67fffdd83def85f7b6cfb5f25a3dc18e4a54dc253"
+        },
+        {
+          "resource": "repo://user_application/web/scripts/tabs/sim_workspace.js",
+          "version": "repo-file-v1:sha256:d50b64976a08f8ace8237851b17f50b48bd45a3daa61f86a372736c83ff8fadc"
+        }
+      ]
+    },
+    {
+      "id": "claim_95c3c7f74b0a4a67aab0a11d97791de8",
+      "statement": "시나리오 패널은 runner의 판정이 있을 때 기록을 다운로드하고 다른 작업 화면에서 제어 도크를 제공한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/tabs/source_scenarios.js",
+          "version": "repo-file-v1:sha256:0bda30b40576474cc881638a093d555f254f4bcc7b60456a9196496932c59f2d"
+        }
+      ]
+    },
+    {
+      "id": "claim_b9c702b20fd843f683f7c52d11fd357d",
+      "statement": "시스템 연동 설정 패널은 원본 topology/ICD와 명시적 probe 계약을 연결한다.",
+      "evidence": [
+        {
+          "resource": "repo://communication/http/integration.py",
+          "version": "repo-file-v1:sha256:c1f0bba2cb2c81948fb4900349cca50c4630addc0deb2aaa002dafece5a13665"
+        },
+        {
+          "resource": "repo://user_application/web/scripts/tabs/source_settings.js",
+          "version": "repo-file-v1:sha256:6e29917aec6cb9680634eaca139cb543c516ef2d7b676436ba4b8fb3bdae6efe"
+        }
+      ]
+    },
+    {
+      "id": "claim_c0001d3ecd98485ea77ffd7edb5c148f",
+      "statement": "DT 상황판은 SIM, 시나리오와 설정의 연결 상태를 함께 표시하며 연결 상태가 모듈 계산 정확도나 실제 위성 상태 판정이 아님을 안내한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/workspace_wall_summary.js",
+          "version": "repo-file-v1:sha256:967682860f3575f5d26a5fd49b5ae772f858d26a64d7391d4f012cf4518df93d"
+        }
+      ]
+    },
+    {
+      "id": "claim_fc5b4dbe6f0b48c09b32aa9cc117f4be",
+      "statement": "시험 작성 정의는 상태 관측·장애 주입·복구 확인·결과 비교 단계를 저장하고 최대48개 정의와128개 단계를 검증한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/scenario/authoring.js",
+          "version": "repo-file-v1:sha256:b04df78ae9fbb8cfd9ea980dfe5f1351f51df355e4ccd1d0d66d17defbbf7004"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-08T08:27:37.110Z"
+  }
+}

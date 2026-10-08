@@ -1,0 +1,506 @@
+{
+  "root": "openwiki",
+  "generatedAt": "2026-10-08T09:50:27.536Z",
+  "types": [
+    "Section",
+    "architecture",
+    "interface-guide",
+    "quickstart",
+    "screen-guide",
+    "validation",
+    "workflow"
+  ],
+  "nodes": [
+    {
+      "id": "architecture/definition-storage",
+      "title": "지상국과 시나리오 정의 저장",
+      "type": "architecture",
+      "description": "PostgreSQL에 저장하는 작성 정의, 브라우저 편집 사본, 실행 상태의 경계와 revision 충돌을 설명한다.",
+      "tags": [
+        "storage",
+        "postgresql",
+        "configuration",
+        "state"
+      ],
+      "body": "\n# 지상국과 시나리오 정의 저장\n\n지상국과 직접 작성한 시험 시나리오는 공유할 수 있는 **정의**다. 실행 중인 SIM, 수락 배치, 텔레메트리는 별도의 **현재 상태**다. 현재 DB 연결은 두 정의만 저장하며, DB를 설치했다고 실행 중인 상태까지 재시작 후 복원되는 것은 아니다.\n\n| 자료 | 저장 위치와 책임 |\n|---|---|\n| `ground_stations` | PostgreSQL JSONB: 지상국 정의와 revision |\n| `scenario_drafts` | PostgreSQL JSONB: 작성 시나리오와 revision |\n| 편집 중 사본 | 브라우저 저장소와 `.pending-postgresql` 복구용 사본 |\n| 최초 이관 전 자료 | `.before-postgresql` 브라우저 백업 |\n| SIM 실행, 배치 수락, 계산 결과 | 기존 runtime 및 계산 소유자. 이번 정의 DB의 저장 대상이 아님 |\n\n## 편집부터 저장까지\n\n```mermaid\nsequenceDiagram\n  actor U as 사용자\n  participant P as 지상국 또는 시나리오 패널\n  participant B as 브라우저 저장 어댑터\n  participant A as 설정 REST API\n  participant D as PostgreSQL\n  B->>A: GET status와 각 정의\n  A-->>B: value와 revision\n  U->>P: 정의 편집과 저장\n  P->>B: 기존 저장소 계약으로 값 전달\n  B->>B: 로컬 pending 사본 보존\n  B->>A: PUT expected_revision, value\n  A->>D: 같은 revision일 때 갱신과 history 기록\n  alt revision 일치\n    D-->>B: 새 revision과 저장 결과\n    B-->>P: 서버 DB 저장 완료\n  else 다른 창이 먼저 수정\n    A-->>B: 409 충돌\n    B-->>P: 편집 보존, 다시 불러오기 안내\n  end\n```\n\n로컬 편집 수락과 서버 저장 완료는 서로 다른 상태다. 화면의 불러오는 중·저장 중·완료·실패를 확인한다. 충돌 후 다른 사용자의 값을 자동으로 덮어쓰지 않는다. 최초 읽기 동안 편집했다면 그 내용을 보존하고 오류를 알린다. DB 미구성이면 브라우저에만 저장된다고 표시한다.\n\n## 인터페이스와 실패\n\n| API | 계약 |\n|---|---|\n| `GET /api/workspace/configurations/status` | 연결 사용 여부, provider와 지원 kind |\n| `GET /api/workspace/configurations/{kind}` | `value`, `revision`, `updated_at` |\n| `PUT /api/workspace/configurations/{kind}` | `expected_revision`과 `value`. `X-ISDC-Configuration: 1` 필요 |\n\n지원 kind는 위 두 가지다. 미지원 kind는404, 다른 Origin 또는 헤더 누락은403, revision 충돌은409, DB 미구성·접속 불가는503, 정의 도메인 오류는400으로 구분한다. 이 same-origin 보호는 사용자별 권한 관리 시스템이 아니다. DB 자격증명은 브라우저로 전달하지 않는다.\n\n정의와 변경 이력은 같은 트랜잭션으로 저장한다. 데이터 크기와 필드 범위를 검증하며 지상국은 최대24개, 작성 시나리오는 최대48개다. DB 연결은 factory에 주입하며 기존 ICD-06의 외부 시험결과 DB 메시지 `VF-04`를 구현한 것으로 해석하지 않는다.\n\n## 근거와 공유 범위\n\n[ADR0065](../../project_support/docs/adr/0065_postgresql_workspace_definitions.md)에는 실제 두 정의 저장·새로고침·격리 백업 복원 기록이 있다. 현재 작업에서 운영 DB에 새 값을 쓰거나 복원하지는 않았다. 자동 DB 시험은 명시적인 `ISDC_TEST_DATABASE_CONFIG`가 없으면 건너뛴다.\n\n소스: [브라우저 저장](../../user_application/web/scripts/workspace_configuration.js), [REST 계약](../../communication/http/workspace_configuration.py), [트랜잭션과 검증](../../data/workspace_configuration.py), [시험](../../project_support/tests/test_workspace_configuration.py).\n\n관련 문서: [ICD와 실행 계약](../interfaces/icd.md), [DT 시험](../screens/scenarios-settings.md), [전체 구조](runtime-flow.md).\n",
+      "size": 2399,
+      "links": [
+        "interfaces/icd",
+        "screens/scenarios-settings",
+        "architecture/runtime-flow"
+      ],
+      "backlinks": [
+        "architecture/index",
+        "architecture/runtime-flow",
+        "interfaces/icd",
+        "quickstart",
+        "screens/scenarios-settings",
+        "testing/evidence"
+      ]
+    },
+    {
+      "id": "architecture/index",
+      "title": "Architecture",
+      "type": "Section",
+      "description": "",
+      "tags": [],
+      "body": "# 파일\n\n- [지상국과 시나리오 정의 저장](definition-storage.md) - PostgreSQL에 저장하는 작성 정의, 브라우저 편집 사본, 실행 상태의 경계와 revision 충돌을 설명한다.\n- [전체 구조와 상태 흐름](runtime-flow.md) - 화면 조작이 API와 실행 상태를 거쳐 결과로 돌아오는 과정과 관제, 모델 계산, 모의실험의 경계를 설명한다.\n",
+      "size": 215,
+      "links": [
+        "architecture/definition-storage",
+        "architecture/runtime-flow"
+      ],
+      "backlinks": []
+    },
+    {
+      "id": "architecture/runtime-flow",
+      "title": "전체 구조와 상태 흐름",
+      "type": "architecture",
+      "description": "화면 조작이 API와 실행 상태를 거쳐 결과로 돌아오는 과정과 관제, 모델 계산, 모의실험의 경계를 설명한다.",
+      "tags": [
+        "architecture",
+        "runtime",
+        "state",
+        "provenance"
+      ],
+      "body": "\n# 전체 구조와 상태 흐름\n\n이 프로그램은 브라우저 화면, Python API, 궤도 및 모의 계산을 조립한 독립 ISDC 디지털 트윈이다. 화면이 계산 결과를 보여준다는 것과 실제 위성으로부터 값을 받았다는 것은 다르다. 먼저 결과가 어디서 왔는지 구분해야 한다.\n\n## 세 가지 자료를 구분하기\n\n| 자료 | 의미 | 해석할 때 주의할 점 |\n|---|---|---|\n| 카탈로그와 저장 궤도 입력 | 궤도요소와 보정 자료로 계산한 위치 | 실시간 수신 위치가 아니다. UTC와 자료 유효기간을 확인한다 |\n| 배치 노드와 SIM | 구성한 가상 위성, 통신 및 임무의 모의 결과 | 모델 가정에 따른 값이다 |\n| 관제 상황판 | 운용 상태를 요약하는 표면 | 실제 원격측정이 없으면 관련 수치는 미확인으로 남는다 |\n\n## 실행 구조\n\n```mermaid\nflowchart TB\n  User[\"사용자: 화면 선택과 명시적 실행\"] --> UI[\"브라우저 작업창\"]\n  UI --> Client[\"API 클라이언트\"]\n  Client --> HTTP[\"FastAPI: 요청 형식과 오류 처리\"]\n  Factory[\"애플리케이션 조립: create_app\"] --> HTTP\n  Factory --> Runtime[\"RuntimeState: SIM 현재 상태\"]\n  Factory --> Modules[\"임무 / 데이터 / 보안 어댑터\"]\n  HTTP --> Runtime\n  HTTP --> Query[\"궤도 및 지상국 계산 질의\"]\n  HTTP --> Modules\n  Query --> Native[\"궤도 계산과 보정 자료\"]\n  Runtime --> Snapshot[\"상태 사본\"]\n  Modules --> Snapshot\n  Native --> Snapshot\n  Snapshot --> View[\"표 / 흐름도 / 공용 Cesium 지구\"]\n  Snapshot --> KPI[\"모의실험 평가와 내보내기\"]\n```\n\n`user_application/web/application.py`의 `create_app`이 실행 객체와 HTTP 라우터를 연결한다. `communication/http`는 요청을 해석하고 주입된 객체를 호출한다. 계산과 실행 상태를 HTTP 계층 자체에 보관하는 구조는 아니다. 실제 책임 배치는 [공동 개발 규칙](../../project_support/docs/DEVELOPMENT.md)에 정리돼 있다.\n\n## 화면 버튼에서 결과까지: SIM 재생 예\n\n```mermaid\nsequenceDiagram\n  actor U as 사용자\n  participant P as SIM 작업 패널\n  participant A as HTTP API\n  participant R as RuntimeState\n  participant W as 상태 스트림\n  U->>P: 재생 명령\n  P->>A: POST /api/runtime/control\n  A->>R: control(action, speed)\n  R->>R: 잠금 아래 상태 변경\n  R-->>A: 상태 결과\n  A-->>P: 응답\n  W->>R: telemetry와 snapshot 조회\n  W-->>P: /ws/telemetry 상태 전달\n  P->>P: 화면용 사본으로 표시\n```\n\nWebSocket은 서버의 모의 상태와 평가를 반복해서 전달한다. 이름이 `telemetry`여도 이것만으로 실제 위성 원격측정 연결을 뜻하지 않는다. 스트림의 코드는 [telemetry.py](../../communication/http/telemetry.py), 명령 경로는 [runtime.py](../../communication/http/runtime.py)에서 확인할 수 있다.\n\n## 누가 상태를 소유하는가\n\nSIM 현재 상태는 `RuntimeState`가 소유하며 상태를 바꾸는 명령은 잠금으로 보호한다. 임무, 데이터, 보안에는 별도 계약과 어댑터가 연결되므로 모든 자료를 단일 SIM 값으로 환원하면 안 된다. 브라우저 패널과 지구는 결과 사본을 표시한다.\n\n화면 조립은 [workspace_orbit.js](../../user_application/web/scripts/workspace_orbit.js)가 맡는다. 이 파일은 기존 패널, 공용 지구, 노드, 카탈로그, 시계와 상태 투영을 연결한다. 메뉴 전환을 맡는 [workspace.js](../../user_application/web/scripts/workspace.js)와 역할이 다르다. 새 화면은 새 서버 상태를 만드는 대신 기존 소유 객체의 자료를 전달받도록 확장한다.\n\n공용 시각에는 궤도 자료, 노드, 카탈로그와 SIM의 출처가 함께 연결된다. 같은 숫자처럼 보이는 UTC라도 소유 자료가 다를 수 있다. 자료 유효기간 오류를 없애려고 임의로 현재 시각이나 오래된 성공값을 덮어쓰지 않는다.\n\n## 오류를 읽는 법\n\n## 2026-10-08 추가된 정의 저장 경계\n\n현재 factory는 주입된 `workspace_configuration` 저장소와 설정 REST 라우터도 조립한다. [지상국과 시나리오 정의 저장](definition-storage.md)은 PostgreSQL에 작성 정의를 보관하는 기능이며 RuntimeState의 실행 상태 저장과 구분한다. 화면은 브라우저 사본을 편집하고 서버 revision으로 저장 충돌을 확인한다.\n\n```mermaid\nflowchart LR\n  P[\"지상국과 시나리오 작성\"] --> C[\"브라우저 편집 사본\"]\n  C --> A[\"설정 REST와 revision 검사\"]\n  A --> D[\"PostgreSQL 정의와 변경 이력\"]\n  D --> C\n  C --> E[\"명시적 시험 준비와 실행\"]\n  E --> R[\"기존 runtime 현재 상태\"]\n```\n\n모듈 간 메시지, UTC와 SIM 경과 초, 진단 주소와 실제 전송 주소의 차이는 [ICD 인터페이스 명세](../interfaces/icd.md)에서 설명한다.\n\n## 오류 해석\n\n입력 형식 오류, 계산 자료의 유효기간 오류, 모듈 응답 실패는 서로 다른 문제다. HTTP 형식 검증과 도메인 오류 처리, 계산의 현재성 검사, 패널의 오류 표시는 각 경계에서 수행한다. 모의 통신 성공은 실제 RF 수신이나 장비 연동 성공의 증거가 아니다.\n\n다음으로 [위성과 지상국](../screens/satellite-ground.md), [DT 시험과 설정](../screens/scenarios-settings.md)을 읽으면 이 구조가 실제 화면에 어떻게 나타나는지 볼 수 있다.\n",
+      "size": 3218,
+      "links": [
+        "architecture/definition-storage",
+        "interfaces/icd",
+        "screens/satellite-ground",
+        "screens/scenarios-settings"
+      ],
+      "backlinks": [
+        "architecture/definition-storage",
+        "architecture/index",
+        "quickstart",
+        "screens/scenarios-settings"
+      ]
+    },
+    {
+      "id": "index",
+      "title": "Home",
+      "type": "Section",
+      "description": "",
+      "tags": [],
+      "body": "\n# 파일\n\n- [시작 안내와 화면 지도](quickstart.md) - ISDC ODT의 화면별 역할과 읽는 순서, 프로그램 및 한국어 시각화 위키를 여는 방법을 안내한다.\n\n# 디렉터리\n\n- [architecture](architecture/)\n- [interfaces](interfaces/)\n- [screens](screens/)\n- [testing](testing/)\n",
+      "size": 211,
+      "links": [
+        "quickstart"
+      ],
+      "backlinks": []
+    },
+    {
+      "id": "interfaces/icd",
+      "title": "ICD 인터페이스 명세와 실행 계약",
+      "type": "interface-guide",
+      "description": "ICD-01부터 ICD-08의 모듈 관계, 실제 API와 메시지, 시간 및 단위, 현재 보호 조건과 미구현 범위를 설명한다.",
+      "tags": [
+        "icd",
+        "interfaces",
+        "contracts",
+        "api",
+        "integration"
+      ],
+      "body": "\n# ICD 인터페이스 명세와 실행 계약\n\nICD는 서로 다른 모듈이 **무슨 자료를, 어떤 형식과 시간 기준으로 주고받는지** 합의하는 인터페이스 명세다. 예를 들어 통신망 계산 결과를 패브릭에 보내려면 노드와 링크의 구조, 분석 UTC, 요청 순서, 실패 결과가 맞아야 한다. 위키는 현재 코드의 계약을 설명하며 새 ICD를 승인하는 문서가 아니다.\n\n화면에서는 **시스템 → 시스템 연동 설정 → 인터페이스 명세**에서 원본 목록을 읽는다. 원본 내부 이름은 `ICD`다. 연결도는 모듈 관계, 연결 목록은 주소와 진단, 인터페이스 명세는 메시지 방향과 상태를 보여준다.\n\n## 전체 연결 지도\n\n```mermaid\nflowchart TB\n  C[\"운용 콘솔\"] <-->|\"ICD-07: REST와 WebSocket\"| F[\"애플리케이션 조립과 API\"]\n  F <-->|\"ICD-01: 객체와 저장 노드\"| D[\"데이터 관리\"]\n  F <-->|\"ICD-02: 망 입력과 경로\"| N[\"데이터 패브릭\"]\n  F <-->|\"ICD-03: 계획과 확정\"| M[\"군집 임무 모듈\"]\n  F <-->|\"ICD-08: SIM 관측과 판정\"| S[\"보안 SIM 모듈\"]\n  F <-->|\"ICD-05: 제어와 상태\"| R[\"DT 실행 및 계산\"]\n  F <-->|\"ICD-06: 시나리오와 결과\"| T[\"내장 시험 지원\"]\n  F -.-> G[\"DT 통신 계층\"]\n  G <-.->|\"ICD-04: 모의 및 계획\"| E[\"EM 장비 연동\"]\n```\n\n이 그림은 기능 경계다. 모든 화살표에 독립 네트워크 서버가 떠 있다는 뜻은 아니다. 내장 모듈은 주입된 객체를 호출하고 원격 모듈은 별도 HTTP 어댑터를 사용한다.\n\n## 8개 명세의 현재 위치\n\n버전과 승인 상태는 [원본 카탈로그](../../user_application/web/scripts/settings/topology.js)의 기록이다. 카탈로그의 날짜·속도·크기 표시는 실제 V6의 모든 경로에서 측정한 성능 보장이 아니다. 특히 오래된 설명의 브라우저 계산 표현은 현재 native 승인 경로와 함께 읽어야 한다.\n\n| 명세 / 카탈로그 버전 | 역할 | 현재 실행 근거 | 남은 범위 |\n|---|---|---|---|\n| ICD-01 / 1.4 승인 | 객체 등록, 저장 배치, 복제와 서비스 | scope를 분리한 데이터 API와 내장 SIM 모듈 | 실제 분산 저장 장비·파일 무결성의 실측 |\n| ICD-02 / 2.0 승인 | 링크 품질, 경로, DTN 저장 전달 | 망 갱신·경로·상태 API, guarded 교환 | DF-06 개별 번들 상태는 계획. 실제 OISL/RF가 아님 |\n| ICD-03 / 1.1 검토 | 군집 임무 편성·확정·중단 | 다섯 임무 종류, guarded plan/commit와 승인 문맥 | OR-05 모듈 자발 상태 보고는 계획. 다섯 종류 전체 live 수용은 별도 |\n| ICD-04 / 0.9 초안 | DT와 EM 장비 사이 명령·상태 | MOCK-HIL 조작과 SIM 상태 | 실제 탑재 프로토콜, 송수신 제어·갱신·하트비트는 미검증/계획 |\n| ICD-05 / 1.4 승인 | 모델 배치, SIM 제어, 상태와 계산 입력 | 기존 runtime·배치·계산 API와 스트림 | 독립 장비용 wire 프로토콜이 아님 |\n| ICD-06 / 1.0 검토 | 시험 정의, KPI 표본, 결과 기록 | 내장 시나리오 runner와 결과 내보내기 | VF-04 외부 시험결과 DB/분석 전달은 계획 |\n| ICD-07 / 1.1 승인 | 콘솔 제어와 상태 수신 | REST 및 `/ws/telemetry` | 수신 값은 현재 SIM. 실제 위성 텔레메트리로 확대하지 않음 |\n| ICD-08 / 1.0 초안 | 보안 관측과 규칙 판정 | 계약1.0 SIM 관측·판정·전환 이력·상태 | 실제 암호화, 인증 장비, 침입 탐지·영구 감사가 아님 |\n\nPostgreSQL의 지상국·시나리오 **정의 저장**은 새 설정 API다. 이를 VF-04의 시험결과 DB 구현으로 합산하지 않는다. [저장 범위](../architecture/definition-storage.md)를 참고한다.\n\n## ICD-01: 데이터를 어디에 보관하는가\n\n패브릭이 전달 경로를 다루는 동안 데이터 관리는 객체의 배치·복제·상태를 다룬다.\n\n| 메시지 | 실제 API 또는 보고 | 중요한 입력과 결과 |\n|---|---|---|\n| DM-01 수집 등록 | POST `/api/data-management/ingest` | `products`: ref, class, source, size_mb, priority |\n| DM-02 서비스 요청 | POST `/api/data-management/requests` | object_id 또는 class, destination, requester |\n| DM-03 운영 조치 | POST `/api/data-management/actions` | verify/heal/rebalance/set_replication/set_filter/purge_expired |\n| DM-04 저장 노드 갱신 | POST `/api/data-management/nodes` | id, kind, capacity_gb, available |\n| DM-05~08 조회 | GET overview/objects/nodes/events | 점수와 객체·노드·사건 사본 |\n| DM-09 모듈 상태 | GET `/api/data-management/status` | 구현, 배치, 주소, scope 계약 |\n\n직접 ICD 쓰기는 `scope_id`, `time`, `sim_elapsed_s`를 전달한다. 스키마에서 scope가 선택 필드처럼 보여도 HTTP 어댑터는 직접 ICD 요청의 누락을409로 거부한다. 별도 실행·배치의 자료가 섞이지 않게 하는 `isolated-v1` 경계다. `time` 문자열과 SIM 경과 초를 같은 시계로 오해하지 않는다.\n\n화면용 `GET /api/data-management/dashboard`는 단순 정적 조회와 다르다. 현재 수락 배치와 SIM 입력을 바탕으로 모듈에 전달한 보고를 합친다. `/console/request`, `/console/action`은 사용자 명령 경로이며 현재 문맥을 검사하고 서버가 시간을 붙인다.\n\n소스: [스키마](../../communication/http/data_management_schemas.py), [라우터](../../communication/http/data_management.py), [데이터 화면](../screens/data-security.md).\n\n## ICD-02: 이 망으로 전달할 수 있는가\n\n`POST /api/data-fabric/network`의 입력은 `time`, `nodes`, `links`다. 노드는 satellite/ground를 구분하고 generation_mbps, storage_gb, extra_delay_ms를 가진다. 링크는 a/b, oisl/ground/terrestrial, state와 faulted를 전달한다. 최대 노드2000개·링크20000개이며 이 숫자는 요청 상한이지 처리 성능 보장이 아니다.\n\n| 메시지 | API와 결과 |\n|---|---|\n| DF-01 → DF-02 | network POST → usable, 품질과 사유, 지상 경로와 저장 전달 보고 |\n| DF-03 → DF-04 | route POST: source, target, objective(latency/reliability/balanced) → 경로 상태와 결과 |\n| DF-05 | status GET → instance, sequence, 갱신 시각과 실제 배치 |\n| DF-06 | 개별 DTN 번들 보고는 계획 항목 |\n\n```mermaid\nsequenceDiagram\n  participant U as 지상 통신 화면\n  participant P as 기존 망 입력 소유자\n  participant A as Fabric HTTP\n  participant F as 패브릭 모듈\n  U->>P: 현재 분석 입력 요청\n  P-->>U: UTC, 노드, 링크와 입력 증거\n  U->>A: network + instance/sequence/request-id\n  A->>F: guarded_update\n  F-->>U: 수락된 sequence와 network_hash, 보고\n  U->>A: route + 같은 instance/sequence\n  A->>F: guarded_route\n  F-->>U: 해당 망의 경로 결과\n```\n\nguarded 헤더는 `X-ISDC-Fabric-Instance`, `Sequence`, `Request-Id`다. network에는 request-id가 필요하며 route는 같은 모듈·순번의 망에서 질의한다. 헤더가 아예 없는 원본 호환 경로도 남아 있으므로 모든 요청이 자동으로 guarded라고 주장하지 않는다. 충돌409, 모듈 불가503을 구분한다.\n\n지상 화면의 주기 조회와 과거 품질 이력은 새로운 정확 입력 전송 승인과 구분한다. 과거 기하나 과거 성공 보고를 현재 링크 품질로 대체하지 않는다.\n\n소스: [wire 스키마](../../communication/http/data_fabric_schemas.py), [헤더와 라우터](../../communication/http/data_fabric.py), [교환 시험](../../project_support/tests/test_data_fabric_guards.py).\n\n## ICD-03: 계획을 제안하고 언제 확정하는가\n\nOR-01은 `POST /api/orchestration/plan`이다. `time`, `mission`, `satellites`, `stations`, `windows`, `mesh`, `exclude`를 보낸다. mission.kind는 observe/compute/relay/pickup/fleet_update다. 창은 contacts/target_access/crosslinks/eclipses로 구분한다. 최상위 wire 형식뿐 아니라 모듈·승인 문맥의 도메인 검사도 필요하다.\n\nOR-02의 작업표는 계획 제안이다. OR-03의 `POST /api/orchestration/commit`에는 time, mission_id, decision(commit/abort), version, tasks가 필요하다. 계획 조회만으로 작업이 확정되지는 않는다. OR-04는 status 조회이며 OR-05는 계획이다.\n\n```mermaid\nflowchart TD\n  I[\"수락 배치와 현재 UTC 및 장애\"] --> P[\"승인 문맥과 native 창 입력\"]\n  P --> R[\"OR-01 계획 요청\"]\n  R --> Q[\"OR-02 feasible와 작업표\"]\n  Q --> U{\"운용자의 명시적 결정\"}\n  U -->|\"확정\"| C[\"OR-03 commit: 같은 계획과 작업\"]\n  U -->|\"중단\"| A[\"OR-03 abort\"]\n  C --> S[\"모듈 점유 작업과 수락 증거\"]\n  D[\"입력 변경 또는 늦은 응답\"] --> X[\"재검토 또는 충돌 거부\"]\n```\n\nguarded 경로의 헤더 접두사는 `X-ISDC-Orchestration-`이며 Instance, Sequence, Request-Id, Context와 Mission-Version(plan) 또는 Plan-Sequence(commit)을 사용한다. 일부 헤더만 보내면 원본 경로로 조용히 내려가지 않는다. 입력 승인 포트가 조립된 경우 배치·위성·지상국·UTC·모듈 문맥을 다시 확인한다. 요청 ID와 sequence 보호는 프로세스 재시작 후 영구 중복 방지 보장이 아니다.\n\n소스: [스키마](../../communication/http/orchestration_schemas.py), [라우터와 문맥](../../communication/http/orchestration.py), [HTTP 보호 시험](../../project_support/tests/test_mission_planning_http_guards.py), [임무 화면](../screens/missions.md).\n\n## ICD-08: 무엇을 보안 관측으로 보내는가\n\nSEC-01은 POST observations, SEC-02/03/04는 GET overview/events/status다. 콘솔 dashboard는 현재 runtime 사본으로 observe를 호출한 뒤 판정·상태·이력을 같은 실행으로 묶는다.\n\n관측은 contract_version=`1.0`, source=`SIM`, run_id, sample_id, sim_elapsed_s, observed_at, running, auth_percent, throughput_mbps, loss_percent, devices를 가진다. observed_at은 UTC ISO8601이다. 임의 필드는 금지하며 장비 id와 connected 형식을 검사한다. 범위를 벗어나거나 빠진 지표는 근거 부족으로 다뤄야 하며 임의의 정상값0으로 바꾸지 않는다.\n\n모듈 보고의 run_id가 현재 실행과 다르면 대시보드는 정상 성공으로 합치지 않는다. 외부 응답 불가·계약 불일치는503이며 내장 SIM 성공값으로 위장하지 않는다. 전환 이력은 모듈 실행 중 메모리 기록이다.\n\n소스: [관측 스키마](../../communication/http/security_schemas.py), [dashboard bridge](../../communication/http/security.py), [외부 응답 검사](../../communication/external/security.py), [보안 조립 시험](../../project_support/tests/test_security_product_assembly.py).\n\n## 설정 주소와 실제 전송을 구분하기\n\n원본 L01/02/03 기본값5101/5102/5103이나 L04의5204는 **설정 카탈로그 값**이다. 실제 내장 HTTP 경로가 이 포트에서 별도로 수신한다는 뜻은 아니다. 브라우저 진단 주소를 바꾼 것과 서버의 원격 어댑터 배치를 바꾼 것도 구분한다.\n\n`POST /api/integration/probe`는 최대64개 링크를 확인한다. 링크별 id, transport, host, port, timeout_s(0.1~5초), endpoints를 받는다.\n\n| 진단 | 실제 확인 범위 |\n|---|---|\n| IPC 또는 localhost/127.x | 주입된 내장 모듈 상태. 별도 localhost TCP 서버의 응답 검사가 아님 |\n| 원격 TCP/WebSocket/gRPC | 제한 시간 안의 TCP 연결 후 종료. payload와 상위 프로토콜은 보내지 않음 |\n| 원격 UDP | 주소 해석. 성공해도 unverified |\n| 외부 보안 주소 | TCP 도달 성공도 보안 프로토콜 미검증으로 표시 |\n\n카탈로그 heartbeat/reconnect 설정이 실제 장비 세션 구현의 증거가 되지는 않는다. EM 모드나 통합 시험 모드 선택도 장비를 연결·배치하는 명령이 아니다.\n\n소스: [연결 진단](../../communication/http/integration.py), [진단 시험](../../project_support/tests/test_source_integration_probe.py), [설정 화면](../screens/scenarios-settings.md).\n\n## 팀과 ICD를 검토할 때\n\n각 인터페이스에서 생산자/소비자, 시간 기준, 필드 단위, 입력 출처, 요청·응답 순서와 실패 동작을 함께 확인한다. 특히 `size_mb`와 `capacity_gb`, `generation_mbps`와 `extra_delay_ms`, UTC와 SIM 경과 초를 혼용하지 않는다. 승인 해시와 요청 영수증은 지정 입력의 수락 증거이며 물리적 통신 성공의 인증이 아니다.\n\n현재 검증 수준과 이번 시험 결과는 [시험 근거](../testing/evidence.md)에 별도로 기록한다. 메시지 추가가 필요하면 먼저 wire 스키마, 모듈 계약, 브라우저 클라이언트와 실패 시험의 변경 범위를 합의한다.\n",
+      "size": 7978,
+      "links": [
+        "architecture/definition-storage",
+        "screens/data-security",
+        "screens/missions",
+        "screens/scenarios-settings",
+        "testing/evidence"
+      ],
+      "backlinks": [
+        "architecture/definition-storage",
+        "architecture/runtime-flow",
+        "interfaces/index",
+        "quickstart",
+        "screens/data-security",
+        "screens/missions",
+        "screens/scenarios-settings",
+        "testing/evidence"
+      ]
+    },
+    {
+      "id": "interfaces/index",
+      "title": "Interfaces",
+      "type": "Section",
+      "description": "",
+      "tags": [],
+      "body": "# 파일\n\n- [ICD 인터페이스 명세와 실행 계약](icd.md) - ICD-01부터 ICD-08의 모듈 관계, 실제 API와 메시지, 시간 및 단위, 현재 보호 조건과 미구현 범위를 설명한다.\n",
+      "size": 110,
+      "links": [
+        "interfaces/icd"
+      ],
+      "backlinks": []
+    },
+    {
+      "id": "quickstart",
+      "title": "시작 안내와 화면 지도",
+      "type": "quickstart",
+      "description": "ISDC ODT의 화면별 역할과 읽는 순서, 프로그램 및 한국어 시각화 위키를 여는 방법을 안내한다.",
+      "tags": [
+        "quickstart",
+        "screens",
+        "navigation",
+        "isdc"
+      ],
+      "body": "\n# 시작 안내와 화면 지도\n\n이 위키는 코드를 먼저 이해하지 않아도 ISDC ODT의 화면과 처리 흐름을 따라갈 수 있도록 작성했다. 그림을 먼저 보고 필요한 설명을 읽은 뒤 관련 코드와 시험으로 들어가면 된다. 현재 구현과 시험 기록을 근거로 하며, 실제 위성 관제 시스템의 운용 인증서는 아니다.\n\n## 먼저 볼 그림\n\n```mermaid\nflowchart TB\n  Start[\"어떤 내용을 알고 싶은가?\"] --> Orbit[\"위성과 교신 조건\"]\n  Start --> Mission[\"임무가 계획되고 확정되는 과정\"]\n  Start --> Trial[\"가상 시험과 결과\"]\n  Start --> Data[\"데이터와 보안 모의 처리\"]\n  Orbit --> OG[\"카탈로그 / 분석 UTC / 지상국 / RF\"]\n  Mission --> MG[\"조건 입력 → 계획 → 확정 → 취소\"]\n  Trial --> TG[\"환경 → 시나리오 → 실행 → 평가\"]\n  Data --> DG[\"현재 배치 → 조회 → 명령 → 결과\"]\n  OG --> Evidence[\"출처와 시험 근거 확인\"]\n  MG --> Evidence\n  TG --> Evidence\n  DG --> Evidence\n```\n\n## 화면 지도\n\n2026-10-08 갱신에서는 최신 U035~U036 화면 배치, 작성 정의의 서버 DB 저장, ICD 실행 계약을 반영했다. 처음 협업하는 사람은 [ICD 명세와 연결 지도](interfaces/icd.md)에서 모듈 경계를 먼저 읽고, [정의 저장 구조](architecture/definition-storage.md)에서 영구 저장과 현재 실행 상태를 구분할 수 있다.\n\n| 메뉴와 화면 | 궁금한 점 | 읽을 문서 |\n|---|---|---|\n| 상황판: 통합 관제 현황 | 위성과 운용 자료는 어디에서 오는가? | [위성과 지상국](screens/satellite-ground.md) |\n| 상황판: DT 통합 상황판 | 가상 배치와 실행·연결 상태는 어떠한가? | [DT 시험과 설정](screens/scenarios-settings.md) |\n| 위성: 위성 상태 및 궤도 | 선택 위성의 궤도를 어떻게 계산하는가? | [위성과 지상국](screens/satellite-ground.md) |\n| 위성: 발사 초기 운용 | 초기 운용 절차 설명은 무엇인가? | [자료 경계](architecture/runtime-flow.md) |\n| 지상국: 지상국 및 통신 | 언제 보이고 어떤 RF 조건이 필요한가? | [위성과 지상국](screens/satellite-ground.md) |\n| 임무: 임무계획 및 결과 | 다섯 서비스의 입력과 작업표는 무엇인가? | [임무 계획](screens/missions.md) |\n| 임무: 정상 운용 절차 / 운용 판단 및 인계 / 이상 대응 및 복구 | 절차 설명과 실제 모듈 응답을 어떻게 구분하는가? | [임무 계획](screens/missions.md) |\n| 데이터: 임무 데이터 관리 | 객체·복제·복구·전달 상태는 무엇인가? | [데이터와 보안](screens/data-security.md) |\n| 보안: 보안 및 명령 권한 | 어떤 모의 판정이며 언제 관측한 값인가? | [데이터와 보안](screens/data-security.md) |\n| 시험: 시험 환경 구성 | 어떤 노드와 조건으로 시험하는가? | [DT 시험과 설정](screens/scenarios-settings.md) |\n| 시험: 시험 시나리오 작성 | 정의를 선택하고 어떻게 검토하는가? | [DT 시험과 설정](screens/scenarios-settings.md) |\n| 시험: 모의실험 실행 및 기록 | 재생·정지·배속과 사건을 어떻게 읽는가? | [DT 시험과 설정](screens/scenarios-settings.md) |\n| 시험: 시험 결과 평가 | 어떤 실행의 KPI이며 무엇을 저장하는가? | [DT 시험과 설정](screens/scenarios-settings.md) |\n| 시스템: 시스템 연동 설정 | 모듈·ICD·주소와 진단은 어떻게 연결되는가? | [DT 시험과 설정](screens/scenarios-settings.md) |\n| 시스템: 지상 시스템 관리 / 장비 연동 시험 | 실제 관측과 장비 연동 근거가 있는가? | [검증 한계](testing/evidence.md) |\n| 선택 위성 카드 / 지도 / 환경 설정 | 모델 상세, 궤적 ON/OFF, 전체 위성·공용 지구 표시를 어디서 바꾸는가? | [위성과 지상국](screens/satellite-ground.md) |\n| 시스템 연동 설정 → 인터페이스 명세 | ICD-01~08은 어떤 메시지와 API를 사용하는가? | [ICD 명세](interfaces/icd.md) |\n| 지상국과 내 시험 시나리오 작성 | DB 저장 완료와 편집 사본을 어떻게 구분하는가? | [정의 저장](architecture/definition-storage.md) |\n\n메뉴는 [workspace.js](../user_application/web/scripts/workspace.js)의 현재 그룹과 이름을 기준으로 했다. 각 메뉴가 있다는 이유만으로 실장비 기능까지 구현된 것은 아니다. 고정 예시·절차 카드와 실제 연결 패널의 출처를 함께 읽는다.\n\n## 추천하는 읽는 순서\n\n### 최근 기능의 연결\n\n```mermaid\nflowchart LR\n  A[\"위성 선택과 시각별 분석\"] --> B[\"등록 지상국 기준 통과 조회\"]\n  B --> C[\"통신망 ICD-02와 임무 ICD-03\"]\n  C --> D[\"데이터 ICD-01와 보안 ICD-08\"]\n  S[\"지상국과 시나리오 작성\"] --> P[\"정의 DB 저장과 revision\"]\n  P --> T[\"시험 준비와 실행\"]\n  T --> V[\"KPI와 결과 기록 ICD-06\"]\n```\n\n화살표는 기능과 자료의 연결이며 앞 단계 수행만으로 다음 명령을 자동 실행하는 절차가 아니다. 실행 흐름과 보호 조건은 각 문서의 상세 도표에서 확인한다.\n\n### 화면에서 찾아 읽기\n\n1. 이 화면 지도에서 알고 싶은 기능을 고른다.\n2. 해당 문서의 흐름도를 보고 입력과 결과를 구분한다.\n3. [전체 구조](architecture/runtime-flow.md)에서 호출 경계와 상태 소유자를 확인한다.\n4. [시험 근거](testing/evidence.md)에서 검증 수준과 남은 범위를 확인한다.\n\n위키 시각화의 큰 그래프는 문서 간 이동 지도다. 버튼과 API의 실행 순서는 문서 안에 있는 Mermaid 흐름도·시퀀스도로 설명한다. 모든 문서에는 관련 코드 링크를 붙였다.\n\n## 프로그램과 위키 열기\n\n제품 개발 주소는 `http://127.0.0.1:8891`이다. 이미 실행 중이라면 현재 서버와 재생 상태를 보존하고 기존 화면을 이용한다. 새 서버를 시작해야 할 때의 README 명령은 다음과 같다. 저장 입력, native 계산과 PostgreSQL 준비는 현재 [README 실행 환경 안내](../README.md#실행-환경-준비)를 따른다. [프로젝트 기동 안내](../project_support/specs/001-v6-function-integration/quickstart.md)는 이전 검증 시점의 이력도 포함한다.\n\n```powershell\n# 저장소 루트에서, 기존 서버가 없는 경우\n$env:ISDC_DATABASE_CONFIG = (Resolve-Path 'data/workspace/postgresql/connection.json').Path\nproject_support/.venv/Scripts/python -m uvicorn user_application.web.application:create_stored_orbit_app --factory --host 0.0.0.0 --port 8891\n```\n\n설치된 OpenWiki로 문서 관계 그래프와 본문을 열 수 있다.\n\n```powershell\n# 저장소 루트에서 실행\nopenwiki visualize openwiki --port 4321 --no-open\n```\n\n위키 서버는 제품 서버와 별개다. 그래프와 도표 라이브러리는 외부 CDN을 이용하므로 네트워크 연결이 필요하다. 정적 내보내기는 다음 명령으로 만들 수 있으며, 파일 생성과 인터넷 공개는 별도 단계다.\n\n```powershell\nopenwiki visualize openwiki --export project_support/wiki_site\n```\n\n## 용어\n\n| 용어 | 의미 |\n|---|---|\n| GP | 공개 궤도요소. 실제 수신 텔레메트리와 구분 |\n| epoch | 궤도요소가 기준으로 삼는 시각 |\n| UTC | 시간대에 의한 혼동을 줄이는 공통 시각 기준 |\n| EOP | 지구 회전 및 좌표 변환 보정 자료 |\n| SIM | 모의실험 |\n| ICD | 모듈 사이의 인터페이스와 메시지 계약 |\n| KPI | 정의된 조건에 따른 평가 지표 |\n| HIL | 실제 장비를 계산 환경에 연결하는 시험. 현재 MOCK-HIL과 구분 |\n\n코드와 실제 화면이 바뀌면 이 위키도 갱신해야 한다. 화면 출처, 계산 UTC, 단위와 검증 범위를 보존하는 것이 공유 문서의 기본 기준이다.\n",
+      "size": 4550,
+      "links": [
+        "interfaces/icd",
+        "architecture/definition-storage",
+        "screens/satellite-ground",
+        "screens/scenarios-settings",
+        "architecture/runtime-flow",
+        "screens/missions",
+        "screens/data-security",
+        "testing/evidence"
+      ],
+      "backlinks": [
+        "index"
+      ]
+    },
+    {
+      "id": "screens/data-security",
+      "title": "데이터 관리와 보안 화면",
+      "type": "screen-guide",
+      "description": "데이터 객체의 배치 범위와 운영 명령, 보안 모의 판정 및 관측 시각을 화면에서 읽는 방법을 설명한다.",
+      "tags": [
+        "screens",
+        "data",
+        "security",
+        "simulation"
+      ],
+      "body": "\n# 데이터 관리와 보안 화면\n\n데이터 화면은 가상 배치에 속한 객체와 저장소, 처리 상태를 다룬다. 보안 화면은 SIM 관측을 보안 모의 모듈에 전달하고 판정과 이력을 보여준다. 두 화면의 정상 결과만으로 실제 파일 전달이나 실제 인증이 검증되는 것은 아니다.\n\n## 임무 데이터 관리\n\n메뉴 **데이터 → 임무 데이터 관리**를 연다. 원본 연결 패널에서는 객체 목록, 사본 수, 무결성 표시, 저장 계층, 이벤트와 모의 처리 추이를 확인한다. 종류, 노드, 검색어로 객체를 좁힐 수 있다.\n\n| 조작 | 먼저 확인할 것 | 결과를 읽는 방법 |\n|---|---|---|\n| 상태 조회 | 현재 배치와 모듈 연결 | 객체가 없는 상태와 조회 실패를 구분한다 |\n| 객체 선택 | 선택 객체가 현재 배치에 존재하는지 | 크기, 출처, 사본, 무결성, 상태를 함께 읽는다 |\n| 서비스 요청 | 현재 객체 또는 종류, 필터, 전달 대상 | 모의 요청 결과이지 실제 이용자 수신 확인이 아니다 |\n| 데이터 작업 | 현재 저장소/객체와 작업 조건 | 정책 설정과 실제 객체에 대한 모의 운영 조건을 구분한다 |\n\n화면에 있는 복제·복구 및 정책 관련 조작은 같은 입력 조건에서 모두 허용되는 것이 아니다. 조회되지 않은 배치, 오류가 남은 응답, 운영할 객체가 없는 경우에는 관련 작업을 제한한다. 현재 패널 구현은 화면이 열려 있을 때 약 3초 간격으로 조회하며, 다른 화면으로 이동하면 폴링과 대기를 정리한다.\n\n```mermaid\nsequenceDiagram\n  actor U as 사용자\n  participant P as 데이터 패널\n  participant A as API\n  participant D as 배치 상태\n  participant M as 데이터 모듈\n  P->>A: 배치 조회와 dashboard 조회\n  A->>D: 현재 배치와 실행 범위 확인\n  A->>M: 해당 범위의 객체와 이벤트 조회\n  M-->>P: 모듈 응답\n  P->>A: 현재 배치 다시 조회\n  P->>P: 범위와 버전 일치 확인 후 표시\n  U->>P: 요청 또는 작업 실행\n  P->>P: 클릭 시 입력값을 사본으로 고정\n  P->>A: console/request 또는 console/action\n  A->>M: 현재 범위 검증 후 명령\n  M-->>P: 모의 결과\n```\n\n`scope_id`는 데이터가 속하는 실행 범위다. 패널은 배치 버전과 노드 목록을 비교하고, 모듈의 `isolated-v1` 범위 계약을 확인한다. 조회 중 배치가 바뀌면 정상 결과로 표시하지 않고 재조회를 요구한다. 다른 실행의 객체가 현재 실행 결과처럼 섞이는 것을 막는 장치다.\n\n근거: [source_data.js](../../user_application/web/scripts/tabs/source_data.js), [데이터 HTTP 경로](../../communication/http/data_management.py), [화면 수명주기 시험](../../project_support/tests/browser/source_data_panel.test.mjs).\n\n## 보안 및 명령 권한\n\n메뉴 **보안 → 보안 및 명령 권한**을 연다. 원본 ICD-08 패널은 현재 모의 판정, 모의 인증률, 처리량, 손실률, 판정 변경 이력을 표시한다. 화면 진입 및 가시성 복귀 때 조회하고 사용자가 조회 버튼으로 갱신할 수도 있다.\n\n```mermaid\nflowchart LR\n  R[\"현재 SIM 관측 사본\"] --> B[\"SecurityBridge: 조회 트랜잭션\"]\n  B --> S[\"보안 모의 모듈 또는 원격 어댑터\"]\n  S --> O[\"판정 / 지표 / 전환 이력\"]\n  O --> P[\"보안 화면\"]\n  P --> T[\"관측 UTC와 수신 UTC 구분\"]\n  P --> L[\"실제 인증과 암호화는 미검증\"]\n```\n\n관측 UTC는 모듈 자료의 기준 시각이고 수신 UTC는 화면이 응답을 받은 시각이다. 새 응답을 받았다고 해서 오래된 관측값까지 현재 자료가 되는 것은 아니다. 응답 시간 초과, 실행 변경, 화면 숨김과 종료에 대한 취소·현재성 처리가 있다.\n\n파일 무결성과 PQC-TEE 표시는 실제 파일이나 장치를 검증했다는 뜻이 아니다. 패널은 최근 전환을 표시하며 영구 보안 감사 로그를 제공한다고 해석하면 안 된다. 화면에 보존된 운용 절차 예시는 원본 모듈의 실제 응답과 별도로 읽는다.\n\n근거: [source_security.js](../../user_application/web/scripts/tabs/source_security.js), [security.py](../../communication/http/security.py), [보안 관측 시험](../../project_support/tests/browser/source_security_observation.test.mjs).\n\n## 다른 화면과의 연결\n\n## 최신 화면 정리와 ICD\n\nU036에서는 원본 모듈 보고와 데이터 정책 JSON을 접힌 상세로 옮겼다. 기본 화면은 안정성·처리 단계·저장 노드·객체·운영 조치부터 읽고, 원본 값이나 처리 시각이 필요하면 상세를 펼친다. 접힘은 표시 방식이며 scope 검사나 명령 조건을 줄이지 않는다.\n\n데이터는 **ICD-01**, 보안은 **ICD-08**을 사용한다. 메시지와 API, SIM 경과 초와 UTC, scope/run 식별자의 차이는 [ICD 명세](../interfaces/icd.md)를 참고한다. 최근 전체 UI 점검은 빈 결과와 현재 표시를 확인한 범위이며 새 저장 명령이나 장애를 실행해 결과를 만든 시험이 아니다.\n\n근거: [현재 데이터 패널](../../user_application/web/scripts/tabs/source_data.js), [U036 실화면 기록](../../project_support/docs/validation/u036_workspace_ui_audit.md).\n\n배치와 임무 조건이 바뀌면 데이터 운영의 전제도 달라진다. [임무 계획](missions.md)을 먼저 확인하고, 모듈 주소와 연결 방식은 [시스템 설정](scenarios-settings.md)에서 확인한다. 실제 화면 수용과 구성요소 시험의 차이는 [시험 근거](../testing/evidence.md)에 정리했다.\n",
+      "size": 3112,
+      "links": [
+        "interfaces/icd",
+        "screens/missions",
+        "screens/scenarios-settings",
+        "testing/evidence"
+      ],
+      "backlinks": [
+        "interfaces/icd",
+        "quickstart",
+        "screens/index",
+        "screens/missions"
+      ]
+    },
+    {
+      "id": "screens/index",
+      "title": "Screens",
+      "type": "Section",
+      "description": "",
+      "tags": [],
+      "body": "# 파일\n\n- [데이터 관리와 보안 화면](data-security.md) - 데이터 객체의 배치 범위와 운영 명령, 보안 모의 판정 및 관측 시각을 화면에서 읽는 방법을 설명한다.\n- [임무 계획과 확정 흐름](missions.md) - 다섯 군집 서비스 임무의 입력, 계획과 확정 및 취소, 일정표와 현재성 검사를 설명한다.\n- [위성과 지상국 화면](satellite-ground.md) - 위성 카탈로그와 배치 노드, 공용 지구와 UTC, 지상국 가시성 및 통신 계산을 연결해 설명한다.\n- [DT 시험과 시스템 설정](scenarios-settings.md) - 시험 환경, 시나리오 작성, 실행과 결과 평가의 역할을 구분하고 모듈 설정 및 연결 진단을 설명한다.\n",
+      "size": 377,
+      "links": [
+        "screens/data-security",
+        "screens/missions",
+        "screens/satellite-ground",
+        "screens/scenarios-settings"
+      ],
+      "backlinks": []
+    },
+    {
+      "id": "screens/missions",
+      "title": "임무 계획과 확정 흐름",
+      "type": "workflow",
+      "description": "다섯 군집 서비스 임무의 입력, 계획과 확정 및 취소, 일정표와 현재성 검사를 설명한다.",
+      "tags": [
+        "missions",
+        "planning",
+        "workflow",
+        "screens"
+      ],
+      "body": "\n# 임무 계획과 확정 흐름\n\n메뉴 **임무 → 임무계획 및 결과**에서 군집 서비스 임무를 다룬다. 현재 화면 매핑에서 이 편집 패널은 `mission` 화면에만 배치된다. 정상 운용 절차, 운용 판단 및 인계, 이상 대응 및 복구 화면의 설명 카드를 같은 계산 기능으로 해석하지 않는다.\n\n## 어떤 임무를 만들 수 있는가\n\n| 종류 | 입력의 핵심 | 계산하려는 것 |\n|---|---|---|\n| 관측 인도 | 관측 지점, 데이터 크기, 처리 여부, 기한 | 촬영부터 처리와 지상 인도까지 가능한 일정 |\n| 궤도상 연산 | 데이터 보유 위성, 입력 크기, 출력 비율 | 궤도에서 처리하고 결과를 전달하는 일정 |\n| 중계 전송 | 출발, 도착, 데이터량, 지연 조건 | 통신 경로와 접속창을 이용한 전달 |\n| 외부 위성 데이터 수신 | 외부 카탈로그 위성, 거리와 수신 속도 가정 | 가까이 지날 때 모의 수신하고 인도하는 일정 |\n| 군집 소프트웨어 갱신 | 대상 위성, 이미지 크기, 적용 시간, 동시 갱신 수 | 배포 및 적용의 모의 일정 |\n\n속도와 장비 능력은 모델 가정이다. 실제 촬영, 외부 기관 교차링크, 원격 소프트웨어 갱신을 수행했다는 의미는 아니다.\n\n## 먼저 준비할 것\n\n시험 환경에서 노드를 배치하고 분석 시계를 정지한다. 임무 화면에서 군집 모듈 상태를 조회하고 요청 이름, 종류, 시작 시각, 기한, 세부 조건을 저장한다. 저장되지 않은 편집값이 있으면 계획이나 확정 전에 저장을 요구한다. 다른 창이 요청을 바꾼 경우 변경 내용을 먼저 불러온다.\n\n```mermaid\nflowchart TD\n  A[\"배치 노드와 분석 UTC 준비\"] --> B[\"군집 모듈 상태 조회\"]\n  B --> C[\"종류 / 조건 / 기한 입력 후 저장\"]\n  C --> D[\"계획 계산\"]\n  D --> E{\"편성 가능한가?\"}\n  E -->|\"아니오\"| F[\"검사 결과를 읽고 입력 수정\"]\n  F --> C\n  E -->|\"예\"| G[\"작업표와 통신창 확인\"]\n  G --> H{\"입력과 모듈 버전이 같은가?\"}\n  H -->|\"변경됨\"| I[\"최신 조건으로 명시적 재계획\"]\n  I --> D\n  H -->|\"같음\"| J[\"계획 확정\"]\n  J --> K[\"분석 UTC에 따른 작업 상태 표시\"]\n  J --> L[\"계획 취소와 수락 상태 확인\"]\n```\n\n**계획**은 가능한 작업 후보를 계산하는 단계이고, **확정**은 그 계획을 모듈이 수락하는 단계다. 편성 불가 결과도 정상적인 계산 결과일 수 있다. 빈 작업표를 성공으로 해석하지 않는다.\n\n## 코드에서는 어떻게 이어지는가\n\n```mermaid\nsequenceDiagram\n  participant U as 임무 패널\n  participant E as 임무 실행 제어기\n  participant A as orchestration API\n  participant M as 군집 운용 모듈\n  U->>E: 저장된 요청의 계획 실행\n  E->>E: 노드 / UTC / 통신창 / 모듈 상태 구성\n  E->>A: POST /api/orchestration/plan\n  A->>A: 현재 문맥과 버전 검사\n  A->>M: guarded 계획 요청\n  M-->>U: 가능 여부 / 검사 / 작업표\n  U->>E: 확정 선택\n  E->>A: POST /api/orchestration/commit\n  A->>M: 현재 입력에 대한 수락 요청\n  M-->>U: 수락 상태\n```\n\nAPI의 보호 경로는 모듈 인스턴스와 sequence/version, 수락한 분석 UTC와 노드·지상국 조건을 검사한다. 이전 계획을 다른 현재 상태에서 무조건 확정하지 않기 위한 검사다. 최신 조건 재계획은 이러한 검사를 해제하는 버튼이 아니다.\n\n## 결과를 읽는 순서\n\n## 최신 화면에서 두 임무 기능을 구분하기\n\nU036 화면 점검에서는 군집 서비스 임무와 기존 SIM 임무 편집기를 모두 유지했다. 군집 계획은 실제 UTC와 계산한 창을 사용하고, SIM 편집기는 0~100 축의 모의 임무를 다룬다. 비슷한 이름이 있어도 같은 작업의 중복 화면으로 합치면 입력 기준을 잃는다.\n\n군집 모듈에 보내는 OR-01 계획, OR-02 결과, OR-03 확정·중단과 OR-04 상태의 API와 보호 헤더는 [ICD-03 실행 계약](../interfaces/icd.md#icd-03-계획을-제안하고-언제-확정하는가)에 정리했다. 새 UI 점검 기록은 현재 화면 표시 범위이며 다섯 임무 종류 전체를 새로 실행했다는 증거가 아니다.\n\n근거: [U036 기능 구분](../../project_support/docs/validation/u036_workspace_ui_audit.md).\n\n## 작업표를 읽는 순서\n\n1. 요청 종류와 계산 UTC, 계획 버전을 확인한다.\n2. 가능 여부와 실패한 검사를 읽는다.\n3. 위성별 일정표, 접속창, 관측창, 작업 시작·종료 UTC와 기한을 비교한다.\n4. 작업 행을 선택해 상세 조건을 확인한다.\n5. 확정 상태와 현재 분석 시각을 확인한다. 작업 진행 표시는 실제 장비 수행 증거와 다르다.\n\n근거: [임무 종류](../../digital_twin/model_library/browser/mission_types.js), [패널과 일정표](../../user_application/web/scripts/tabs/source_missions.js), [실행 제어기](../../user_application/web/scripts/missions/mission_execution.js), [HTTP 보호 경로](../../communication/http/orchestration.py).\n\n종류와 상태 경계는 [source_mission_types.test.mjs](../../project_support/tests/browser/source_mission_types.test.mjs) 등에서 시험한다. 다섯 종류 모두의 실제 브라우저 복구와 성공 수용이 끝났다고 주장하는 문서는 아니다. 남은 검증은 [시험 근거](../testing/evidence.md)를 참고한다. 데이터 전달 후속 설명은 [데이터 관리](data-security.md)로 이어진다.\n",
+      "size": 3053,
+      "links": [
+        "interfaces/icd",
+        "testing/evidence",
+        "screens/data-security"
+      ],
+      "backlinks": [
+        "interfaces/icd",
+        "quickstart",
+        "screens/data-security",
+        "screens/index",
+        "screens/satellite-ground"
+      ]
+    },
+    {
+      "id": "screens/satellite-ground",
+      "title": "위성과 지상국 화면",
+      "type": "screen-guide",
+      "description": "위성 카탈로그와 배치 노드, 공용 지구와 UTC, 지상국 가시성 및 통신 계산을 연결해 설명한다.",
+      "tags": [
+        "screens",
+        "orbit",
+        "ground",
+        "rf",
+        "time"
+      ],
+      "body": "\n# 위성과 지상국 화면\n\n위성 화면에서 선택하는 카탈로그 위성과 시험 환경에 배치하는 가상 노드는 출처가 다르다. 같은 지구 위에 보이더라도 카탈로그 GP 궤도요소와 배치 노드 정의를 구분한다. GP는 공개 궤도요소 자료이며 실측 원격측정이 아니다.\n\n## 화면별 역할\n\n| 메뉴 | 역할 | 연결된 자료 |\n|---|---|---|\n| 상황판 → 통합 관제 현황 | 위성 및 운용 상태 요약 | 실제 원격측정이 없는 수치는 미확인 |\n| 위성 → 위성 상태 및 궤도 | 카탈로그 선택과 궤도 자료 탐색 | 저장 입력 또는 선택 GP와 계산 결과 |\n| 지상국 → 지상국 및 통신 | 지상국, 접속창, RF 및 노드 통신망 | 기하 계산과 모의 통신 결과 |\n| 시험 → 시험 환경 구성 | 노드 정의와 가상 배치 | 가상 위성 및 장비 모델 |\n| 선택 위성 카드 상세 | 해당 위성의 모델 표현 | 기존 모델 선택 소유자 |\n| 지도 궤적 버튼 | 선택 위성의 궤적 ON/OFF | 기존 궤적 소유자 |\n| 환경 설정 | 공용 지구 표시와 전체 위성 표시 | 표시 범위와 화면 설정 |\n\nU035~U036에서는 모델 표현을 선택 위성 카드 상세로, 궤적 ON/OFF를 지도 버튼으로 옮겼다. 전체 위성 표시는 환경 설정의 공용 지구 설정 안의 체크박스이며 기본 기준은 현재 시각이다. 독립 고급 탭은 노출하지 않는다. 발사 초기 운용 화면의 절차 설명은 실제 발사·교신 완료 기록이 아니다.\n\n최신 U018 검토에서는 통합 관제 현황의 중앙에 공용 Cesium 지구, 좌우에 운용 수치와 상태를 배치했다. DT 상황판은 중앙 모듈 연결 SVG와 좌우 시나리오·결과 요약으로 구성한다. 작은 화면에서는 요약 패널을 하단으로 옮기며 기존 상태 소유자는 유지한다.\n\n## 위성의 위치가 지구에 나타나는 과정\n\n```mermaid\nflowchart TD\n  A[\"카탈로그에서 위성 선택\"] --> B[\"GP 궤도요소와 자료 출처\"]\n  B --> C[\"분석 UTC와 보정 자료\"]\n  C --> D{\"자료 유효기간과 입력이 맞는가?\"}\n  D -->|\"예\"| E[\"궤도 및 좌표 계산\"]\n  D -->|\"아니오\"| F[\"오류 표시 / 자료와 UTC 확인\"]\n  E --> G[\"위치와 궤적 결과 사본\"]\n  G --> H[\"공용 Cesium 지구\"]\n  N[\"시험 환경의 배치 노드 정의\"] --> Q[\"노드 계산 질의와 현재성 검증\"]\n  Q --> H\n  S[\"선택 위성 모델 / 지도 궤적 / 환경 표시 범위\"] --> H\n```\n\n화면 하단 시간창은 현재 시각과 분석 시각을 구분한다. 분석 시각은 해당 계산 자료의 시계이며 실제 관제 현재 시각과 동일한 의미가 아니다. 전체 위성 표시에서는 계산 스냅샷의 분석 UTC와 재생 표시 UTC를 구분하고 현재 출처와 일치하는지 확인한다. 화면 애니메이션이 움직인다고 새 정밀 계산이 매 프레임 완료됐다는 뜻은 아니다.\n\nEOP는 지구 회전과 좌표 변환에 쓰는 보정 자료다. 현재 UI 검토 기록에는 저장 자료의 기간을 벗어난 UTC 오류와 자료 갱신 필요가 남아 있다. 유효기간 검사를 해제하거나 오류를 성공값으로 바꾸는 대신 적용된 입력 자료를 확인해야 한다.\n\n코드 근거: [화면 조립](../../user_application/web/scripts/workspace_orbit.js), [전체 위성 시간 결합](../../user_application/web/scripts/catalogue_scene_time_binding.js), [궤도 API](../../communication/http/orbit.py), [노드 계산 API](../../communication/http/node_geometry.py).\n\n## 지상국에서 언제 교신할 수 있는가\n\n지상국 위치는 위도·경도와 타원체 높이로 지정한다. 최소 고도각은 위성이 지평선보다 얼마나 높아야 허용할지 정하는 조건이다. 조회 구간의 가시성은 궤도 모델로 계산한 기하학적 조건이며 장비 수신 성공의 증거가 아니다.\n\n```mermaid\nflowchart LR\n  S[\"선택 위성과 분석 UTC\"] --> V[\"가시 구간 질의\"]\n  G[\"지상국 위치 / 최소 고도각\"] --> V\n  V --> T[\"시작 / 최대 고도각 / 종료 / 접점\"]\n  T --> R[\"RF 계산 또는 임무 통신창 검토\"]\n  P[\"주파수 / 전력 / 이득 / 대역폭 가정\"] --> R\n  R --> O[\"링크 여유와 계산 결과\"]\n  O --> L[\"실제 장비와 수신 확인은 별도\"]\n```\n\n현재 선택 카탈로그 위성의 통과 분석은 지상국 화면에 있다. 활성 등록 지상국을 명시적으로 선택하면 해당 위도·경도·타원체 높이·최소 고도각을 기존 시각 소유자에 적용하고 선택 시각부터24시간을 조회한다. 저장 궤도, 배치 위성, 시나리오 통신 계획은 다른 입력을 쓰므로 별도 이름과 화면으로 구분한다. 접속창 없음, 조회 구간 잘림과 계산 오류도 구분한다.\n\n```mermaid\nflowchart TD\n  A[\"선택 카탈로그 위성\"] --> Q[\"선택 시각부터 24시간 조회\"]\n  B[\"활성 등록 지상국 선택\"] --> C[\"좌표와 높이 및 최소 고도각 적용\"]\n  C --> Q\n  Q --> N[\"기존 native 가시성 질의\"]\n  N --> R[\"구간과 고도각 또는 오류 표시\"]\n  B --> D[\"작성 지상국 정의: PostgreSQL 저장\"]\n```\n\n지상국은 지도와 선택 지상국을 먼저 읽고 목록·저장 관리, 배치 위성 통신 분석의 상세는 필요할 때 펼친다. 위성 선택과 지상국 분석은 저장 정의를 실행 배치와 혼동하지 않도록 분리한다.\n\n근거: [U035 표시 제어](../../project_support/docs/validation/u035_display_controls.md), [U036 전체 UI 점검](../../project_support/docs/validation/u036_workspace_ui_audit.md). 화면 캡처는 해당 변경 체크포인트의 근거다.\n\n![지상국 화면의 지도와 통과 분석](../../project_support/u036_ground_final.jpg)\n\nRF-Friis-v1 계산기는 주파수, 거리, 송신 전력, 안테나 이득과 손실 등의 조건에서 결과를 계산한다. ISS APRS 조건은 출처가 있는 일부 주파수 조건과 사용자 장비 가정을 구분한다. 통신망 패널은 지상국·OISL 모델, 경로와 DTN 결과, 통신 모듈 상태를 연결한다. 모듈로 보내는 동작과 단순 지구 표시를 동일하게 취급하지 않는다.\n\n근거: [지상 통신 패널](../../user_application/web/scripts/tabs/ground_network.js), [RF 계산 패널](../../user_application/web/scripts/tabs/rf_link_budget.js), [RF와 경로 API](../../communication/http/rf_network.py), [카탈로그 통과 패널](../../user_application/web/scripts/tabs/catalog_passes.js).\n\n## 확인할 순서\n\n1. 선택 자료가 카탈로그인지 배치 노드인지 확인한다.\n2. 분석 UTC와 궤도요소 epoch, 보정 자료의 유효기간을 확인한다.\n3. 지상국과 최소 고도각을 정하고 가시 구간을 계산한다.\n4. RF 결과의 입력 가정과 단위를 읽는다.\n5. 실제 수신·장비·HIL 증거가 있는지는 별도로 확인한다.\n\n모델 선택지와 GPU에서의 모든 자산 정상 렌더링, 많은 노드의 목표 프레임 성능은 서로 다른 검증 항목이다. 상세 범위는 [시험 근거](../testing/evidence.md), 통신창을 쓰는 계획 흐름은 [임무 문서](missions.md)를 참고한다.\n",
+      "size": 3824,
+      "links": [
+        "testing/evidence",
+        "screens/missions"
+      ],
+      "backlinks": [
+        "architecture/runtime-flow",
+        "quickstart",
+        "screens/index"
+      ]
+    },
+    {
+      "id": "screens/scenarios-settings",
+      "title": "DT 시험과 시스템 설정",
+      "type": "workflow",
+      "description": "시험 환경, 시나리오 작성, 실행과 결과 평가의 역할을 구분하고 모듈 설정 및 연결 진단을 설명한다.",
+      "tags": [
+        "screens",
+        "scenarios",
+        "simulation",
+        "settings",
+        "kpi"
+      ],
+      "body": "\n# DT 시험과 시스템 설정\n\n시험은 환경을 구성하고 시나리오를 검토한 뒤 실행하고 결과를 평가하는 순서로 읽는다. 현재 UI는 이 네 책임을 서로 다른 화면에 배치한다. 시나리오의 성공 판정은 정의된 모의 조건에 대한 판정이며 실제 위성 운용 성공을 뜻하지 않는다.\n\n## 화면별 역할\n\n| 화면 | 하는 일 | 다음 화면과의 연결 |\n|---|---|---|\n| DT 통합 상황판 | 가상 배치, 실행 경과, 배속, 단계와 모듈 상태 요약 | 각 작업 화면으로 이동 |\n| 시험 환경 구성 | 노드 및 초기 시험 조건 구성 | 시나리오의 입력 조건 |\n| 시험 시나리오 작성 | 내 시험 정의 작성·저장과 기존 운용 시나리오 검토 | 정의와 현재 입력을 구분 |\n| 모의실험 실행 및 기록 | 서버 SIM 제어와 시나리오 재생, 사건 기록 | 평가할 실행과 사건 |\n| 시험 결과 평가 | KPI, 조건 판정, 비교 및 결과 저장 | 같은 실행의 결과 문서 |\n| 시스템 연동 설정 | 모듈 연결도, ICD, 주소와 진단 | 실행에 사용할 연결 설정 |\n| 환경 설정 | 표시·테마 및 공용 지구 관련 설정 | 화면 표현과 표시 범위 |\n\n시나리오 단계의 시간 진행과 서버 SIM 재생 제어는 연결돼 있지만 동일한 객체는 아니다. 원본 시나리오 runner는 단계와 검사를 관리하고 SIM 제어기는 서버 스트림과 실행 명령을 관리한다. 두 실행의 식별자와 현재 입력이 맞는지 확인해야 한다.\n\n## 시나리오 실행 흐름\n\n```mermaid\nflowchart TD\n  A[\"시험 환경: 노드와 초기 조건\"] --> B[\"시나리오 정의 선택\"]\n  B --> C[\"준비 조건 검토와 확인\"]\n  C --> D[\"runner 준비\"]\n  D --> E{\"현재 입력과 실행 증거가 맞는가?\"}\n  E -->|\"아니오\"| F[\"재검토 / 오류 설명\"]\n  E -->|\"예\"| G[\"재생 / 일시정지 / 다음 단계\"]\n  G --> H[\"단계와 사건 기록\"]\n  H --> I[\"검사와 규칙 판정\"]\n  I --> J[\"시험 결과 평가\"]\n  J --> K[\"결과 파일 다운로드\"]\n```\n\n완료된 시나리오를 현재 입력과 다시 대조하는 기능은 과거 판정을 새 입력의 성공으로 바꾸는 기능이 아니다. 준비·재생·정지·종료·입력 변경 상태에 따라 허용되는 조작이 다르다. 다른 화면에 있을 때도 실행 상태를 보여주는 작은 도크가 있어 해당 실행의 제어와 결과 화면으로 이어질 수 있다.\n\n시나리오 결과 저장은 runner의 기록과 판정에서 이루어진다. 서버 KPI의 JSON/CSV 내보내기와 시나리오 기록 다운로드는 서로 다른 파일 경로다. 둘 중 한 파일의 바이트 검증을 다른 파일의 검증으로 대신할 수 없다.\n\n근거: [시나리오 패널](../../user_application/web/scripts/tabs/source_scenarios.js), [SIM 패널](../../user_application/web/scripts/tabs/sim_workspace.js), [KPI 패널](../../user_application/web/scripts/tabs/kpi_workspace.js), [서버 보고서](../../communication/http/reports.py).\n\n## DT 상황판과 관제 상황판의 차이\n\n```mermaid\nflowchart LR\n  R[\"SIM 상태\"] --> D[\"DT 통합 상황판\"]\n  S[\"시나리오 단계와 판정\"] --> D\n  L[\"설정의 모듈 연결 상태\"] --> D\n  D --> A[\"환경 / 시나리오 / 실행 / 평가\"]\n  O[\"관제 자료 문맥\"] --> W[\"통합 관제 현황\"]\n  W --> U[\"실제 원격측정 없는 수치는 미확인\"]\n```\n\nDT 상황판의 연결 수는 통신 연결 근거다. 모듈 계산 정확도나 실제 위성 상태의 인증으로 읽지 않는다. 관제 상황판에는 가상 시험 수치를 실제 운용 수치로 넣지 않는다는 경계가 있다.\n\n## 시스템 연동 설정\n\n## 직접 작성하는 시험 정의\n\n현재 작성 패널은 이름·목적·위성 구성·지상국과 시간순 시험 단계를 저장한다. 단계는 상태 관측, 장애 주입, 복구 확인, 결과 비교로 구분하며 장애 종류·대상·지속 시간·기대 결과를 적는다. 정의 저장은 실제 runtime 장애 주입과 다르다. 작성 정의만으로 실험 성공이나 자동 실행을 주장하지 않는다.\n\n```mermaid\nflowchart LR\n  A[\"이름과 목적 및 구성\"] --> B[\"시험 단계와 예상 결과\"]\n  B --> V[\"작성 형식과 범위 검증\"]\n  V --> S[\"작성 정의 저장\"]\n  S --> D[\"서버 DB revision과 저장 상태\"]\n  D --> R[\"별도 실행 준비와 현재 입력 검토\"]\n```\n\n저장 가능한 초안은 최대48개이고 단계는 최대128개다. [작성 코드](../../user_application/web/scripts/scenario/authoring.js)는 정의 사본을 반환하며 다른 창의 저장 변경을 검사한다. 서버 DB가 활성화되면 지상국과 작성 정의의 저장을 [PostgreSQL 저장 어댑터](../architecture/definition-storage.md)가 연결한다. 실행 결과와 텔레메트리는 이 정의 DB에 저장하지 않는다.\n\n![시험 시나리오 작성 화면](../../project_support/u036_authoring_layout.jpg)\n\n## 연동 설정의 실제 조작\n\n연결도를 보고 링크를 선택하면 전송 방식, 주소, timeout 및 관련 운용 설정을 편집한다. 저장과 초기화, 전체/개별 연결 확인은 서로 다른 동작이다. 편집한 주소가 곧바로 연결 성공을 의미하지 않으며 명시적으로 실행한 진단 결과를 읽어야 한다.\n\n```mermaid\nsequenceDiagram\n  actor U as 사용자\n  participant P as 연동 설정 패널\n  participant S as 설정 제어기\n  participant A as probe API\n  U->>P: 링크 선택과 조건 편집\n  U->>P: 저장\n  P->>S: 설정 저장\n  U->>P: 명시적 연결 확인\n  S->>A: POST /api/integration/probe\n  A-->>P: 해당 방식의 연결 진단\n  P->>P: 연결도와 상태 카드 갱신\n```\n\nTCP 연결, UDP 주소 확인, 모듈 계약 조회는 서로 다른 증거다. 통신 진단 통과를 보안 인증·RF 수신·실제 HIL 성공으로 확대하지 않는다. ICD는 모듈 사이 메시지와 인터페이스 계약을 설명하는 자료다.\n\n8개 ICD의 방향, 메시지, 실제 API와 계획 항목은 [ICD 인터페이스 명세](../interfaces/icd.md)에 정리했다. U036에서는 시스템 연동의18개 모듈,17개 연결,8개 인터페이스 상세를 펼쳐 확인했다. 이는 상세 접근과 표시 확인이며 실제18개 독립 제품이 연동된 결과가 아니다.\n\n설정의 저장되지 않은 편집값과 다른 창 변경은 충돌 처리 대상이다. 화면 이동과 별도 창 사이의 초안 전달이 있다고 해서 전체 다중창 복구 수용이 모두 완료된 것은 아니다. `facility`와 `em` 화면도 실제 시설·장비 관측이 연결됐는지 별도로 확인해야 한다.\n\n근거: [설정 패널](../../user_application/web/scripts/tabs/source_settings.js), [연결 진단](../../communication/http/integration.py), [상황판 표현](../../user_application/web/scripts/workspace_wall_summary.js).\n\n연결의 전체 구조는 [아키텍처](../architecture/runtime-flow.md), 검증 범위와 미완료 항목은 [시험 근거](../testing/evidence.md)를 참고한다.\n",
+      "size": 3852,
+      "links": [
+        "architecture/definition-storage",
+        "interfaces/icd",
+        "architecture/runtime-flow",
+        "testing/evidence"
+      ],
+      "backlinks": [
+        "architecture/definition-storage",
+        "architecture/runtime-flow",
+        "interfaces/icd",
+        "quickstart",
+        "screens/data-security",
+        "screens/index"
+      ]
+    },
+    {
+      "id": "testing/evidence",
+      "title": "시험 근거와 남은 한계",
+      "type": "validation",
+      "description": "현재 소스 설명, 집중 회귀시험, 과거 전체 시험 및 실제 화면 증거의 범위를 구분한다.",
+      "tags": [
+        "testing",
+        "evidence",
+        "limitations",
+        "acceptance"
+      ],
+      "body": "\n# 시험 근거와 남은 한계\n\n이 위키는 2026-10-07에 처음 만들고 2026-10-08 현재 구현과 ICD를 다시 확인해 갱신했다. 커밋되지 않은 화면·저장·시험 수정도 포함한 작업트리 설명이다. 문서의 갱신 시각만으로 모든 제품 수용이나 실장비 검증이 끝났다고 해석하지 않는다. 이전 작성의 시험은 아래에서 과거 체크포인트로 보존한다.\n\n## 증거 수준\n\n```mermaid\nflowchart TD\n  C[\"소스 확인: 호출과 보호 조건 존재\"] --> U[\"단위 및 구성 시험: 지정 입력의 동작\"]\n  U --> B[\"실제 브라우저: 조작과 결과 화면\"]\n  B --> F[\"저장 파일: 실제 바이트와 실행 일치\"]\n  F --> H[\"장비와 현장: 실측 수신과 실제 HIL\"]\n  C -. \"다음 수준을 자동 보장하지 않음\" .-> L[\"각 수준의 독립 근거 필요\"]\n```\n\n이 그림은 증거 범위의 차이를 설명한다. 단위시험을 많이 통과해도 실제 장비 검증까지 끝난 것은 아니다. 코드가 구현됐는지, 브라우저에서 동작했는지, 요구 수용이 완료됐는지는 나눠 읽는다.\n\n## 2026-10-08 갱신에서 직접 실행한 시험\n\n| 실행 | 결과 | 범위 |\n|---|---|---|\n| Node 집중5파일 | 46 통과, 실패·생략0, 172.62ms | ICD 카탈로그, 설정 제어, 정의 DB 브라우저 어댑터, 통과 패널과 데이터 상세 |\n| 전체 Python pytest | 963 통과,10 생략,2 실패,8 경고,338.12s | 현재 프로젝트 가상환경. 제품 wheel 누락으로 설치 검사2건 실패 |\n| 기존 wheel 지정 후 설치 파일 재검증 | 3 통과,1 경고,9.17s | 기존0.3.0 wheel의 기록·라이선스와 격리 설치/native 호출 |\n\n전체 Python의 두 실패는 이전 작성 때와 같은 `test_orbit_install.py`의 wheel 검색 문제였다. 아래 기존 wheel 경로를 명시해 해당 파일만 다시 실행했다. 전체 시험을 모두 다시 통과했다고 합산하지 않는다. DB 및 native 전용 조건이 없는 시험의 생략은 미실행이며 성공 증거가 아니다. 이번 작업에서는 운영 DB에 쓰거나 제품 서버를 재시작하지 않았다.\n\n```powershell\nnode --test project_support/tests/browser/source_topology.test.mjs project_support/tests/browser/source_settings_controller.test.mjs project_support/tests/browser/workspace_configuration.test.mjs project_support/tests/browser/catalog_passes.test.mjs project_support/tests/browser/source_data_detail.test.mjs\nproject_support/.venv/Scripts/python -m pytest -q\n```\n\n실행 로그는 로컬 검증 산출물 `validation-20261008`의 `node.log`, `pytest.log`, `install.log`다. 공유 사이트에는 자동 포함하지 않는다.\n\n## 최신 저장소 기록과 실제 화면 점검\n\n[U036 전체 UI 점검](../../project_support/docs/validation/u036_workspace_ui_audit.md)은 Python967통과/8생략/8경고와 Node2195통과/1생략을 기록한다. 이는 해당 UI 변경의 기록이며 이번 직접 실행 결과와 구분한다.8개 메뉴 그룹·환경 설정과18모듈·17연결·8인터페이스 상세를 실제로 펼쳐 확인했다. 새 배치·시험 실행·장애·명령·설정 저장을 만들어 모든 상태 행렬을 검증한 기록은 아니다.\n\n[U035](../../project_support/docs/validation/u035_display_controls.md)는 전체 위성 표시 ON/OFF와 등록 지상국 기준의 선택 위성 통과5구간/0오류를 실제 화면에서 확인했다. [U029](../../project_support/docs/validation/u029_idle_performance.md)의 정지 반복 알림·복제 감소는 로컬 미세 측정이며 실제 RAF p95는19.0→18.9ms로16.7ms 수용 기준을 통과하지 않았다. 성능 최적화를 GPU 목표 완료로 확대하지 않는다.\n\nICD의 구현·모의·계획 범위는 [인터페이스 명세](../interfaces/icd.md)에, 실제 정의 DB의 저장·백업 복원 기록과 범위는 [저장 구조](../architecture/definition-storage.md)에 연결했다. PostgreSQL 관련 자동 시험은 명시적 시험 연결이 없으면 생략한다.\n\n## 최초 작성에서 실행한 집중 시험\n\n다음 8개 파일의 29개 시험은 모두 통과했다. 실패, 건너뜀, 취소는 0개였으며 실행 시간은 약 0.53초였다. DOM fixture를 포함한 Node 시험이며 실제 브라우저 캡처 시험으로 부르지 않는다.\n\n```powershell\nnode --test project_support/tests/browser/operator_summary.test.mjs project_support/tests/browser/workspace_domain_navigation.test.mjs project_support/tests/browser/workspace_navigation_ownership.test.mjs project_support/tests/browser/source_mission_types.test.mjs project_support/tests/browser/source_data_panel.test.mjs project_support/tests/browser/source_security_observation.test.mjs project_support/tests/browser/source_settings_controller.test.mjs project_support/tests/browser/source_scenario_review.test.mjs\n```\n\n| 묶음 | 확인한 내용 |\n|---|---|\n| 운영 요약 | 진행률을 성공 판정으로 오해하지 않고 미확인 단위를 보존 |\n| 화면 탐색과 소유권 | 보안 메뉴, 환경 설정의 단일 표시 설정 소유권 |\n| 임무 | 다섯 종류, 장비 능력, 분석 시각에 따른 작업 상태 |\n| 데이터 | 미조회 상태에서 명령 차단과 패널 수명주기 |\n| 보안 | 조회 순서, 화면 숨김, 시간 초과, 늦은 응답 거부 |\n| 연동 설정 | 명시적 설정·probe, 편집 충돌 및 오래된 성공 거부 |\n| 시나리오 | 현재 정의 검토, 기록 복원과 명시적 재개, 분석 따라가기 |\n\n## 저장소에 남아 있는 전체 시험과 실화면 기록\n\n### 2026-10-07 전체 Python 실행과 환경 보완\n\n이번 위키 작업에서는 프로젝트 가상환경으로 전체 `pytest -q`도 실행했다. 결과는 958개 통과, 8개 건너뜀, 2개 실패, 경고 8개였고 307.40초가 걸렸다. 두 실패는 `test_orbit_install.py`의 wheel 검사와 깨끗한 가상환경 설치 검사에서 제품 wheel을 찾지 못한 경우였다. 문서 변경으로 생긴 계산 회귀라고 단정하지 않는다.\n\n이후 기존 `ISDC_ODT` 저장소에 보존된 `20261005_230855_957/isdc_orbit_propagation-0.3.0-cp314-cp314-win_amd64.whl`을 `ISDC_ORBIT_INSTALL_WHEEL`로 명시해 해당 시험 파일을 다시 실행했다. 세 시험 모두 통과했고 경고 1개, 9.96초였다. 새 native 빌드나 운영 환경 설치는 하지 않았으며, 시험이 만든 별도 가상환경만 사용했다. 전체 시험의 첫 실패와 이 환경 보완 후 집중 통과는 별도 결과다. 전체 시험을 다시 모두 통과했다고 합산해서 표현하지 않는다.\n\n```powershell\n$env:ISDC_ORBIT_INSTALL_WHEEL=(Resolve-Path '<검증한 제품 wheel 경로>').Path\nproject_support/.venv/Scripts/python -m pytest -q project_support/tests/test_orbit_install.py\n```\n\n실행 로그는 로컬 검증 산출물 `validation-20261007`의 `pytest.log`와 `install.log`에 보존했다. 이 로컬 검증 자료는 공유 사이트에 포함된 파일은 아니다. UI U018 검토 기록에는 별도로 전체 Node 2,146개 통과와 1개 생략이 추가됐으며 이는 해당 UI 변경 체크포인트의 기록이다.\n\n현재 [README](../../README.md)는 U037의 Python 967개 통과, 8개 건너뜀, 8개 경고와 U038의 JavaScript 2,195개 통과, 1개 건너뜀을 기록한다. 각 실행 시점의 회귀 결과이며 실제 장비, 전체 모델 GPU, 성능과 다중창 수용의 완료를 뜻하지 않는다. 이 단락은 위의 과거 위키 작업 실행과 구분해 읽으며, 더 오래된 숫자는 개발 로그의 과거 경과로 읽는다.\n\n[실제 실행 기록](../../project_support/specs/001-v6-function-integration/validation/t081_live_continuation_20261007.md)에는 원본 시나리오 실행, 구성요소 결과와 실제 다운로드 파일의 바이트 확인이 구분돼 있다. 특정 VF-03 파일의 검증을 모든 보고서·다운로드 성공으로 확대하지 않는다.\n\n[UI 요청 이행 점검](../../project_support/docs/validation/ui_request_completion_review.md)은 최근 메뉴·시간창·상황판·제어 소유권 개편과 화면 확인을 기록한다. 문구와 배치 확인은 모델 물리 정확성의 시험이 아니다.\n\n## 남아 있는 수용 범위\n\n현재 감사 기록의 남은 항목을 기준으로 읽으며 과거 표의 미완료를 현재 코드 부재로 단정하지 않는다.\n\n| 영역 | 현재 읽을 수 있는 근거 | 별도 확인이 필요한 범위 |\n|---|---|---|\n| 위성·모델 | 계산, 매핑, 일부 자산 GPU 캡처 | 전체 자산 외관, 두 해상도 수용, 대규모 프레임 목표 |\n| 통신 | 기하·RF·경로와 모듈 연계 코드 및 시험 | 현재 실화면 실패/복구 행렬, 실제 RF 수신 |\n| 임무 | 다섯 종류와 보호 계획/확정/취소 | 다섯 종류 전체의 실제 성공·복구 수용 |\n| 데이터·보안 | 배치 범위와 모의 모듈 흐름 | 실제 운영 명령 행렬, 실제 인증·암호화·장비 |\n| 공유 상태 | 현재 시각·선택·문맥 검사 | 전체 다중창 인계와 복원 수용 |\n| 시간 자료 | 계산 유효기간 검사 | 최신 EOP 확보와 출처 검증 |\n| 제품 연계 | 독립 저장소 구조 | 향후 AerODT 연계와 실제 HIL |\n\n근거: [현재 요구별 감사](../../project_support/specs/001-v6-function-integration/validation/t075_t083_current_requirement_audit.md). 새 결과가 나오면 해당 실험 조건, 입력, 커밋 또는 작업트리 범위와 함께 이 표를 갱신한다.\n\n## 위키를 갱신하는 기준\n\n현재 화면 메뉴나 소유 패널, API 계약, UTC 의미, 모듈 범위, 시험 수용 결과가 바뀌면 관련 문서를 갱신한다. OpenWiki의 코드 근거 연결은 자료 변경을 추적하는 장치이며 설명이 항상 참이라는 인증은 아니다. 도표의 화살표가 실제 호출과 맞는지, 모의 결과를 실측처럼 적지 않았는지를 함께 확인한다.\n",
+      "size": 5763,
+      "links": [
+        "interfaces/icd",
+        "architecture/definition-storage"
+      ],
+      "backlinks": [
+        "interfaces/icd",
+        "quickstart",
+        "screens/data-security",
+        "screens/missions",
+        "screens/satellite-ground",
+        "screens/scenarios-settings",
+        "testing/index"
+      ]
+    },
+    {
+      "id": "testing/index",
+      "title": "Testing",
+      "type": "Section",
+      "description": "",
+      "tags": [],
+      "body": "# 파일\n\n- [시험 근거와 남은 한계](evidence.md) - 현재 소스 설명, 집중 회귀시험, 과거 전체 시험 및 실제 화면 증거의 범위를 구분한다.\n",
+      "size": 88,
+      "links": [
+        "testing/evidence"
+      ],
+      "backlinks": []
+    }
+  ],
+  "edges": [
+    {
+      "source": "architecture/definition-storage",
+      "target": "interfaces/icd"
+    },
+    {
+      "source": "architecture/definition-storage",
+      "target": "screens/scenarios-settings"
+    },
+    {
+      "source": "architecture/definition-storage",
+      "target": "architecture/runtime-flow"
+    },
+    {
+      "source": "architecture/index",
+      "target": "architecture/definition-storage"
+    },
+    {
+      "source": "architecture/index",
+      "target": "architecture/runtime-flow"
+    },
+    {
+      "source": "architecture/runtime-flow",
+      "target": "architecture/definition-storage"
+    },
+    {
+      "source": "architecture/runtime-flow",
+      "target": "interfaces/icd"
+    },
+    {
+      "source": "architecture/runtime-flow",
+      "target": "screens/satellite-ground"
+    },
+    {
+      "source": "architecture/runtime-flow",
+      "target": "screens/scenarios-settings"
+    },
+    {
+      "source": "index",
+      "target": "quickstart"
+    },
+    {
+      "source": "interfaces/icd",
+      "target": "architecture/definition-storage"
+    },
+    {
+      "source": "interfaces/icd",
+      "target": "screens/data-security"
+    },
+    {
+      "source": "interfaces/icd",
+      "target": "screens/missions"
+    },
+    {
+      "source": "interfaces/icd",
+      "target": "screens/scenarios-settings"
+    },
+    {
+      "source": "interfaces/icd",
+      "target": "testing/evidence"
+    },
+    {
+      "source": "interfaces/index",
+      "target": "interfaces/icd"
+    },
+    {
+      "source": "quickstart",
+      "target": "interfaces/icd"
+    },
+    {
+      "source": "quickstart",
+      "target": "architecture/definition-storage"
+    },
+    {
+      "source": "quickstart",
+      "target": "screens/satellite-ground"
+    },
+    {
+      "source": "quickstart",
+      "target": "screens/scenarios-settings"
+    },
+    {
+      "source": "quickstart",
+      "target": "architecture/runtime-flow"
+    },
+    {
+      "source": "quickstart",
+      "target": "screens/missions"
+    },
+    {
+      "source": "quickstart",
+      "target": "screens/data-security"
+    },
+    {
+      "source": "quickstart",
+      "target": "testing/evidence"
+    },
+    {
+      "source": "screens/data-security",
+      "target": "interfaces/icd"
+    },
+    {
+      "source": "screens/data-security",
+      "target": "screens/missions"
+    },
+    {
+      "source": "screens/data-security",
+      "target": "screens/scenarios-settings"
+    },
+    {
+      "source": "screens/data-security",
+      "target": "testing/evidence"
+    },
+    {
+      "source": "screens/index",
+      "target": "screens/data-security"
+    },
+    {
+      "source": "screens/index",
+      "target": "screens/missions"
+    },
+    {
+      "source": "screens/index",
+      "target": "screens/satellite-ground"
+    },
+    {
+      "source": "screens/index",
+      "target": "screens/scenarios-settings"
+    },
+    {
+      "source": "screens/missions",
+      "target": "interfaces/icd"
+    },
+    {
+      "source": "screens/missions",
+      "target": "testing/evidence"
+    },
+    {
+      "source": "screens/missions",
+      "target": "screens/data-security"
+    },
+    {
+      "source": "screens/satellite-ground",
+      "target": "testing/evidence"
+    },
+    {
+      "source": "screens/satellite-ground",
+      "target": "screens/missions"
+    },
+    {
+      "source": "screens/scenarios-settings",
+      "target": "architecture/definition-storage"
+    },
+    {
+      "source": "screens/scenarios-settings",
+      "target": "interfaces/icd"
+    },
+    {
+      "source": "screens/scenarios-settings",
+      "target": "architecture/runtime-flow"
+    },
+    {
+      "source": "screens/scenarios-settings",
+      "target": "testing/evidence"
+    },
+    {
+      "source": "testing/evidence",
+      "target": "interfaces/icd"
+    },
+    {
+      "source": "testing/evidence",
+      "target": "architecture/definition-storage"
+    },
+    {
+      "source": "testing/index",
+      "target": "testing/evidence"
+    }
+  ]
+}

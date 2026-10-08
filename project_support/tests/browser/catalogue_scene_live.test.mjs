@@ -1,0 +1,47 @@
+import {OrbitClock} from '../../../user_application/web/scripts/orbit/clock.js';import {createNodeClockControls} from '../../../user_application/web/scripts/nodes/clock_controls.js';
+import test from 'node:test';import assert from 'node:assert/strict';import {fixture} from './workspace_fixture.mjs';import {createCatalogScene} from '../../../user_application/web/scripts/catalog_scene.js';import {createCatalogueSceneTimeBinding} from '../../../user_application/web/scripts/catalogue_scene_time_binding.js';import {createUtcCodec,LEAP_SHA256} from '../../../user_application/web/scripts/orbit_utc.js';
+const codec=createUtcCodec(LEAP_SHA256),utc=codec.advance('2026-10-07T08:00:00Z',0);
+const response=p=>({...p,version:1,status:'valid',source:'celestrak-cache',count:1,valid_count:1,error_count:0,scene_sha256:'a'.repeat(64),eop_sha256:'b'.repeat(64),leap_sha256:LEAP_SHA256,eop_kind:'IERS_A',eop_quality:{ut1:'predicted_a',polar_motion:'predicted_a'},frame:'ITRF',profile:'WGS72_AFSPC',units:{position:'m',time:'UTC'},rows:[{catalog_number:1,name:'one',orbit_regime:'LEO',normalized_gp_sha256:'c'.repeat(64),epoch_utc:utc,status:'valid',error_code:null,position_m:[7000000,1,2]}]});
+test('real whole-scene assembly continues the selected satellite using accepted native positions',async()=>{
+ let n=0;const f=fixture(1280,720,{catalogScene:async p=>{const value=response(p);value.rows[0].position_m[0]+=++n;return value;}});
+ try{await new Promise(r=>setImmediate(r));f.context.selectionBase={...response({group:'active',utc}).rows[0],group:'active',utc,frame:'ITRF',profile:'WGS72_AFSPC',eop_kind:'IERS_A',eop_sha256:'b'.repeat(64),leap_sha256:LEAP_SHA256,eop_quality:{ut1:'predicted_a',polar_motion:'predicted_a'}};
+ f.evaluate("catalogScene.configure({group:'active',query:'',orbit:'all'});catalogTimeline.select(selectionBase);");
+ await f.evaluate('sceneTime.enable(catalogScenePanel.requestUtc())');assert.equal(f.evaluate('catalogTimeline.snapshot().display.position_m[0]'),7000001);
+ await f.evaluate('sceneTime.enable(catalogScenePanel.requestUtc())');assert.equal(f.evaluate('catalogTimeline.snapshot().display.position_m[0]'),7000002);
+ assert.equal(f.evaluate('catalogTimeline.currentUtc()===catalogScene.snapshot().result.utc'),true);assert.equal(f.counts().commands,0);
+ }finally{f.dispose();}
+});
+test('whole scene defaults to current time even after explicit stored selection; fixed and analysis modes are explicit',()=>{
+ const f=fixture();try{
+ f.evaluate("storedSceneSelected=true;showWorkspaceOrbit('settings');");
+ assert.equal(f.evaluate('catalogScenePanel.followsCurrent()'),true);
+ assert.equal(f.evaluate('readCatalogueTimeSource().kind'),'catalogue_live');
+ assert.equal(f.get('scene-utc').disabled,true);
+ f.evaluate("catalogScenePanel.applyDraft([{id:'scene-current',value:'false'}]);");
+ assert.equal(f.evaluate('readCatalogueTimeSource()'),null);
+ f.evaluate("catalogScenePanel.applyDraft([{id:'scene-follow',value:'true'}]);");
+ assert.equal(f.evaluate('catalogScenePanel.followsCurrent()'),false);
+ assert.equal(f.evaluate('readCatalogueTimeSource().kind'),'stored');
+ }finally{f.dispose();}
+});
+test('single existing scene timer follows registered station-free live source and stops on OFF',async()=>{let stamp=utc,ms=0,timer,binding;const calls=[];const source=()=>({kind:'catalogue_live',identity:'live:1',running:true,context:{key:'catalogue_live:1',utc:stamp,leap_sha256:LEAP_SHA256,eop_sha256:null}});const scene=createCatalogScene({catalogScene:async p=>(calls.push(p),response(p))},v=>binding?.accept(v),()=>{},{now:()=>ms,setTimer:fn=>(timer=fn,1),clearTimer:()=>{timer=null;},readUtc:()=>{binding.observe();return stamp;}});scene.configure({group:'active',query:'',orbit:'all'});binding=createCatalogueSceneTimeBinding({scene,readSource:source,codec});await binding.enable(utc);assert.equal(binding.presentation()?.source_kind,'catalogue_live');assert.equal(calls.length,1);assert.equal(typeof timer,'function');stamp=codec.advance(utc,1);ms=1000;const next=timer;timer=null;next();await new Promise(r=>setImmediate(r));assert.equal(calls.length,2);assert.equal(calls[1].utc,stamp);assert.equal(binding.presentation().analysis_utc,stamp);binding.disable();assert.equal(timer,null);binding.destroy();scene.destroy();});
+test('fresh real workspace whole ON chooses original live catalogue owner despite restored paused historical stored state',async()=>{const calls=[];const f=fixture(1280,720,{hash:'#wall',catalogScene:async p=>(calls.push(p),response(p))});try{await new Promise(r=>setImmediate(r));f.evaluate("catalogScene.configure({group:'active',query:'',orbit:'all'});");f.context.setWorkspaceWallScope('toggle');await new Promise(r=>setImmediate(r));assert.equal(f.evaluate('sceneTime.presentation()?.source_kind'),'catalogue_live');assert.notEqual(calls[0].utc,f.snapshot().state.current_utc);assert.equal(f.counts().commands,0);assert.equal(f.evaluate('catalogTimeline.snapshot().selected'),null);assert.equal(f.evaluate('catalogScenePanel.followsTimeline()'),false);}finally{f.dispose();}});
+
+test('registered live scene controls target sole original cursor, revoke old proof, and never write stored server',async()=>{let wall=Date.parse(utc),epoch=0,binding,writes=0;const clock=new OrbitClock(()=>wall),source=()=>({kind:'catalogue_live',identity:`live:${epoch}`,running:clock.running,context:{key:`catalogue_live:${epoch}`,utc:codec.advance(clock.now().toISOString(),0),leap_sha256:LEAP_SHA256,eop_sha256:null}});const scene=createCatalogScene({catalogScene:async p=>response(p)},v=>binding?.accept(v),()=>{},{now:()=>0});scene.configure({group:'active',query:'',orbit:'all'});binding=createCatalogueSceneTimeBinding({scene,readSource:source,codec});await binding.enable(utc);let display={key:'scene:'+ 'a'.repeat(64),utc,leap_sha256:LEAP_SHA256};const live={snapshot:()=>({identity:'sole',running:clock.running,speed:clock.speed}),verify:c=>c.key===`catalogue_live:${epoch}`,controls:Object.fromEntries(['play','pause','setSpeed','seek','live'].map(k=>[k,(...args)=>{const release=binding.beginControl();epoch++;try{return clock[k](...args);}finally{release();}}]))};const controls=createNodeClockControls({readContext:()=>display,stored:{snapshot:()=>({}),control:()=>writes++},catalog:{snapshot:()=>({})},advanceUtc:codec.advance,now:()=>wall,catalogueLive:live,resolveSceneSource:c=>binding.resolveSource(c),verifySceneSource:(v,o)=>binding.verifySource(v,o)});const old=binding.presentation();assert.equal(controls.read(display).running,true);await controls.actions.pause();await new Promise(r=>setImmediate(r));assert.equal(clock.running,false);assert.equal(binding.verifyPresentation(old),false);await controls.actions.play();await new Promise(r=>setImmediate(r));assert.equal(clock.running,true);await controls.actions.setSpeed(10);await new Promise(r=>setImmediate(r));assert.equal(clock.speed,10);await controls.actions.step(-60);await new Promise(r=>setImmediate(r));display={...display,utc:codec.advance(utc,-60)};assert.equal(clock.running,false);assert.equal(binding.presentation().analysis_utc,display.utc);wall+=5000;await controls.actions.live();await new Promise(r=>setImmediate(r));assert.equal(clock.isLive,true);assert.equal(clock.speed,1);assert.equal(binding.presentation().analysis_utc,codec.advance(new Date(wall).toISOString(),0));assert.equal(writes,0);controls.destroy();binding.destroy();scene.destroy();});
+test('captured live tick cannot query after readUtc callback OFF or source getter failure',async()=>{for(const kind of ['off','throw']){let timer,scene,calls=0;scene=createCatalogScene({catalogScene:async p=>(calls++,response(p))},()=>{},()=>{},{now:()=>0,setTimer:f=>(timer=f,1),clearTimer:()=>{timer=null;},readUtc:()=>{if(kind==='off'){scene.clear();return codec.advance(utc,1);}throw Error('source revoked');}});scene.configure({group:'active',query:'',orbit:'all'});await scene.load(utc);const late=timer;timer=null;late();await new Promise(r=>setImmediate(r));assert.equal(calls,1);assert.equal(scene.snapshot().enabled,false);assert.equal(scene.snapshot().result,null);assert.equal(timer,null);scene.destroy();}});
+
+test('Escape dismisses selected satellite and explanation while whole live scene survives; reselection restores card',async()=>{
+ const f=fixture(1280,720,{catalogScene:async p=>response(p)});
+ try{await new Promise(r=>setImmediate(r));f.context.selectionBase={...response({group:'active',utc}).rows[0],group:'active',utc,frame:'ITRF',profile:'WGS72_AFSPC',eop_kind:'IERS_A',eop_sha256:'b'.repeat(64),leap_sha256:LEAP_SHA256,eop_quality:{ut1:'predicted_a',polar_motion:'predicted_a'}};
+ f.evaluate("catalogScene.configure({group:'active',query:'',orbit:'all'});catalogTimeline.select(selectionBase);");await f.evaluate('sceneTime.enable(catalogScenePanel.requestUtc())');
+ await f.doc.dispatch('keydown',{key:'Escape'});
+ assert.equal(f.evaluate('catalogTimeline.snapshot().selected'),null);
+ assert.equal(f.evaluate('catalogPanel.controller.snapshot().selected'),null);
+ assert.equal(f.evaluate('globe.modelState().selected'),null);
+ assert.equal(f.get('desktop-satellite-card').hidden,true);
+ assert.equal(f.evaluate('catalogScene.snapshot().enabled'),true);
+ await f.evaluate('sceneTime.enable(catalogScenePanel.requestUtc())');assert.equal(f.evaluate('catalogTimeline.snapshot().selected'),null);
+ f.evaluate("catalogTimeline.select(selectionBase);");assert.equal(f.get('desktop-satellite-card').hidden,false);
+ assert.equal(f.counts().commands,0);
+ }finally{f.dispose();}
+});

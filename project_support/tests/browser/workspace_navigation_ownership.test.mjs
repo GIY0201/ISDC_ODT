@@ -1,0 +1,11 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {fixture} from './workspace_fixture.mjs';
+test('display tools have one settings owner and trial environment reuses the same satellite configuration owner',async()=>{const f=fixture();try{await new Promise(r=>setTimeout(r,0));
+ f.evaluate("showWorkspaceOrbit('satellite')");
+ assert.equal(f.doc.getElementById('satellite-model-panel')?.parentElement.id,'desktop-model-info');
+ assert.equal(f.doc.getElementById('catalog-scene')?.isConnected===true,false);
+ assert.equal(f.doc.getElementById('catalog-passes')?.isConnected===true,false);
+ f.evaluate("showWorkspaceOrbit('settings')");
+ assert.equal(f.doc.getElementById('satellite-model-panel').parentElement.id,'desktop-model-info');assert.equal(f.doc.getElementById('catalog-scene').parentElement.id,'globe-display-controls');assert.equal(f.doc.getElementById('catalog-passes')?.isConnected===true,false);
+ f.evaluate("showWorkspaceOrbit('scene')");assert.equal(f.doc.getElementById('satellite-nodes')?.hidden,false);
+ f.evaluate("showWorkspaceOrbit('composer')");assert.notEqual(f.doc.getElementById('satellite-nodes')?.hidden,false);
+ }finally{f.dispose();}});

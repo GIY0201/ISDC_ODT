@@ -68,3 +68,31 @@ test('owner-created replica borrows complete immutable source fields and rejects
   const main=f.viewers[0],counts=f.counts();f.viewers[1].scene.preRender.raise();assert.deepEqual(f.counts(),counts);f.evaluate('globe.catalogScene(null,()=>{});');assert.equal(replica.verifyProjection(value),false);assert.equal(replica.readProjection().scene,null);replica.destroy();assert.equal(replica.verifyProjection(replica.readProjection()),false);assert.equal(main.destroyCount,undefined);
  }finally{f.dispose();}
 });
+
+
+test('paused replica preRender does not perpetually request another identical frame',()=>{
+ const f=fixture(1280,720,{hash:'#wall'});try{
+  const viewer=f.viewers[1];let requests=0;viewer.scene.requestRender=()=>requests++;
+  viewer.scene.preRender.raise();const first=requests;
+  for(let i=0;i<60;i++)viewer.scene.preRender.raise();
+  assert.equal(requests,first,'unchanged projection and visibility must not feed a render loop');
+  f.evaluate("globalThis.idleReplica=globe.createDisplayReplica(document.createElement('div'),document.createElement('p'));");
+  const other=f.viewers[2];let changed=0;other.scene.requestRender=()=>changed++;
+  f.context.idleReplica.setCatalogVisible(true);assert.ok(changed>0);
+  const after=changed;for(let i=0;i<60;i++)other.scene.preRender.raise();assert.equal(changed,after);
+  f.context.idleReplica.destroy();
+ }finally{f.dispose();}
+});
+
+
+test('new render bindings are cleared when an already hidden replica has no source',()=>{
+ const f=fixture(1280,720,{hash:'#settings'});try{
+  f.evaluate("globe.update({status:'empty',state:null,result:null},null,null);globe.catalog(null);globe.catalogScene(null);globalThis.hiddenReplica=globe.createDisplayReplica(document.createElement('div'),document.createElement('p'));");
+  assert.equal(f.evaluate('globe.displayContext()'),null);
+  let solarClears=0,nodeClears=0;const replica=f.context.hiddenReplica;
+  replica.bindSolar(()=>({clear(){solarClears++;},destroy(){}}));
+  replica.bindNodes(()=>({syncFrame(utc){assert.equal(utc,null);nodeClears++;},destroy(){}}));
+  assert.equal(solarClears,2);assert.equal(nodeClears,1);
+  const clears=[solarClears,nodeClears];for(let i=0;i<60;i++)f.viewers[1].scene.preRender.raise();assert.deepEqual([solarClears,nodeClears],clears);replica.destroy();
+ }finally{f.dispose();}
+});

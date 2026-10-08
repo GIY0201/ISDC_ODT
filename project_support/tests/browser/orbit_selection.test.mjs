@@ -69,3 +69,26 @@ test('ground command uses fresh server UTC and updates height/angle with the sam
  const client=createOrbitSelection(api,()=>{});await client.load();await client.select('tle');const ground={latitude_deg:35,longitude_deg:127,ellipsoid_height_m:500};await client.setGround(ground,0);
  assert.deepEqual(body.ground_point,ground);assert.equal(body.minimum_elevation_deg,0);assert.equal(body.expected_revision,1);assert.equal(body.anchor_utc,input.epoch_utc);assert.equal(body.playing,false);
 });
+
+
+test('paused unchanged server polls adopt receipt without redrawing or cloning result into notifications',async()=>{
+ let receipt=0,emits=0,observed=0;
+ const current={...state,input_id:'tle',input_hash:'hash',playing:false,current_utc:input.epoch_utc};
+ const api=fixture({orbitState:async()=>({...current,observed_monotonic_s:++observed})});
+ const client=createOrbitSelection(api,()=>emits++,()=> 'id',()=>++receipt);
+ await client.load();const before=emits;
+ for(let i=0;i<12;i++)await client.refresh();
+ assert.equal(emits,before);assert.equal(client.snapshot().state.observed_monotonic_s,13);assert.equal(client.snapshot().receivedAtMs,13);
+ current.minimum_elevation_deg=20;await client.refresh();assert.equal(emits,before+1);
+ current.revision++;await client.refresh();assert.equal(emits,before+2);
+ await client.refresh({force:true});assert.equal(emits,before+3);
+});
+
+test('playing receipts always redraw and provenance changes are never suppressed',async()=>{
+ let emits=0;const current={...state,input_id:'tle',input_hash:'hash',playing:true,current_utc:input.epoch_utc};
+ const client=createOrbitSelection(fixture({orbitState:async()=>({...current})}),()=>emits++);
+ await client.load();await client.refresh();await client.refresh();assert.equal(emits,3);
+ current.playing=false;await client.refresh();assert.equal(emits,4);
+ current.eop_sha256='changed';await client.refresh();assert.equal(emits,5);
+ client.destroy();await client.refresh();assert.equal(emits,5);
+});

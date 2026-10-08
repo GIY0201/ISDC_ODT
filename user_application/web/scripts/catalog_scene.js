@@ -49,11 +49,17 @@ export function createCatalogScene(api,onDisplay=()=>{},notify=()=>{},host={}){
   })();
  }
  function schedule(){
-  if(dead||!s.enabled||s.pending||!s.desiredUtc||s.result?.utc===s.desiredUtc)return;
+  if(dead||!s.enabled||s.pending||!s.desiredUtc)return;
+  const polling=typeof host.readUtc==='function';
+  if(s.result?.utc===s.desiredUtc&&!polling)return;
   if(timer!==null)clearTimer(timer);
-  const wait=Math.max(0,1000-(now()-lastStarted));
+  const wait=s.result?.utc===s.desiredUtc?1000:Math.max(0,1000-(now()-lastStarted));
   if(wait===0){void query();return;}
-  timer=setTimer(()=>{timer=null;void query();},wait);
+  const ticket=generation;
+  timer=setTimer(()=>{timer=null;if(dead||ticket!==generation||!s.enabled)return;
+   try{const next=polling?host.readUtc():null;if(dead||ticket!==generation||!s.enabled)return;if(next!==null&&next!==undefined)s.desiredUtc=codec.advance(next,0);}catch(e){if(dead||ticket!==generation)return;s.error=String(e.message||e);s.enabled=false;cancel();discard();emit();return;}
+   if(s.result?.utc!==s.desiredUtc)void query();else schedule();
+  },wait);
  }
  async function query(){
   if(dead||s.pending||!s.enabled||!s.context)return;

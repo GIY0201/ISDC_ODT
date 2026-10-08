@@ -7,6 +7,9 @@ export function createOrbitSelection(api, notify, requestId=()=>createBrowserId(
   function beginControl(){const cleanup=onControl?.();let released=false;const release=()=>{if(released)return;released=true;controlReleases.delete(release);try{cleanup?.();}catch{/* Cleanup cannot replace command results. */}};controlReleases.add(release);if(disposed)release();return release;}
   const snapshot=()=>structuredClone({inputs,state,result,status,error,fetching,receivedAtMs});
   const emit=()=>{if(!disposed)notify(snapshot());};
+  // Observation receipt time changes on every poll, even when a paused selection is identical.
+  // Keep receiving authority updates while avoiding full result clones and DOM/scene redraws.
+  const presentationKey=value=>JSON.stringify(Object.fromEntries(Object.entries(value??{}).filter(([key])=>key!=='observed_monotonic_s')));
   const adopt=current=>{if(!disposed){state=current;receivedAtMs=now();}};
   const fail=exc=>{if(disposed)return;if(exc.status===409&&exc.state)adopt(exc.state);status='error';error=exc.message;result=null;fetching=false;emit();};
   async function load(){if(disposed)return;try{const [catalog,current]=await Promise.all([api.orbitInputs(),api.orbitState()]);if(disposed)return;inputs=catalog.inputs;adopt(current);status=inputs.length?'ready':'empty';emit();}catch(exc){fail(exc);}}
@@ -57,7 +60,8 @@ export function createOrbitSelection(api, notify, requestId=()=>createBrowserId(
     try{
       const current=await api.orbitState();if(ticket!==generation||current.revision<state.revision)return;
       if(current.revision!==state.revision){generation++;queryAbort?.abort();result=null;}
-      adopt(current);emit();
+      const unchanged=!force&&status==='ready'&&current.playing===false&&state?.playing===false&&presentationKey(current)===presentationKey(state);
+      adopt(current);if(!unchanged)emit();
     }catch(exc){if(ticket===generation)fail(exc);}
   }
   const setGround=(groundPoint,minimumElevation)=>select(state?.input_id,undefined,{preserveUtc:true,groundPoint,minimumElevation,playing:false});

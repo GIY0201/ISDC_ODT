@@ -28,7 +28,7 @@ test('selected satellite endpoint uses existing route once and preserves other e
   s.store.select(s.station.id);await s.f.get('ground-node-edit').dispatch('click');s.f.get('ground-node-name').value='unsaved station';
   await s.f.get('ground-node-pass-query').dispatch('click');await s.f.get('ground-node-pass-next').dispatch('click');const contactPage=s.f.get('ground-node-pass-results').innerHTML;
   const custody=s.f.get('ground-node-fabric-custody').innerHTML;
-  await s.click('source');assert.deepEqual(s.calls,[['A',s.station.id,'balanced']]);
+  await s.click('source');assert.deepEqual(s.calls,[['A',s.station.id,'balanced']]);assert.equal(s.f.get('ground-node-fabric-disclosure').open,true);
   assert.equal(s.f.get('ground-node-fabric-target').value,s.station.id);assert.equal(s.f.get('ground-node-name').value,'unsaved station');assert.equal(s.f.get('ground-node-fabric-custody').innerHTML,custody);
   assert.equal(s.f.get('ground-node-pass-results').innerHTML,contactPage);
   await s.choose('source','B');await s.select('A');await s.click('target');assert.deepEqual(s.calls.at(-1),['B','A','balanced']);

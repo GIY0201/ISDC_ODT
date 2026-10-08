@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:8950e24f561c6b19627d812f9ce6d575ce860f6efb577445e644e96623ec22a0",
+  "claims": [
+    {
+      "id": "claim_11c11d12f67f4e4d8ba4315a6ec679fd",
+      "statement": "README는 U037 Python 967개 통과와 U038 JavaScript 2,195개 통과의 회귀 결과를 기록하며, 이를 실제 장비나 전체 모델 GPU·성능·다중창 수용 완료로 해석하지 않도록 구분한다.",
+      "evidence": [
+        {
+          "resource": "repo://README.md",
+          "version": "repo-file-v1:sha256:705609c99b8a3e8649644c69155d46c0ba5030e621ff03e8c4594ac65e02d676"
+        }
+      ]
+    },
+    {
+      "id": "claim_0030d098131c4d009ca323ac454a4cf8",
+      "statement": "현재 요구별 감사는 전체 모델 GPU, 프레임 성능, 일부 임무 및 운영 행렬과 다중창/실장비 검증의 남은 범위를 구분한다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/specs/001-v6-function-integration/validation/t075_t083_current_requirement_audit.md",
+          "version": "repo-file-v1:sha256:5c7776c6b5cf746f0212af6a44d42371aaf996952bd4bf177277c0a55d88ff4b"
+        }
+      ]
+    },
+    {
+      "id": "claim_a7f16aba97b54b01824a939181fd135d",
+      "statement": "U036은 실제 메뉴·상세 접근과 표시를 점검했으며 새 배치·장애·시험·저장 명령으로 모든 결과 상태를 만든 검증이 아니라고 구분한다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/docs/validation/u036_workspace_ui_audit.md",
+          "version": "repo-file-v1:sha256:adce8059cbcd61e0fc8650857256891510ffccf18195bd45ac2d76b88ddea88b"
+        }
+      ]
+    },
+    {
+      "id": "claim_35b915ce2fe7409cbdb54d03b33ee4e4",
+      "statement": "선택한 시험 파일은 화면 소유권, 미조회 데이터 명령 차단, 보안 늦은 응답 거부와 시나리오 명시적 검토를 검증하는 집중시험을 포함한다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/tests/browser/source_data_panel.test.mjs",
+          "version": "repo-file-v1:sha256:97bc8b2e1d1a6fbf2614d1ebe4765f0fe5d68c4d338e068c8dd12eef716fa2e8"
+        },
+        {
+          "resource": "repo://project_support/tests/browser/source_scenario_review.test.mjs",
+          "version": "repo-file-v1:sha256:ab9aee41a94e3207d8236c9cd6ca87df485654882570de396339aba8a5989bce"
+        },
+        {
+          "resource": "repo://project_support/tests/browser/source_security_observation.test.mjs",
+          "version": "repo-file-v1:sha256:ef82d7925b0833799488a6555dd66a3b2c8e86032e091b98ee1cf13480cbadc1"
+        },
+        {
+          "resource": "repo://project_support/tests/browser/workspace_navigation_ownership.test.mjs",
+          "version": "repo-file-v1:sha256:5f447601b35e703282f2fbb2d1d6ada7667f0b22fe58ac4d8cfa1956cddf3425"
+        }
+      ]
+    },
+    {
+      "id": "claim_c38de8046f5e42d9b451d9cea8e00a18",
+      "statement": "제품 설치 시험은 ISDC_ORBIT_INSTALL_WHEEL 환경변수로 기존 wheel을 지정할 수 있고 지정하지 않으면 tooling/orbit_wheels에서 wheel을 찾는다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/tests/test_orbit_install.py",
+          "version": "repo-file-v1:sha256:94c7b1678324214fcef2e0eebc1adfa494660f6096c46df1d8d7751df1bfa4a9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b43b33325f884daab03b938f121655f5",
+      "statement": "workspace_configuration DB 시험은 ISDC_TEST_DATABASE_CONFIG가 없으면 명시적으로 생략한다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/tests/test_workspace_configuration.py",
+          "version": "repo-file-v1:sha256:50bb5cb79813b28dd67186aea7155f50ec8e15a3fcfb1d34f37d84c1fcca85fb"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-08T09:47:53.692Z"
+  }
+}

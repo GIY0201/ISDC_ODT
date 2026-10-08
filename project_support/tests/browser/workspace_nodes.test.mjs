@@ -140,7 +140,7 @@ test('mounted catalog consumer samples once per analysis tick and revokes same-U
 for(const [width,height] of [[1280,720],[1920,1080]])test(`accepted receipt with denied local persistence preserves drafts and identical reviewed retry ${width}x${height}`,async()=>{
  const records=new Map(),posts=[];let deny=false,server={revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]};
  const storage={getItem:key=>records.get(key)??null,setItem(key,value){if(deny&&key==='spacetwin-nodes-deployed-v1')throw Error('denied');records.set(key,value);}};
- const f=actualWorkspaceFixture(width,height,{hash:'#scene',storage,fetch:async(url,options)=>{if(options.method==='GET')return{ok:true,json:async()=>structuredClone(server)};const p=JSON.parse(options.body);posts.push(p);server={revision:1,run_id:'fixture',scope_id:`fixture:deployment:${p.deployment_id}`,deployment_id:p.deployment_id,nodes:p.nodes};return{ok:true,json:async()=>structuredClone(server)};}});
+ const f=actualWorkspaceFixture(width,height,{hash:'#satellite',storage,fetch:async(url,options)=>{if(options.method==='GET')return{ok:true,json:async()=>structuredClone(server)};const p=JSON.parse(options.body);posts.push(p);server={revision:1,run_id:'fixture',scope_id:`fixture:deployment:${p.deployment_id}`,deployment_id:p.deployment_id,nodes:p.nodes};return{ok:true,json:async()=>structuredClone(server)};}});
  try{
   await new Promise(resolve=>setTimeout(resolve,10));await f.get('node-add').dispatch('click');const drafts=f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),before=new Map(records);deny=true;await f.get('nodes-deploy').dispatch('click');
   for(let i=0;i<60&&f.evaluate('nodeWorkspace.snapshot().deployment.busy');i++)await new Promise(resolve=>setTimeout(resolve,2));
@@ -167,7 +167,7 @@ for(const failure of ['timeout','dispose'])test(`actual V6 ${failure} rejects a 
 
 test('actual conflicting server-only deployment can be explicitly recalled without creating a draft',async()=>{
  const server={revision:1,run_id:'fixture',scope_id:'fixture:deployment:other',deployment_id:'other',nodes:[{id:'NODE-1',name:'Server-only',mode:'nominal',equipment:[]}]};let posts=0;
- const f=actualWorkspaceFixture(1280,720,{hash:'#scene',fetch:async(url,options)=>{if(options.method==='GET')return{ok:true,json:async()=>server};posts++;const p=JSON.parse(options.body);assert.equal(p.expected_revision,1);assert.deepEqual(p.nodes,[]);return{ok:true,json:async()=>({revision:2,run_id:'fixture',scope_id:`fixture:deployment:${p.deployment_id}`,deployment_id:p.deployment_id,nodes:[]})};}});
+ const f=actualWorkspaceFixture(1280,720,{hash:'#satellite',fetch:async(url,options)=>{if(options.method==='GET')return{ok:true,json:async()=>server};posts++;const p=JSON.parse(options.body);assert.equal(p.expected_revision,1);assert.deepEqual(p.nodes,[]);return{ok:true,json:async()=>({revision:2,run_id:'fixture',scope_id:`fixture:deployment:${p.deployment_id}`,deployment_id:p.deployment_id,nodes:[]})};}});
  try{
   await new Promise(resolve=>setTimeout(resolve,10));assert.equal(posts,0);assert.equal(f.get('nodes-recall').disabled,true);const recall=f.doc.getElementById('nodes-recall-reviewed');assert.ok(recall);assert.equal(recall.disabled,false);assert.match(f.get('node-server-configuration').textContent,/Server-only/);
   await recall.dispatch('click');for(let i=0;i<60&&f.evaluate('nodeWorkspace.snapshot().deployment.busy');i++)await new Promise(resolve=>setTimeout(resolve,2));
@@ -204,26 +204,26 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`lost accepted reply r
   await f.get('nodes-deploy').dispatch('click');for(let i=0;i<60&&f.evaluate('nodeWorkspace.snapshot().deployment.busy');i++)await new Promise(resolve=>setTimeout(resolve,2));
   assert.deepEqual(posts[1],posts[0]);assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().deployed'),drafts);assert.equal(f.evaluate('nodeWorkspace.sceneSnapshot().deployment_confirmed'),true);await f.win.dispatch('pagehide',{persisted:false});
  }finally{f.dispose();}
- const before=posts.length,g=actualWorkspaceFixture(width,height,{hash:'#composer',storage,fetch});try{
+ const before=posts.length,g=actualWorkspaceFixture(width,height,{hash:'#satellite',storage,fetch});try{
   await new Promise(resolve=>setTimeout(resolve,10));assert.deepEqual(g.evaluate('nodeWorkspace.sceneSnapshot().drafts'),drafts);assert.deepEqual(g.evaluate('nodeWorkspace.sceneSnapshot().deployed'),drafts);assert.equal(g.evaluate('nodeWorkspace.sceneSnapshot().deployment_confirmed'),false);assert.equal(posts.length,before);assert.match(g.get('node-scene-summary').textContent,/배치 수락 미확인/);
   await g.win.dispatch('pagehide',{persisted:false});
  }finally{g.dispose();}
 });
 
 test('scene snapshot copies the original draft/deployment definitions and never treats passive restore as acceptance',async()=>{
- const f=fixture();await f.workspace.start();f.workspace.show('scene');assert.equal(f.sections.get('satellite-nodes')?.hidden,false);
+ const f=fixture();await f.workspace.start();f.workspace.show('satellite');assert.equal(f.sections.get('satellite-nodes')?.hidden,false);
  f.options.store.add({name:'Shared scene'});const s=f.workspace.sceneSnapshot();assert.equal(s.drafts[0].name,'Shared scene');assert.equal(s.selected_id,s.drafts[0].id);assert.deepEqual(s.deployed,[]);assert.equal(s.deployment_confirmed,false);assert.equal(s.display,null);
  s.drafts[0].name='foreign';s.server.nodes.push({id:'foreign'});assert.equal(f.workspace.sceneSnapshot().drafts[0].name,'Shared scene');assert.deepEqual(f.workspace.sceneSnapshot().server.nodes,[]);
- f.workspace.show('composer');assert.equal(f.sections.get('satellite-nodes').hidden,false);assert.equal(f.options.store.drafts.length,1);assert.deepEqual(f.calls.filter(c=>c[0]==='http').map(c=>c[2]),['GET']);
+ f.workspace.show('composer');assert.equal(f.sections.get('satellite-nodes').hidden,true);assert.equal(f.options.store.drafts.length,1);assert.deepEqual(f.calls.filter(c=>c[0]==='http').map(c=>c[2]),['GET']);
  f.workspace.destroy();assert.equal(f.workspace.sceneSnapshot(),null);
 });
 
-for(const view of ['scene','composer'])test(`actual V6 ${view} shares source node editor and readonly review snapshot`,async()=>{
- const f=actualWorkspaceFixture(1280,720,{hash:'#'+view});try{
+for(const view of ['scene','composer'])test(`actual V6 ${view} preserves shared satellite configuration without commands`,async()=>{
+ const f=actualWorkspaceFixture(1280,720,{hash:'#satellite'});try{
   await new Promise(resolve=>setTimeout(resolve,10));assert.equal(f.get('satellite-nodes').hidden,false);await f.get('node-add').dispatch('click');
   assert.equal(f.get('node-count').textContent,'1');assert.match(f.get('node-scene-summary').textContent,/초안 1/);assert.match(f.get('node-scene-summary').textContent,/수락 배치 0/);
   const s=f.evaluate('nodeWorkspace.sceneSnapshot()');assert.equal(s.drafts.length,1);assert.deepEqual(s.deployed,[]);assert.match(f.get('node-scene-definitions').textContent,/'?schema"?:\s*1/);
-  const count=f.counts().commands;f.evaluate("showWorkspaceOrbit('satellite')");assert.equal(f.get('node-count').textContent,'1');assert.equal(f.counts().commands,count);assert.equal(f.viewers.length,1);
+  const count=f.counts().commands;f.evaluate(`showWorkspaceOrbit('${view}')`);assert.equal(f.get('satellite-nodes').hidden,view!=='scene');f.evaluate("showWorkspaceOrbit('satellite')");assert.equal(f.get('node-count').textContent,'1');assert.equal(f.counts().commands,count);assert.equal(f.viewers.length,1);
   await f.win.dispatch('pagehide',{persisted:false});
  }finally{f.dispose();}
 });
@@ -231,13 +231,13 @@ for(const view of ['scene','composer'])test(`actual V6 ${view} shares source nod
 for(const [width,height] of [[1280,720],[1920,1080]])test(`restored source definitions survive actual scene/composer screen reconstruction ${width}x${height}`,async()=>{
  const records=new Map();const storage={getItem:key=>records.get(key)??null,setItem:(key,value)=>records.set(key,value)};
  const seed=fixture({storage});await seed.workspace.start();seed.workspace.show('satellite');seed.options.store.add({name:'Restored source'});const expected=seed.options.store.drafts;seed.workspace.destroy();
- const requests=[],f=actualWorkspaceFixture(width,height,{hash:'#scene',storage,fetch:async(url,options)=>{requests.push(options.method);return{ok:true,json:async()=>({revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]})};}});
+ const requests=[],f=actualWorkspaceFixture(width,height,{hash:'#satellite',storage,fetch:async(url,options)=>{if(url.startsWith('/api/workspace/configurations/'))return{ok:true,json:async()=>({enabled:false})};requests.push(options.method);return{ok:true,json:async()=>({revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]})};}});
  try{
   await new Promise(resolve=>setTimeout(resolve,10));const oldRoot=f.get('satellite-nodes');const before=f.counts().commands;
   assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),expected);assert.match(f.get('node-scene-definitions').textContent,/Restored source/);
   f.evaluate("location.hash='#composer'");await f.win.dispatch('hashchange');assert.equal(oldRoot.isConnected,false);assert.notEqual(f.get('satellite-nodes'),oldRoot);
-  assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),expected);assert.equal(f.get('node-count').textContent,'1');assert.match(f.get('node-scene-definitions').textContent,/Restored source/);
-  f.evaluate("location.hash='#satellite'");await f.win.dispatch('hashchange');assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),expected);assert.deepEqual(requests,['GET']);assert.equal(f.counts().commands,before);assert.equal(f.viewers.length,1);
+  assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),expected);assert.equal(f.get('work-section-nav').innerHTML.includes('satellite-nodes'),false);
+  f.evaluate("location.hash='#satellite'");await f.win.dispatch('hashchange');assert.match(f.get('node-scene-definitions').textContent,/Restored source/);assert.deepEqual(f.evaluate('nodeWorkspace.sceneSnapshot().drafts'),expected);assert.deepEqual(requests,['GET']);assert.equal(f.counts().commands,before);assert.equal(f.viewers.length,1);
   await f.win.dispatch('pagehide',{persisted:false});
  }finally{f.dispose();}
 });
@@ -440,7 +440,7 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 node lighti
 for(const [width,height] of [[1280,720],[1920,1080]])test(`actual V6 damaged restore retry keeps bytes and cryptographic IDs work without randomUUID ${width}x${height}`,async()=>{
  let raw='broken',writes=0,reads=0,sequence=0;
  const storage={getItem:key=>key==='spacetwin-nodes-draft-v1'?raw:null,setItem(key,value){writes++;if(key==='spacetwin-nodes-draft-v1')raw=value;}};
- const f=actualWorkspaceFixture(width,height,{hash:'#satellite',storage,crypto:{getRandomValues(bytes){bytes.fill(0);bytes[15]=++sequence;return bytes;}},fetch:async()=>{reads++;return{ok:true,json:async()=>({revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]})};}});
+ const f=actualWorkspaceFixture(width,height,{hash:'#satellite',storage,crypto:{getRandomValues(bytes){bytes.fill(0);bytes[15]=++sequence;return bytes;}},fetch:async(url)=>{if(url.startsWith('/api/workspace/configurations/'))return{ok:true,json:async()=>({enabled:false})};reads++;return{ok:true,json:async()=>({revision:0,run_id:'fixture',scope_id:'fixture:unconfigured',deployment_id:null,nodes:[]})};}});
  try{
   await new Promise(resolve=>setTimeout(resolve,10));assert.match(f.get('deploy-state').textContent,/손상/);assert.equal(raw,'broken');assert.equal(writes,0);assert.equal(reads,0);
   const retry=f.get('nodes-restore');assert.equal(retry.disabled,false);raw=JSON.stringify({schema:1,nodes:[],sequence:0,selectedId:null,revision:0});await retry.dispatch('click');

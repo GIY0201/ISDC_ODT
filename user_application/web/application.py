@@ -25,7 +25,7 @@ from user_application.bootstrap import create_runtime
 from user_application.configs.paths import APP_NAME, APP_VERSION, WEB_DIR, VISUALIZATION_DIR, CLIENT_DIR, CATALOG_CACHE_DIR
 
 
-def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None,solar_geometry_query=None,node_geometry_query=None,data_management=None,data_management_bridge=None,data_fabric=None,mission_window_query=None,orchestration=None,mission_context_query=None,security=None) -> FastAPI:
+def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), eop_provider=None, orbit_calculator=None, orbit_manifest_path=None,catalog_geometry_query=None,catalog_geometry_manifest_path=None,solar_geometry_query=None,node_geometry_query=None,data_management=None,data_management_bridge=None,data_fabric=None,mission_window_query=None,orchestration=None,mission_context_query=None,security=None,workspace_configuration=None) -> FastAPI:
     from communication.native.orbit_execution import BoundedOrbitExecutor
     from digital_twin.runtime.orbit import OrbitRuntime
     from digital_twin.contracts.orbit import GroundPoint
@@ -81,6 +81,9 @@ def create_app(*, catalog_reader: CatalogReader | None = None, orbit_inputs=(), 
                     if callable(close):close()
 
     app = FastAPI(title=APP_NAME, version=APP_VERSION, lifespan=lifespan)
+    from communication.http import workspace_configuration as configuration_http
+    app.state.workspace_configuration=workspace_configuration
+    app.include_router(configuration_http.router)
     app.state.catalog_geometry_query=catalog_geometry_query
     app.state.catalog_geometry_error=None
     app.include_router(catalog_geometry_http.router)
@@ -199,4 +202,12 @@ def create_stored_orbit_app() -> FastAPI:
     """Explicit local orbit profile; IO happens in lifespan, never at import."""
     from user_application.configs.orbit import ORBIT_MANIFEST_PATH
     from user_application.configs.catalog_geometry import CATALOG_GEOMETRY_MANIFEST
-    return create_app(orbit_manifest_path=ORBIT_MANIFEST_PATH,catalog_geometry_manifest_path=CATALOG_GEOMETRY_MANIFEST)
+    import os,json
+    from pathlib import Path
+    from data.workspace_configuration import PostgresWorkspaceConfiguration
+    config_path=os.environ.get('ISDC_DATABASE_CONFIG')
+    repository=None
+    if config_path:
+        config=json.loads(Path(config_path).read_text(encoding='utf-8'))
+        repository=PostgresWorkspaceConfiguration(config['app'])
+    return create_app(orbit_manifest_path=ORBIT_MANIFEST_PATH,catalog_geometry_manifest_path=CATALOG_GEOMETRY_MANIFEST,workspace_configuration=repository)

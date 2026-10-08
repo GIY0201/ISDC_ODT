@@ -1,3 +1,4 @@
+import {koreaCoordinate,koreaPoint,stationMapMarkup,stationMapBaseMarkup,stationStatusMarkup} from './ground_station_map.js?v=u025';
 import {createGroundStationEditorTools} from './ground_station_editor.js';
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const numeric=['latitude','longitude','altitude_km','dish_m','min_elevation_deg'];
@@ -5,6 +6,7 @@ const numeric=['latitude','longitude','altitude_km','dish_m','min_elevation_deg'
 export function createGroundNetworkPanel({store,model,network,fabric=null,diagram=null,networkScene=null,contactWindows=null,futurePasses=null,document,host,refreshRuntime,drawSparkline=null,onRfLinkDraft=null}={}) {
  let root=null,view=null,dead=false,editorId=null,externalPending=false,message='',busy=false,page=0;
  const editor=createGroundStationEditorTools({model,escape}),removers=[];
+ let mapDraft=null,mapAdding=false,mapOutsideSelected=null,mapMarkersHtml=null,mapListHtml=null;
  const routeChoice={source:'',target:'',objective:'balanced'};
  let routeDraftGeneration=0;
  function adoptRouteDraft(input){
@@ -79,6 +81,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
  function clearSampledUi(){
   if(!root)return;
   for(const id of ['diagram','diagram-detail','results','fabric-results','fabric-custody','fabric-hops']){const item=get(id);if(item){item.textContent='';item.innerHTML='';}}
+  if(get('overview'))get('overview').innerHTML='';
   for(const id of ['summary','diagram-status']){const item=get(id);if(item)item.textContent='현재 UTC·입력의 검증된 노드 통신망 결과 없음';}
   for(const id of ['prev','next','scene-links','scene-coverage','fabric-send','fabric-route','focus']){const item=get(id);if(item)item.disabled=true;}
   const path=get('fabric-path'),dtn=get('fabric-dtn');if(path)path.textContent='현재 통신망의 경로 결과 미확인';if(dtn)dtn.textContent='현재 통신망의 DTN 결과 미확인';
@@ -101,6 +104,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
  function open(id){
   const station=store.find(id);if(!station)return;editorId=id;
   const form=get('editor');form.innerHTML=editor.markup(station);form.hidden=false;
+  get('management').open=true;form.scrollIntoView?.({block:'nearest'});
   // Editor handlers are owned by the form and discarded with its fields.
   get('cancel').addEventListener('click',()=>{close();update();});
   get('remove').addEventListener('click',()=>attempt(()=>{
@@ -221,27 +225,28 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
    if(!node||field==='source'&&node.kind!=='satellite')return;
    const next={...routeChoice,[field]:held.id},ids=new Set(fresh.network.nodes.map(node=>node.id));
    if(network.verifyNetworkSnapshot(fresh)!==true||!current())return;
-   routeChoice[field]=held.id;get('fabric-'+field).value=held.id;
+   routeChoice[field]=held.id;get('fabric-'+field).value=held.id;get('fabric-disclosure').open=true;
    if(ids.has(next.source)&&ids.has(next.target)&&next.source!==next.target)return fabricAction('route');
    update();
   }catch{/* Read/proof failure cannot turn historical details into a command. */}
  }
  function mount(){
   root=document.createElement('section');root.id='ground-node-network';root.className='panel';
-  root.innerHTML='<header><h2>노드 통신망과 지상국 편집</h2></header><div class="body"><p>대표 지상국 설정과 Kepler+J2 통신 기하입니다. 안테나·대역은 대표 설정이며 실제 수신 미확인입니다. 저장 궤도 RF/접촉 계획과 별개입니다. 계산 전 표시 시계를 정지하면 같은 UTC의 결과를 확인할 수 있습니다.</p><label>추가 지상국 <select id="ground-node-preset"></select></label><button type="button" id="ground-node-add">지상국 추가</button><label>편집 지상국 <select id="ground-node-select"></select></label><button type="button" id="ground-node-edit">선택 지상국 편집</button><button type="button" id="ground-node-reload">저장 설정 다시 불러오기</button><button type="button" id="ground-node-reset">기본 지상국으로 초기화</button><form id="ground-node-editor" class="form"></form><p id="ground-node-status" role="status"></p><button type="button" id="ground-node-calculate">SIM 상태 조회 후 노드 통신망 계산</button><p id="ground-node-summary"></p><h3>배치 위성의 미래 지상국 통과 · SIM</h3><p>서버 수락 배치와 정지한 표시 UTC가 필요합니다. 통과는 고각 마스크에 따른 기하이며 실제 RF 수신 가능 여부는 미확인입니다.</p><label>표시 지상국 <select id="ground-node-pass-station"></select></label><button type="button" id="ground-node-pass-query">앞으로 3시간 native 통과 조회</button><button type="button" id="ground-node-pass-cancel">조회 취소</button><p id="ground-node-pass-status" role="status"></p><div id="ground-node-pass-results"></div><button type="button" id="ground-node-pass-prev">이전 통과</button><button type="button" id="ground-node-pass-next">다음 통과</button><button type="button" id="ground-node-scene-links" aria-pressed="true">지상 링크 3D</button><button type="button" id="ground-node-scene-coverage" aria-pressed="true">대표 고도 마스크 커버리지 3D · SIM</button><p id="ground-node-diagram-status"></p><div id="ground-node-diagram" style="max-height:420px;overflow:auto"></div><div id="ground-node-diagram-detail"></div><div id="ground-node-results"></div><button type="button" id="ground-node-prev">이전 링크</button><button type="button" id="ground-node-next">다음 링크</button></div>';
+  root.innerHTML='<header><h2>지상국과 통신망</h2></header><div class="body"><section class="gs-map-workspace"><div class="gs-map-column">'+stationMapBaseMarkup()+'<p id="ground-node-map-load" role="status"></p></div><aside class="gs-map-sidebar"><h3>한반도 지도 내 지상국</h3><div id="ground-node-map-list" class="gs-map-list"></div><div id="ground-node-map-selected"></div><div id="ground-node-map-actions" class="gs-map-actions"><button type="button" id="ground-node-map-edit">선택 지상국 설정</button><button type="button" id="ground-node-map-toggle">통신망 사용 변경</button></div><section class="gs-map-build"><h3>새 가상 지상국</h3><button type="button" id="ground-node-map-mode" aria-pressed="false">지도에서 위치 지정</button><div class="gs-map-coordinate"><label>위도 ° <input id="ground-node-map-lat" type="number" step="0.0001" min="-90" max="90" value="36.5"></label><label>경도 ° <input id="ground-node-map-lon" type="number" step="0.0001" min="-180" max="180" value="127.5"></label></div><button type="button" id="ground-node-map-locate">좌표로 후보 위치 확인</button><p id="ground-node-map-draft" role="status">후보 위치를 지정하세요.</p><button type="button" id="ground-node-map-add">선택 위치에 가상 지상국 추가</button></section></aside></section><details class="gs-map-catalog"><summary>공개 지상국 목록에서 선택</summary><div id="ground-node-station-browser"></div></details><details id="ground-node-management" class="gs-network-detail"><summary>지상국 목록 및 저장 관리</summary><p>기존 시험 지점을 추가하거나 저장한 지상국 설정을 관리합니다.</p><label>추가 지상국 <select id="ground-node-preset"></select></label><button type="button" id="ground-node-add">지상국 추가</button><label>편집 지상국 <select id="ground-node-select"></select></label><button type="button" id="ground-node-edit">선택 지상국 편집</button><button type="button" id="ground-node-reload">저장 설정 다시 불러오기</button><button type="button" id="ground-node-reset">기본 지상국으로 초기화</button><form id="ground-node-editor" class="form"></form></details><p id="ground-node-status" role="status"></p><details id="ground-node-analysis" class="gs-network-detail"><summary>배치 위성 통신 분석</summary><p>시험에 배치한 위성과 사용 지상국의 연결을 계산합니다. 안테나와 대역은 등록 설정을 사용하며 실제 교신 상태를 나타내지 않습니다.</p><button type="button" id="ground-node-calculate">현재 배치의 통신망 계산</button><div id="ground-node-overview"></div><p id="ground-node-summary" hidden></p><div id="ground-node-pass-tools"></div><details id="ground-node-contact-plan" class="gs-network-detail"><summary>정지 시각의 접촉 일정 상세 조회</summary><p>시험 재생을 정지한 시각부터 3시간의 전체 배치 통과 구간을 조회합니다. 자동 갱신 통과 예측과 달리 조회한 조건을 고정해 비교할 때 사용합니다.</p><label>표시 지상국 <select id="ground-node-pass-station"></select></label><button type="button" id="ground-node-pass-query">정지 시각부터 3시간 조회</button><button type="button" id="ground-node-pass-cancel">조회 취소</button><p id="ground-node-pass-status" role="status"></p><div id="ground-node-pass-results"></div><button type="button" id="ground-node-pass-prev">이전 통과</button><button type="button" id="ground-node-pass-next">다음 통과</button></details><div class="ground-scene-actions"><button type="button" id="ground-node-scene-links" aria-pressed="true">지상 링크 3D</button><button type="button" id="ground-node-scene-coverage" aria-pressed="true">지상국 가시 범위 3D</button></div><details class="gs-network-detail"><summary>시험 통신망 연결 계산 상세</summary><p id="ground-node-diagram-status"></p><div id="ground-node-diagram" style="max-height:420px;overflow:auto"></div><div id="ground-node-diagram-detail"></div><div id="ground-node-results"></div><button type="button" id="ground-node-prev">이전 링크</button><button type="button" id="ground-node-next">다음 링크</button></details></details></div>';
   document.getElementById('screen').prepend(root);close();
   if(futurePasses){
-   const future=document.createElement('section');future.innerHTML='<h3>배치 위성의 앞으로 3시간 통과</h3><p>전체 배치의 원본 native 기하를 계산해 위성별 첫 3구간 중 빠른 12구간을 표시합니다. 현재 표시 시각과 선택 지상국을 따라 갱신합니다.</p><label>통과 지상국 <select id="ground-node-future-pass-station"></select></label><button type="button" id="ground-node-future-pass-refresh">통과 새로고침</button><p id="ground-node-future-pass-status" role="status"></p><div id="ground-node-future-pass-results" style="overflow:auto"></div>';
-   (root.querySelector('.body')||root).append(future);
+   const future=document.createElement('details');future.id='ground-node-future-pass-disclosure';future.className='gs-network-detail';future.innerHTML='<summary>자동 갱신 통과 예측</summary><p>표시 시각부터 3시간 동안 각 위성의 첫 3구간을 계산하고 빠른 12구간을 보여줍니다. 표시 시각과 선택 지상국에 따라 갱신합니다.</p><label>통과 지상국 <select id="ground-node-future-pass-station"></select></label><button type="button" id="ground-node-future-pass-refresh">통과 새로고침</button><p id="ground-node-future-pass-status" role="status"></p><div id="ground-node-future-pass-results" style="overflow:auto"></div>';
+   get('pass-tools').append(future);
    listen(get('future-pass-station'),'change',()=>{futurePasses.selectStation(get('future-pass-station').value);update();});
    listen(get('future-pass-refresh'),'click',()=>{void futurePasses.refresh();update();});
   }
-  const focusControls=document.createElement('section');focusControls.innerHTML='<button type="button" id="ground-node-focus" disabled>선택 지상국 초점</button>';(root.querySelector('.body')||root).append(focusControls);const focusButton=get('focus');
+  const focusControls=document.createElement('section');focusControls.innerHTML='<button type="button" id="ground-node-focus" disabled>선택 지상국 초점</button>';get('map-actions').append(focusControls);const focusButton=get('focus');
   listen(focusButton,'click',()=>attempt(()=>{if(dead||view!=='ground'||focusButton.disabled||externalPending||!store.ready)return;if(network.focusGroundNetworkStation?.(store.selectedId)!==true)message='현재 표시된 지상국을 확인한 뒤 초점을 이동하세요.';}));
-  const observation=document.createElement('section');observation.innerHTML='<p id="ground-node-module-status" role="status"></p><p id="ground-node-quality-status" role="status"></p><canvas id="ground-node-quality-history" width="320" height="80" aria-label="선택 링크의 과거 모의 품질" hidden></canvas>';root.append(observation);
+  const observation=document.createElement('details');observation.id='ground-node-diagnostics';observation.className='module-diagnostics';observation.innerHTML='<summary>통신 모듈 상태와 링크 품질 이력</summary><p id="ground-node-module-status" role="status"></p><p id="ground-node-quality-status" role="status"></p><canvas id="ground-node-quality-history" width="320" height="80" aria-label="선택 링크의 과거 모의 품질" hidden></canvas>';
   const controls=document.createElement('section');controls.id='ground-node-fabric';
-  controls.innerHTML='<h3>모의 통신 경로와 DTN</h3><p>모의 통신 모듈에 계산된 통신망을 명시적으로 전송합니다. DTN은 연결이 없을 때 데이터를 저장했다가 전달하는 모의 계산이며 실제 패킷·장비 전송은 미확인입니다.</p><button type="button" id="ground-node-fabric-send">계산된 통신망 전송</button><button type="button" id="ground-node-fabric-refresh">모듈 상태 조회</button><p id="ground-node-fabric-status" role="status"></p><label>출발 노드 <select id="ground-node-fabric-source"></select></label><label>목적 노드 <select id="ground-node-fabric-target"></select></label><label>경로 목적 <select id="ground-node-fabric-objective"><option value="balanced">균형</option><option value="latency">지연 최소</option><option value="reliability">신뢰도</option></select></label><button type="button" id="ground-node-fabric-route">경로 조회</button><p id="ground-node-fabric-dtn"></p><div id="ground-node-fabric-results"></div><div id="ground-node-fabric-custody"></div><p id="ground-node-fabric-path"></p><div id="ground-node-fabric-hops"></div>';
-  (root.querySelector('.body')||root).append(controls);
+  const fabricDisclosure=document.createElement('details');fabricDisclosure.id='ground-node-fabric-disclosure';fabricDisclosure.className='gs-network-detail';fabricDisclosure.innerHTML='<summary>통신 경로와 저장 후 전달 시험</summary>';fabricDisclosure.append(controls);
+  controls.innerHTML='<p>계산된 통신망을 모의 통신 모듈에 전송해 경로를 비교합니다. 연결이 끊긴 동안 데이터를 저장했다가 전달하는 DTN 동작도 시험할 수 있습니다.</p><button type="button" id="ground-node-fabric-send">계산된 통신망 전송</button><button type="button" id="ground-node-fabric-refresh">모듈 상태 조회</button><p id="ground-node-fabric-status" role="status"></p><label>출발 노드 <select id="ground-node-fabric-source"></select></label><label>목적 노드 <select id="ground-node-fabric-target"></select></label><label>경로 목적 <select id="ground-node-fabric-objective"><option value="balanced">균형</option><option value="latency">지연 최소</option><option value="reliability">신뢰도</option></select></label><button type="button" id="ground-node-fabric-route">경로 조회</button><p id="ground-node-fabric-dtn"></p><div id="ground-node-fabric-results"></div><div id="ground-node-fabric-custody"></div><p id="ground-node-fabric-path"></p><div id="ground-node-fabric-hops"></div>';
+  get('analysis').append(fabricDisclosure);get('analysis').append(observation);
   listen(get('scene-links'),'click',()=>{groundLinksVisible=!groundLinksVisible;networkScene?.setGroundLinksVisible(groundLinksVisible);get('scene-links').setAttribute('aria-pressed',String(groundLinksVisible));});
   listen(get('scene-coverage'),'click',()=>{coverageVisible=!coverageVisible;networkScene?.setCoverageVisible(coverageVisible);get('scene-coverage').setAttribute('aria-pressed',String(coverageVisible));});
   for(const event of ['click','keydown'])listen(get('diagram'),event,value=>{
@@ -251,9 +256,21 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
    if(!node&&!link)return;value.preventDefault?.();selection={type:node?'node':'link',id:node||link};update();
   });
   listen(get('diagram-detail'),'click',event=>{const id=event.target?.closest?.('button')?.id;if(id==='ground-node-detail-rf-draft')return rfLinkDraft(event);if(['ground-node-detail-focus','ground-node-detail-edit'].includes(id))return stationShortcut(event);linkEndpoint(event);return routeShortcut(event);});
-  const analytical=document.createElement('section');analytical.id='ground-node-fabric-analytical';analytical.innerHTML='<h4>주기 통신 모듈 결과</h4><p id="ground-node-fabric-analytical-status"></p><div id="ground-node-fabric-analytical-results" style="max-height:22rem;overflow:auto"></div>';controls.append(analytical);
+  const analytical=document.createElement('details');analytical.id='ground-node-fabric-analytical';analytical.innerHTML='<summary>이전 통신 계산 결과</summary><p id="ground-node-fabric-analytical-status"></p><div id="ground-node-fabric-analytical-results" style="max-height:22rem;overflow:auto"></div>';controls.append(analytical);
   for(const kind of ['send','refresh','route'])listen(get('fabric-'+kind),'click',()=>fabricAction(kind));
   for(const field of ['source','target','objective'])listen(get('fabric-'+field),'change',()=>{routeChoice[field]=get('fabric-'+field).value;update();});
+  const selectMapStation=id=>attempt(()=>{if(externalPending||!store.ready)throw Error('지상국 설정을 먼저 확인하세요.');if(editorId&&editorId!==id)throw Error('현재 지상국 편집을 저장하거나 닫은 뒤 선택하세요.');mapOutsideSelected=id;store.select(id);});
+  for(const area of ['map-markers','map-list'])listen(get(area),'click',event=>{const button=event.target?.closest?.('[data-map-station]');if(button)selectMapStation(button.getAttribute('data-map-station'));});
+  listen(get('map-mode'),'click',()=>{mapAdding=!mapAdding;update();});
+  if(mapDraft){get('map-lat').value=mapDraft.latitude.toFixed(4);get('map-lon').value=mapDraft.longitude.toFixed(4);}
+  for(const field of ['map-lat','map-lon'])listen(get(field),'input',()=>{mapDraft=null;update();});
+  listen(get('map'),'click',event=>{if(!mapAdding||event.target?.closest?.('button,a'))return;const rect=get('map').getBoundingClientRect();const point=koreaCoordinate((event.clientX-rect.left)/rect.width,(event.clientY-rect.top)/rect.height);if(!point)return;mapDraft=point;get('map-lat').value=point.latitude.toFixed(4);get('map-lon').value=point.longitude.toFixed(4);update();});
+  listen(get('map-locate'),'click',()=>{const lat=get('map-lat').value.trim(),lon=get('map-lon').value.trim();const point={latitude:lat===''?NaN:Number(lat),longitude:lon===''?NaN:Number(lon)};mapDraft=koreaPoint(point)?point:null;update();if(!mapDraft)get('map-draft').textContent='한반도 지도 범위 안의 위도와 경도를 입력하세요.';});
+  listen(get('map-add'),'click',()=>attempt(()=>{if(!mapDraft||!koreaPoint(mapDraft))throw Error('후보 위치를 먼저 지정하세요.');if(externalPending||!store.ready)throw Error('다른 창의 변경을 먼저 확인하세요.');if(editorId)throw Error('현재 편집을 저장하거나 닫은 뒤 추가하세요.');const station=store.add({name:'',...mapDraft,enabled:true});mapDraft=null;mapAdding=false;open(station.id);message='가상 지상국 추가됨. 안테나와 통신 조건을 설정하세요.';}));
+  listen(get('map-edit'),'click',()=>attempt(()=>{if(externalPending||!store.ready)throw Error('지상국 설정을 먼저 확인하세요.');if(editorId&&editorId!==store.selectedId)throw Error('현재 편집을 먼저 닫으세요.');open(store.selectedId);}));
+  listen(get('map-toggle'),'click',()=>attempt(()=>{if(externalPending||!store.ready||editorId)throw Error('현재 편집이나 다른 창의 변경을 먼저 확인하세요.');const station=store.selected;if(station)store.setEnabled(station.id,!station.enabled);}));
+  const tileStates=new Array(6).fill('pending');
+  for(let i=0;i<6;i++)for(const event of ['load','error'])listen(get('map-tile-'+i),event,()=>{tileStates[i]=event;get('map-load').textContent=tileStates.includes('error')?'지도 배경을 불러오지 못했습니다. 좌표 입력과 지상국 목록은 사용할 수 있습니다.':tileStates.includes('pending')?'지도 불러오는 중':'';});
   listen(get('add'),'click',()=>attempt(()=>{if(externalPending)throw Error('다른 창의 변경을 먼저 확인하세요.');const preset=get('preset').value;const station=store.add(preset==='custom'?{name:'',latitude:37.5,longitude:127}:{preset});open(station.id);}));
   listen(get('select'),'change',()=>attempt(()=>{if(externalPending)throw Error('다른 창의 변경을 먼저 확인하세요.');store.select(get('select').value);if(!editorId)update();}));
   listen(get('edit'),'click',()=>attempt(()=>{if(externalPending)throw Error('다른 창의 변경을 먼저 확인하세요.');open(store.selectedId);}));
@@ -270,7 +287,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
    if(replacing)futurePasses?.cancel();
    if(dead||view!=='ground')return;
    if(root!==null||paintGeneration!==ticket){restoreEditor(draft);return;}
-   mount();restoreEditor(draft);
+   mapMarkersHtml=null;mapListHtml=null;mount();restoreEditor(draft);
   }
   const paintRoot=root,ticket=++paintGeneration,current=()=>!dead&&view==='ground'&&root===paintRoot&&paintGeneration===ticket;
   try{
@@ -282,7 +299,17 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   get('select').innerHTML='<option value="">지상국 선택</option>'+store.stations.map(s=>`<option value="${escape(s.id)}">${escape(s.name)} · ${s.enabled?'사용':'비활성'} · ${s.latitude}°/${s.longitude}° · ${s.min_elevation_deg}°</option>`).join('');get('select').value=store.selectedId??'';
   get('add').disabled=!store.ready||externalPending||store.stations.length>=24;get('edit').disabled=!store.ready||externalPending||!store.selectedId;
   get('calculate').disabled=busy||!store.ready||externalPending;
-  get('status').textContent=externalPending?'다른 창의 지상국 변경이 있습니다. 편집 내용을 보존했습니다. 확인 후 다시 불러오세요.':store.error||message||`지상국 ${store.stations.length}개 · ${store.persistence==='memory_only'?'메모리만 사용 · 영구 저장 없음':'브라우저 설정'}`;
+  if(externalPending)get('management').open=true;
+  get('status').textContent=externalPending?'다른 창의 지상국 변경이 있습니다. 편집 내용을 보존했습니다. 확인 후 다시 불러오세요.':store.error||message||`지상국 ${store.stations.length}개 · ${store.persistence==='memory_only'?'메모리만 사용 · 영구 저장 없음':'저장 구성'}`;
+  const configured=store.stations,storedSelected=store.selected,selected=storedSelected&&(koreaPoint(storedSelected)||mapOutsideSelected===storedSelected.id)?storedSelected:null;
+  const markerHtml=stationMapMarkup(configured,store.selectedId,mapDraft),listHtml=configured.map(s=>({station:s,html:'<button type="button" data-map-station="'+escape(s.id)+'" aria-pressed="'+(s.id===store.selectedId)+'"><b>'+escape(s.name)+'</b><span>'+(!koreaPoint(s)?'지도 범위 밖 / ':'')+(s.enabled?'사용':'사용 안 함')+'</span></button>'})).reduce((result,item)=>{result[koreaPoint(item.station)?'domestic':'foreign']+=item.html;return result;},{domestic:'',foreign:''});
+  const siteListHtml=listHtml.domestic+(listHtml.foreign?'<details class="gs-map-foreign"><summary>해외 지상국</summary>'+listHtml.foreign+'</details>':'');
+  if(mapMarkersHtml!==markerHtml){mapMarkersHtml=markerHtml;get('map-markers').innerHTML=markerHtml;}if(mapListHtml!==siteListHtml){mapListHtml=siteListHtml;get('map-list').innerHTML=siteListHtml;}
+  get('map-selected').innerHTML=stationStatusMarkup(selected);
+  get('map-mode').setAttribute('aria-pressed',String(mapAdding));get('map-mode').textContent=mapAdding?'위치 지정 중 / 지도 클릭':'지도에서 위치 지정';get('map').classList[mapAdding?'add':'remove']('placing');
+  get('map-draft').textContent=mapDraft?'후보 '+mapDraft.latitude.toFixed(4)+'° / '+mapDraft.longitude.toFixed(4)+'°':'후보 위치를 지정하세요.';
+  get('map-add').disabled=!mapDraft||!store.ready||externalPending||configured.length>=24||!!editorId;
+  get('map-edit').disabled=!selected||!store.ready||externalPending;get('map-toggle').disabled=!selected||!store.ready||externalPending||!!editorId;get('map-toggle').textContent=selected?.enabled?'이 지상국 사용 안 함':'이 지상국 통신망에 사용';
   const snapshot=network.networkSnapshot(),valid=store.ready&&!externalPending&&snapshot?.status==='valid'&&network.verifyNetworkSnapshot(snapshot);
   if(!current())return;
   let sampled=null;
@@ -298,10 +325,11 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   if(!visualCurrent()){if(current())clearSampledUi();return;}renderContacts();if(!visualCurrent()){if(current())clearSampledUi();return;}
   if(!renderObservations(visual,visualValid,visualCurrent)){if(current()){clearObservations();clearSampledUi();}return;}
   get('results').textContent='';get('results').innerHTML='';
-  if(!visualValid){get('summary').textContent=snapshot?.error||'현재 UTC·입력의 검증된 노드 통신망 결과 없음';get('prev').disabled=true;get('next').disabled=true;return;}
+  if(!visualValid){get('overview').innerHTML='<p role="status">'+escape(snapshot?.error||'현재 시각의 통신망 계산 결과 없음')+'</p>'; get('summary').textContent=snapshot?.error||'현재 UTC·입력의 검증된 노드 통신망 결과 없음';get('prev').disabled=true;get('next').disabled=true;return;}
   const links=visual.network.links;page=Math.min(page,Math.max(0,Math.ceil(links.length/50)-1));
   const rows=links.slice(page*50,(page+1)*50);
   get('summary').textContent=sampled?`분석 UTC ${sampled.analysis_utc} · 표시 UTC ${sampled.display_utc} · 분석 경과 ${Number(sampled.age_seconds).toFixed(3)} s · 현재 분석 ${sampled.current_analysis?'같은 시각':'미확인'}${sampled.availability==='pending'?' · 갱신 중':''} · 노드 ${visual.network.nodes.length}개 · 링크 ${links.length}개 · ${page+1}/${Math.max(1,Math.ceil(links.length/50))}페이지 · GMST/UTC 근사 · 공학 가정 · 현재 통신 품질·실제 RF 연결 미확인`:`표시 UTC ${snapshot.utc} · 노드 ${snapshot.network.nodes.length}개 · 링크 ${links.length}개 · ${page+1}/${Math.max(1,Math.ceil(links.length/50))}페이지 · GMST/UTC 근사 · 공학 가정 · 실제 RF 연결 미확인 · 모의 통신 결과는 아래에서 별도 조회`;
+  get('overview').innerHTML=groundNetworkSummaryMarkup(visual,sampled,page);
   get('results').innerHTML='<table><thead><tr><th>링크</th><th>종류</th><th>모의 계산 기록</th></tr></thead><tbody>'+rows.map(link=>`<tr><td>${escape(link.id)}</td><td>${escape(link.kind)}</td><td><details><summary>단위·기하·상태 확인</summary><pre style="max-width:28rem;white-space:pre-wrap">${escape(JSON.stringify(link,null,2))}</pre></details></td></tr>`).join('')+'</tbody></table>';
   get('prev').disabled=page===0;get('next').disabled=(page+1)*50>=links.length;
   if(!visualCurrent()&&current())clearSampledUi();
@@ -412,7 +440,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
   get('diagram-status').textContent=!valid?'현재 UTC·입력의 연결도 미확인':!diagram?'연결도 표시 모듈 미확인':sampled?`분석 UTC ${snapshot.analysis_utc} · 표시 UTC ${snapshot.display_utc} · 통신 품질·보관 상태·현재 경로 미확인 · 공학 가정`:receipt?'모의 연결 구조 · 지리적 위치 아님 · 움직이는 선은 실측 패킷이 아님':'검증된 native 기하 · 통신 품질·보관 상태·현재 경로 미확인 · 현재 통신 승인·실제 RF 미확인';
   if(!valid||!diagram)return current();
   const nodes=snapshot.network.nodes,ids=new Set(nodes.map(node=>node.id));
-  const layout=diagram.layoutNetwork({satellites:(snapshot.node_definitions??[]).filter(node=>ids.has(node.id)).map(node=>({id:node.id,name:node.name,raan:node.orbit?.raan,meanAnomaly:node.orbit?.mean_anomaly,formation:node.formation})),stations:(snapshot.stations??[]).filter(station=>station.enabled&&ids.has(station.id))});
+  const layout=diagram.layoutNetwork({compactGround:true,satellites:(snapshot.node_definitions??[]).filter(node=>ids.has(node.id)).map(node=>({id:node.id,name:node.name,raan:node.orbit?.raan,meanAnomaly:node.orbit?.mean_anomaly,formation:node.formation})),stations:(snapshot.stations??[]).filter(station=>station.enabled&&ids.has(station.id))});
   if(!current())return false;
   let historical=null;
   const nativeInputs=value=>JSON.stringify(Object.fromEntries(Object.entries(value??{}).filter(([key])=>!['utc','network','presentation_kind','analysis_utc','display_utc','age_seconds','availability','current_analysis','reason'].includes(key))));
@@ -444,7 +472,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
    const record=selected.type==='link'?{...links.find(link=>link.id===selected.id)}:{definition:(snapshot.node_definitions??[]).find(node=>node.id===selected.id)||(snapshot.stations??[]).find(node=>node.id===selected.id),fabric:(visualReceipt?.nodes??[]).find(node=>node.id===selected.id)??null};
    if(historical&&selected.type==='link'){record.current_geometry=snapshot.network.links.find(link=>link.id===selected.id);record.captured_module=reports.get(selected.id)??null;}
    if(historical)record.historical_analysis={source:historical.source,analysis_utc:historical.analysis_utc,display_utc:historical.display_utc,age_seconds:historical.age_seconds,current_communication_approval:false};
-   get('diagram-detail').innerHTML='<h4>선택한 모의 '+(selected.type==='link'?'링크':'노드')+'</h4><pre style="white-space:pre-wrap;overflow-wrap:anywhere">'+escape(JSON.stringify(record,null,2))+'</pre>';
+   get('diagram-detail').innerHTML='<h4>선택한 모의 '+(selected.type==='link'?'링크':'노드')+'</h4><details><summary>선택 항목의 계산 자료</summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere">'+escape(JSON.stringify(record,null,2))+'</pre></details>';
    if(selected.type==='link'){
     const endpoints=['a','b'].filter(side=>typeof record?.[side]==='string'&&ids.has(record[side]));
     get('diagram-detail').innerHTML+='<div>'+endpoints.map(side=>'<button type="button" id="ground-node-detail-select-'+side+'">'+escape(side.toUpperCase()+' 노드 선택 · '+record[side])+'</button>').join('')+'</div>';
@@ -492,7 +520,7 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
  const unsubscribe=store.subscribe(()=>{routeDraftGeneration++;let next=null;try{next=stationInputs();}catch{/* Failed config revokes old geometry. */}const changed=next===null||next!==stationInputSignature;stationInputSignature=next;if(changed){cancelContacts();network.clearNetwork();void futurePasses?.observe?.();}update();});
  const external=event=>{
   if(dead||event.key!=='spacetwin-ground-stations-v1')return;cancelContacts();
-  if(editorId){externalPending=true;network.clearNetwork();void futurePasses?.observe?.();update();}
+  if(editorId||mapDraft){externalPending=true;network.clearNetwork();void futurePasses?.observe?.();update();}
   else{store.load();network.clearNetwork();void futurePasses?.observe?.();update();}
  };
  host.addEventListener('storage',external);
@@ -510,4 +538,12 @@ export function createGroundNetworkPanel({store,model,network,fabric=null,diagra
  }
  return Object.freeze({show,update,adoptRouteDraft,routeRequest:()=>Object.freeze({...routeChoice}),selectedLinkId:()=>!dead&&selection?.type==='link'?selection.id:null,hasExternalChange:()=>externalPending,
   destroy(){if(dead)return;paintGeneration++;dead=true;futurePasses?.setActive(false);clearFuturePasses();clearAnalyticalFabric();stopStatusPolling();clearObservations();clearSampledUi();cancelContacts();networkScene?.setActive?.(false);networkScene?.clear();unsubscribe();host.removeEventListener('storage',external);for(const remove of removers.splice(0))remove();root?.remove();root=null;}});
+}
+
+export function groundNetworkSummaryMarkup(visual,sampled=null,page=0){
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const nodes=visual.network.nodes,links=visual.network.links,stations=nodes.filter(n=>n.kind==='ground').length;
+ const card=(label,value)=>`<div class="overview-metric"><span>${label}</span><strong>${value}</strong></div>`;
+ const time=(label,utc)=>`<div class="ground-analysis-time"><span>${label}</span><time datetime="${esc(utc)}" title="${esc(utc)}">${esc(String(utc??'미확인').replace('T',' ').slice(0,19))} UTC</time></div>`;
+ return `<div class="ground-network-overview"><div class="overview-heading"><span class="overview-badge">시험용 통신망</span><span>모든 활성 지상국 간 연결 가정</span><span>실제 RF 미확인</span><details class="ground-network-info"><summary aria-label="통신망 계산 설명">i</summary><p>위성 수와 지상국 수는 현재 표시 자료의 구성입니다. 지상국 사이는 모든 쌍을 연결하고 10 Gbps를 가정합니다. 실제 회선 계약이나 접속 상태를 조회한 결과가 아닙니다. 위성 연결은 위치, 최소 고각과 지원 대역으로 계산하며 실제 교신 성공 수가 아닙니다. GMST/UTC 근사와 대표 장비 가정을 사용합니다. 품질과 전송 결과는 통신 모듈 조회에서 확인합니다.</p></details></div><div class="overview-metrics">${card('표시 위성',nodes.length-stations)}${card('지상국',stations)}${card('계산 연결',links.length)}</div>${time('표시 시각',sampled?.display_utc??visual.utc)}${sampled?time('분석 기준',sampled.analysis_utc)+`<div>분석 경과 ${Number(sampled.age_seconds).toFixed(3)} s / ${sampled.current_analysis?'현재 시각과 일치':'이전 분석'}${sampled.availability==='pending'?' / 갱신 중':''}</div>`:''}<small>연결 목록 ${page+1} / ${Math.max(1,Math.ceil(links.length/50))} 페이지</small></div>`;
 }

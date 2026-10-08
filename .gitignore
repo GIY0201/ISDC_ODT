@@ -30,3 +30,6 @@ venv/
 /project_support/tooling/sgp4_python_probe/wheels_repaired/
 /project_support/tooling/orbit_wheels/
 /project_support/tooling/validation_runs/
+
+/project_support/tooling/postgresql/
+/project_support/.cache/

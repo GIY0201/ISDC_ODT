@@ -5,6 +5,15 @@ const codec=createUtcCodec(LEAP_SHA256),H='a'.repeat(64),base={group:'active',ca
 const point={latitude_deg:36.3742,longitude_deg:127.3567,ellipsoid_height_m:0,virtual:true,ellipsoid:'WGS84'};
 function response(p){return {...base,...p,version:1,status:'valid',communication_status:'unknown',units:{position:'m',range:'m',elevation:'deg',azimuth:'deg',time:'UTC'},rows:Array.from({length:p.count},(_,i)=>({utc:codec.advance(p.start_utc,i),status:'valid',error_code:null,position_m:[7e6+i,1,2],elevation_deg:10,range_m:1000+i,azimuth_deg:350,visible:true,eop_quality:base.eop_quality}))};}
 function fixture(call=p=>Promise.resolve(response(p))){let now=0,frame;const shown=[],requests=[];const c=createCatalogTimeline({catalogSamples:async p=>{requests.push(p);return call(p);}},v=>shown.push(v),()=>{},{now:()=>now,requestFrame:fn=>(frame=fn,1),cancelFrame:()=>{frame=null;},requestId:()=> 'time-test'});return{c,shown,requests,tick(ms){now=ms;const work=frame;frame=null;work?.();}};}
+test('selected whole-scene satellite receives fresh native positions without station or extra query and clears on invalid source',()=>{
+ const f=fixture();f.c.select(base);
+ const scene={...base,utc:codec.advance(base.utc,10),rows:[{catalog_number:25544,normalized_gp_sha256:H,status:'valid',error_code:null,position_m:[7100000,2,3]}]};
+ assert.equal(f.c.displaySceneSelection(scene),true);assert.equal(f.c.currentUtc(),scene.utc);assert.deepEqual(f.c.sampleAt(scene.utc).position_m,[7100000,2,3]);assert.equal(f.requests.length,0);
+ assert.equal(f.c.displaySceneSelection({...scene,utc:codec.advance(base.utc,11),rows:[{...scene.rows[0],position_m:[7100010,2,3]}]}),true);
+ assert.deepEqual(f.shown.at(-1).position_m,[7100010,2,3]);
+ assert.equal(f.c.displaySceneSelection({...scene,eop_sha256:'b'.repeat(64)}),false);assert.equal(f.c.snapshot().display,null);
+ f.c.destroy();
+});
 test('time query pins GP and observer with no stored orbit commands; playback uses prepared buffer',async()=>{
  const f=fixture();f.c.select(base);f.c.observer(point,5);await f.c.calculate();assert.equal(f.requests[0].count,601);assert.equal(f.requests[0].normalized_gp_sha256,H);assert.deepEqual(f.requests[0].ground_point,point);assert.equal(f.shown.at(-1).elevation_deg,10);
  f.c.play();f.tick(500);assert.equal(f.shown.at(-1).position_m[0],7000000.5);assert.equal(f.requests.length,1);assert.equal(f.shown.at(-1).observation_utc,base.utc);f.c.pause();f.tick(2000);assert.equal(f.requests.length,1);f.c.destroy();
@@ -67,4 +76,18 @@ test('model sampler does not bridge failed rows and uses leap SI seconds without
 test('epoch pin sample belongs to current selection only and old GP buffer cannot survive selection',async()=>{
  const f=fixture();f.c.select(base);f.c.observer(point,5);await f.c.calculate();const next={...base,catalog_number:123,normalized_gp_sha256:'b'.repeat(64)},utc=codec.advance(base.utc,50),pin={normalized_gp_sha256:next.normalized_gp_sha256,utc,position_m:[8e6,4,5]};
  f.c.select(next,pin);assert.equal(f.c.sampleAt(base.utc),null);assert.equal(f.c.sampleAt(utc).catalog_number,123);assert.equal(f.c.sampleAt(utc).normalized_gp_sha256,next.normalized_gp_sha256);assert.deepEqual(f.c.sampleAt(utc).position_m,pin.position_m);pin.position_m[0]=0;assert.equal(f.c.sampleAt(utc).position_m[0],8e6);f.c.destroy();
+});
+
+test('live catalogue analysis follows current UTC independently and stops on input change',async()=>{
+ let wall=Date.parse('2026-10-07T11:10:00Z'),frame,mono=0;const requests=[];
+ const c=createCatalogTimeline({catalogSamples:async p=>{requests.push(p);return response(p);}},()=>{},()=>{},{now:()=>mono,wallNow:()=>wall,requestFrame:fn=>(frame=fn,1),cancelFrame:()=>{frame=null;},requestId:()=> 'live-time'});
+ c.select(base);c.observer(point,5);await c.live();assert.equal(c.snapshot().live,true);assert.equal(c.snapshot().rate,1);assert.equal(requests[0].start_utc,codec.advance('2026-10-07T11:10:00Z',0));
+ wall+=2500;mono=2500;frame();assert.equal(c.snapshot().utc,codec.advance('2026-10-07T11:10:00Z',2.5));assert.equal(requests.length,1);
+ c.pause();assert.equal(c.snapshot().live,false);assert.equal(c.snapshot().playing,false);
+ await c.live();c.observer({...point,longitude_deg:128},5);assert.equal(c.snapshot().live,false);assert.equal(c.snapshot().playing,false);c.destroy();
+});
+test('late live query cannot start playback after clear',async()=>{let resolve;const c=createCatalogTimeline({catalogSamples:p=>new Promise(r=>{resolve=()=>r(response(p));})},()=>{},()=>{},{wallNow:()=>Date.parse('2026-10-07T11:10:00Z'),now:()=>0,requestFrame:()=>{throw Error('late playback');},cancelFrame:()=>{},requestId:()=> 'live-late'});c.select(base);c.observer(point,5);const pending=c.live();c.clear();resolve();await pending;assert.equal(c.snapshot().selected,null);assert.equal(c.snapshot().playing,false);assert.equal(c.snapshot().live,false);c.destroy();});
+
+test('explicit ground observation keeps its analysis UTC stable while whole scene runs',()=>{
+ const f=fixture();f.c.select(base);f.c.observer(point,5);const before=f.c.currentUtc();assert.equal(f.c.displaySceneSelection({...base,utc:codec.advance(base.utc,10),rows:[{catalog_number:25544,normalized_gp_sha256:H,status:'valid',error_code:null,position_m:[7100000,2,3]}]}),false);assert.equal(f.c.currentUtc(),before);assert.deepEqual(f.c.snapshot().observer,point);f.c.destroy();
 });

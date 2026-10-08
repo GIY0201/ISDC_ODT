@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:2678aa40c48031d862cd3fd1cac502aff348769dfcf2fcd944acf87394e384a9",
+  "claims": [
+    {
+      "id": "claim_77b497ef41634a02b1e3613049817211",
+      "statement": "create_app은 런타임과 데이터·보안 어댑터 및 HTTP 라우터를 조립한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/application.py",
+          "version": "repo-file-v1:sha256:ac7d8cf0d4ece6bd6cef96ab2279720629b11b4a4929a825b04a0125bf782085"
+        }
+      ]
+    },
+    {
+      "id": "claim_61be80964e3c497098aa62d352ef7c62",
+      "statement": "RuntimeState는 SIM 상태 변경에 asyncio 잠금을 사용하며 HTTP control 요청은 runtime.control을 호출한다.",
+      "evidence": [
+        {
+          "resource": "repo://communication/http/runtime.py",
+          "version": "repo-file-v1:sha256:6bd331a00779cc62876f6a7cb393a5fde1ecc22377924cc339314566816c122f"
+        },
+        {
+          "resource": "repo://digital_twin/runtime/state.py",
+          "version": "repo-file-v1:sha256:e76b3db8eefdc344091215c8880b99a3edef94cea6c893ebd6e0a36e745d6da8"
+        }
+      ]
+    },
+    {
+      "id": "claim_e7c2eb2daefe43e0aa189db2757a9c5a",
+      "statement": "/ws/telemetry는 runtime 텔레메트리와 snapshot 평가를 반복 전송하는 서버 스트림이다.",
+      "evidence": [
+        {
+          "resource": "repo://communication/http/telemetry.py",
+          "version": "repo-file-v1:sha256:d9511d9c83fd608ba93eb97a2bfdbf8084c9e06de210c52d1242cb9e9b3448c0"
+        }
+      ]
+    },
+    {
+      "id": "claim_b21d592cc2284520a3d6ae1bf52b1f2f",
+      "statement": "workspace_orbit.js는 카탈로그, 노드, 공용 지구와 기존 기능 패널을 연결하고 workspace.js는 화면 탐색을 구성한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/workspace.js",
+          "version": "repo-file-v1:sha256:b84a413fd048b0dff9fb75a800dd5f60a346d3ddc28ab8eba4edaa1532933eeb"
+        },
+        {
+          "resource": "repo://user_application/web/scripts/workspace_orbit.js",
+          "version": "repo-file-v1:sha256:1efe6f1ce4d3e996a0ceb7ecd8a0aa259f900bf3c563989c91dbaecb16c8a48d"
+        }
+      ]
+    },
+    {
+      "id": "claim_b7910ee0e76c44e88bf4f4c8935c06e8",
+      "statement": "create_app은 주입된 workspace_configuration 저장소의 REST 라우터를 별도로 조립한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/application.py#L84-L86",
+          "version": "repo-lines-v1:sha256:b35bbbb7b65d321f7eb4c4f3fff76394cfdab99fbe66ffdea10e93e15bbffd3e:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjUxNzliYWE2MzVkYmNjMjBiM2JjMzBjMTJjYjAyNjcxNDhmNTEwYzlkNDFmYjhmMGMxYWNhNzlkNGYyYjQxOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDg2ZjgxMWIyN2NlMWIzNjY2MWQ3MTFmZGIwNGYxYzQzMDI5YjVjYTM2MTJiNGU3ZTc0ZTU1MWFhMWM4OGFmNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzUzODlhNGRiYThjMmQ0NjFhYjBkM2ZkNjVhOWU4NDlhNDkwMDI0MmExY2QzYzM0OGZlNTA1MDc1YzMxM2E4ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzJiZGM1NmIxMTJjM2JlNjM3MGE5YzY4ZDkzNzY0YzRlZmM2YmQ3ZTUxNTdmYjk5ZjZhYWU0NjEzNDM0MWFmYiJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-08T08:27:37.110Z"
+  }
+}

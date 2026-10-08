@@ -1,10 +1,11 @@
-import {SolarDisplay} from '/static/visualization/solar_display.js';
+import {SolarDisplay} from '/static/visualization/solar_display.js?v=u031';
 import {createSolarTimeline} from './solar_timeline.js';
+import {createUtcCodec,LEAP_SHA256} from './orbit_utc.js';
 const KEY='spacetwin-globe-lighting-v1',EVENT='spacetwin:globelighting';
 
 /** Existing globe/display owner assembly and original browser preference. */
 export function createWorkspaceSolar({api,globe,overlay,host=window,createDisplay=(...args)=>new SolarDisplay(...args)}){
- let dead=false,renderer=null,context=null,theme='dark',enabled=true,renderStatus={phase:'unavailable',reason:'no_solar_geometry',indicator:'unavailable'},sample=null;
+ let dead=false,renderer=null,context=null,ownerContext=null,theme='dark',enabled=true,renderStatus={phase:'unavailable',reason:'no_solar_geometry',indicator:'unavailable'},sample=null;
  const observers=new Set(),replicas=new Set();
  try{enabled=host.localStorage?.getItem(KEY)!=='off';}catch{/* original session-only policy */}
  const state=()=>structuredClone({enabled,theme,context,timeline:timeline.snapshot(),renderer:renderStatus,
@@ -15,7 +16,16 @@ export function createWorkspaceSolar({api,globe,overlay,host=window,createDispla
   sample=value;
   if(renderer){if(value)renderer.update(value);else renderer.clear(timeline.snapshot().error||'no_solar_geometry');}
  },notify);
- const removeContext=globe.observeDisplayContext(value=>{if(dead)return;context=value?structuredClone(value):null;timeline.setContext(value);notify();});
+ // Display-only Earth sunlight. A calculated scene retains its own UTC;
+ // without one, the browser clock supplies UTC, never an orbit or SIM state.
+ const codec=createUtcCodec(LEAP_SHA256);
+ function refreshContext(){
+  if(dead)return;
+  context=ownerContext?structuredClone(ownerContext):{key:'earth:current',utc:codec.advance((host.now?.()??new Date()).toISOString(),0),leap_sha256:LEAP_SHA256};
+  timeline.setContext(context);notify();
+ }
+ const removeContext=globe.observeDisplayContext(value=>{if(dead)return;ownerContext=value?structuredClone(value):null;refreshContext();});
+ const clock=host.setInterval?.(()=>{if(!ownerContext)refreshContext();},10000);
  const removeView=globe.observeView(value=>{if(dead)return;theme=value.choice.theme;apply();});
  const removeRenderer=globe.bindSolarRenderer((C,viewer)=>{
   if(dead)return null;
@@ -46,6 +56,6 @@ export function createWorkspaceSolar({api,globe,overlay,host=window,createDispla
    },clear(){if(!stopped)display.clear('no_solar_geometry');},destroy(){if(stopped)return;stopped=true;replicas.delete(owned);display.destroy();}};replicas.add(owned);return owned;
   });},
   observe(fn){if(dead)return()=>{};observers.add(fn);fn(state());return()=>observers.delete(fn);},
-  destroy(){if(dead)return;dead=true;for(const replica of [...replicas])replica.destroy();removeContext();removeView();removeRenderer();timeline.destroy();observers.clear();host.removeEventListener?.(EVENT,event);host.removeEventListener?.('storage',storage);context=null;sample=null;},
+  destroy(){if(dead)return;dead=true;if(clock!=null)host.clearInterval?.(clock);for(const replica of [...replicas])replica.destroy();removeContext();removeView();removeRenderer();timeline.destroy();observers.clear();host.removeEventListener?.(EVENT,event);host.removeEventListener?.('storage',storage);context=null;ownerContext=null;sample=null;},
  };
 }

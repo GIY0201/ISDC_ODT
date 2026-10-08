@@ -30,8 +30,8 @@ test('unused contact card is removed while the primary globe remains mounted',()
  assert.match(declarations('#wall-globe-slot #workspace-globe-surface'),/position:absolute;inset:0/);
 });
 
-test('four rail controls retain Korean names and click scopes with decorative inline SVG icons',()=>{
- for(const [scope,label,name] of [['data-group="0"','관제','공용 작업 목록 열기'],['data-group="1"','운용','운용자 작업 목록 열기'],['data-group="2"','DT','DT 작업 목록 열기'],['data-view="settings"','환경 설정',null]]){
+test('domain rail controls retain Korean names and click scopes with decorative inline SVG icons',()=>{
+ for(const [scope,label,name] of [['data-group="0"','상황판','상황판 작업 목록 열기'],['data-group="1"','위성','위성 작업 목록 열기'],['data-group="2"','지상국','지상국 작업 목록 열기'],['data-group="5"','보안','보안 작업 목록 열기'],['data-view="settings"','환경 설정',null]]){
   const button=[...html.matchAll(/<button\b[^>]*>[\s\S]*?<\/button>/g)].map(match=>match[0]).find(value=>value.includes(scope));
   assert.ok(button,`${label} control exists in the initial document`);
   assert.match(button,/<svg\b[^>]*aria-hidden="true"[^>]*focusable="false"[^>]*>/);
@@ -51,7 +51,7 @@ test('rail group controls retain the existing scoped launcher behavior without a
   // The existing fixture parses only elements with IDs; scope-only nav buttons
   // are supplied at this DOM boundary while the real root listener is exercised.
   f.get('nav').querySelector=selector=>selector==='button'?{focus(){}}:null;
-  for(const [index,title,first] of [[0,'공용 작업공간','wall'],[1,'운용자 작업공간','mission'],[2,'DT 작업공간','integration']]){
+  for(const [index,title,first] of [[0,'상황판 작업공간','wall'],[1,'위성 작업공간','satellite'],[5,'보안 작업공간','security'],[6,'시험 작업공간','scene']]){
    const button={dataset:{group:String(index)},closest(selector){return selector==='[data-group]'?this:null;}};
    await rail.dispatch('click',{target:button});
    assert.equal(f.get('launcher-title').textContent,title);

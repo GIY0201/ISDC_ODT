@@ -28,13 +28,15 @@ test('wall catalog toggle is additive and only its explicit ON requests missing 
  }finally{f.dispose();}
 });
 
-test('fresh wall ON uses existing catalog conditions and original query draft; OFF fences late setup',async()=>{
+test('fresh wall ON uses existing catalog conditions and original live owner; OFF fences late setup',async()=>{
  const f=fixture(1280,720,{hash:'#wall'});try{
   f.evaluate("globalThis.wallLoads=[];globalThis.wallSetup=0;const savedWallClient=client.snapshot;client.snapshot=()=>({...savedWallClient(),status:'loading',state:null});globe.displayContext=()=>null;const previousWallTimeline=catalogTimeline.snapshot;catalogTimeline.snapshot=()=>({...previousWallTimeline(),utc:null});catalogScenePanel.requestUtc=()=> '2026-10-07T01:00:00.000Z';catalogPanel.controller.load=async()=>{wallSetup++;catalogScene.configure({group:'active',query:'',orbit:'all'});};catalogScene.load=async utc=>{wallLoads.push(utc);};");
   assert.equal(f.evaluate('wallSetup'),0);f.context.setWorkspaceWallScope('toggle');await new Promise(resolve=>setTimeout(resolve,0));
-  assert.equal(f.evaluate('wallSetup'),1);assert.equal(f.evaluate('wallLoads[0]'),'2026-10-07T01:00:00.000Z');assert.doesNotMatch(f.get('wall-globe-caption').textContent,/위성 창에서 저장 입력/);
+  assert.equal(f.evaluate('wallSetup'),1);assert.match(f.evaluate('wallLoads[0]'),/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{9}Z$/);assert.notEqual(f.evaluate('wallLoads[0]'),'2026-10-07T01:00:00.000Z');assert.doesNotMatch(f.get('wall-globe-caption').textContent,/위성 창에서 저장 입력/);
   f.context.setWorkspaceWallScope('toggle');assert.doesNotMatch(f.get('wall-globe-caption').textContent,/조회 준비 중/);f.evaluate("catalogScene.configure(null);catalogPanel.controller.load=()=>new Promise(resolve=>{globalThis.finishWallSetup=resolve;});");
   f.context.setWorkspaceWallScope('toggle');f.context.setWorkspaceWallScope('toggle');f.evaluate("catalogScene.configure({group:'active',query:'',orbit:'all'});finishWallSetup();");await new Promise(resolve=>setTimeout(resolve,0));assert.equal(f.evaluate('wallLoads.length'),1);
   f.evaluate("catalogScene.configure(null);");f.context.setWorkspaceWallScope('toggle');f.evaluate("location.hash='#settings'");await f.win.dispatch('hashchange');f.evaluate("location.hash='#wall'");await f.win.dispatch('hashchange');f.evaluate("catalogScene.configure({group:'active',query:'',orbit:'all'});finishWallSetup();");await new Promise(resolve=>setTimeout(resolve,0));assert.equal(f.evaluate('wallLoads.length'),1);
  }finally{f.dispose();}
 });
+
+test('enabled wall scope stays ON while live catalog coordinates are refreshing',async()=>{const f=fixture(1280,720,{hash:'#wall'});try{await new Promise(r=>setTimeout(r,0));f.evaluate("const previousSnapshot=catalogScene.snapshot;catalogScene.snapshot=()=>({...previousSnapshot(),pending:true});");f.context.setWorkspaceWallScope('whole');assert.equal(f.get('wall-whole').textContent,'전체 위성 ON');assert.equal(f.get('wall-whole').attributes['aria-pressed'],'true');assert.equal(f.get('wall-scope-status').hidden,true);f.context.setWorkspaceWallScope('ours');assert.equal(f.get('wall-whole').textContent,'전체 위성 OFF');}finally{f.dispose();}});

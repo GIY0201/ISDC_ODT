@@ -24,7 +24,7 @@ test('native direction lights from opposite sign, copies input and preserves ori
  assert.equal(f.viewer.scene.globe.dynamicAtmosphereLightingFromSun,false);assert.equal(f.overlay.hidden,false);assert.equal(f.overlay.dataset.state,'visible');assert.equal(f.overlay.style.left,'20px');assert.equal(f.overlay.dataset.utc,utc);
  assert.deepEqual(f.projected[0],{x:80000010,y:0,z:0});assert.equal(f.viewer.clock.currentTime,'untouched');assert.equal(f.C.Cartesian3.dot(new f.C.Cartesian3(1,0,0),light.direction),-1);
  sample.direction_to_sun[0]=999;f.states.at(-1).utc='mutated';assert.equal(f.display.status().utc,utc);
- f.display.setStyle('light',true);assert.equal(f.viewer.scene.globe.enableLighting,false);assert.equal(f.overlay.hidden,false);
+ f.display.setStyle('light',true);assert.equal(f.viewer.scene.globe.enableLighting,true);assert.equal(f.overlay.hidden,false);
  f.display.setStyle('dark',false);assert.equal(f.viewer.scene.globe.dynamicAtmosphereLighting,false);
  f.display.setStyle('dark',true);assert.equal(f.viewer.scene.globe.enableLighting,true);f.display.destroy();
 });

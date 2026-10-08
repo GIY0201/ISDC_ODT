@@ -17,7 +17,7 @@ function escape(value) {
 // Formation indices keep node positions stable as anomalies advance. Loose nodes group by RAAN.
 // Rings fill the grid in serpentine order so planes with neighbouring RAAN sit next to each other
 // and the cross-plane links between them stay short.
-export function layoutNetwork({ satellites = [], stations = [], width = DIAGRAM_SIZE.width, height = DIAGRAM_SIZE.height } = {}) {
+export function layoutNetwork({ satellites = [], stations = [], width = DIAGRAM_SIZE.width, height = DIAGRAM_SIZE.height, compactGround = false } = {}) {
   const groups = new Map();
   for (const satellite of satellites) {
     const key = satellite.formation ? `${satellite.formation.id}:${satellite.formation.plane}` : `raan:${Math.round(Number(satellite.raan) || 0)}`;
@@ -50,7 +50,7 @@ export function layoutNetwork({ satellites = [], stations = [], width = DIAGRAM_
     });
     return {key:plane.key, raan:plane.raan, index, cx, cy, radius, count:members.length};
   });
-  const groundTop = Math.max(72+gridRows*cellHeight+12, height-(stations.length ? 126 : 24));
+  const groundTop = compactGround && !planes.length ? 78 : Math.max(72+gridRows*cellHeight+12, height-(stations.length ? 126 : 24));
   const stationColumns = Math.max(1, Math.min(6, Math.floor((width-48)/196)));
   const sorted = [...stations].sort((a,b)=>(Number(a.longitude)||0)-(Number(b.longitude)||0) || String(a.id).localeCompare(String(b.id)));
   sorted.forEach((station,index) => {
@@ -59,8 +59,8 @@ export function layoutNetwork({ satellites = [], stations = [], width = DIAGRAM_
     positions.set(String(station.id), {x:width/2+(index%stationColumns-(rowCount-1)/2)*196,
       y:groundTop+70+row*76, w:172, h:58, row:-1, column:index, kind:'ground', label:station.name || station.id});
   });
-  height = Math.max(height, groundTop+(stations.length ? 110+76*(Math.ceil(stations.length/stationColumns)-1) : 24));
-  return {width,height,positions,rings,groundTop};
+  height = Math.max(compactGround && !planes.length ? 180 : height, groundTop+(stations.length ? 110+76*(Math.ceil(stations.length/stationColumns)-1) : 24));
+  return {width,height,positions,rings,groundTop,compactGround};
 }
 
 export function linkTone(link) {
@@ -164,8 +164,8 @@ export function diagramMarkup(layout, links = [], options = {}) {
   const planeMarkup = layout.rings.map(ring => `<g class="nd-plane"><circle cx="${ring.cx}" cy="${ring.cy}" r="${ring.radius}"/><circle class="inner" cx="${ring.cx}" cy="${ring.cy}" r="${ring.radius-24}"/></g>`).join('');
   const planeLabels = layout.rings.map(ring => `<g class="nd-plane-label" transform="translate(${ring.cx},${ring.cy})"><rect x="-66" y="-37" width="132" height="74" rx="8"/><text class="kicker" y="-15" text-anchor="middle">ORBITAL PLANE</text><text class="name" y="5" text-anchor="middle">궤도면 ${String(ring.index+1).padStart(2,'0')}</text><text class="meta" y="25" text-anchor="middle">${ring.count}기 / Ω ${Math.round(ring.raan)}°</text></g>`).join('');
   const groundCount = [...positions.values()].filter(p=>p.kind === 'ground').length;
-  const groundMarkup = groundCount ? `<g class="nd-ground-tier"><rect x="24" y="${layout.groundTop+24}" width="${width-48}" height="${height-layout.groundTop-30}" rx="10"/><text x="38" y="${layout.groundTop+12}">GROUND SEGMENT</text><text x="${width-38}" y="${layout.groundTop+12}" text-anchor="end">지상국 ${groundCount}</text></g>` : '';
-  const header = `<g class="nd-heading"><text x="32" y="29" class="name">위성 네트워크</text><text x="32" y="48" class="meta">궤도면 기반 연결 구조 / 지리적 위치 아님</text><text x="${width-32}" y="29" class="meta" text-anchor="end">${layout.rings.length}개 궤도면 / ${positions.size-groundCount}기</text></g>`;
+  const groundMarkup = groundCount ? `<g class="nd-ground-tier"><rect x="24" y="${layout.groundTop+24}" width="${width-48}" height="${height-layout.groundTop-30}" rx="10"/><text x="38" y="${layout.groundTop+12}">${layout.compactGround?"지상국":"GROUND SEGMENT"}</text><text x="${width-38}" y="${layout.groundTop+12}" text-anchor="end">지상국 ${groundCount}</text></g>` : '';
+  const header = `<g class="nd-heading"><text x="32" y="29" class="name">${layout.compactGround&&!layout.rings.length?"시험용 지상망":"위성 네트워크"}</text><text x="32" y="48" class="meta">${layout.compactGround&&!layout.rings.length?"모든 활성 지상국 간 연결 가정":"궤도면 기반 연결 구조"} / 지리적 위치 아님</text><text x="${width-32}" y="29" class="meta" text-anchor="end">${layout.rings.length}개 궤도면 / ${positions.size-groundCount}기</text></g>`;
   // Negative wall-clock delay preserves phase when the snapshot rebuilds the SVG every second.
   const elapsed = Number.isFinite(options.flowTimeSeconds) ? Math.max(0, options.flowTimeSeconds) : 0;
   const stateOf = link => {
@@ -245,5 +245,5 @@ export function diagramMarkup(layout, links = [], options = {}) {
       : `<text class="label" x="6" y="${state.badge ? -2 : 4}" text-anchor="middle">${escape(shortLabel(place.label,11))}</text>${state.badge ? `<text class="badge" x="6" y="11" text-anchor="middle">${escape(state.badge)}</text>` : ''}`;
     return `<g class="${classes}" data-diagram-node="${escape(id)}" tabindex="0" role="button" aria-label="${escape(title)}" transform="translate(${place.x},${place.y})"><title>${escape(title)}</title>${shape}${text}</g>`;
   }).join('');
-  return `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="통신 네트워크 연결도" class="nd" style="min-width:${Math.round(width*.68)}px;min-height:${Math.round(height*.68)}px">${groundMarkup}${planeMarkup}${linkMarkup}${lineMarkup.join('')}${planeLabels}${nodeMarkup}${tagMarkup.join('')}${header}</svg>`;
+  return `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="통신 네트워크 연결도" class="nd" style="${!layout.compactGround||layout.rings.length?`min-width:${Math.round(width*.68)}px;min-height:${Math.round(height*.68)}px`:"width:100%;height:auto"}">${groundMarkup}${planeMarkup}${linkMarkup}${lineMarkup.join('')}${planeLabels}${nodeMarkup}${tagMarkup.join('')}${header}</svg>`;
 }

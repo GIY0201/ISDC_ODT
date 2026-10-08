@@ -6,7 +6,7 @@ const analytics={run_id:'R',scenario_id:'S',generated_at:'2026-10-04T00:00:00Z',
 for(const [w,h] of [[1280,720],[1920,1080]])test(`V6 KPI actual assembly/shared stream/filters/window retention ${w}x${h}`,async()=>{
  const f=fixture(w,h,{hash:'#compare',planningBootstrap:async()=>({runtime,analytics,events:[],missions:[]})});
  try{await Promise.resolve();await Promise.resolve();f.flush();assert.ok(f.doc.getElementById('kpi-workspace'));assert.equal(f.streams.length,1);
- const selected=f.get('kpi-select');assert.match(f.get('kpi-summary').textContent,/PASS/);assert.match(f.get('kpi-detail').innerHTML,/20.*ms/);
+ const selected=f.get('kpi-select');assert.match(f.get('kpi-summary').innerHTML,/통과/);assert.match(f.get('kpi-detail').innerHTML,/20.*ms/);
  const filter=f.get('kpi-filter-PASS');filter.checked=false;await filter.dispatch('change');
  f.streams[0].message({type:'telemetry',runtime,analytics,events:[],missions:[],wall_time:'2026-10-04T00:00:00Z',data_quality:{mode:'SIM',source:'deterministic-sim'},telemetry:Object.fromEntries(['power','temperature','attitude_error','storage','link_quality','delay_ms','loss_percent','throughput_mbps','ber','auth_percent'].map(k=>[k,20]))});
  assert.equal(f.get('kpi-select'),selected);assert.equal(f.get('kpi-filter-PASS'),filter);assert.equal(filter.checked,false);assert.match(f.get('kpi-requirements').innerHTML,/조건에 맞는 요구사항 없음/);

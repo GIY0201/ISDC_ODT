@@ -3,23 +3,27 @@ import{createUtcCodec,LEAP_SHA256}from'../../../user_application/web/scripts/orb
 let serial=0;
 async function fixture(){
  const code=(await readFile(new URL('../../../user_application/web/scripts/workspace_solar.js',import.meta.url),'utf8'))
- .replace("'/static/visualization/solar_display.js'",JSON.stringify(new URL('../../../digital_twin/visualization/solar_display.js',import.meta.url).href))
+ .replace("'/static/visualization/solar_display.js?v=u031'",JSON.stringify(new URL('../../../digital_twin/visualization/solar_display.js',import.meta.url).href))
  .replace("'./solar_timeline.js'",JSON.stringify(new URL('../../../user_application/web/scripts/solar_timeline.js',import.meta.url).href));
- const {createWorkspaceSolar}=await import(`data:text/javascript;base64,${Buffer.from(code+'\n//'+serial++).toString('base64')}`);
+ const patched=code.replace("'./orbit_utc.js'",JSON.stringify(new URL('../../../user_application/web/scripts/orbit_utc.js',import.meta.url).href));
+ const {createWorkspaceSolar}=await import(`data:text/javascript;base64,${Buffer.from(patched+'\n//'+serial++).toString('base64')}`);
  let contextCallback,viewCallback,factory,owned;const events=new Map(),instances=[],writes=[];
  const globe={observeDisplayContext(fn){contextCallback=fn;fn(null);return()=>{contextCallback=null;};},observeView(fn){viewCallback=fn;fn({choice:{theme:'dark'}});return()=>{viewCallback=null;};},bindSolarRenderer(fn){factory=fn;return()=>{owned?.destroy();factory=null;};}};
  const host={localStorage:{getItem:()=> 'off',setItem:(...v)=>writes.push(v)},addEventListener(k,fn){events.set(k,fn);},removeEventListener(k){events.delete(k);},dispatchEvent(event){events.get(event.type)?.(event);},CustomEvent:class{constructor(type,options){this.type=type;Object.assign(this,options);}}};
+ let tick,cleared=false;host.now=()=>new Date('2026-10-08T03:00:00Z');host.setInterval=fn=>(tick=fn,1);host.clearInterval=()=>{cleared=true;};
  const api={solarSamples:()=>new Promise(()=>{})};
  const c=createWorkspaceSolar({api,globe,overlay:{},host,createDisplay:(C,viewer,overlay,options)=>{const d={updates:[],styles:[],update(v){this.updates.push(v);options.onStatus({phase:v?'ready':'unavailable',indicator:'offscreen',reason:null});},clear(reason){this.updates.push(null);options.onStatus({phase:'unavailable',reason,indicator:'unavailable'});},setStyle(...v){this.styles.push(v);},destroy(){this.destroyed=true;}};instances.push(d);return d;}});
- return{c,api,host,events,instances,writes,context(v){contextCallback?.(v);},view(v){viewCallback?.({choice:{theme:v}});},boot(){owned=factory({},{});return instances.at(-1);},connected:()=>Boolean(contextCallback||viewCallback||factory)};
+ return{c,api,host,events,instances,writes,tick:()=>tick?.(),cleared:()=>cleared,context(v){contextCallback?.(v);},view(v){viewCallback?.({choice:{theme:v}});},boot(){owned=factory({},{});return instances.at(-1);},connected:()=>Boolean(contextCallback||viewCallback||factory)};
 }
 test('original preference/event policy reapplies theme, mirrors storage, tolerates denied storage and disposes',async()=>{
  const f=await fixture(),d=f.boot();assert.equal(f.c.state().enabled,false);assert.deepEqual(d.styles.at(-1),['dark',false]);f.c.setEnabled(true);assert.deepEqual(f.writes.at(-1),['spacetwin-globe-lighting-v1','on']);f.view('light');assert.deepEqual(d.styles.at(-1),['light',true]);
  f.events.get('storage')({key:'spacetwin-globe-lighting-v1',newValue:'off'});assert.equal(f.c.state().enabled,false);f.events.get('spacetwin:globelighting')({detail:{enabled:true}});assert.equal(f.c.state().enabled,true);const count=f.writes.length;f.events.get('spacetwin:globelighting')({detail:{enabled:'false'}});assert.equal(f.c.state().enabled,true);assert.equal(f.writes.length,count);
  Object.defineProperty(f.host,'localStorage',{get(){throw Error('denied');}});f.c.setEnabled(false);assert.equal(f.c.state().enabled,false);const states=[];const remove=f.c.observe(v=>states.push(v));remove();f.c.destroy();assert.equal(f.events.size,0);assert.equal(f.connected(),false);assert.equal(d.destroyed,true);const n=states.length;f.c.setEnabled(true);f.view('dark');assert.equal(states.length,n);
 });
-test('missing display owner stays unlit, failed query reports error without globe commands and retry is explicit',async()=>{
- const f=await fixture(),d=f.boot();assert.equal(f.c.state().context,null);assert.equal(d.updates.at(-1),null);f.context(null);assert.equal(f.c.state().timeline.status,'unavailable');f.c.retry();assert.equal(f.c.state().timeline.pending,false);f.c.destroy();
+test('unselected Earth uses current UTC; selected geometry takes priority and cleanup stops the clock',async()=>{
+ const f=await fixture();assert.equal(f.c.state().context.key,'earth:current');assert.equal(f.c.state().context.utc,'2026-10-08T03:00:00.000000000Z');
+ const selected={key:'stored:one',utc:'2020-07-12T21:16:01.000416000Z',leap_sha256:LEAP_SHA256};f.context(selected);f.tick();assert.equal(f.c.state().context.utc,selected.utc);
+ f.context(null);assert.equal(f.c.state().context.key,'earth:current');f.c.destroy();assert.equal(f.cleared(),true);f.tick();
 });
 
 test('actual timeline assembly follows injected UTC, reports copied quality, failure and explicit recovery',async()=>{

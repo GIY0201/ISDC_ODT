@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fixture} from './workspace_fixture.mjs';
 
-function inside(f,width,height){const rect=f.get('work-window').getBoundingClientRect();assert.ok(rect.left>=80,'left controls remain past rail');assert.ok(rect.top>=116,'title remains below app header');assert.ok(rect.right<=width-8,`right ${rect.right} <= ${width-8}`);assert.ok(rect.bottom<=height-29,`bottom ${rect.bottom} <= ${height-29}`);}
+function inside(f,width,height){const rect=f.get('work-window').getBoundingClientRect();assert.ok(rect.left>=80,'left controls remain past rail');assert.ok(rect.top>=f.get('desktop').getBoundingClientRect().top+4,'title remains below app header');assert.ok(rect.right<=width-8,`right ${rect.right} <= ${width-8}`);assert.ok(rect.bottom<=height-29,`bottom ${rect.bottom} <= ${height-29}`);}
 const key=(f,id,name,shiftKey=false)=>f.get(id).dispatch('keydown',{key:name,shiftKey});
 
 for(const [width,height] of [[1280,720],[1920,1080]]){
@@ -19,3 +19,5 @@ test('real page exit releases document subscriptions and renderer exactly once; 
 test('page exit also detaches an unfinished pointer gesture',async()=>{const f=fixture();try{const title=f.get('window-titlebar');await title.dispatch('pointerdown',{button:0,pointerId:7,clientX:200,clientY:160});await f.win.dispatch('pagehide',{persisted:false});assert.equal(title.listeners.get('pointermove')?.size,0);assert.equal(title.listeners.get('pointerup')?.size,0);assert.equal(title.listeners.get('pointercancel')?.size,0);assert.equal(title.capture,null);}finally{f.dispose();}});
 
 test('orbit assembly disposes request client only on final page exit',async()=>{const f=fixture();try{await f.win.dispatch('pagehide',{persisted:true});assert.equal(f.counts().clientDestroyed,0);await f.win.dispatch('pagehide',{persisted:false});await f.win.dispatch('pagehide',{persisted:false});assert.equal(f.counts().clientDestroyed,1);}finally{f.dispose();}});
+
+test('moving upward reaches the real desktop edge without an empty reserved strip',async()=>{const f=fixture(1280,720);try{const field=f.get('ground-height');field.value='321';const before=f.counts();for(let i=0;i<100;i++)await key(f,'window-title','ArrowUp',true);assert.equal(f.get('work-window').getBoundingClientRect().top,f.get('desktop').getBoundingClientRect().top+4);assert.equal(field.value,'321');assert.deepEqual(f.counts(),before);}finally{f.dispose();}});

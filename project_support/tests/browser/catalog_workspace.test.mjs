@@ -40,3 +40,13 @@ test('empty/demo/unavailable and explicit source preserved, copies immutable',as
  for(const source of ['demo-fallback','upstream-unavailable','celestrak-stale']){
  const c=createCatalogWorkspace({satelliteGroups:async()=>groups,satellites:async p=>page(p,{source,items:[],count:0,filtered_total:0,total:0,warning:'offline',stale:true})});await c.load();const s=c.snapshot();assert.equal(s.result.source,source);if(source==='upstream-unavailable')assert.equal(s.status,'원본 조회 불가');s.draft.query='mutated';assert.equal(c.snapshot().draft.query,'');c.destroy();}
 });
+
+test('dismiss selection cancels late profile and preserves catalogue results and filters',async()=>{
+ const d=deferred(),events=[];const c=createCatalogWorkspace({satelliteGroups:async()=>groups,satellites:async p=>page(p),satelliteProfile:()=>d.promise});c.observeSelection(x=>events.push(x));
+ await c.load();const work=c.select(25544);const before=c.snapshot();c.clearSelection();assert.equal(c.snapshot().selected,null);assert.deepEqual(c.snapshot().result,before.result);assert.deepEqual(c.snapshot().applied,before.applied);
+ const count=events.length;d.resolve({catalog:item});await work;assert.equal(events.length,count);assert.equal(c.snapshot().profile,null);c.destroy();
+});
+
+test('validated scene selection uses its own native group without editing list filters',async()=>{
+ const calls=[];const c=createCatalogWorkspace({satelliteGroups:async()=>groups,satellites:async p=>page(p),satelliteProfile:async number=>({source:'gp-cache',catalog:{NORAD_CAT_ID:number},gp:null})},()=>{},{select:(...args)=>calls.push(args)});await c.load();c.edit('query','draft');const before=c.snapshot();await c.selectScene({status:'valid',catalog_number:2,name:'scene',epoch_utc:'2026-10-08T00:00:00Z',position_m:[1,2,3]},{group:'active',query:'',orbit:'all',utc:'2026-10-08T01:00:00Z'});assert.equal(c.snapshot().selected,2);assert.deepEqual(c.snapshot().draft,before.draft);assert.deepEqual(c.snapshot().applied,before.applied);assert.equal(calls[0][1],'active');assert.equal(calls[0][2].utc,'2026-10-08T01:00:00Z');c.destroy();
+});

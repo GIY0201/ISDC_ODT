@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:3888fe7979fb739e0edc60b2abf23e4a83e01a736bcbb147cbd1dd5bc4c51463",
+  "claims": [
+    {
+      "id": "claim_f0d5fccf33744df1bfe197f686f18ecd",
+      "statement": "U035~U036은 모델 표현을 선택 위성 카드, 궤적 ON/OFF를 지도, 전체 위성 표시를 공용 지구 설정에 두며 카탈로그 통과를 등록 지상국 조건으로 지상국 화면에서 조회한다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/docs/validation/u035_display_controls.md",
+          "version": "repo-file-v1:sha256:ada3efd35e5684e3f9587d9bbcd1bf52a37a0b8d01239e24ac669ddf690570f0"
+        },
+        {
+          "resource": "repo://user_application/web/scripts/tabs/catalog_passes.js",
+          "version": "repo-file-v1:sha256:dbe8622f1cb71ce66370b81a3c965aef6bbb8e3a6f1c952191c15b17403994ae"
+        },
+        {
+          "resource": "repo://user_application/web/scripts/workspace_orbit.js",
+          "version": "repo-file-v1:sha256:1efe6f1ce4d3e996a0ceb7ecd8a0aa259f900bf3c563989c91dbaecb16c8a48d"
+        }
+      ]
+    },
+    {
+      "id": "claim_8d5f3bbe73564b64b9af6132b8ce8f55",
+      "statement": "전체 위성 시간 결합은 분석 스냅샷 UTC와 표시 UTC 및 현재 출처를 구분해 검증한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/catalogue_scene_time_binding.js",
+          "version": "repo-file-v1:sha256:e4509fb626287680d65c1632742cfa2b7d6df33ba412a010defae321b37a8594"
+        }
+      ]
+    },
+    {
+      "id": "claim_0b8260384f8f42ef95c7f1e09814b641",
+      "statement": "지상국 및 통신에는 RF, 가시성, 노드 망과 원본 통신 모듈 패널을 조립한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/tabs/ground_network.js",
+          "version": "repo-file-v1:sha256:4359c0a87c6b06922d34e8184c7ac1273bf581bb19009d54117b9fbcf2c5684d"
+        },
+        {
+          "resource": "repo://user_application/web/scripts/workspace_orbit.js",
+          "version": "repo-file-v1:sha256:1efe6f1ce4d3e996a0ceb7ecd8a0aa259f900bf3c563989c91dbaecb16c8a48d"
+        }
+      ]
+    },
+    {
+      "id": "claim_838cfea8dd7e4dee9df34744546bc631",
+      "statement": "UI 수정 검토 기록은 EOP 자료 기간 오류와 갱신 미완료를 구분하고 계산 유효기간 검사를 유지한다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/docs/validation/ui_request_completion_review.md",
+          "version": "repo-file-v1:sha256:7c1e399a7b38aba9582fd190208cf1ebef8c20ac44924b1eb056cbc5d55f2d9d"
+        }
+      ]
+    },
+    {
+      "id": "claim_83511188bb514d8aad47bf499bb54737",
+      "statement": "U018 UI 검토는 관제의 중앙 지구와 좌우 운용 요약, DT의 중앙 모듈 SVG와 좌우 시나리오·결과 패널 구성을 기록한다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/docs/validation/ui_request_completion_review.md",
+          "version": "repo-file-v1:sha256:7c1e399a7b38aba9582fd190208cf1ebef8c20ac44924b1eb056cbc5d55f2d9d"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-08T08:27:37.110Z"
+  }
+}

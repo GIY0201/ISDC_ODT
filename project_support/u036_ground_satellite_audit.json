@@ -1,0 +1,1046 @@
+[
+  {
+    "label": "ground/지상국과 통신망",
+    "initial": [
+      {
+        "bottom": 596.625,
+        "cls": "body",
+        "h": 307,
+        "id": "",
+        "top": 0,
+        "total": 1879,
+        "w": 744,
+        "x": 122.390625,
+        "y": 289.5
+      }
+    ],
+    "steps": [
+      {
+        "region": "body",
+        "top": 0,
+        "total": 1879,
+        "h": 307
+      },
+      {
+        "region": "body",
+        "top": 576,
+        "total": 1879,
+        "h": 307
+      },
+      {
+        "region": "body",
+        "top": 1152,
+        "total": 1879,
+        "h": 307
+      },
+      {
+        "region": "body",
+        "top": 1571,
+        "total": 1879,
+        "h": 307
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic: UTC\n- time: 05:47:52\n- generic: 2026-10-08\n- generic: KST\n- time: 14:47:52\n- generic: 2026-10-08\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국과 통신망\" [pressed]\n    - button \"선택 위성의 지상국 가시 시간\"\n    - button \"가시 구간 거리, 도플러 변화\"\n    - button \"통신 경로, 접촉 계획\"\n    - button \"RF 링크 계산\"\n    - button \"가상 지점, 가시 구간\"\n    - button \"지상국 및 통신\"\n  - main [active]:\n    - status: 서버 DB 저장 완료\n    - strong: 한반도 지상국\n    - generic: 지점을 선택하거나 새 위치를 지정하세요\n    - generic \"한반도 지상국 위치 선택 지도\":\n      - button \"대전 상태 보기\":\n        - generic: ●\n        - generic: 대전\n      - button \"제주 상태 보기\":\n        - generic: ●\n        - generic: 제주\n      - button \"서울 상태 보기\":\n        - generic: ●\n        - generic: 서울\n      - link \"© OpenStreetMap contributors\":\n        - /url: https://www.openstreetmap.org/copyright\n    - status\n    - complementary:\n      - heading \"한반도 지도 내 지상국\" [level=3]\n      - button \"대전 사용\":\n        - generic: 대전\n        - generic: 사용\n      - button \"제주 사용\":\n        - generic: 제주\n        - generic: 사용\n      - button \"서울 사용\" [pressed]:\n        - generic: 서울\n        - generic: 사용\n      - generic \"해외 지상국\"\n      - heading \"서울\" [level=3]\n      - generic: 통신망 사용\n      - generic: 위도\n      - generic: 37.5717°\n      - generic: 경도\n      - generic: 126.9734°\n      - generic: 안테나\n      - generic: 7.3 m\n      - generic: 최소 고각\n      - generic: 5°\n      - generic: 실제 연결\n      - generic: 미확인\n      - generic: 지원 대역\n      - generic: S / X / Ka\n      - button \"선택 지상국 설정\"\n      - button \"이 지상국 사용 안 함\"\n      - heading \"새 가상 지상국\" [level=3]\n      - button \"지도에서 위치 지정\"\n      - text: 위도 °\n      - spinbutton \"위도 °\": \"36.5\"\n      - text: 경도 °\n      - spinbutton \"경도 °\": \"127.5\"\n      - button \"좌표로 후보 위치 확인\"\n      - status: 후보 위치를 지정하세요.\n      - button \"선택 위치에 가상 지상국 추가\" [disabled]\n    - generic \"공개 지상국 목록에서 선택\"\n    - option \"모든 지역\" [selected]\n    - option \"대한민국\"\n    - option \"아시아, 오세아니아\"\n    - option \"유럽, 아프리카\"\n    - option \"북미, 남미\"\n    - option \"극지\"\n    - option \"지상국 선택\" [selected]\n    - option \"금산\"\n    - option \"대전\"\n    - option \"서울\"\n    - option \"제주\"\n    - option \"뉴노샤\"\n    - option \"동가라\"\n    - option \"비얄랄루\"\n    - option \"싱가포르\"\n    - option \"우스다\"\n    - option \"캔버라\"\n    - option \"하와이\"\n    - option \"호바트\"\n    - option \"마드리드\"\n    - option \"마스팔로마스\"\n    - option \"바일하임\"\n    - option \"키루나\"\n    - option \"하르테비스훅\"\n    - option \"골드스톤\"\n    - option \"말라르궤\"\n    - option \"아타카마\"\n    - option \"월롭스\"\n    - option \"쿠루\"\n    - option \"페어뱅크스\"\n    - option \"푼타아레나스\"\n    - option \"맥머도\"\n    - option \"스발바르\"\n    - option \"이누빅\"\n    - option \"트롤\"\n    - option \"트롬쇠\"\n    - heading \"시험 통신망 지상국 구성\" [level=3]\n    - button \"시험 통신망 지상국 구성 설명 보기\": i\n    - text: 추가 지상국\n    - combobox \"추가 지상국\":\n      - option \"서울, 대한민국\" [selected]\n      - option \"트롬쇠, 노르웨이\"\n      - option \"페어뱅크스, 미국 알래스카\"\n      - option \"이누빅, 캐나다\"\n      - option \"싱가포르, 싱가포르\"\n      - option \"하와이, 미국\"\n      - option \"아타카마, 칠레\"\n      - option \"푼타아레나스, 칠레\"\n      - option \"호바트, 호주\"\n      - option \"직접 입력 (위도, 경도)\"\n    - button \"지상국 추가\"\n    - text: 편집 지상국\n    - combobox \"편집 지상국\":\n      - option \"지상국 선택\"\n      - option \"대전, 사용, 36.3742°/127.3567°, 5°\"\n      - option \"제주, 사용, 33.4996°/126.5312°, 5°\"\n      - option \"스발바르, 사용, 78.2298°/15.4078°, 3°\"\n      - option \"서울, 사용, 37.5717°/126.9734°, 5°\" [selected]\n    - button \"선택 지상국 편집\"\n    - button \"저장 설정 다시 불러오기\"\n    - button \"기본 지상국으로 초기화\"\n    - status: 지상국 4개, 저장 구성\n    - button \"모의실험 상태 조회 후 노드 통신망 계산\"\n    - status: 모의실험 상태 미확인\n    - heading \"배치 위성의 미래 지상국 통과, 모의실험\" [level=3]\n    - button \"배치 위성의 미래 지상국 통과, 모의실험 설명 보기\": i\n    - text: 표시 지상국\n    - combobox \"표시 지상국\":\n      - option \"대전\" [selected]\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"서울\"\n    - button \"앞으로 3시간 native 통과 조회\"\n    - button \"조회 취소\" [disabled]\n    - status: 명시적 조회 전 통과 결과 미확인\n    - button \"이전 통과\" [disabled]\n    - button \"다음 통과\" [disabled]\n    - button \"지상 링크 3D\" [disabled] [pressed]\n    - button \"대표 고도 마스크 커버리지 3D, 모의실험\" [disabled] [pressed]\n    - generic \"시험 통신망 연결 계산 상세\"\n    - heading \"배치 위성의 앞으로 3시간 통과\" [level=3]\n    - button \"배치 위성의 앞으로 3시간 통과 설명 보기\": i\n    - text: 통과 지상국\n    - combobox \"통과 지상국\":\n      - option \"대전\" [selected]\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"서울\"\n    - button \"통과 새로고침\"\n    - status: 통과 결과 미확인, 실제 RF 미확인\n    - button \"선택 지상국 초점\" [disabled]\n    - heading \"모의 통신 경로와 DTN\" [level=3]\n    - button \"모의 통신 경로와 DTN 설명 보기\": i\n    - button \"계산된 통신망 전송\" [disabled]\n    - button \"모듈 상태 조회\"\n    - status: 현재 통신망 미전송, 통신 결과 미확인\n    - text: 출발 노드\n    - combobox \"출발 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 목적 노드\n    - combobox \"목적 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 경로 목적\n    - combobox \"경로 목적\":\n      - option \"균형\" [selected]\n      - option \"지연 최소\"\n      - option \"신뢰도\"\n    - button \"경로 조회\" [disabled]\n    - paragraph: 현재 통신망의 DTN 결과 미확인\n    - paragraph: 현재 통신망의 경로 결과 미확인\n    - heading \"주기 통신 모듈 결과\" [level=4]\n    - paragraph: 주기 통신 결과 미확인\n    - generic \"통신 모듈 조회 정보\"\n    - status: 과거 모의 링크 품질 미확인, 검증된 통신망 결과 없음\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "ground/지상국과 통신망/full-overlap",
+    "initial": [
+      {
+        "bottom": 795.625,
+        "cls": "body",
+        "h": 595,
+        "id": "",
+        "top": 1284,
+        "total": 1879,
+        "w": 967,
+        "x": 83,
+        "y": 200.5
+      }
+    ],
+    "steps": [
+      {
+        "region": "body",
+        "top": 0,
+        "total": 1879,
+        "h": 595
+      },
+      {
+        "region": "body",
+        "top": 446,
+        "total": 1879,
+        "h": 595
+      },
+      {
+        "region": "body",
+        "top": 893,
+        "total": 1879,
+        "h": 595
+      },
+      {
+        "region": "body",
+        "top": 1283,
+        "total": 1879,
+        "h": 595
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\" [active]: 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국과 통신망\" [pressed]\n    - button \"선택 위성의 지상국 가시 시간\"\n    - button \"가시 구간 거리, 도플러 변화\"\n    - button \"통신 경로, 접촉 계획\"\n    - button \"RF 링크 계산\"\n    - button \"가상 지점, 가시 구간\"\n    - button \"지상국 및 통신\"\n  - main:\n    - status: 서버 DB 저장 완료\n    - strong: 한반도 지상국\n    - generic: 지점을 선택하거나 새 위치를 지정하세요\n    - generic \"한반도 지상국 위치 선택 지도\":\n      - button \"대전 상태 보기\":\n        - generic: ●\n        - generic: 대전\n      - button \"제주 상태 보기\":\n        - generic: ●\n        - generic: 제주\n      - button \"서울 상태 보기\":\n        - generic: ●\n        - generic: 서울\n      - link \"© OpenStreetMap contributors\":\n        - /url: https://www.openstreetmap.org/copyright\n    - status\n    - complementary:\n      - heading \"한반도 지도 내 지상국\" [level=3]\n      - button \"대전 사용\":\n        - generic: 대전\n        - generic: 사용\n      - button \"제주 사용\":\n        - generic: 제주\n        - generic: 사용\n      - button \"서울 사용\" [pressed]:\n        - generic: 서울\n        - generic: 사용\n      - generic \"해외 지상국\"\n      - heading \"서울\" [level=3]\n      - generic: 통신망 사용\n      - generic: 위도\n      - generic: 37.5717°\n      - generic: 경도\n      - generic: 126.9734°\n      - generic: 안테나\n      - generic: 7.3 m\n      - generic: 최소 고각\n      - generic: 5°\n      - generic: 실제 연결\n      - generic: 미확인\n      - generic: 지원 대역\n      - generic: S / X / Ka\n      - button \"선택 지상국 설정\"\n      - button \"이 지상국 사용 안 함\"\n      - heading \"새 가상 지상국\" [level=3]\n      - button \"지도에서 위치 지정\"\n      - text: 위도 °\n      - spinbutton \"위도 °\": \"36.5\"\n      - text: 경도 °\n      - spinbutton \"경도 °\": \"127.5\"\n      - button \"좌표로 후보 위치 확인\"\n      - status: 후보 위치를 지정하세요.\n      - button \"선택 위치에 가상 지상국 추가\" [disabled]\n    - generic \"공개 지상국 목록에서 선택\"\n    - option \"모든 지역\" [selected]\n    - option \"대한민국\"\n    - option \"아시아, 오세아니아\"\n    - option \"유럽, 아프리카\"\n    - option \"북미, 남미\"\n    - option \"극지\"\n    - option \"지상국 선택\" [selected]\n    - option \"금산\"\n    - option \"대전\"\n    - option \"서울\"\n    - option \"제주\"\n    - option \"뉴노샤\"\n    - option \"동가라\"\n    - option \"비얄랄루\"\n    - option \"싱가포르\"\n    - option \"우스다\"\n    - option \"캔버라\"\n    - option \"하와이\"\n    - option \"호바트\"\n    - option \"마드리드\"\n    - option \"마스팔로마스\"\n    - option \"바일하임\"\n    - option \"키루나\"\n    - option \"하르테비스훅\"\n    - option \"골드스톤\"\n    - option \"말라르궤\"\n    - option \"아타카마\"\n    - option \"월롭스\"\n    - option \"쿠루\"\n    - option \"페어뱅크스\"\n    - option \"푼타아레나스\"\n    - option \"맥머도\"\n    - option \"스발바르\"\n    - option \"이누빅\"\n    - option \"트롤\"\n    - option \"트롬쇠\"\n    - heading \"시험 통신망 지상국 구성\" [level=3]\n    - button \"시험 통신망 지상국 구성 설명 보기\": i\n    - text: 추가 지상국\n    - combobox \"추가 지상국\":\n      - option \"서울, 대한민국\" [selected]\n      - option \"트롬쇠, 노르웨이\"\n      - option \"페어뱅크스, 미국 알래스카\"\n      - option \"이누빅, 캐나다\"\n      - option \"싱가포르, 싱가포르\"\n      - option \"하와이, 미국\"\n      - option \"아타카마, 칠레\"\n      - option \"푼타아레나스, 칠레\"\n      - option \"호바트, 호주\"\n      - option \"직접 입력 (위도, 경도)\"\n    - button \"지상국 추가\"\n    - text: 편집 지상국\n    - combobox \"편집 지상국\":\n      - option \"지상국 선택\"\n      - option \"대전, 사용, 36.3742°/127.3567°, 5°\"\n      - option \"제주, 사용, 33.4996°/126.5312°, 5°\"\n      - option \"스발바르, 사용, 78.2298°/15.4078°, 3°\"\n      - option \"서울, 사용, 37.5717°/126.9734°, 5°\" [selected]\n    - button \"선택 지상국 편집\"\n    - button \"저장 설정 다시 불러오기\"\n    - button \"기본 지상국으로 초기화\"\n    - status: 지상국 4개, 저장 구성\n    - button \"모의실험 상태 조회 후 노드 통신망 계산\"\n    - status: 모의실험 상태 미확인\n    - heading \"배치 위성의 미래 지상국 통과, 모의실험\" [level=3]\n    - button \"배치 위성의 미래 지상국 통과, 모의실험 설명 보기\": i\n    - text: 표시 지상국\n    - combobox \"표시 지상국\":\n      - option \"대전\" [selected]\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"서울\"\n    - button \"앞으로 3시간 native 통과 조회\"\n    - button \"조회 취소\" [disabled]\n    - status: 명시적 조회 전 통과 결과 미확인\n    - button \"이전 통과\" [disabled]\n    - button \"다음 통과\" [disabled]\n    - button \"지상 링크 3D\" [disabled] [pressed]\n    - button \"대표 고도 마스크 커버리지 3D, 모의실험\" [disabled] [pressed]\n    - generic \"시험 통신망 연결 계산 상세\"\n    - heading \"배치 위성의 앞으로 3시간 통과\" [level=3]\n    - button \"배치 위성의 앞으로 3시간 통과 설명 보기\": i\n    - text: 통과 지상국\n    - combobox \"통과 지상국\":\n      - option \"대전\" [selected]\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"서울\"\n    - button \"통과 새로고침\"\n    - status: 통과 결과 미확인, 실제 RF 미확인\n    - button \"선택 지상국 초점\" [disabled]\n    - heading \"모의 통신 경로와 DTN\" [level=3]\n    - button \"모의 통신 경로와 DTN 설명 보기\": i\n    - button \"계산된 통신망 전송\" [disabled]\n    - button \"모듈 상태 조회\"\n    - status: 현재 통신망 미전송, 통신 결과 미확인\n    - text: 출발 노드\n    - combobox \"출발 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 목적 노드\n    - combobox \"목적 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 경로 목적\n    - combobox \"경로 목적\":\n      - option \"균형\" [selected]\n      - option \"지연 최소\"\n      - option \"신뢰도\"\n    - button \"경로 조회\" [disabled]\n    - paragraph: 현재 통신망의 DTN 결과 미확인\n    - paragraph: 현재 통신망의 경로 결과 미확인\n    - heading \"주기 통신 모듈 결과\" [level=4]\n    - paragraph: 주기 통신 결과 미확인\n    - generic \"통신 모듈 조회 정보\"\n    - status: 과거 모의 링크 품질 미확인, 검증된 통신망 결과 없음"
+  },
+  {
+    "label": "ground/선택 위성의 지상국 가시 시간",
+    "initial": [],
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국과 통신망\"\n    - button \"선택 위성의 지상국 가시 시간\" [pressed]\n    - button \"가시 구간 거리, 도플러 변화\"\n    - button \"통신 경로, 접촉 계획\"\n    - button \"RF 링크 계산\"\n    - button \"가상 지점, 가시 구간\"\n    - button \"지상국 및 통신\"\n  - main:\n    - heading \"선택 위성의 지상국 가시 시간\" [level=2]\n    - button \"선택 위성의 지상국 가시 시간 설명 보기\": i\n    - text: 관측 지상국\n    - combobox \"관측 지상국\":\n      - option \"지상국 선택\" [selected]\n      - option \"대전\"\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"서울\"\n    - button \"앞으로 24시간 가시 시간 조회\" [disabled]\n    - status: 선택 위성과 관측 조건을 적용한 뒤 명시적으로 조회하세요."
+  },
+  {
+    "label": "ground/가시 구간 거리, 도플러 변화",
+    "initial": [],
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국과 통신망\"\n    - button \"선택 위성의 지상국 가시 시간\"\n    - button \"가시 구간 거리, 도플러 변화\" [active] [pressed]\n    - button \"통신 경로, 접촉 계획\"\n    - button \"RF 링크 계산\"\n    - button \"가상 지점, 가시 구간\"\n    - button \"지상국 및 통신\"\n  - main:\n    - heading \"가시 구간 거리, 도플러 변화\" [level=2]\n    - button \"가시 구간 거리, 도플러 변화 설명 보기\": i\n    - paragraph: 선택한 가시 구간 없음\n    - text: 구간 송신 주파수 MHz\n    - spinbutton \"구간 송신 주파수 MHz\"\n    - button \"구간용 ISS 공식 주파수 불러오기\"\n    - button \"구간 입력에 공식 주파수 적용\" [disabled]\n    - paragraph: 주파수 미확인\n    - button \"구간 거리, 도플러 계산\" [disabled]\n    - button \"구간 계산 취소\"\n    - status: 구간과 주파수를 확인하세요."
+  },
+  {
+    "label": "ground/통신 경로, 접촉 계획",
+    "initial": [],
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국과 통신망\"\n    - button \"선택 위성의 지상국 가시 시간\"\n    - button \"가시 구간 거리, 도플러 변화\"\n    - button \"통신 경로, 접촉 계획\" [pressed]\n    - button \"RF 링크 계산\"\n    - button \"가상 지점, 가시 구간\"\n    - button \"지상국 및 통신\"\n  - main:\n    - heading \"통신 경로, 접촉 계획\" [level=2]\n    - button \"통신 경로, 접촉 계획 설명 보기\": i\n    - button \"시나리오 통신망 불러오기\"\n    - button \"망 조회 취소\"\n    - status: 망 조회 대기\n    - paragraph\n    - text: 출발 노드\n    - combobox \"출발 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 도착 노드\n    - combobox \"도착 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 경로 목적\n    - combobox \"경로 목적\":\n      - option \"균형\" [selected]\n      - option \"예시 지연\"\n      - option \"예시 신뢰도\"\n    - text: 일정 생성 시간 h\n    - spinbutton \"일정 생성 시간 h\": \"12\"\n    - button \"시나리오 경로 조회\"\n    - button \"경로 조회 취소\"\n    - status: 입력 후 조회하세요. 변경 시 다시 조회합니다.\n    - button \"접촉 일정 조회\"\n    - button \"일정 조회 취소\"\n    - status: 입력 후 조회하세요. 변경 시 다시 조회합니다."
+  },
+  {
+    "label": "ground/RF 링크 계산",
+    "initial": [
+      {
+        "bottom": 877,
+        "cls": "body",
+        "h": 631,
+        "id": "",
+        "top": 0,
+        "total": 780,
+        "w": 967,
+        "x": 83,
+        "y": 246.5
+      }
+    ],
+    "steps": [
+      {
+        "region": "body",
+        "top": 0,
+        "total": 780,
+        "h": 631
+      },
+      {
+        "region": "body",
+        "top": 149,
+        "total": 780,
+        "h": 631
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국과 통신망\"\n    - button \"선택 위성의 지상국 가시 시간\"\n    - button \"가시 구간 거리, 도플러 변화\"\n    - button \"통신 경로, 접촉 계획\"\n    - button \"RF 링크 계산\" [active] [pressed]\n    - button \"가상 지점, 가시 구간\"\n    - button \"지상국 및 통신\"\n  - main:\n    - heading \"RF 링크 계산\" [level=2]\n    - button \"RF 링크 계산 설명 보기\": i\n    - button \"ISS 공식 조건 불러오기\"\n    - button \"공식 주파수 적용\" [disabled]\n    - status:\n      - paragraph: ISS APRS 수신, 장비 미선정, 실제 통신 미확인. 공식 공지 조건을 불러온 뒤 주파수만 적용할 수 있습니다.\n    - status\n    - text: 링크 이름\n    - textbox \"링크 이름 미확인\"\n    - generic: 미확인\n    - text: 주파수 GHz\n    - spinbutton \"주파수 GHz 미확인\"\n    - generic: 미확인\n    - text: 거리 km\n    - spinbutton \"거리 km 미확인\"\n    - generic: 미확인\n    - text: 송신 전력 W\n    - spinbutton \"송신 전력 W 미확인\"\n    - generic: 미확인\n    - text: 송신 이득 dBi\n    - spinbutton \"송신 이득 dBi 미확인\"\n    - generic: 미확인\n    - text: 수신 이득 dBi\n    - spinbutton \"수신 이득 dBi 미확인\"\n    - generic: 미확인\n    - text: 기타 손실 dB\n    - spinbutton \"기타 손실 dB 미확인\"\n    - generic: 미확인\n    - text: 대역폭 MHz\n    - spinbutton \"대역폭 MHz 미확인\"\n    - generic: 미확인\n    - text: 데이터율 Mbps\n    - spinbutton \"데이터율 Mbps 미확인\"\n    - generic: 미확인\n    - text: 시스템 잡음온도 K\n    - spinbutton \"시스템 잡음온도 K 미확인\"\n    - generic: 미확인\n    - text: 요구 Eb/N0 dB\n    - spinbutton \"요구 Eb/N0 dB 미확인\"\n    - generic: 미확인\n    - paragraph: 공식 주파수는 선택적으로 적용할 수 있습니다. 나머지는 직접 입력한 가정이며 장비 조건과 실제 수신은 미확인입니다.\n    - button \"모델 계산\"\n    - button \"조회 취소\" [disabled]\n    - status: 입력 후 계산하세요. 입력이 변경되면 재계산이 필요합니다."
+  },
+  {
+    "label": "ground/가상 지점, 가시 구간",
+    "initial": [],
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국과 통신망\"\n    - button \"선택 위성의 지상국 가시 시간\"\n    - button \"가시 구간 거리, 도플러 변화\"\n    - button \"통신 경로, 접촉 계획\"\n    - button \"RF 링크 계산\"\n    - button \"가상 지점, 가시 구간\" [active] [pressed]\n    - button \"지상국 및 통신\"\n  - main:\n    - heading \"가상 지점, 가시 구간\" [level=2]\n    - button \"가상 지점, 가시 구간 설명 보기\": i\n    - text: 저장 입력\n    - combobox \"저장 입력\":\n      - option \"입력 선택\"\n      - option \"25544 / TLE\"\n      - option \"25544 / OMM\" [selected]\n    - text: 위도 °\n    - spinbutton \"위도 °\": \"33.4996\"\n    - text: 경도 °\n    - spinbutton \"경도 °\": \"126.5312\"\n    - text: WGS84 타원체 높이 m\n    - spinbutton \"WGS84 타원체 높이 m\": \"0\"\n    - text: 최소 고도각 °\n    - spinbutton \"최소 고도각 °\": \"10\"\n    - text: 조회 시작 UTC\n    - textbox \"조회 시작 UTC\": 2020-07-12T21:16:01.000416000Z\n    - text: 조회 종료 UTC\n    - textbox \"조회 종료 UTC\": 2020-07-13T21:16:01.000416000Z\n    - button \"지점 적용, 정지\"\n    - button \"입력 epoch부터 24시간\"\n    - button \"설정 적용 후 구간 계산\"\n    - button \"조회 취소\" [disabled]\n    - status: 계산할 설정과 UTC 범위를 확인하세요."
+  },
+  {
+    "label": "ground/지상국 및 통신",
+    "initial": [],
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국과 통신망\"\n    - button \"선택 위성의 지상국 가시 시간\"\n    - button \"가시 구간 거리, 도플러 변화\"\n    - button \"통신 경로, 접촉 계획\"\n    - button \"RF 링크 계산\"\n    - button \"가상 지점, 가시 구간\"\n    - button \"지상국 및 통신\" [active] [pressed]\n  - main:\n    - heading \"지상국 및 통신\" [level=1]\n    - paragraph: SYS-05, 2026-09-23 03:18 UTC 고정 예시\n    - button \"관련 흐름\"\n    - heading \"지금 판단할 일\" [level=2]\n    - generic: GS-02의 예정 패스에서 실제 신호, 데이터를 확인할 수 있는가?\n    - generic: 실제 자료, 권한, 절차가 없어 판단은 보류합니다.\n    - button \"통합 관제 현황\"\n    - heading \"현재 자료와 업무 상태\" [level=2]\n    - generic: 계획 접촉\n    - strong: GS-02, 03:24 UTC\n    - generic: 예약\n    - strong: 원장 미연동\n    - generic: AOS/RF\n    - strong: 실측 없음\n    - generic: 전송 큐\n    - strong: D-731, 상태 없음\n    - generic: 대체국\n    - strong: GS-01, 가시 미산출\n    - generic: 시설\n    - strong: 망, 전력 계측 없음\n    - heading \"증거, 인계\" [level=2]\n    - strong: 필요한 근거\n    - generic: 안테나/RF, 예약, 가시 근거\n    - strong: 없음\n    - generic: 실제 신호 획득, 전송 로그\n    - strong: 없음\n    - generic: 수신 데이터 무결성\n    - strong: 없음\n    - paragraph:\n      - strong: 다음 인계\n      - text: 통신 → 데이터, 운용 판단 및 인계\n    - heading \"계획\" [level=2]\n    - strong: GS-02 03:24 UTC\n    - text: 접촉 계획 예시\n    - heading \"관측/실측\" [level=2]\n    - strong: 원격측정, 수신, 시험용 장비 없음\n    - heading \"DT 질문\" [level=2]\n    - generic: 가상 제주/사천 후보와 대체 접촉은?\n    - heading \"결과 확인\" [level=2]\n    - strong: 승인, 명령 수신 확인, 수신 근거 필요"
+  },
+  {
+    "label": "ground/지상국과 통신망/모든 상세 펼침",
+    "initial": [
+      {
+        "bottom": 759.9375,
+        "cls": "body",
+        "h": 559,
+        "id": "",
+        "top": 1451,
+        "total": 2347,
+        "w": 967,
+        "x": 83,
+        "y": 200.5
+      }
+    ],
+    "steps": [
+      {
+        "region": "body",
+        "top": 0,
+        "total": 2347,
+        "h": 559
+      },
+      {
+        "region": "body",
+        "top": 419,
+        "total": 2347,
+        "h": 559
+      },
+      {
+        "region": "body",
+        "top": 839,
+        "total": 2347,
+        "h": 559
+      },
+      {
+        "region": "body",
+        "top": 1258,
+        "total": 2347,
+        "h": 559
+      },
+      {
+        "region": "body",
+        "top": 1677,
+        "total": 2347,
+        "h": 559
+      },
+      {
+        "region": "body",
+        "top": 1788,
+        "total": 2347,
+        "h": 559
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국과 통신망\" [pressed]\n    - button \"선택 위성의 지상국 가시 시간\"\n    - button \"가시 구간 거리, 도플러 변화\"\n    - button \"통신 경로, 접촉 계획\"\n    - button \"RF 링크 계산\"\n    - button \"가상 지점, 가시 구간\"\n    - button \"지상국 및 통신\"\n  - main:\n    - status: 서버 DB 저장 완료\n    - strong: 한반도 지상국\n    - generic: 지점을 선택하거나 새 위치를 지정하세요\n    - generic \"한반도 지상국 위치 선택 지도\":\n      - button \"대전 상태 보기\":\n        - generic: ●\n        - generic: 대전\n      - button \"제주 상태 보기\":\n        - generic: ●\n        - generic: 제주\n      - button \"서울 상태 보기\":\n        - generic: ●\n        - generic: 서울\n      - link \"© OpenStreetMap contributors\":\n        - /url: https://www.openstreetmap.org/copyright\n    - status\n    - complementary:\n      - heading \"한반도 지도 내 지상국\" [level=3]\n      - button \"대전 사용\":\n        - generic: 대전\n        - generic: 사용\n      - button \"제주 사용\":\n        - generic: 제주\n        - generic: 사용\n      - button \"서울 사용\" [pressed]:\n        - generic: 서울\n        - generic: 사용\n      - generic \"해외 지상국\"\n      - button \"스발바르 지도 범위 밖 / 사용\":\n        - generic: 스발바르\n        - generic: 지도 범위 밖 / 사용\n      - heading \"서울\" [level=3]\n      - generic: 통신망 사용\n      - generic: 위도\n      - generic: 37.5717°\n      - generic: 경도\n      - generic: 126.9734°\n      - generic: 안테나\n      - generic: 7.3 m\n      - generic: 최소 고각\n      - generic: 5°\n      - generic: 실제 연결\n      - generic: 미확인\n      - generic: 지원 대역\n      - generic: S / X / Ka\n      - button \"선택 지상국 설정\"\n      - button \"이 지상국 사용 안 함\"\n      - heading \"새 가상 지상국\" [level=3]\n      - button \"지도에서 위치 지정\"\n      - text: 위도 °\n      - spinbutton \"위도 °\": \"36.5\"\n      - text: 경도 °\n      - spinbutton \"경도 °\": \"127.5\"\n      - button \"좌표로 후보 위치 확인\"\n      - status: 후보 위치를 지정하세요.\n      - button \"선택 위치에 가상 지상국 추가\" [disabled]\n    - generic \"공개 지상국 목록에서 선택\"\n    - heading \"지상국 목록과 지구 선택\" [level=2]\n    - paragraph: 대표 지상국 설정입니다. 실제 시설 좌표, 높이, 장비 사양과 수신 상태는 미확인입니다. 선택은 지구 표시만 바꾸며 저장 궤도와 가상 계산 지점은 유지합니다.\n    - text: 지상국 지역\n    - combobox \"지상국 지역\":\n      - option \"모든 지역\" [selected]\n      - option \"대한민국\"\n      - option \"아시아, 오세아니아\"\n      - option \"유럽, 아프리카\"\n      - option \"북미, 남미\"\n      - option \"극지\"\n    - text: 표시 지상국\n    - combobox \"표시 지상국\":\n      - option \"지상국 선택\" [selected]\n      - option \"금산\"\n      - option \"대전\"\n      - option \"서울\"\n      - option \"제주\"\n      - option \"뉴노샤\"\n      - option \"동가라\"\n      - option \"비얄랄루\"\n      - option \"싱가포르\"\n      - option \"우스다\"\n      - option \"캔버라\"\n      - option \"하와이\"\n      - option \"호바트\"\n      - option \"마드리드\"\n      - option \"마스팔로마스\"\n      - option \"바일하임\"\n      - option \"키루나\"\n      - option \"하르테비스훅\"\n      - option \"골드스톤\"\n      - option \"말라르궤\"\n      - option \"아타카마\"\n      - option \"월롭스\"\n      - option \"쿠루\"\n      - option \"페어뱅크스\"\n      - option \"푼타아레나스\"\n      - option \"맥머도\"\n      - option \"스발바르\"\n      - option \"이누빅\"\n      - option \"트롤\"\n      - option \"트롬쇠\"\n    - button \"선택 지상국으로 이동\" [disabled]\n    - button \"지상국 선택 해제\"\n    - button \"좌표, 최소각을 계산 초안에 사용\" [disabled]\n    - button \"카탈로그 관측 초안에 사용\" [disabled]\n    - status: 목록 29 / 전체 29개, 지상국 미선택, 지구의 지상국 표식으로도 선택할 수 있습니다.\n    - button \"선택 관측 기준의 24시간 구간 조회\" [disabled]\n    - status\n    - heading \"시험 통신망 지상국 구성\" [level=3]\n    - button \"시험 통신망 지상국 구성 설명 보기\": i\n    - text: 추가 지상국\n    - combobox \"추가 지상국\":\n      - option \"서울, 대한민국\" [selected]\n      - option \"트롬쇠, 노르웨이\"\n      - option \"페어뱅크스, 미국 알래스카\"\n      - option \"이누빅, 캐나다\"\n      - option \"싱가포르, 싱가포르\"\n      - option \"하와이, 미국\"\n      - option \"아타카마, 칠레\"\n      - option \"푼타아레나스, 칠레\"\n      - option \"호바트, 호주\"\n      - option \"직접 입력 (위도, 경도)\"\n    - button \"지상국 추가\"\n    - text: 편집 지상국\n    - combobox \"편집 지상국\":\n      - option \"지상국 선택\"\n      - option \"대전, 사용, 36.3742°/127.3567°, 5°\"\n      - option \"제주, 사용, 33.4996°/126.5312°, 5°\"\n      - option \"스발바르, 사용, 78.2298°/15.4078°, 3°\"\n      - option \"서울, 사용, 37.5717°/126.9734°, 5°\" [selected]\n    - button \"선택 지상국 편집\"\n    - button \"저장 설정 다시 불러오기\"\n    - button \"기본 지상국으로 초기화\"\n    - status: 지상국 4개, 저장 구성\n    - button \"모의실험 상태 조회 후 노드 통신망 계산\"\n    - status: 모의실험 상태 미확인\n    - heading \"배치 위성의 미래 지상국 통과, 모의실험\" [level=3]\n    - button \"배치 위성의 미래 지상국 통과, 모의실험 설명 보기\": i\n    - text: 표시 지상국\n    - combobox \"표시 지상국\":\n      - option \"대전\" [selected]\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"서울\"\n    - button \"앞으로 3시간 native 통과 조회\"\n    - button \"조회 취소\" [disabled]\n    - status: 명시적 조회 전 통과 결과 미확인\n    - button \"이전 통과\" [disabled]\n    - button \"다음 통과\" [disabled]\n    - button \"지상 링크 3D\" [disabled] [pressed]\n    - button \"대표 고도 마스크 커버리지 3D, 모의실험\" [disabled] [pressed]\n    - generic \"시험 통신망 연결 계산 상세\"\n    - paragraph: 현재 UTC, 입력의 연결도 미확인\n    - button \"이전 링크\" [disabled]\n    - button \"다음 링크\" [disabled]\n    - heading \"배치 위성의 앞으로 3시간 통과\" [level=3]\n    - button \"배치 위성의 앞으로 3시간 통과 설명 보기\": i\n    - text: 통과 지상국\n    - combobox \"통과 지상국\":\n      - option \"대전\" [selected]\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"서울\"\n    - button \"통과 새로고침\"\n    - status: 통과 결과 미확인, 실제 RF 미확인\n    - button \"선택 지상국 초점\" [disabled]\n    - heading \"모의 통신 경로와 DTN\" [level=3]\n    - button \"모의 통신 경로와 DTN 설명 보기\": i\n    - button \"계산된 통신망 전송\" [disabled]\n    - button \"모듈 상태 조회\"\n    - status: 현재 통신망 미전송, 통신 결과 미확인\n    - text: 출발 노드\n    - combobox \"출발 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 목적 노드\n    - combobox \"목적 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 경로 목적\n    - combobox \"경로 목적\":\n      - option \"균형\" [selected]\n      - option \"지연 최소\"\n      - option \"신뢰도\"\n    - button \"경로 조회\" [disabled]\n    - paragraph: 현재 통신망의 DTN 결과 미확인\n    - paragraph: 현재 통신망의 경로 결과 미확인\n    - heading \"주기 통신 모듈 결과\" [level=4]\n    - paragraph: 주기 통신 결과 미확인\n    - generic \"통신 모듈 조회 정보\" [active]\n    - status: 모듈 상태 조회, 2026-10-08T05:50:00.351Z, 실행 7aa30676798045749f382ba7a22237cd, 응답 번호 0, 통신망 수락과 별개\n    - status: 과거 모의 링크 품질 미확인, 검증된 통신망 결과 없음"
+  },
+  {
+    "label": "satellite/저장 궤도 입력 실제 계산",
+    "initial": [],
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"저장 궤도 입력, 실제 계산\" [pressed]\n    - button \"위성군 구성\"\n    - button \"실시간 궤도 분석과 시간 탐색\"\n    - button \"위성 카탈로그, 기존 조회\"\n    - button \"위성 거리, 도플러\"\n    - button \"위성 상태 및 궤도\"\n  - main [active]:\n    - heading \"저장 궤도 입력, 실제 계산\" [level=2]\n    - button \"저장 궤도 입력, 실제 계산 설명 보기\": i\n    - button \"재생\"\n    - button \"정지\" [disabled]\n    - text: 속도\n    - combobox \"속도\":\n      - option \"0.1×\"\n      - option \"1×\" [selected]\n      - option \"10×\"\n      - option \"60×\"\n    - text: UTC\n    - textbox \"UTC\":\n      - /placeholder: YYYY-MM-DDTHH:mm:ss.sssssssssZ\n      - text: 2020-07-12T21:16:01.000416000Z\n    - button \"UTC 적용, 정지\"\n    - button \"입력 기준 시각으로 복귀\"\n    - generic: 1초 샘플만 보간합니다. 자료 밖에서는 위치를 표시하지 않습니다.\n    - status: 준비 완료\n    - text: 저장 입력\n    - combobox \"저장 입력\":\n      - option \"입력 선택\"\n      - option \"25544 / TLE\"\n      - option \"25544 / OMM\" [selected]\n    - generic \"입력 출처, 시각, 해시 상세\"\n    - button \"현재 UTC부터 3개 샘플 계산\""
+  },
+  {
+    "label": "satellite/저장 궤도/상세",
+    "initial": [],
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"저장 궤도 입력, 실제 계산\" [pressed]\n    - button \"위성군 구성\"\n    - button \"실시간 궤도 분석과 시간 탐색\"\n    - button \"위성 카탈로그, 기존 조회\"\n    - button \"위성 거리, 도플러\"\n    - button \"위성 상태 및 궤도\"\n  - main:\n    - heading \"저장 궤도 입력, 실제 계산\" [level=2]\n    - button \"저장 궤도 입력, 실제 계산 설명 보기\": i\n    - button \"재생\"\n    - button \"정지\" [disabled]\n    - text: 속도\n    - combobox \"속도\":\n      - option \"0.1×\"\n      - option \"1×\" [selected]\n      - option \"10×\"\n      - option \"60×\"\n    - text: UTC\n    - textbox \"UTC\":\n      - /placeholder: YYYY-MM-DDTHH:mm:ss.sssssssssZ\n      - text: 2020-07-12T21:16:01.000416000Z\n    - button \"UTC 적용, 정지\"\n    - button \"입력 기준 시각으로 복귀\"\n    - generic: 1초 샘플만 보간합니다. 자료 밖에서는 위치를 표시하지 않습니다.\n    - status: 준비 완료\n    - text: 저장 입력\n    - combobox \"저장 입력\":\n      - option \"입력 선택\"\n      - option \"25544 / TLE\"\n      - option \"25544 / OMM\" [selected]\n    - generic \"입력 출처, 시각, 해시 상세\" [active]\n    - term: 출처\n    - definition: derived equivalent OMM from https://docs.rs/crate/sgp4/2.4.0/source/examples/tle_afspc.rs\n    - term: epoch UTC\n    - definition: 2020-07-12T21:16:01.000416000Z\n    - term: 보존 UTC\n    - definition: 2026-10-02T01:38:12.749553000Z\n    - term: 서버 UTC\n    - definition: 2020-07-12T21:16:01.000416000Z\n    - term: epoch 대비 경과\n    - definition: 0.000 h\n    - term: 입력 SHA256\n    - definition: 68a5776943f3a2d4513d058780c3598355a378d91295715d290f362335007b9e\n    - button \"현재 UTC부터 3개 샘플 계산\""
+  },
+  {
+    "label": "satellite/위성군 구성",
+    "initial": [
+      {
+        "bottom": 877,
+        "cls": "panel",
+        "h": 683,
+        "id": "satellite-nodes",
+        "top": 0,
+        "total": 1181,
+        "w": 967,
+        "x": 83,
+        "y": 194.5
+      },
+      {
+        "bottom": 1158.5,
+        "cls": "ns-detail",
+        "h": 695,
+        "id": "",
+        "top": 0,
+        "total": 902,
+        "w": 383,
+        "x": 652,
+        "y": 463.5
+      }
+    ],
+    "steps": [
+      {
+        "region": "satellite-nodes",
+        "top": 0,
+        "total": 1181,
+        "h": 683
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 0,
+        "total": 1181,
+        "h": 683
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 498,
+        "total": 1181,
+        "h": 683
+      },
+      {
+        "region": "ns-detail",
+        "top": 207,
+        "total": 902,
+        "h": 695
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"저장 궤도 입력, 실제 계산\"\n    - button \"위성군 구성\" [pressed]\n    - button \"실시간 궤도 분석과 시간 탐색\"\n    - button \"위성 카탈로그, 기존 조회\"\n    - button \"위성 거리, 도플러\"\n    - button \"위성 상태 및 궤도\"\n  - main:\n    - generic \"공용 지구의 내 위성 제어\":\n      - group \"지구 보기\":\n        - generic: 지구 보기\n        - button \"뷰 초기화\"\n        - button \"뷰 정렬\" [disabled]\n        - button \"궤적\" [pressed]\n        - button \"OISL 링크\" [pressed]\n        - button \"3D 모델\" [pressed]\n        - button \"햇빛 표시\" [pressed]: 햇빛\n      - group \"분석 시각\":\n        - generic: 분석 시각\n        - generic: 표시 시각 미확인\n        - time: —\n        - generic: UTC\n        - button \"−60s\" [disabled]\n        - button \"분석 시계 재생 상태 미확인\" [disabled]: ▶\n        - button \"+60s\" [disabled]\n        - combobox \"분석 배속\" [disabled]:\n          - option \"×1\" [disabled]\n          - option \"×10\" [disabled]\n          - option \"×60\" [disabled]\n          - option \"×600\" [disabled]\n        - button \"현재\" [disabled]\n      - group \"확대, 축소\":\n        - generic: 확대, 축소\n        - button \"공용 지구 확대\": +\n        - slider \"공용 지구 확대 수준\": \"70.1\"\n        - button \"공용 지구 축소\": −\n    - paragraph: 공용 지구와 표시 UTC를 사용합니다. Kepler+J2 모의 노드, 실제 통신 미확인\n    - region \"위성군 구성 도구\":\n      - heading \"위성군 구성\" [level=2]\n      - group \"배치 프리셋\":\n        - button \"단일\"\n        - button \"열차형\"\n        - button \"Walker Δ\" [pressed]\n        - button \"Walker ★\"\n      - text: 이름 접두사\n      - textbox \"이름 접두사\": ODT\n      - text: 위성 버스\n      - combobox \"버스 프리셋\":\n        - option \"평판형 통신위성 버스\"\n        - option \"소형 통신위성 버스\" [selected]\n        - option \"지구관측 소형위성\"\n        - option \"3U 큐브샛\"\n        - option \"정지궤도 중계위성\"\n      - text: OISL 연결 정책\n      - combobox \"OISL 링크 정책\":\n        - option \"앞, 뒤 + 좌, 우 (4 링크)\" [selected]\n        - option \"앞, 뒤만 (동일 궤도면)\"\n        - option \"OISL 사용 안 함\"\n      - generic: 궤도면 수\n      - slider \"궤도면 수\": \"4\"\n      - spinbutton \"궤도면 수 입력\": \"4\"\n      - emphasis: 면\n      - generic: 면당 위성 수\n      - slider \"면당 위성 수\": \"10\"\n      - spinbutton \"면당 위성 수 입력\": \"10\"\n      - emphasis: 기\n      - generic: 고도\n      - slider \"고도\": \"550\"\n      - spinbutton \"고도 입력\": \"550\"\n      - emphasis: km\n      - generic: 경사각\n      - slider \"경사각\": \"53\"\n      - spinbutton \"경사각 입력\": \"53\"\n      - emphasis: °\n      - generic: 위상 계수 F\n      - slider \"위상 계수 F\": \"1\"\n      - spinbutton \"위상 계수 F 입력\": \"1\"\n      - emphasis\n      - generic: 위성 간 위상 간격\n      - slider \"위성 간 위상 간격\" [disabled]: \"30\"\n      - spinbutton \"위성 간 위상 간격 입력\" [disabled]: \"30\"\n      - emphasis: °\n      - generic: 첫 궤도면 승교점 적경\n      - slider \"첫 궤도면 승교점 적경\": \"0\"\n      - spinbutton \"첫 궤도면 승교점 적경 입력\": \"0\"\n      - emphasis: °\n      - generic: 궤도면 분포 폭\n      - slider \"궤도면 분포 폭\": \"360\"\n      - spinbutton \"궤도면 분포 폭 입력\": \"360\"\n      - emphasis: °\n      - generic: 첫 위성 평균 근점 이각\n      - slider \"첫 위성 평균 근점 이각\": \"0\"\n      - spinbutton \"첫 위성 평균 근점 이각 입력\": \"0\"\n      - emphasis: °\n      - checkbox \"슬라이더 즉시 반영\" [checked]\n      - text: 슬라이더 즉시 반영\n      - button \"편대 생성\"\n      - button \"편대 제거\" [disabled]\n      - button \"전체 비우기\"\n      - generic: 서버 배치 revision 0, 편집 변경 있음\n      - button \"배치 완료 → 대시보드\"\n      - button \"회수\" [disabled]\n    - complementary \"내 위성과 선택 위성\":\n      - heading \"내 위성 1\" [level=2]\n      - button \"＋ 위성 추가\"\n      - paragraph: 표시 UTC 미확인, 현재 시각 통신 분석 미확인\n      - listbox \"내 위성 목록\":\n        - option \"통신 결과 미확인 NODE-0001 LEO, 550 km, i 53.0° 정상 운용\" [selected]:\n          - generic \"통신 결과 미확인\"\n          - generic: NODE-0001\n          - generic: LEO, 550 km, i 53.0°\n          - generic: 정상 운용\n      - text: 지구관측 소형위성, NODE-0001, 참조 900001\n      - heading \"NODE-0001\" [level=3]\n      - button \"NODE-0001 설명 보기\": i\n      - generic: 정상 운용\n      - generic: LEO\n      - generic: 개별 배치\n      - button \"편집\"\n      - button \"복제\"\n      - button \"뷰 정렬\" [disabled]\n      - button \"삭제\"\n      - figure \"Earth Observing-1 사용자 지정 모델, 대표 치수 7.0 m\":\n        - img \"NASA 3D Resources 렌더링 · Earth Observing-1 (EO-1)\"\n        - generic: Earth Observing-1\n        - generic: 사용자 지정 모델, 대표 치수 7.0 m\n      - heading \"궤도 Kepler + J2, 정의 2026-10-07 11:41 UTC\" [level=4]:\n        - text: 궤도\n        - generic: Kepler + J2, 정의 2026-10-07 11:41 UTC\n      - term: 평균 고도\n      - definition: 550.0 km\n      - term: 이심률 / 경사각\n      - definition: 0.0000 / 53.00°\n      - term: 승교점 적경 (현재)\n      - definition: —°\n      - term: 근지점 편각 (현재)\n      - definition: —°\n      - term: 평균 근점 이각 (현재)\n      - definition: —°\n      - term: 주기\n      - definition: 95.65 min\n      - term: 승교점 이동률\n      - definition: \"-4.489°/일\"\n      - term: 근지점 / 원지점\n      - definition: 550 / 550 km\n      - term: 위도 / 경도\n      - definition: —° / —°\n      - term: 타원체 고도\n      - definition: — km\n      - term: 속력 (관성계)\n      - definition: — km/s\n      - term: 태양 조건\n      - definition: 위치 계산 미확인\n      - heading \"전력 순간 수지, 배터리 적분 아님\" [level=4]:\n        - text: 전력\n        - generic: 순간 수지, 배터리 적분 아님\n      - text: 발전\n      - generic: 미확인\n      - text: 소비\n      - generic: 미확인\n      - text: 여유\n      - generic: 미확인\n      - text: 배터리\n      - generic: 3,000 Wh\n      - heading \"임무 장비 전력 소비 미확인, 총 질량 579 kg\" [level=4]:\n        - text: 임무 장비\n        - generic: 전력 소비 미확인, 총 질량 579 kg\n      - generic: 광학 관측 카메라\n      - generic: 150 W\n      - generic: X 대역 데이터 다운링크\n      - generic: 60 W\n      - generic: OISL 광 단말 (표준)\n      - generic: 통신 결과 미확인\n      - generic: DTN 저장 전달 장치\n      - generic: 30 W\n      - generic: S 대역 TT&C\n      - generic: 8 W\n      - generic: GNSS 수신기\n      - generic: 5 W\n      - heading \"OISL 단말 통신 결과 미확인\" [level=4]:\n        - text: OISL 단말\n        - generic: 통신 결과 미확인\n      - generic: OISL 계산 결과가 아직 확인되지 않았습니다.\n      - paragraph:\n        - text: \"노드 탭에서 이 위성에 지정한 NASA 3D Resources 모델(Earth Observing-1 (EO-1))입니다. 표시용 형상이며 실제 기체나 촬영 이미지가 아닙니다. 대표 치수 약 7 m 기준의 실제 축척으로 표시합니다. 출처:\"\n        - link \"NASA 3D Resources\":\n          - /url: https://github.com/nasa/NASA-3D-Resources\n        - text: \", 렌더링 model_ready\"\n      - paragraph: 현재 시각의 위치 계산 미확인\n      - paragraph: \"전체 활성 단말 운용 가정: 소비 523 W, 통신 연결은 미확인\"\n      - paragraph: 표시 UTC 미확인, 현재 시각 통신 분석 미확인\n    - status: 공용 표시 UTC를 먼저 선택하세요.\n    - button \"노드 계산 다시 시도\" [disabled]\n    - button \"초안 복원, 서버 조회 재시도\" [disabled]\n    - button \"저장 배치 재확인\" [disabled]\n    - status: 공유 작업 세트, 초안 1개, 수락 배치 0개, 배치 수락 미확인, 표시 UTC 미제공, 실제 통신 미확인\n    - generic \"공유 노드 정의 확인, 초안과 수락 배치\"\n    - generic \"서버 배치 구성 JSON 보기\""
+  },
+  {
+    "label": "satellite/실시간 궤도 분석과 시간 탐색",
+    "initial": [],
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"저장 궤도 입력, 실제 계산\"\n    - button \"위성군 구성\"\n    - button \"실시간 궤도 분석과 시간 탐색\" [active] [pressed]\n    - button \"위성 카탈로그, 기존 조회\"\n    - button \"위성 거리, 도플러\"\n    - button \"위성 상태 및 궤도\"\n  - main:\n    - heading \"실시간 궤도 분석과 시간 탐색\" [level=2]\n    - button \"실시간 궤도 분석과 시간 탐색 설명 보기\": i\n    - text: 관측 지상국\n    - combobox \"관측 지상국\":\n      - option \"지상국 선택\" [selected]\n      - option \"서울\"\n      - option \"대전\"\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"트롬쇠\"\n      - option \"페어뱅크스\"\n      - option \"이누빅\"\n      - option \"싱가포르\"\n      - option \"하와이\"\n      - option \"아타카마\"\n      - option \"푼타아레나스\"\n      - option \"호바트\"\n      - option \"금산\"\n      - option \"우스다\"\n      - option \"비얄랄루\"\n      - option \"뉴노샤\"\n      - option \"동가라\"\n      - option \"캔버라\"\n      - option \"키루나\"\n      - option \"바일하임\"\n      - option \"마드리드\"\n      - option \"마스팔로마스\"\n      - option \"쿠루\"\n      - option \"하르테비스훅\"\n      - option \"골드스톤\"\n      - option \"월롭스\"\n      - option \"말라르궤\"\n      - option \"트롤\"\n      - option \"맥머도\"\n    - text: 가정 타원체 높이 m\n    - spinbutton \"가정 타원체 높이 m\": \"0\"\n    - text: 최소 고도각 °\n    - spinbutton \"최소 고도각 °\": \"5\"\n    - text: 계산 UTC\n    - textbox \"계산 UTC\"\n    - button \"GP epoch 초안\" [disabled]\n    - button \"UTC, 관측 조건 적용 후 계산\" [disabled]\n    - button \"현재 시각 연속 분석\" [disabled]\n    - button \"카탈로그 재생\" [disabled]\n    - button \"카탈로그 정지\" [disabled]\n    - text: 배속\n    - combobox \"배속\":\n      - option \"0.1×\"\n      - option \"1×\" [selected]\n      - option \"10×\"\n      - option \"60×\"\n    - status: 카탈로그 위성을 먼저 선택하세요."
+  },
+  {
+    "label": "satellite/위성 카탈로그, 기존 조회",
+    "initial": [
+      {
+        "bottom": 877,
+        "cls": "body",
+        "h": 677,
+        "id": "",
+        "top": 0,
+        "total": 718,
+        "w": 967,
+        "x": 83,
+        "y": 200.5
+      },
+      {
+        "bottom": 776.5625,
+        "cls": "cp-table",
+        "h": 350,
+        "id": "cat-list",
+        "top": 0,
+        "total": 4685,
+        "w": 936,
+        "x": 91,
+        "y": 426.5625
+      }
+    ],
+    "steps": [
+      {
+        "region": "body",
+        "top": 0,
+        "total": 718,
+        "h": 677
+      },
+      {
+        "region": "body",
+        "top": 0,
+        "total": 718,
+        "h": 677
+      },
+      {
+        "region": "body",
+        "top": 0,
+        "total": 718,
+        "h": 677
+      },
+      {
+        "region": "body",
+        "top": 0,
+        "total": 718,
+        "h": 677
+      },
+      {
+        "region": "body",
+        "top": 0,
+        "total": 718,
+        "h": 677
+      },
+      {
+        "region": "body",
+        "top": 0,
+        "total": 718,
+        "h": 677
+      },
+      {
+        "region": "body",
+        "top": 0,
+        "total": 718,
+        "h": 677
+      },
+      {
+        "region": "body",
+        "top": 0,
+        "total": 718,
+        "h": 677
+      },
+      {
+        "region": "body",
+        "top": 0,
+        "total": 718,
+        "h": 677
+      },
+      {
+        "region": "body",
+        "top": 0,
+        "total": 718,
+        "h": 677
+      },
+      {
+        "region": "body",
+        "top": 41,
+        "total": 718,
+        "h": 677
+      },
+      {
+        "region": "cat-list",
+        "top": 4334,
+        "total": 4685,
+        "h": 350
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"저장 궤도 입력, 실제 계산\"\n    - button \"위성군 구성\"\n    - button \"실시간 궤도 분석과 시간 탐색\"\n    - button \"위성 카탈로그, 기존 조회\" [pressed]\n    - button \"위성 거리, 도플러\"\n    - button \"위성 상태 및 궤도\"\n  - main:\n    - text: 그룹\n    - combobox \"그룹\":\n      - option \"우주정거장/유인 우주체\"\n      - option \"전체 활성 위성\" [selected]\n      - option \"최근 30일 발사\"\n      - option \"육안 관측 주요 위성\"\n      - option \"기상 위성\"\n      - option \"지구 관측 위성\"\n      - option \"정지궤도 위성\"\n      - option \"Starlink\"\n      - option \"OneWeb\"\n      - option \"CubeSat\"\n      - option \"과학 위성\"\n      - option \"GPS 운용 위성\"\n      - option \"GLONASS 운용 위성\"\n      - option \"Galileo\"\n      - option \"BeiDou\"\n      - option \"전체 GNSS\"\n    - text: 검색\n    - textbox \"검색\":\n      - /placeholder: 위성 이름, COSPAR, NORAD\n    - text: 궤도\n    - combobox \"궤도\":\n      - option \"전체 궤도\" [selected]\n      - option \"LEO\"\n      - option \"MEO\"\n      - option \"GEO\"\n      - option \"HEO\"\n    - button \"조건 적용, 조회\"\n    - generic: \"전체 검색 결과 정렬:\"\n    - button \"이름\"\n    - button \"NORAD\"\n    - button \"궤도\"\n    - button \"자료 경과 시간\"\n    - checkbox \"관심 위성만\"\n    - text: 관심 위성만\n    - button \"선택 위성 관심 등록\" [disabled]\n    - status: \"정렬: 기본 순서\"\n    - status\n    - paragraph: \"궤도 자료: 저장된 공개 목록 / 자료 갱신 2026-10-08 05:02:30 UTC\"\n    - paragraph: 검색 결과 16,689개 / 1–100\n    - table:\n      - rowgroup:\n        - row \"위성, 관심 ★ NORAD 궤도, 모델 궤도 자료 기준 시각 (UTC)\":\n          - columnheader \"위성, 관심 ★\"\n          - columnheader \"NORAD\"\n          - columnheader \"궤도, 모델\"\n          - columnheader \"궤도 자료 기준 시각 (UTC)\"\n      - rowgroup:\n        - row \"CALSPHERE 1 900 LEO 2026-10-07T19:58:14.680704\":\n          - cell \"CALSPHERE 1\":\n            - button \"CALSPHERE 1\"\n          - cell \"900\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T19:58:14.680704\"\n        - row \"CALSPHERE 2 902 LEO 2026-10-07T23:32:41.519904\":\n          - cell \"CALSPHERE 2\":\n            - button \"CALSPHERE 2\"\n          - cell \"902\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T23:32:41.519904\"\n        - row \"LCS 1 1361 MEO 2026-10-07T23:08:00.673152\":\n          - cell \"LCS 1\":\n            - button \"LCS 1\"\n          - cell \"1361\"\n          - cell \"MEO\"\n          - cell \"2026-10-07T23:08:00.673152\"\n        - row \"TEMPSAT 1 1512 LEO 2026-10-07T18:08:47.378688\":\n          - cell \"TEMPSAT 1\":\n            - button \"TEMPSAT 1\"\n          - cell \"1512\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T18:08:47.378688\"\n        - row \"CALSPHERE 4A 1520 LEO 2026-10-07T18:41:40.905024\":\n          - cell \"CALSPHERE 4A\":\n            - button \"CALSPHERE 4A\"\n          - cell \"1520\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T18:41:40.905024\"\n        - row \"OPS 5712 (P/L 160) 2826 LEO 2026-10-07T21:46:50.829600\":\n          - cell \"OPS 5712 (P/L 160)\":\n            - button \"OPS 5712 (P/L 160)\"\n          - cell \"2826\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T21:46:50.829600\"\n        - row \"LES-5 2866 GEO 2026-10-07T15:18:49.386240\":\n          - cell \"LES-5\":\n            - button \"LES-5\"\n          - cell \"2866\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T15:18:49.386240\"\n        - row \"SURCAL 159 2872 LEO 2026-10-07T22:23:08.296224\":\n          - cell \"SURCAL 159\":\n            - button \"SURCAL 159\"\n          - cell \"2872\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T22:23:08.296224\"\n        - row \"OPS 5712 (P/L 153) 2874 LEO 2026-10-07T13:11:00.213792\":\n          - cell \"OPS 5712 (P/L 153)\":\n            - button \"OPS 5712 (P/L 153)\"\n          - cell \"2874\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T13:11:00.213792\"\n        - row \"RIGIDSPHERE 2 (LCS 4) 5398 LEO 2026-10-07T22:13:58.694592\":\n          - cell \"RIGIDSPHERE 2 (LCS 4)\":\n            - button \"RIGIDSPHERE 2 (LCS 4)\"\n          - cell \"5398\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T22:13:58.694592\"\n        - row \"OSCAR 7 (AO-7) 7530 LEO 2026-10-07T23:16:33.115008\":\n          - cell \"OSCAR 7 (AO-7)\":\n            - button \"OSCAR 7 (AO-7)\"\n          - cell \"7530\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T23:16:33.115008\"\n        - row \"STARLETTE 7646 LEO 2026-10-07T19:05:39.689664\":\n          - cell \"STARLETTE\":\n            - button \"STARLETTE\"\n          - cell \"7646\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T19:05:39.689664\"\n        - row \"LAGEOS 1 8820 MEO 2026-10-07T13:42:58.198752\":\n          - cell \"LAGEOS 1\":\n            - button \"LAGEOS 1\"\n          - cell \"8820\"\n          - cell \"MEO\"\n          - cell \"2026-10-07T13:42:58.198752\"\n        - row \"PHASE 3B (AO-10) 14129 HEO 2026-10-07T00:45:00.033696\":\n          - cell \"PHASE 3B (AO-10)\":\n            - button \"PHASE 3B (AO-10)\"\n          - cell \"14129\"\n          - cell \"HEO\"\n          - cell \"2026-10-07T00:45:00.033696\"\n        - row \"UOSAT 2 (UO-11) 14781 LEO 2026-10-07T18:31:47.159904\":\n          - cell \"UOSAT 2 (UO-11)\":\n            - button \"UOSAT 2 (UO-11)\"\n          - cell \"14781\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T18:31:47.159904\"\n        - row \"AJISAI (EGS) 16908 LEO 2026-10-07T21:22:26.606208\":\n          - cell \"AJISAI (EGS)\":\n            - button \"AJISAI (EGS)\"\n          - cell \"16908\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T21:22:26.606208\"\n        - row \"TDRS 3 19548 GEO 2026-10-03T05:31:22.469088\":\n          - cell \"TDRS 3\":\n            - button \"TDRS 3\"\n          - cell \"19548\"\n          - cell \"GEO\"\n          - cell \"2026-10-03T05:31:22.469088\"\n        - row \"COSMOS 1989 (ETALON 1) 19751 MEO 2026-10-07T08:05:25.800288\":\n          - cell \"COSMOS 1989 (ETALON 1)\":\n            - button \"COSMOS 1989 (ETALON 1)\"\n          - cell \"19751\"\n          - cell \"MEO\"\n          - cell \"2026-10-07T08:05:25.800288\"\n        - row \"COSMOS 2024 (ETALON 2) 20026 MEO 2026-10-07T17:43:02.828352\":\n          - cell \"COSMOS 2024 (ETALON 2)\":\n            - button \"COSMOS 2024 (ETALON 2)\"\n          - cell \"20026\"\n          - cell \"MEO\"\n          - cell \"2026-10-07T17:43:02.828352\"\n        - row \"FLTSATCOM 8 (USA 46) 20253 GEO 2026-10-07T14:56:16.949760\":\n          - cell \"FLTSATCOM 8 (USA 46)\":\n            - button \"FLTSATCOM 8 (USA 46)\"\n          - cell \"20253\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T14:56:16.949760\"\n        - row \"LUSAT (LO-19) 20442 LEO 2026-10-07T15:33:03.096864\":\n          - cell \"LUSAT (LO-19)\":\n            - button \"LUSAT (LO-19)\"\n          - cell \"20442\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T15:33:03.096864\"\n        - row \"HST 20580 LEO 2026-10-07T16:39:25.235712\":\n          - cell \"HST\":\n            - button \"HST\"\n          - cell \"20580\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T16:39:25.235712\"\n        - row \"TDRS 5 21639 GEO 2026-10-07T09:04:56.288928\":\n          - cell \"TDRS 5\":\n            - button \"TDRS 5\"\n          - cell \"21639\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T09:04:56.288928\"\n        - row \"LAGEOS 2 22195 MEO 2026-10-07T12:04:32.947104\":\n          - cell \"LAGEOS 2\":\n            - button \"LAGEOS 2\"\n          - cell \"22195\"\n          - cell \"MEO\"\n          - cell \"2026-10-07T12:04:32.947104\"\n        - row \"TDRS 6 22314 GEO 2026-10-04T01:18:38.067264\":\n          - cell \"TDRS 6\":\n            - button \"TDRS 6\"\n          - cell \"22314\"\n          - cell \"GEO\"\n          - cell \"2026-10-04T01:18:38.067264\"\n        - row \"SCD 1 22490 LEO 2026-10-07T06:01:08.199840\":\n          - cell \"SCD 1\":\n            - button \"SCD 1\"\n          - cell \"22490\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T06:01:08.199840\"\n        - row \"UFO 2 (USA 95) 22787 GEO 2026-10-06T21:22:23.325600\":\n          - cell \"UFO 2 (USA 95)\":\n            - button \"UFO 2 (USA 95)\"\n          - cell \"22787\"\n          - cell \"GEO\"\n          - cell \"2026-10-06T21:22:23.325600\"\n        - row \"STELLA 22824 LEO 2026-10-07T21:37:54.472224\":\n          - cell \"STELLA\":\n            - button \"STELLA\"\n          - cell \"22824\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T21:37:54.472224\"\n        - row \"EYESAT A (AO-27) 22825 LEO 2026-10-07T17:11:16.483200\":\n          - cell \"EYESAT A (AO-27)\":\n            - button \"EYESAT A (AO-27)\"\n          - cell \"22825\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T17:11:16.483200\"\n        - row \"ITAMSAT (IO-26) 22826 LEO 2026-10-07T17:33:51.615360\":\n          - cell \"ITAMSAT (IO-26)\":\n            - button \"ITAMSAT (IO-26)\"\n          - cell \"22826\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T17:33:51.615360\"\n        - row \"RADIO ROSTO (RS15) 23439 MEO 2026-10-07T22:16:58.974240\":\n          - cell \"RADIO ROSTO (RS15)\":\n            - button \"RADIO ROSTO (RS15)\"\n          - cell \"23439\"\n          - cell \"MEO\"\n          - cell \"2026-10-07T22:16:58.974240\"\n        - row \"UFO 4 (USA 108) 23467 GEO 2026-10-07T11:44:27.853728\":\n          - cell \"UFO 4 (USA 108)\":\n            - button \"UFO 4 (USA 108)\"\n          - cell \"23467\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T11:44:27.853728\"\n        - row \"TDRS 7 23613 GEO 2026-10-06T18:30:46.670400\":\n          - cell \"TDRS 7\":\n            - button \"TDRS 7\"\n          - cell \"23613\"\n          - cell \"GEO\"\n          - cell \"2026-10-06T18:30:46.670400\"\n        - row \"USA 115 (MILSTAR-1 2) 23712 GEO 2026-10-07T05:10:43.567392\":\n          - cell \"USA 115 (MILSTAR-1 2)\":\n            - button \"USA 115 (MILSTAR-1 2)\"\n          - cell \"23712\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T05:10:43.567392\"\n        - row \"POLAR 23802 HEO 2026-10-06T17:20:45.371040\":\n          - cell \"POLAR\":\n            - button \"POLAR\"\n          - cell \"23802\"\n          - cell \"HEO\"\n          - cell \"2026-10-06T17:20:45.371040\"\n        - row \"INMARSAT 3-F1 23839 GEO 2026-10-07T15:03:46.232352\":\n          - cell \"INMARSAT 3-F1\":\n            - button \"INMARSAT 3-F1\"\n          - cell \"23839\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T15:03:46.232352\"\n        - row \"USA 119 23893 LEO 2026-10-07T08:03:25.995456\":\n          - cell \"USA 119\":\n            - button \"USA 119\"\n          - cell \"23893\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T08:03:25.995456\"\n        - row \"JAS-2 (FO-29) 24278 LEO 2026-10-07T13:01:10.876800\":\n          - cell \"JAS-2 (FO-29)\":\n            - button \"JAS-2 (FO-29)\"\n          - cell \"24278\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T13:01:10.876800\"\n        - row \"INMARSAT 3-F2 24307 GEO 2026-10-06T23:06:35.831808\":\n          - cell \"INMARSAT 3-F2\":\n            - button \"INMARSAT 3-F2\"\n          - cell \"24307\"\n          - cell \"GEO\"\n          - cell \"2026-10-06T23:06:35.831808\"\n        - row \"INMARSAT 3-F3 24674 GEO 2026-10-06T19:11:46.869792\":\n          - cell \"INMARSAT 3-F3\":\n            - button \"INMARSAT 3-F3\"\n          - cell \"24674\"\n          - cell \"GEO\"\n          - cell \"2026-10-06T19:11:46.869792\"\n        - row \"NAVSTAR 43 (USA 132) 24876 MEO 2026-10-07T09:10:16.144320\":\n          - cell \"NAVSTAR 43 (USA 132)\":\n            - button \"NAVSTAR 43 (USA 132)\"\n          - cell \"24876\"\n          - cell \"MEO\"\n          - cell \"2026-10-07T09:10:16.144320\"\n        - row \"FORTE 24920 LEO 2026-10-07T17:35:03.150240\":\n          - cell \"FORTE\":\n            - button \"FORTE\"\n          - cell \"24920\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T17:35:03.150240\"\n        - row \"USA 134 25019 GEO 2026-10-07T09:38:29.205024\":\n          - cell \"USA 134\":\n            - button \"USA 134\"\n          - cell \"25019\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T09:38:29.205024\"\n        - row \"ORBCOMM FM06 25118 LEO 2026-10-07T07:10:24.445920\":\n          - cell \"ORBCOMM FM06\":\n            - button \"ORBCOMM FM06\"\n          - cell \"25118\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T07:10:24.445920\"\n        - row \"INMARSAT 3-F5 25153 GEO 2026-10-07T10:00:07.429824\":\n          - cell \"INMARSAT 3-F5\":\n            - button \"INMARSAT 3-F5\"\n          - cell \"25153\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T10:00:07.429824\"\n        - row \"ORBCOMM FM04 25159 LEO 2026-10-07T06:50:26.647296\":\n          - cell \"ORBCOMM FM04\":\n            - button \"ORBCOMM FM04\"\n          - cell \"25159\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T06:50:26.647296\"\n        - row \"CELESTIS-02 & TAURUS R/B 25160 LEO 2026-10-07T16:43:25.709376\":\n          - cell \"CELESTIS-02 & TAURUS R/B\":\n            - button \"CELESTIS-02 & TAURUS R/B\"\n          - cell \"25160\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T16:43:25.709376\"\n        - row \"TECHSAT 1B (GO-32) 25397 LEO 2026-10-07T14:13:48.417600\":\n          - cell \"TECHSAT 1B (GO-32)\":\n            - button \"TECHSAT 1B (GO-32)\"\n          - cell \"25397\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T14:13:48.417600\"\n        - row \"WESTPAC 25398 LEO 2026-10-07T13:17:19.723200\":\n          - cell \"WESTPAC\":\n            - button \"WESTPAC\"\n          - cell \"25398\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T13:17:19.723200\"\n        - row \"ORBCOMM FM19 25415 LEO 2026-10-07T12:03:13.769280\":\n          - cell \"ORBCOMM FM19\":\n            - button \"ORBCOMM FM19\"\n          - cell \"25415\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T12:03:13.769280\"\n        - row \"ORBCOMM FM20 25416 LEO 2026-10-07T09:51:36.582912\":\n          - cell \"ORBCOMM FM20\":\n            - button \"ORBCOMM FM20\"\n          - cell \"25416\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T09:51:36.582912\"\n        - row \"ORBCOMM FM27 25481 LEO 2026-10-06T09:20:35.037888\":\n          - cell \"ORBCOMM FM27\":\n            - button \"ORBCOMM FM27\"\n          - cell \"25481\"\n          - cell \"LEO\"\n          - cell \"2026-10-06T09:20:35.037888\"\n        - row \"SCD 2 25504 LEO 2026-10-07T13:21:10.312704\":\n          - cell \"SCD 2\":\n            - button \"SCD 2\"\n          - cell \"25504\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T13:21:10.312704\"\n        - row \"ISS (ZARYA) 25544 LEO 2026-10-07T19:42:27.216576\":\n          - cell \"ISS (ZARYA)\":\n            - button \"ISS (ZARYA)\"\n          - cell \"25544\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T19:42:27.216576\"\n        - row \"SWAS 25560 LEO 2026-10-07T13:41:58.527456\":\n          - cell \"SWAS\":\n            - button \"SWAS\"\n          - cell \"25560\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T13:41:58.527456\"\n        - row \"ISS (UNITY) 25575 LEO 2026-10-07T19:42:27.216576\":\n          - cell \"ISS (UNITY)\":\n            - button \"ISS (UNITY)\"\n          - cell \"25575\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T19:42:27.216576\"\n        - row \"DLR-TUBSAT 25757 LEO 2026-10-07T14:00:38.120256\":\n          - cell \"DLR-TUBSAT\":\n            - button \"DLR-TUBSAT\"\n          - cell \"25757\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T14:00:38.120256\"\n        - row \"CXO 25867 HEO 2026-10-10T02:09:12.691008\":\n          - cell \"CXO\":\n            - button \"CXO\"\n          - cell \"25867\"\n          - cell \"HEO\"\n          - cell \"2026-10-10T02:09:12.691008\"\n        - row \"ABS-6 25924 GEO 2026-10-07T15:06:01.017216\":\n          - cell \"ABS-6\":\n            - button \"ABS-6\"\n          - cell \"25924\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T15:06:01.017216\"\n        - row \"NAVSTAR 46 (USA 145) 25933 MEO 2026-10-07T11:26:07.115136\":\n          - cell \"NAVSTAR 46 (USA 145)\":\n            - button \"NAVSTAR 46 (USA 145)\"\n          - cell \"25933\"\n          - cell \"MEO\"\n          - cell \"2026-10-07T11:26:07.115136\"\n        - row \"UFO 10 (USA 146) 25967 GEO 2026-10-06T02:18:47.841984\":\n          - cell \"UFO 10 (USA 146)\":\n            - button \"UFO 10 (USA 146)\"\n          - cell \"25967\"\n          - cell \"GEO\"\n          - cell \"2026-10-06T02:18:47.841984\"\n        - row \"ORBCOMM FM32 25982 LEO 2026-10-07T06:35:51.436032\":\n          - cell \"ORBCOMM FM32\":\n            - button \"ORBCOMM FM32\"\n          - cell \"25982\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T06:35:51.436032\"\n        - row \"XMM-NEWTON 25989 HEO 2026-10-08T01:06:41.885568\":\n          - cell \"XMM-NEWTON\":\n            - button \"XMM-NEWTON\"\n          - cell \"25989\"\n          - cell \"HEO\"\n          - cell \"2026-10-08T01:06:41.885568\"\n        - row \"TERRA 25994 LEO 2026-10-07T22:53:28.079808\":\n          - cell \"TERRA\":\n            - button \"TERRA\"\n          - cell \"25994\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T22:53:28.079808\"\n        - row \"ASIASTAR 26107 GEO 2026-10-07T18:12:40.296672\":\n          - cell \"ASIASTAR\":\n            - button \"ASIASTAR\"\n          - cell \"26107\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T18:12:40.296672\"\n        - row \"IMAGE 26113 HEO 2026-10-06T03:32:27.788640\":\n          - cell \"IMAGE\":\n            - button \"IMAGE\"\n          - cell \"26113\"\n          - cell \"HEO\"\n          - cell \"2026-10-06T03:32:27.788640\"\n        - row \"USA 149 (DSP 20) 26356 GEO 2026-10-06T22:30:54.634176\":\n          - cell \"USA 149 (DSP 20)\":\n            - button \"USA 149 (DSP 20)\"\n          - cell \"26356\"\n          - cell \"GEO\"\n          - cell \"2026-10-06T22:30:54.634176\"\n        - row \"TDRS 8 26388 GEO 2026-10-07T17:41:07.295136\":\n          - cell \"TDRS 8\":\n            - button \"TDRS 8\"\n          - cell \"26388\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T17:41:07.295136\"\n        - row \"ISS (ZVEZDA) 26400 LEO 2026-10-07T19:42:27.216576\":\n          - cell \"ISS (ZVEZDA)\":\n            - button \"ISS (ZVEZDA)\"\n          - cell \"26400\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T19:42:27.216576\"\n        - row \"NAVSTAR 48 (USA 151) 26407 MEO 2026-10-07T05:12:07.337376\":\n          - cell \"NAVSTAR 48 (USA 151)\":\n            - button \"NAVSTAR 48 (USA 151)\"\n          - cell \"26407\"\n          - cell \"MEO\"\n          - cell \"2026-10-07T05:12:07.337376\"\n        - row \"NSS-11 26554 GEO 2026-10-07T15:10:45.561792\":\n          - cell \"NSS-11\":\n            - button \"NSS-11\"\n          - cell \"26554\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T15:10:45.561792\"\n        - row \"USA 153 26575 GEO 2026-10-07T12:51:21.053376\":\n          - cell \"USA 153\":\n            - button \"USA 153\"\n          - cell \"26575\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T12:51:21.053376\"\n        - row \"AMC-6 26580 GEO 2026-10-07T15:24:44.220672\":\n          - cell \"AMC-6\":\n            - button \"AMC-6\"\n          - cell \"26580\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T15:24:44.220672\"\n        - row \"NAVSTAR 49 (USA 154) 26605 MEO 2026-10-07T08:58:18.458400\":\n          - cell \"NAVSTAR 49 (USA 154)\":\n            - button \"NAVSTAR 49 (USA 154)\"\n          - cell \"26605\"\n          - cell \"MEO\"\n          - cell \"2026-10-07T08:58:18.458400\"\n        - row \"ISS (DESTINY) 26700 LEO 2026-10-07T19:42:27.216576\":\n          - cell \"ISS (DESTINY)\":\n            - button \"ISS (DESTINY)\"\n          - cell \"26700\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T19:42:27.216576\"\n        - row \"USA 157 (MILSTAR-2 2) 26715 GEO 2026-10-07T11:21:16.692768\":\n          - cell \"USA 157 (MILSTAR-2 2)\":\n            - button \"USA 157 (MILSTAR-2 2)\"\n          - cell \"26715\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T11:21:16.692768\"\n        - row \"BSAT-2A 26720 GEO 2026-10-06T13:37:03.965664\":\n          - cell \"BSAT-2A\":\n            - button \"BSAT-2A\"\n          - cell \"26720\"\n          - cell \"GEO\"\n          - cell \"2026-10-06T13:37:03.965664\"\n        - row \"OMNI-M1 26857 MEO 2026-10-06T13:46:39.132192\":\n          - cell \"OMNI-M1\":\n            - button \"OMNI-M1\"\n          - cell \"26857\"\n          - cell \"MEO\"\n          - cell \"2026-10-06T13:46:39.132192\"\n        - row \"INTELSAT 902 (IS-902) 26900 GEO 2026-10-07T17:30:41.711616\":\n          - cell \"INTELSAT 902 (IS-902)\":\n            - button \"INTELSAT 902 (IS-902)\"\n          - cell \"26900\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T17:30:41.711616\"\n        - row \"PCSAT (NO-44) 26931 LEO 2026-10-07T12:56:23.920800\":\n          - cell \"PCSAT (NO-44)\":\n            - button \"PCSAT (NO-44)\"\n          - cell \"26931\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T12:56:23.920800\"\n        - row \"PROBA-1 26958 LEO 2026-10-07T23:04:33.169728\":\n          - cell \"PROBA-1\":\n            - button \"PROBA-1\"\n          - cell \"26958\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T23:04:33.169728\"\n        - row \"TIMED 26998 LEO 2026-10-07T16:02:27.965472\":\n          - cell \"TIMED\":\n            - button \"TIMED\"\n          - cell \"26998\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T16:02:27.965472\"\n        - row \"MAROC-TUBSAT 27004 LEO 2026-10-07T23:27:24.761088\":\n          - cell \"MAROC-TUBSAT\":\n            - button \"MAROC-TUBSAT\"\n          - cell \"27004\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T23:27:24.761088\"\n        - row \"COSMOS 2385 27056 LEO 2026-10-07T23:55:57.158976\":\n          - cell \"COSMOS 2385\":\n            - button \"COSMOS 2385\"\n          - cell \"27056\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T23:55:57.158976\"\n        - row \"COSMOS 2386 27057 LEO 2026-10-07T16:48:46.770912\":\n          - cell \"COSMOS 2386\":\n            - button \"COSMOS 2386\"\n          - cell \"27057\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T16:48:46.770912\"\n        - row \"USA 164 (MILSTAR-2 3) 27168 GEO 2026-10-06T23:02:21.238656\":\n          - cell \"USA 164 (MILSTAR-2 3)\":\n            - button \"USA 164 (MILSTAR-2 3)\"\n          - cell \"27168\"\n          - cell \"GEO\"\n          - cell \"2026-10-06T23:02:21.238656\"\n        - row \"INTELSAT 904 (IS-904) 27380 GEO 2026-10-07T18:25:39.108864\":\n          - cell \"INTELSAT 904 (IS-904)\":\n            - button \"INTELSAT 904 (IS-904)\"\n          - cell \"27380\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T18:25:39.108864\"\n        - row \"AQUA 27424 LEO 2026-10-07T23:04:00.310080\":\n          - cell \"AQUA\":\n            - button \"AQUA\"\n          - cell \"27424\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T23:04:00.310080\"\n        - row \"DIRECTV 5 (TEMPO 1) 27426 GEO 2026-10-07T12:06:33.234912\":\n          - cell \"DIRECTV 5 (TEMPO 1)\":\n            - button \"DIRECTV 5 (TEMPO 1)\"\n          - cell \"27426\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T12:06:33.234912\"\n        - row \"INTELSAT 905 (IS-905) 27438 GEO 2026-10-07T12:11:59.781984\":\n          - cell \"INTELSAT 905 (IS-905)\":\n            - button \"INTELSAT 905 (IS-905)\"\n          - cell \"27438\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T12:11:59.781984\"\n        - row \"GALAXY 3C (G-3C) 27445 GEO 2026-10-07T12:10:55.316352\":\n          - cell \"GALAXY 3C (G-3C)\":\n            - button \"GALAXY 3C (G-3C)\"\n          - cell \"27445\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T12:10:55.316352\"\n        - row \"COSMOS 2390 27464 LEO 2026-10-07T23:34:38.586720\":\n          - cell \"COSMOS 2390\":\n            - button \"COSMOS 2390\"\n          - cell \"27464\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T23:34:38.586720\"\n        - row \"COSMOS 2391 27465 LEO 2026-10-07T23:16:32.846304\":\n          - cell \"COSMOS 2391\":\n            - button \"COSMOS 2391\"\n          - cell \"27465\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T23:16:32.846304\"\n        - row \"INTELSAT 906 (IS-906) 27513 GEO 2026-10-07T11:13:38.313120\":\n          - cell \"INTELSAT 906 (IS-906)\":\n            - button \"INTELSAT 906 (IS-906)\"\n          - cell \"27513\"\n          - cell \"GEO\"\n          - cell \"2026-10-07T11:13:38.313120\"\n        - row \"LATINSAT B 27606 LEO 2026-10-07T09:52:14.611008\":\n          - cell \"LATINSAT B\":\n            - button \"LATINSAT B\"\n          - cell \"27606\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T09:52:14.611008\"\n        - row \"SAUDISAT 1C (SO-50) 27607 LEO 2026-10-07T16:36:26.271936\":\n          - cell \"SAUDISAT 1C (SO-50)\":\n            - button \"SAUDISAT 1C (SO-50)\"\n          - cell \"27607\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T16:36:26.271936\"\n        - row \"LATINSAT A 27612 LEO 2026-10-07T13:52:05.457216\":\n          - cell \"LATINSAT A\":\n            - button \"LATINSAT A\"\n          - cell \"27612\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T13:52:05.457216\"\n        - row \"NIMIQ 2 27632 GEO 2026-10-06T22:25:47.246304\":\n          - cell \"NIMIQ 2\":\n            - button \"NIMIQ 2\"\n          - cell \"27632\"\n          - cell \"GEO\"\n          - cell \"2026-10-06T22:25:47.246304\"\n        - row \"CORIOLIS 27640 LEO 2026-10-07T14:06:19.350144\":\n          - cell \"CORIOLIS\":\n            - button \"CORIOLIS\"\n          - cell \"27640\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T14:06:19.350144\"\n        - row \"SORCE 27651 LEO 2026-10-07T05:27:12.774816\":\n          - cell \"SORCE\":\n            - button \"SORCE\"\n          - cell \"27651\"\n          - cell \"LEO\"\n          - cell \"2026-10-07T05:27:12.774816\"\n    - button \"이전 100개\" [disabled]\n    - button \"다음 100개\"\n    - status\n    - status\n    - generic \"좌표 자료의 SHA-256\"\n    - button \"카탈로그 지구 표시 해제\"\n    - button \"카탈로그 위치 표시 안내\": i"
+  },
+  {
+    "label": "satellite/위성 거리, 도플러",
+    "initial": [],
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"저장 궤도 입력, 실제 계산\"\n    - button \"위성군 구성\"\n    - button \"실시간 궤도 분석과 시간 탐색\"\n    - button \"위성 카탈로그, 기존 조회\"\n    - button \"위성 거리, 도플러\" [active] [pressed]\n    - button \"위성 상태 및 궤도\"\n  - main:\n    - heading \"위성 거리, 도플러\" [level=2]\n    - button \"위성 거리, 도플러 설명 보기\": i\n    - paragraph: 선택한 궤도와 관측 지점의 거리 및 주파수 변화를 계산합니다.\n    - text: 계산 UTC\n    - textbox \"계산 UTC\":\n      - /placeholder: YYYY-MM-DDTHH:mm:ssZ\n    - text: 송신 주파수 MHz\n    - spinbutton \"송신 주파수 MHz\"\n    - button \"서버 UTC 가져오기\"\n    - button \"ISS 공식 주파수 불러오기\"\n    - button \"도플러 입력에 공식 주파수 적용\" [disabled]\n    - paragraph: 주파수 미확인\n    - button \"거리, 도플러 계산\"\n    - button \"거리, 도플러 조회 취소\"\n    - status: 입력 후 계산하세요. 편집, 선택 변경 시 재계산합니다."
+  },
+  {
+    "label": "satellite/위성 상태 및 궤도",
+    "initial": [],
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"저장 궤도 입력, 실제 계산\"\n    - button \"위성군 구성\"\n    - button \"실시간 궤도 분석과 시간 탐색\"\n    - button \"위성 카탈로그, 기존 조회\"\n    - button \"위성 거리, 도플러\"\n    - button \"위성 상태 및 궤도\" [active] [pressed]\n  - main:\n    - heading \"위성 상태 및 궤도\" [level=1]\n    - paragraph: SYS-03, 2026-09-23 03:18 UTC 고정 예시\n    - button \"관련 흐름\"\n    - heading \"지금 판단할 일\" [level=2]\n    - generic: SAT-A 자원과 초기 궤도 상태는 접촉, 탑재 작업을 허용하는가?\n    - generic: 실제 자료, 권한, 절차가 없어 판단은 보류합니다.\n    - button \"통합 관제 현황\"\n    - heading \"현재 자료와 업무 상태\" [level=2]\n    - generic: 플랫폼\n    - strong: 전력, 열, 자세 미연동\n    - generic: 탑재체\n    - strong: 작업 상태 미연동\n    - generic: 저장\n    - strong: 사용량, 여유 미연동\n    - generic: 궤도\n    - strong: 초기 결정/오차 없음\n    - generic: 투입\n    - strong: 분리 후 +6분 DT 입력\n    - generic: 첫 접촉\n    - strong: GS-02 계획 예시\n    - heading \"증거, 인계\" [level=2]\n    - strong: 필요한 근거\n    - generic: 분리 신호, 상태 벡터\n    - strong: 없음\n    - generic: 궤도결정, 불확실성\n    - strong: 없음\n    - generic: 실측 원격측정, 안전 제약\n    - strong: 없음\n    - paragraph:\n      - strong: 다음 인계\n      - text: 비행역학/플랫폼 → 지상국, 운용 판단 및 인계\n    - heading \"계획\" [level=2]\n    - strong: GS-02 03:24 UTC\n    - text: 접촉 계획 예시\n    - heading \"관측/실측\" [level=2]\n    - strong: 원격측정, 수신, 시험용 장비 없음\n    - heading \"DT 질문\" [level=2]\n    - generic: 투입 시각, 궤도 조건을 바꾸면 첫 접촉은?\n    - heading \"결과 확인\" [level=2]\n    - strong: 승인, 명령 수신 확인, 수신 근거 필요"
+  },
+  {
+    "label": "initial/발사 초기 운용",
+    "initial": [],
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 발사 초기 운용\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 작은 크기로 복원\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 분리부터 첫 교신까지의 초기 운용 절차\n  - main [active]:\n    - heading \"분리부터 첫 접촉까지\" [level=1]\n    - paragraph: SCN-01 연구 장면, 위성, 지상국, 투입 시각은 DT 입력\n    - button \"장면 편집\"\n    - heading \"다섯 업무 인계\" [level=2]\n    - generic: 01 분리 입력\n    - strong: 위성 플랫폼\n    - generic: \"필요: 분리 신호/식별\"\n    - emphasis: \"다음: 비행역학\"\n    - generic: 02 초기 궤도\n    - strong: 비행역학\n    - generic: \"필요: 상태 벡터/오차\"\n    - emphasis: \"다음: 지상국, 운용\"\n    - generic: 03 첫 접촉 준비\n    - strong: 지상국 및 통신\n    - generic: \"필요: 예약/가시/RF\"\n    - emphasis: \"다음: 관제\"\n    - generic: 04 신호, 원격측정\n    - strong: 통신, 위성\n    - generic: \"필요: AOS/건전성\"\n    - emphasis: \"다음: 운용 판단 및 인계\"\n    - generic: 05 초기 인계\n    - strong: 운용, DT 분석\n    - generic: \"필요: 실측/모델 차이\"\n    - emphasis: \"다음: 다음 교대\"\n    - heading \"DT 투입 입력\" [level=2]\n    - generic: 궤도 종류\n    - strong: LEO\n    - generic: 투입 시각\n    - strong: 분리 후 +6분\n    - generic: 후보 지상국\n    - strong: 제주 후보\n    - generic: 첫 접촉\n    - strong: 미산출\n    - heading \"운용 확인\" [level=2]\n    - generic: 분리 신호\n    - strong: 미확인\n    - generic: 궤도결정\n    - strong: 없음\n    - generic: AOS/원격측정\n    - strong: 없음\n    - generic: 모델–실측 차이\n    - strong: 미산출\n    - heading \"인계 경계\" [level=2]\n    - generic: 후보 마커의 근접은 가시성이나 신호 획득 판정이 아닙니다.\n    - button \"위성 담당\"\n    - button \"통신 담당\""
+  },
+  {
+    "label": "fixed/ground/지상국 구성",
+    "steps": [
+      {
+        "region": "body",
+        "top": 0,
+        "total": 1675,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 272,
+        "total": 1675,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 545,
+        "total": 1675,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 817,
+        "total": 1675,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 1089,
+        "total": 1675,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 1286,
+        "total": 1675,
+        "h": 389
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국 구성\" [pressed]\n    - button \"선택 위성의 가시 시간\"\n    - button \"저장 궤도 구간 분석\"\n    - button \"시나리오 통신 계획\"\n    - button \"RF 링크 계산\"\n    - button \"저장 궤도 가시 구간\"\n  - main [active]:\n    - status: 서버 DB 저장 완료\n    - strong: 한반도 지상국\n    - generic: 지점을 선택하거나 새 위치를 지정하세요\n    - generic \"한반도 지상국 위치 선택 지도\":\n      - button \"대전 상태 보기\":\n        - generic: ●\n        - generic: 대전\n      - button \"제주 상태 보기\":\n        - generic: ●\n        - generic: 제주\n      - button \"서울 상태 보기\":\n        - generic: ●\n        - generic: 서울\n      - link \"© OpenStreetMap contributors\":\n        - /url: https://www.openstreetmap.org/copyright\n    - status\n    - complementary:\n      - heading \"한반도 지도 내 지상국\" [level=3]\n      - button \"대전 사용\":\n        - generic: 대전\n        - generic: 사용\n      - button \"제주 사용\":\n        - generic: 제주\n        - generic: 사용\n      - button \"서울 사용\" [pressed]:\n        - generic: 서울\n        - generic: 사용\n      - generic \"해외 지상국\"\n      - heading \"서울\" [level=3]\n      - generic: 통신망 사용\n      - generic: 위도\n      - generic: 37.5717°\n      - generic: 경도\n      - generic: 126.9734°\n      - generic: 안테나\n      - generic: 7.3 m\n      - generic: 최소 고각\n      - generic: 5°\n      - generic: 실제 연결\n      - generic: 미확인\n      - generic: 지원 대역\n      - generic: S / X / Ka\n      - button \"선택 지상국 설정\"\n      - button \"이 지상국 사용 안 함\"\n      - button \"선택 지상국 초점\" [disabled]\n      - heading \"새 가상 지상국\" [level=3]\n      - button \"지도에서 위치 지정\"\n      - text: 위도 °\n      - spinbutton \"위도 °\": \"36.5\"\n      - text: 경도 °\n      - spinbutton \"경도 °\": \"127.5\"\n      - button \"좌표로 후보 위치 확인\"\n      - status: 후보 위치를 지정하세요.\n      - button \"선택 위치에 가상 지상국 추가\" [disabled]\n    - generic \"공개 지상국 목록에서 선택\"\n    - option \"모든 지역\" [selected]\n    - option \"대한민국\"\n    - option \"아시아, 오세아니아\"\n    - option \"유럽, 아프리카\"\n    - option \"북미, 남미\"\n    - option \"극지\"\n    - option \"지상국 선택\" [selected]\n    - option \"금산\"\n    - option \"대전\"\n    - option \"서울\"\n    - option \"제주\"\n    - option \"뉴노샤\"\n    - option \"동가라\"\n    - option \"비얄랄루\"\n    - option \"싱가포르\"\n    - option \"우스다\"\n    - option \"캔버라\"\n    - option \"하와이\"\n    - option \"호바트\"\n    - option \"마드리드\"\n    - option \"마스팔로마스\"\n    - option \"바일하임\"\n    - option \"키루나\"\n    - option \"하르테비스훅\"\n    - option \"골드스톤\"\n    - option \"말라르궤\"\n    - option \"아타카마\"\n    - option \"월롭스\"\n    - option \"쿠루\"\n    - option \"페어뱅크스\"\n    - option \"푼타아레나스\"\n    - option \"맥머도\"\n    - option \"스발바르\"\n    - option \"이누빅\"\n    - option \"트롤\"\n    - option \"트롬쇠\"\n    - generic \"지상국 목록 및 저장 관리\"\n    - option \"서울, 대한민국\" [selected]\n    - option \"트롬쇠, 노르웨이\"\n    - option \"페어뱅크스, 미국 알래스카\"\n    - option \"이누빅, 캐나다\"\n    - option \"싱가포르, 싱가포르\"\n    - option \"하와이, 미국\"\n    - option \"아타카마, 칠레\"\n    - option \"푼타아레나스, 칠레\"\n    - option \"호바트, 호주\"\n    - option \"직접 입력 (위도, 경도)\"\n    - option \"지상국 선택\"\n    - option \"대전, 사용, 36.3742°/127.3567°, 5°\"\n    - option \"제주, 사용, 33.4996°/126.5312°, 5°\"\n    - option \"스발바르, 사용, 78.2298°/15.4078°, 3°\"\n    - option \"서울, 사용, 37.5717°/126.9734°, 5°\" [selected]\n    - status: 지상국 4개, 저장 구성\n    - generic \"배치 위성 통신 분석\"\n    - option \"대전\" [selected]\n    - option \"제주\"\n    - option \"스발바르\"\n    - option \"서울\"\n    - option \"대전\" [selected]\n    - option \"제주\"\n    - option \"스발바르\"\n    - option \"서울\"\n    - option \"노드 선택\" [selected]\n    - option \"노드 선택\" [selected]\n    - option \"균형\" [selected]\n    - option \"지연 최소\"\n    - option \"신뢰도\"\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/ground/모든 세부 기능",
+    "steps": [
+      {
+        "region": "body",
+        "top": 0,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 0,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 272,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 545,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 817,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 1089,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 1362,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 1634,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 1906,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 2178,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 2451,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 2723,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 2995,
+        "total": 3562,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 3173,
+        "total": 3562,
+        "h": 389
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국 구성\" [pressed]\n    - button \"선택 위성의 가시 시간\"\n    - button \"저장 궤도 구간 분석\"\n    - button \"시나리오 통신 계획\"\n    - button \"RF 링크 계산\"\n    - button \"저장 궤도 가시 구간\"\n  - main:\n    - status: 서버 DB 저장 완료\n    - strong: 한반도 지상국\n    - generic: 지점을 선택하거나 새 위치를 지정하세요\n    - generic \"한반도 지상국 위치 선택 지도\":\n      - button \"대전 상태 보기\":\n        - generic: ●\n        - generic: 대전\n      - button \"제주 상태 보기\":\n        - generic: ●\n        - generic: 제주\n      - button \"서울 상태 보기\":\n        - generic: ●\n        - generic: 서울\n      - link \"© OpenStreetMap contributors\":\n        - /url: https://www.openstreetmap.org/copyright\n    - status\n    - complementary:\n      - heading \"한반도 지도 내 지상국\" [level=3]\n      - button \"대전 사용\":\n        - generic: 대전\n        - generic: 사용\n      - button \"제주 사용\":\n        - generic: 제주\n        - generic: 사용\n      - button \"서울 사용\" [pressed]:\n        - generic: 서울\n        - generic: 사용\n      - generic \"해외 지상국\"\n      - button \"스발바르 지도 범위 밖 / 사용\":\n        - generic: 스발바르\n        - generic: 지도 범위 밖 / 사용\n      - heading \"서울\" [level=3]\n      - generic: 통신망 사용\n      - generic: 위도\n      - generic: 37.5717°\n      - generic: 경도\n      - generic: 126.9734°\n      - generic: 안테나\n      - generic: 7.3 m\n      - generic: 최소 고각\n      - generic: 5°\n      - generic: 실제 연결\n      - generic: 미확인\n      - generic: 지원 대역\n      - generic: S / X / Ka\n      - button \"선택 지상국 설정\"\n      - button \"이 지상국 사용 안 함\"\n      - button \"선택 지상국 초점\" [disabled]\n      - heading \"새 가상 지상국\" [level=3]\n      - button \"지도에서 위치 지정\"\n      - text: 위도 °\n      - spinbutton \"위도 °\": \"36.5\"\n      - text: 경도 °\n      - spinbutton \"경도 °\": \"127.5\"\n      - button \"좌표로 후보 위치 확인\"\n      - status: 후보 위치를 지정하세요.\n      - button \"선택 위치에 가상 지상국 추가\" [disabled]\n    - generic \"공개 지상국 목록에서 선택\"\n    - heading \"지상국 목록과 지구 선택\" [level=2]\n    - paragraph: 대표 지상국 설정입니다. 실제 시설 좌표, 높이, 장비 사양과 수신 상태는 미확인입니다. 선택은 지구 표시만 바꾸며 저장 궤도와 가상 계산 지점은 유지합니다.\n    - text: 지상국 지역\n    - combobox \"지상국 지역\":\n      - option \"모든 지역\" [selected]\n      - option \"대한민국\"\n      - option \"아시아, 오세아니아\"\n      - option \"유럽, 아프리카\"\n      - option \"북미, 남미\"\n      - option \"극지\"\n    - text: 표시 지상국\n    - combobox \"표시 지상국\":\n      - option \"지상국 선택\" [selected]\n      - option \"금산\"\n      - option \"대전\"\n      - option \"서울\"\n      - option \"제주\"\n      - option \"뉴노샤\"\n      - option \"동가라\"\n      - option \"비얄랄루\"\n      - option \"싱가포르\"\n      - option \"우스다\"\n      - option \"캔버라\"\n      - option \"하와이\"\n      - option \"호바트\"\n      - option \"마드리드\"\n      - option \"마스팔로마스\"\n      - option \"바일하임\"\n      - option \"키루나\"\n      - option \"하르테비스훅\"\n      - option \"골드스톤\"\n      - option \"말라르궤\"\n      - option \"아타카마\"\n      - option \"월롭스\"\n      - option \"쿠루\"\n      - option \"페어뱅크스\"\n      - option \"푼타아레나스\"\n      - option \"맥머도\"\n      - option \"스발바르\"\n      - option \"이누빅\"\n      - option \"트롤\"\n      - option \"트롬쇠\"\n    - button \"선택 지상국으로 이동\" [disabled]\n    - button \"지상국 선택 해제\"\n    - button \"좌표, 최소각을 계산 초안에 사용\" [disabled]\n    - button \"카탈로그 관측 초안에 사용\" [disabled]\n    - status: 목록 29 / 전체 29개, 지상국 미선택, 지구의 지상국 표식으로도 선택할 수 있습니다.\n    - button \"선택 관측 기준의 24시간 구간 조회\" [disabled]\n    - status\n    - generic \"지상국 목록 및 저장 관리\"\n    - paragraph: 기존 시험 지점을 추가하거나 저장한 지상국 설정을 관리합니다.\n    - text: 추가 지상국\n    - combobox \"추가 지상국\":\n      - option \"서울, 대한민국\" [selected]\n      - option \"트롬쇠, 노르웨이\"\n      - option \"페어뱅크스, 미국 알래스카\"\n      - option \"이누빅, 캐나다\"\n      - option \"싱가포르, 싱가포르\"\n      - option \"하와이, 미국\"\n      - option \"아타카마, 칠레\"\n      - option \"푼타아레나스, 칠레\"\n      - option \"호바트, 호주\"\n      - option \"직접 입력 (위도, 경도)\"\n    - button \"지상국 추가\"\n    - text: 편집 지상국\n    - combobox \"편집 지상국\":\n      - option \"지상국 선택\"\n      - option \"대전, 사용, 36.3742°/127.3567°, 5°\"\n      - option \"제주, 사용, 33.4996°/126.5312°, 5°\"\n      - option \"스발바르, 사용, 78.2298°/15.4078°, 3°\"\n      - option \"서울, 사용, 37.5717°/126.9734°, 5°\" [selected]\n    - button \"선택 지상국 편집\"\n    - button \"저장 설정 다시 불러오기\"\n    - button \"기본 지상국으로 초기화\"\n    - status: 지상국 4개, 저장 구성\n    - generic \"배치 위성 통신 분석\"\n    - paragraph: 시험에 배치한 위성과 사용 지상국의 연결을 계산합니다. 안테나와 대역은 등록 설정을 사용하며 실제 교신 상태를 나타내지 않습니다.\n    - button \"현재 배치의 통신망 계산\"\n    - status: 모의실험 상태 미확인\n    - generic \"자동 갱신 통과 예측\"\n    - paragraph: 표시 시각부터 3시간 동안 각 위성의 첫 3구간을 계산하고 빠른 12구간을 보여줍니다. 표시 시각과 선택 지상국에 따라 갱신합니다.\n    - text: 통과 지상국\n    - combobox \"통과 지상국\":\n      - option \"대전\" [selected]\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"서울\"\n    - button \"통과 새로고침\"\n    - status: 통과 결과 미확인, 실제 RF 미확인\n    - generic \"정지 시각의 접촉 일정 상세 조회\"\n    - paragraph: 시험 재생을 정지한 시각부터 3시간의 전체 배치 통과 구간을 조회합니다. 자동 갱신 통과 예측과 달리 조회한 조건을 고정해 비교할 때 사용합니다.\n    - text: 표시 지상국\n    - combobox \"표시 지상국\":\n      - option \"대전\" [selected]\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"서울\"\n    - button \"정지 시각부터 3시간 조회\"\n    - button \"조회 취소\" [disabled]\n    - status: 명시적 조회 전 통과 결과 미확인\n    - button \"이전 통과\" [disabled]\n    - button \"다음 통과\" [disabled]\n    - button \"지상 링크 3D\" [disabled] [pressed]\n    - button \"지상국 가시 범위 3D\" [disabled] [pressed]\n    - generic \"시험 통신망 연결 계산 상세\"\n    - paragraph: 현재 UTC, 입력의 연결도 미확인\n    - button \"이전 링크\" [disabled]\n    - button \"다음 링크\" [disabled]\n    - generic \"통신 경로와 저장 후 전달 시험\"\n    - paragraph: 계산된 통신망을 모의 통신 모듈에 전송해 경로를 비교합니다. 연결이 끊긴 동안 데이터를 저장했다가 전달하는 DTN 동작도 시험할 수 있습니다.\n    - button \"계산된 통신망 전송\" [disabled]\n    - button \"모듈 상태 조회\"\n    - status: 현재 통신망 미전송, 통신 결과 미확인\n    - text: 출발 노드\n    - combobox \"출발 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 목적 노드\n    - combobox \"목적 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 경로 목적\n    - combobox \"경로 목적\":\n      - option \"균형\" [selected]\n      - option \"지연 최소\"\n      - option \"신뢰도\"\n    - button \"경로 조회\" [disabled]\n    - paragraph: 현재 통신망의 DTN 결과 미확인\n    - paragraph: 현재 통신망의 경로 결과 미확인\n    - generic \"이전 통신 계산 결과\"\n    - paragraph: 주기 통신 결과 미확인\n    - generic \"통신 모듈 상태와 링크 품질 이력\"\n    - status: 모듈 상태 조회, 2026-10-08T06:02:25.143Z, 실행 7aa30676798045749f382ba7a22237cd, 응답 번호 0, 통신망 수락과 별개\n    - status: 과거 모의 링크 품질 미확인, 검증된 통신망 결과 없음\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/ground/선택 위성의 가시 시간",
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국 구성\"\n    - button \"선택 위성의 가시 시간\" [active] [pressed]\n    - button \"저장 궤도 구간 분석\"\n    - button \"시나리오 통신 계획\"\n    - button \"RF 링크 계산\"\n    - button \"저장 궤도 가시 구간\"\n  - main:\n    - paragraph: 선택한 위성이 지상국의 최소 고도각 위에 나타나는 시간을 확인합니다.\n    - paragraph: 조회 시작 시각은 위성을 선택하면 표시됩니다.\n    - text: 관측 지상국\n    - combobox \"관측 지상국\":\n      - option \"지상국 선택\" [selected]\n      - option \"대전\"\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"서울\"\n    - button \"선택 시각부터 24시간 조회\" [disabled]\n    - status: 위성을 먼저 선택한 뒤 관측 지상국을 선택하세요.\n    - generic \"가시 시간 계산 안내\"\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/ground/저장 궤도 구간 분석",
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국 구성\"\n    - button \"선택 위성의 가시 시간\"\n    - button \"저장 궤도 구간 분석\" [active] [pressed]\n    - button \"시나리오 통신 계획\"\n    - button \"RF 링크 계산\"\n    - button \"저장 궤도 가시 구간\"\n  - main:\n    - heading \"가시 구간 거리, 도플러 변화\" [level=2]\n    - button \"가시 구간 거리, 도플러 변화 설명 보기\": i\n    - paragraph: 선택한 가시 구간 없음\n    - text: 구간 송신 주파수 MHz\n    - spinbutton \"구간 송신 주파수 MHz\"\n    - button \"구간용 ISS 공식 주파수 불러오기\"\n    - button \"구간 입력에 공식 주파수 적용\" [disabled]\n    - paragraph: 주파수 미확인\n    - button \"구간 거리, 도플러 계산\" [disabled]\n    - button \"구간 계산 취소\"\n    - status: 구간과 주파수를 확인하세요.\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/ground/시나리오 통신 계획",
+    "steps": [
+      {
+        "region": "body",
+        "top": 0,
+        "total": 386,
+        "h": 343
+      },
+      {
+        "region": "body",
+        "top": 43,
+        "total": 386,
+        "h": 343
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국 구성\"\n    - button \"선택 위성의 가시 시간\"\n    - button \"저장 궤도 구간 분석\"\n    - button \"시나리오 통신 계획\" [active] [pressed]\n    - button \"RF 링크 계산\"\n    - button \"저장 궤도 가시 구간\"\n  - main:\n    - heading \"통신 경로, 접촉 계획\" [level=2]\n    - button \"통신 경로, 접촉 계획 설명 보기\": i\n    - button \"시나리오 통신망 불러오기\"\n    - button \"망 조회 취소\"\n    - status: 망 조회 대기\n    - paragraph\n    - text: 출발 노드\n    - combobox \"출발 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 도착 노드\n    - combobox \"도착 노드\":\n      - option \"노드 선택\" [selected]\n    - text: 경로 목적\n    - combobox \"경로 목적\":\n      - option \"균형\" [selected]\n      - option \"예시 지연\"\n      - option \"예시 신뢰도\"\n    - text: 일정 생성 시간 h\n    - spinbutton \"일정 생성 시간 h\": \"12\"\n    - button \"시나리오 경로 조회\"\n    - button \"경로 조회 취소\"\n    - status: 입력 후 조회하세요. 변경 시 다시 조회합니다.\n    - button \"접촉 일정 조회\"\n    - button \"일정 조회 취소\"\n    - status: 입력 후 조회하세요. 변경 시 다시 조회합니다.\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/ground/RF 링크 계산",
+    "steps": [
+      {
+        "region": "body",
+        "top": 0,
+        "total": 802,
+        "h": 343
+      },
+      {
+        "region": "body",
+        "top": 240,
+        "total": 802,
+        "h": 343
+      },
+      {
+        "region": "body",
+        "top": 459,
+        "total": 802,
+        "h": 343
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국 구성\"\n    - button \"선택 위성의 가시 시간\"\n    - button \"저장 궤도 구간 분석\"\n    - button \"시나리오 통신 계획\"\n    - button \"RF 링크 계산\" [active] [pressed]\n    - button \"저장 궤도 가시 구간\"\n  - main:\n    - heading \"RF 링크 계산\" [level=2]\n    - button \"RF 링크 계산 설명 보기\": i\n    - button \"ISS 공식 조건 불러오기\"\n    - button \"공식 주파수 적용\" [disabled]\n    - status:\n      - paragraph: ISS APRS 수신, 장비 미선정, 실제 통신 미확인. 공식 공지 조건을 불러온 뒤 주파수만 적용할 수 있습니다.\n    - status\n    - text: 링크 이름\n    - textbox \"링크 이름 미확인\"\n    - generic: 미확인\n    - text: 주파수 GHz\n    - spinbutton \"주파수 GHz 미확인\"\n    - generic: 미확인\n    - text: 거리 km\n    - spinbutton \"거리 km 미확인\"\n    - generic: 미확인\n    - text: 송신 전력 W\n    - spinbutton \"송신 전력 W 미확인\"\n    - generic: 미확인\n    - text: 송신 이득 dBi\n    - spinbutton \"송신 이득 dBi 미확인\"\n    - generic: 미확인\n    - text: 수신 이득 dBi\n    - spinbutton \"수신 이득 dBi 미확인\"\n    - generic: 미확인\n    - text: 기타 손실 dB\n    - spinbutton \"기타 손실 dB 미확인\"\n    - generic: 미확인\n    - text: 대역폭 MHz\n    - spinbutton \"대역폭 MHz 미확인\"\n    - generic: 미확인\n    - text: 데이터율 Mbps\n    - spinbutton \"데이터율 Mbps 미확인\"\n    - generic: 미확인\n    - text: 시스템 잡음온도 K\n    - spinbutton \"시스템 잡음온도 K 미확인\"\n    - generic: 미확인\n    - text: 요구 Eb/N0 dB\n    - spinbutton \"요구 Eb/N0 dB 미확인\"\n    - generic: 미확인\n    - paragraph: 공식 주파수는 선택적으로 적용할 수 있습니다. 나머지는 직접 입력한 가정이며 장비 조건과 실제 수신은 미확인입니다.\n    - button \"모델 계산\"\n    - button \"조회 취소\" [disabled]\n    - status: 입력 후 계산하세요. 입력이 변경되면 재계산이 필요합니다.\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/ground/저장 궤도 가시 구간",
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국 구성\"\n    - button \"선택 위성의 가시 시간\"\n    - button \"저장 궤도 구간 분석\"\n    - button \"시나리오 통신 계획\"\n    - button \"RF 링크 계산\"\n    - button \"저장 궤도 가시 구간\" [active] [pressed]\n  - main:\n    - heading \"가상 지점, 가시 구간\" [level=2]\n    - button \"가상 지점, 가시 구간 설명 보기\": i\n    - text: 저장 입력\n    - combobox \"저장 입력\":\n      - option \"입력 선택\"\n      - option \"25544 / TLE\"\n      - option \"25544 / OMM\" [selected]\n    - text: 위도 °\n    - spinbutton \"위도 °\": \"33.4996\"\n    - text: 경도 °\n    - spinbutton \"경도 °\": \"126.5312\"\n    - text: WGS84 타원체 높이 m\n    - spinbutton \"WGS84 타원체 높이 m\": \"0\"\n    - text: 최소 고도각 °\n    - spinbutton \"최소 고도각 °\": \"10\"\n    - text: 조회 시작 UTC\n    - textbox \"조회 시작 UTC\": 2020-07-12T21:16:01.000416000Z\n    - text: 조회 종료 UTC\n    - textbox \"조회 종료 UTC\": 2020-07-13T21:16:01.000416000Z\n    - button \"지점 적용, 정지\"\n    - button \"입력 epoch부터 24시간\"\n    - button \"설정 적용 후 구간 계산\"\n    - button \"조회 취소\" [disabled]\n    - status: 계산할 설정과 UTC 범위를 확인하세요.\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/satellite/카탈로그100개 표 전체 스크롤",
+    "tableSteps": [
+      {
+        "top": 0,
+        "rows": [
+          "CALSPHERE 1\t900\tLEO\t2026-10-07T19:58:14.680704",
+          "CALSPHERE 2\t902\tLEO\t2026-10-07T23:32:41.519904",
+          "LCS 1\t1361\tMEO\t2026-10-07T23:08:00.673152",
+          "TEMPSAT 1\t1512\tLEO\t2026-10-07T18:08:47.378688",
+          "CALSPHERE 4A\t1520\tLEO\t2026-10-07T18:41:40.905024",
+          "OPS 5712 (P/L 160)\t2826\tLEO\t2026-10-07T21:46:50.829600",
+          "LES-5\t2866\tGEO\t2026-10-07T15:18:49.386240"
+        ]
+      },
+      {
+        "top": 245,
+        "rows": [
+          "CALSPHERE 4A\t1520\tLEO\t2026-10-07T18:41:40.905024",
+          "OPS 5712 (P/L 160)\t2826\tLEO\t2026-10-07T21:46:50.829600",
+          "LES-5\t2866\tGEO\t2026-10-07T15:18:49.386240",
+          "SURCAL 159\t2872\tLEO\t2026-10-07T22:23:08.296224",
+          "OPS 5712 (P/L 153)\t2874\tLEO\t2026-10-07T13:11:00.213792",
+          "RIGIDSPHERE 2 (LCS 4)\t5398\tLEO\t2026-10-07T22:13:58.694592",
+          "OSCAR 7 (AO-7)\t7530\tLEO\t2026-10-07T23:16:33.115008",
+          "STARLETTE\t7646\tLEO\t2026-10-07T19:05:39.689664",
+          "LAGEOS 1\t8820\tMEO\t2026-10-07T13:42:58.198752"
+        ]
+      },
+      {
+        "top": 490,
+        "rows": [
+          "RIGIDSPHERE 2 (LCS 4)\t5398\tLEO\t2026-10-07T22:13:58.694592",
+          "OSCAR 7 (AO-7)\t7530\tLEO\t2026-10-07T23:16:33.115008",
+          "STARLETTE\t7646\tLEO\t2026-10-07T19:05:39.689664",
+          "LAGEOS 1\t8820\tMEO\t2026-10-07T13:42:58.198752",
+          "PHASE 3B (AO-10)\t14129\tHEO\t2026-10-07T00:45:00.033696",
+          "UOSAT 2 (UO-11)\t14781\tLEO\t2026-10-07T18:31:47.159904",
+          "AJISAI (EGS)\t16908\tLEO\t2026-10-07T21:22:26.606208",
+          "TDRS 3\t19548\tGEO\t2026-10-03T05:31:22.469088",
+          "COSMOS 1989 (ETALON 1)\t19751\tMEO\t2026-10-07T08:05:25.800288"
+        ]
+      },
+      {
+        "top": 735,
+        "rows": [
+          "AJISAI (EGS)\t16908\tLEO\t2026-10-07T21:22:26.606208",
+          "TDRS 3\t19548\tGEO\t2026-10-03T05:31:22.469088",
+          "COSMOS 1989 (ETALON 1)\t19751\tMEO\t2026-10-07T08:05:25.800288",
+          "COSMOS 2024 (ETALON 2)\t20026\tMEO\t2026-10-07T17:43:02.828352",
+          "FLTSATCOM 8 (USA 46)\t20253\tGEO\t2026-10-07T14:56:16.949760",
+          "LUSAT (LO-19)\t20442\tLEO\t2026-10-07T15:33:03.096864",
+          "HST\t20580\tLEO\t2026-10-07T16:39:25.235712",
+          "TDRS 5\t21639\tGEO\t2026-10-07T09:04:56.288928"
+        ]
+      },
+      {
+        "top": 980,
+        "rows": [
+          "LUSAT (LO-19)\t20442\tLEO\t2026-10-07T15:33:03.096864",
+          "HST\t20580\tLEO\t2026-10-07T16:39:25.235712",
+          "TDRS 5\t21639\tGEO\t2026-10-07T09:04:56.288928",
+          "LAGEOS 2\t22195\tMEO\t2026-10-07T12:04:32.947104",
+          "TDRS 6\t22314\tGEO\t2026-10-04T01:18:38.067264",
+          "SCD 1\t22490\tLEO\t2026-10-07T06:01:08.199840",
+          "UFO 2 (USA 95)\t22787\tGEO\t2026-10-06T21:22:23.325600",
+          "STELLA\t22824\tLEO\t2026-10-07T21:37:54.472224"
+        ]
+      },
+      {
+        "top": 1225,
+        "rows": [
+          "SCD 1\t22490\tLEO\t2026-10-07T06:01:08.199840",
+          "UFO 2 (USA 95)\t22787\tGEO\t2026-10-06T21:22:23.325600",
+          "STELLA\t22824\tLEO\t2026-10-07T21:37:54.472224",
+          "EYESAT A (AO-27)\t22825\tLEO\t2026-10-07T17:11:16.483200",
+          "ITAMSAT (IO-26)\t22826\tLEO\t2026-10-07T17:33:51.615360",
+          "RADIO ROSTO (RS15)\t23439\tMEO\t2026-10-07T22:16:58.974240",
+          "UFO 4 (USA 108)\t23467\tGEO\t2026-10-07T11:44:27.853728",
+          "TDRS 7\t23613\tGEO\t2026-10-06T18:30:46.670400",
+          "USA 115 (MILSTAR-1 2)\t23712\tGEO\t2026-10-07T05:10:43.567392"
+        ]
+      },
+      {
+        "top": 1470,
+        "rows": [
+          "RADIO ROSTO (RS15)\t23439\tMEO\t2026-10-07T22:16:58.974240",
+          "UFO 4 (USA 108)\t23467\tGEO\t2026-10-07T11:44:27.853728",
+          "TDRS 7\t23613\tGEO\t2026-10-06T18:30:46.670400",
+          "USA 115 (MILSTAR-1 2)\t23712\tGEO\t2026-10-07T05:10:43.567392",
+          "POLAR\t23802\tHEO\t2026-10-06T17:20:45.371040",
+          "INMARSAT 3-F1\t23839\tGEO\t2026-10-07T15:03:46.232352",
+          "USA 119\t23893\tLEO\t2026-10-07T08:03:25.995456",
+          "JAS-2 (FO-29)\t24278\tLEO\t2026-10-07T13:01:10.876800",
+          "INMARSAT 3-F2\t24307\tGEO\t2026-10-06T23:06:35.831808"
+        ]
+      },
+      {
+        "top": 1715,
+        "rows": [
+          "USA 119\t23893\tLEO\t2026-10-07T08:03:25.995456",
+          "JAS-2 (FO-29)\t24278\tLEO\t2026-10-07T13:01:10.876800",
+          "INMARSAT 3-F2\t24307\tGEO\t2026-10-06T23:06:35.831808",
+          "INMARSAT 3-F3\t24674\tGEO\t2026-10-06T19:11:46.869792",
+          "NAVSTAR 43 (USA 132)\t24876\tMEO\t2026-10-07T09:10:16.144320",
+          "FORTE\t24920\tLEO\t2026-10-07T17:35:03.150240",
+          "USA 134\t25019\tGEO\t2026-10-07T09:38:29.205024",
+          "ORBCOMM FM06\t25118\tLEO\t2026-10-07T07:10:24.445920"
+        ]
+      },
+      {
+        "top": 1960,
+        "rows": [
+          "FORTE\t24920\tLEO\t2026-10-07T17:35:03.150240",
+          "USA 134\t25019\tGEO\t2026-10-07T09:38:29.205024",
+          "ORBCOMM FM06\t25118\tLEO\t2026-10-07T07:10:24.445920",
+          "INMARSAT 3-F5\t25153\tGEO\t2026-10-07T10:00:07.429824",
+          "ORBCOMM FM04\t25159\tLEO\t2026-10-07T06:50:26.647296",
+          "CELESTIS-02 & TAURUS R/B\t25160\tLEO\t2026-10-07T16:43:25.709376",
+          "TECHSAT 1B (GO-32)\t25397\tLEO\t2026-10-07T14:13:48.417600",
+          "WESTPAC\t25398\tLEO\t2026-10-07T13:17:19.723200"
+        ]
+      },
+      {
+        "top": 2205,
+        "rows": [
+          "CELESTIS-02 & TAURUS R/B\t25160\tLEO\t2026-10-07T16:43:25.709376",
+          "TECHSAT 1B (GO-32)\t25397\tLEO\t2026-10-07T14:13:48.417600",
+          "WESTPAC\t25398\tLEO\t2026-10-07T13:17:19.723200",
+          "ORBCOMM FM19\t25415\tLEO\t2026-10-07T12:03:13.769280",
+          "ORBCOMM FM20\t25416\tLEO\t2026-10-07T09:51:36.582912",
+          "ORBCOMM FM27\t25481\tLEO\t2026-10-06T09:20:35.037888",
+          "SCD 2\t25504\tLEO\t2026-10-07T13:21:10.312704",
+          "ISS (ZARYA)\t25544\tLEO\t2026-10-07T19:42:27.216576",
+          "SWAS\t25560\tLEO\t2026-10-07T13:41:58.527456"
+        ]
+      },
+      {
+        "top": 2450,
+        "rows": [
+          "ORBCOMM FM27\t25481\tLEO\t2026-10-06T09:20:35.037888",
+          "SCD 2\t25504\tLEO\t2026-10-07T13:21:10.312704",
+          "ISS (ZARYA)\t25544\tLEO\t2026-10-07T19:42:27.216576",
+          "SWAS\t25560\tLEO\t2026-10-07T13:41:58.527456",
+          "ISS (UNITY)\t25575\tLEO\t2026-10-07T19:42:27.216576",
+          "DLR-TUBSAT\t25757\tLEO\t2026-10-07T14:00:38.120256",
+          "CXO\t25867\tHEO\t2026-10-10T02:09:12.691008",
+          "ABS-6\t25924\tGEO\t2026-10-07T15:06:01.017216",
+          "NAVSTAR 46 (USA 145)\t25933\tMEO\t2026-10-07T11:26:07.115136"
+        ]
+      },
+      {
+        "top": 2695,
+        "rows": [
+          "CXO\t25867\tHEO\t2026-10-10T02:09:12.691008",
+          "ABS-6\t25924\tGEO\t2026-10-07T15:06:01.017216",
+          "NAVSTAR 46 (USA 145)\t25933\tMEO\t2026-10-07T11:26:07.115136",
+          "UFO 10 (USA 146)\t25967\tGEO\t2026-10-06T02:18:47.841984",
+          "ORBCOMM FM32\t25982\tLEO\t2026-10-07T06:35:51.436032",
+          "XMM-NEWTON\t25989\tHEO\t2026-10-08T01:06:41.885568",
+          "TERRA\t25994\tLEO\t2026-10-07T22:53:28.079808",
+          "ASIASTAR\t26107\tGEO\t2026-10-07T18:12:40.296672"
+        ]
+      },
+      {
+        "top": 2940,
+        "rows": [
+          "XMM-NEWTON\t25989\tHEO\t2026-10-08T01:06:41.885568",
+          "TERRA\t25994\tLEO\t2026-10-07T22:53:28.079808",
+          "ASIASTAR\t26107\tGEO\t2026-10-07T18:12:40.296672",
+          "IMAGE\t26113\tHEO\t2026-10-06T03:32:27.788640",
+          "USA 149 (DSP 20)\t26356\tGEO\t2026-10-06T22:30:54.634176",
+          "TDRS 8\t26388\tGEO\t2026-10-07T17:41:07.295136",
+          "ISS (ZVEZDA)\t26400\tLEO\t2026-10-07T19:42:27.216576",
+          "NAVSTAR 48 (USA 151)\t26407\tMEO\t2026-10-07T05:12:07.337376",
+          "NSS-11\t26554\tGEO\t2026-10-07T15:10:45.561792"
+        ]
+      },
+      {
+        "top": 3185,
+        "rows": [
+          "TDRS 8\t26388\tGEO\t2026-10-07T17:41:07.295136",
+          "ISS (ZVEZDA)\t26400\tLEO\t2026-10-07T19:42:27.216576",
+          "NAVSTAR 48 (USA 151)\t26407\tMEO\t2026-10-07T05:12:07.337376",
+          "NSS-11\t26554\tGEO\t2026-10-07T15:10:45.561792",
+          "USA 153\t26575\tGEO\t2026-10-07T12:51:21.053376",
+          "AMC-6\t26580\tGEO\t2026-10-07T15:24:44.220672",
+          "NAVSTAR 49 (USA 154)\t26605\tMEO\t2026-10-07T08:58:18.458400",
+          "ISS (DESTINY)\t26700\tLEO\t2026-10-07T19:42:27.216576",
+          "USA 157 (MILSTAR-2 2)\t26715\tGEO\t2026-10-07T11:21:16.692768"
+        ]
+      },
+      {
+        "top": 3430,
+        "rows": [
+          "NAVSTAR 49 (USA 154)\t26605\tMEO\t2026-10-07T08:58:18.458400",
+          "ISS (DESTINY)\t26700\tLEO\t2026-10-07T19:42:27.216576",
+          "USA 157 (MILSTAR-2 2)\t26715\tGEO\t2026-10-07T11:21:16.692768",
+          "BSAT-2A\t26720\tGEO\t2026-10-06T13:37:03.965664",
+          "OMNI-M1\t26857\tMEO\t2026-10-06T13:46:39.132192",
+          "INTELSAT 902 (IS-902)\t26900\tGEO\t2026-10-07T17:30:41.711616",
+          "PCSAT (NO-44)\t26931\tLEO\t2026-10-07T12:56:23.920800",
+          "PROBA-1\t26958\tLEO\t2026-10-07T23:04:33.169728"
+        ]
+      },
+      {
+        "top": 3675,
+        "rows": [
+          "INTELSAT 902 (IS-902)\t26900\tGEO\t2026-10-07T17:30:41.711616",
+          "PCSAT (NO-44)\t26931\tLEO\t2026-10-07T12:56:23.920800",
+          "PROBA-1\t26958\tLEO\t2026-10-07T23:04:33.169728",
+          "TIMED\t26998\tLEO\t2026-10-07T16:02:27.965472",
+          "MAROC-TUBSAT\t27004\tLEO\t2026-10-07T23:27:24.761088",
+          "COSMOS 2385\t27056\tLEO\t2026-10-07T23:55:57.158976",
+          "COSMOS 2386\t27057\tLEO\t2026-10-07T16:48:46.770912",
+          "USA 164 (MILSTAR-2 3)\t27168\tGEO\t2026-10-06T23:02:21.238656"
+        ]
+      },
+      {
+        "top": 3920,
+        "rows": [
+          "COSMOS 2385\t27056\tLEO\t2026-10-07T23:55:57.158976",
+          "COSMOS 2386\t27057\tLEO\t2026-10-07T16:48:46.770912",
+          "USA 164 (MILSTAR-2 3)\t27168\tGEO\t2026-10-06T23:02:21.238656",
+          "INTELSAT 904 (IS-904)\t27380\tGEO\t2026-10-07T18:25:39.108864",
+          "AQUA\t27424\tLEO\t2026-10-07T23:04:00.310080",
+          "DIRECTV 5 (TEMPO 1)\t27426\tGEO\t2026-10-07T12:06:33.234912",
+          "INTELSAT 905 (IS-905)\t27438\tGEO\t2026-10-07T12:11:59.781984",
+          "GALAXY 3C (G-3C)\t27445\tGEO\t2026-10-07T12:10:55.316352",
+          "COSMOS 2390\t27464\tLEO\t2026-10-07T23:34:38.586720"
+        ]
+      },
+      {
+        "top": 4165,
+        "rows": [
+          "DIRECTV 5 (TEMPO 1)\t27426\tGEO\t2026-10-07T12:06:33.234912",
+          "INTELSAT 905 (IS-905)\t27438\tGEO\t2026-10-07T12:11:59.781984",
+          "GALAXY 3C (G-3C)\t27445\tGEO\t2026-10-07T12:10:55.316352",
+          "COSMOS 2390\t27464\tLEO\t2026-10-07T23:34:38.586720",
+          "COSMOS 2391\t27465\tLEO\t2026-10-07T23:16:32.846304",
+          "INTELSAT 906 (IS-906)\t27513\tGEO\t2026-10-07T11:13:38.313120",
+          "LATINSAT B\t27606\tLEO\t2026-10-07T09:52:14.611008",
+          "SAUDISAT 1C (SO-50)\t27607\tLEO\t2026-10-07T16:36:26.271936",
+          "LATINSAT A\t27612\tLEO\t2026-10-07T13:52:05.457216"
+        ]
+      },
+      {
+        "top": 4334,
+        "rows": [
+          "COSMOS 2391\t27465\tLEO\t2026-10-07T23:16:32.846304",
+          "INTELSAT 906 (IS-906)\t27513\tGEO\t2026-10-07T11:13:38.313120",
+          "LATINSAT B\t27606\tLEO\t2026-10-07T09:52:14.611008",
+          "SAUDISAT 1C (SO-50)\t27607\tLEO\t2026-10-07T16:36:26.271936",
+          "LATINSAT A\t27612\tLEO\t2026-10-07T13:52:05.457216",
+          "NIMIQ 2\t27632\tGEO\t2026-10-06T22:25:47.246304",
+          "CORIOLIS\t27640\tLEO\t2026-10-07T14:06:19.350144",
+          "SORCE\t27651\tLEO\t2026-10-07T05:27:12.774816"
+        ]
+      }
+    ]
+  },
+  {
+    "label": "fixed/satellite/실시간 및 시각별 분석",
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"위성 찾기\"\n    - button \"실시간 및 시각별 분석\" [active] [pressed]\n    - button \"위성군 구성\"\n    - button \"저장 궤도 분석\"\n    - button \"저장 궤도 거리, 도플러\"\n  - main:\n    - heading \"실시간 궤도 분석과 시간 탐색\" [level=2]\n    - button \"실시간 궤도 분석과 시간 탐색 설명 보기\": i\n    - text: 관측 지상국\n    - combobox \"관측 지상국\":\n      - option \"지상국 선택\" [selected]\n      - option \"서울\"\n      - option \"대전\"\n      - option \"제주\"\n      - option \"스발바르\"\n      - option \"트롬쇠\"\n      - option \"페어뱅크스\"\n      - option \"이누빅\"\n      - option \"싱가포르\"\n      - option \"하와이\"\n      - option \"아타카마\"\n      - option \"푼타아레나스\"\n      - option \"호바트\"\n      - option \"금산\"\n      - option \"우스다\"\n      - option \"비얄랄루\"\n      - option \"뉴노샤\"\n      - option \"동가라\"\n      - option \"캔버라\"\n      - option \"키루나\"\n      - option \"바일하임\"\n      - option \"마드리드\"\n      - option \"마스팔로마스\"\n      - option \"쿠루\"\n      - option \"하르테비스훅\"\n      - option \"골드스톤\"\n      - option \"월롭스\"\n      - option \"말라르궤\"\n      - option \"트롤\"\n      - option \"맥머도\"\n    - text: 가정 타원체 높이 m\n    - spinbutton \"가정 타원체 높이 m\": \"0\"\n    - text: 최소 고도각 °\n    - spinbutton \"최소 고도각 °\": \"5\"\n    - text: 계산 UTC\n    - textbox \"계산 UTC\"\n    - button \"GP epoch 초안\" [disabled]\n    - button \"UTC, 관측 조건 적용 후 계산\" [disabled]\n    - button \"현재 시각 연속 분석\" [disabled]\n    - button \"카탈로그 재생\" [disabled]\n    - button \"카탈로그 정지\" [disabled]\n    - text: 배속\n    - combobox \"배속\":\n      - option \"0.1×\"\n      - option \"1×\" [selected]\n      - option \"10×\"\n      - option \"60×\"\n    - status: 카탈로그 위성을 먼저 선택하세요.\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/satellite/저장 궤도 분석",
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"위성 찾기\"\n    - button \"실시간 및 시각별 분석\"\n    - button \"위성군 구성\"\n    - button \"저장 궤도 분석\" [active] [pressed]\n    - button \"저장 궤도 거리, 도플러\"\n  - main:\n    - heading \"저장 궤도 입력, 실제 계산\" [level=2]\n    - button \"저장 궤도 입력, 실제 계산 설명 보기\": i\n    - button \"재생\"\n    - button \"정지\" [disabled]\n    - text: 속도\n    - combobox \"속도\":\n      - option \"0.1×\"\n      - option \"1×\" [selected]\n      - option \"10×\"\n      - option \"60×\"\n    - text: UTC\n    - textbox \"UTC\":\n      - /placeholder: YYYY-MM-DDTHH:mm:ss.sssssssssZ\n      - text: 2020-07-12T21:16:01.000416000Z\n    - button \"UTC 적용, 정지\"\n    - button \"입력 기준 시각으로 복귀\"\n    - generic: 1초 샘플만 보간합니다. 자료 밖에서는 위치를 표시하지 않습니다.\n    - status: 준비 완료\n    - text: 저장 입력\n    - combobox \"저장 입력\":\n      - option \"입력 선택\"\n      - option \"25544 / TLE\"\n      - option \"25544 / OMM\" [selected]\n    - generic \"입력 출처, 시각, 해시 상세\"\n    - button \"현재 UTC부터 3개 샘플 계산\"\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/satellite/저장 궤도 거리, 도플러",
+    "steps": [],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"위성 찾기\"\n    - button \"실시간 및 시각별 분석\"\n    - button \"위성군 구성\"\n    - button \"저장 궤도 분석\"\n    - button \"저장 궤도 거리, 도플러\" [active] [pressed]\n  - main:\n    - heading \"위성 거리, 도플러\" [level=2]\n    - button \"위성 거리, 도플러 설명 보기\": i\n    - paragraph: 선택한 궤도와 관측 지점의 거리 및 주파수 변화를 계산합니다.\n    - text: 계산 UTC\n    - textbox \"계산 UTC\":\n      - /placeholder: YYYY-MM-DDTHH:mm:ssZ\n    - text: 송신 주파수 MHz\n    - spinbutton \"송신 주파수 MHz\"\n    - button \"서버 UTC 가져오기\"\n    - button \"ISS 공식 주파수 불러오기\"\n    - button \"도플러 입력에 공식 주파수 적용\" [disabled]\n    - paragraph: 주파수 미확인\n    - button \"거리, 도플러 계산\"\n    - button \"거리, 도플러 조회 취소\"\n    - status: 입력 후 계산하세요. 편집, 선택 변경 시 재계산합니다.\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/satellite/위성군 구성",
+    "steps": [
+      {
+        "region": "satellite-nodes",
+        "top": 0,
+        "total": 1807,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 277,
+        "total": 1807,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 553,
+        "total": 1807,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 830,
+        "total": 1807,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 1106,
+        "total": 1807,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 1383,
+        "total": 1807,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 1412,
+        "total": 1807,
+        "h": 395
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"위성 찾기\"\n    - button \"실시간 및 시각별 분석\"\n    - button \"위성군 구성\" [active] [pressed]\n    - button \"저장 궤도 분석\"\n    - button \"저장 궤도 거리, 도플러\"\n  - main:\n    - generic \"공용 지구의 내 위성 제어\":\n      - group \"지구 보기\":\n        - generic: 지구 보기\n        - button \"뷰 초기화\"\n        - button \"뷰 정렬\" [disabled]\n        - button \"궤적\" [pressed]\n        - button \"OISL 링크\" [pressed]\n        - button \"3D 모델\" [pressed]\n        - button \"햇빛 표시\" [pressed]: 햇빛\n      - group \"분석 시각\":\n        - generic: 분석 시각\n        - generic: 표시 시각 미확인\n        - time: —\n        - generic: UTC\n        - button \"−60s\" [disabled]\n        - button \"분석 시계 재생 상태 미확인\" [disabled]: ▶\n        - button \"+60s\" [disabled]\n        - combobox \"분석 배속\" [disabled]:\n          - option \"×1\" [disabled]\n          - option \"×10\" [disabled]\n          - option \"×60\" [disabled]\n          - option \"×600\" [disabled]\n        - button \"현재\" [disabled]\n      - group \"확대, 축소\":\n        - generic: 확대, 축소\n        - button \"공용 지구 확대\": +\n        - slider \"공용 지구 확대 수준\": \"76.5\"\n        - button \"공용 지구 축소\": −\n    - paragraph: 공용 지구와 표시 UTC를 사용합니다. Kepler+J2 모의 노드, 실제 통신 미확인\n    - region \"위성군 구성 도구\":\n      - heading \"위성군 구성\" [level=2]\n      - group \"배치 프리셋\":\n        - button \"단일\"\n        - button \"열차형\"\n        - button \"Walker Δ\" [pressed]\n        - button \"Walker ★\"\n      - text: 이름 접두사\n      - textbox \"이름 접두사\": ODT\n      - text: 위성 버스\n      - combobox \"버스 프리셋\":\n        - option \"평판형 통신위성 버스\"\n        - option \"소형 통신위성 버스\" [selected]\n        - option \"지구관측 소형위성\"\n        - option \"3U 큐브샛\"\n        - option \"정지궤도 중계위성\"\n      - text: OISL 연결 정책\n      - combobox \"OISL 링크 정책\":\n        - option \"앞, 뒤 + 좌, 우 (4 링크)\" [selected]\n        - option \"앞, 뒤만 (동일 궤도면)\"\n        - option \"OISL 사용 안 함\"\n      - generic: 궤도면 수\n      - slider \"궤도면 수\": \"4\"\n      - spinbutton \"궤도면 수 입력\": \"4\"\n      - emphasis: 면\n      - generic: 면당 위성 수\n      - slider \"면당 위성 수\": \"10\"\n      - spinbutton \"면당 위성 수 입력\": \"10\"\n      - emphasis: 기\n      - generic: 고도\n      - slider \"고도\": \"550\"\n      - spinbutton \"고도 입력\": \"550\"\n      - emphasis: km\n      - generic: 경사각\n      - slider \"경사각\": \"53\"\n      - spinbutton \"경사각 입력\": \"53\"\n      - emphasis: °\n      - generic: 위상 계수 F\n      - slider \"위상 계수 F\": \"1\"\n      - spinbutton \"위상 계수 F 입력\": \"1\"\n      - emphasis\n      - generic: 위성 간 위상 간격\n      - slider \"위성 간 위상 간격\" [disabled]: \"30\"\n      - spinbutton \"위성 간 위상 간격 입력\" [disabled]: \"30\"\n      - emphasis: °\n      - generic: 첫 궤도면 승교점 적경\n      - slider \"첫 궤도면 승교점 적경\": \"0\"\n      - spinbutton \"첫 궤도면 승교점 적경 입력\": \"0\"\n      - emphasis: °\n      - generic: 궤도면 분포 폭\n      - slider \"궤도면 분포 폭\": \"360\"\n      - spinbutton \"궤도면 분포 폭 입력\": \"360\"\n      - emphasis: °\n      - generic: 첫 위성 평균 근점 이각\n      - slider \"첫 위성 평균 근점 이각\": \"0\"\n      - spinbutton \"첫 위성 평균 근점 이각 입력\": \"0\"\n      - emphasis: °\n      - checkbox \"슬라이더 즉시 반영\" [checked]\n      - text: 슬라이더 즉시 반영\n      - button \"편대 생성\"\n      - button \"편대 제거\" [disabled]\n      - button \"전체 비우기\"\n      - generic: 서버 배치 revision 0, 편집 변경 있음\n      - button \"배치 완료 → 대시보드\"\n      - button \"회수\" [disabled]\n    - complementary \"내 위성과 선택 위성\":\n      - heading \"내 위성 1\" [level=2]\n      - button \"＋ 위성 추가\"\n      - paragraph: 표시 UTC 미확인, 현재 시각 통신 분석 미확인\n      - listbox \"내 위성 목록\":\n        - option \"통신 결과 미확인 NODE-0001 LEO, 550 km, i 53.0° 정상 운용\" [selected]:\n          - generic \"통신 결과 미확인\"\n          - generic: NODE-0001\n          - generic: LEO, 550 km, i 53.0°\n          - generic: 정상 운용\n      - text: 지구관측 소형위성, NODE-0001, 참조 900001\n      - heading \"NODE-0001\" [level=3]\n      - button \"NODE-0001 설명 보기\": i\n      - generic: 정상 운용\n      - generic: LEO\n      - generic: 개별 배치\n      - button \"편집\"\n      - button \"복제\"\n      - button \"뷰 정렬\" [disabled]\n      - button \"삭제\"\n      - figure \"Earth Observing-1 사용자 지정 모델, 대표 치수 7.0 m\":\n        - img \"NASA 3D Resources 렌더링 · Earth Observing-1 (EO-1)\"\n        - generic: Earth Observing-1\n        - generic: 사용자 지정 모델, 대표 치수 7.0 m\n      - heading \"궤도 Kepler + J2, 정의 2026-10-07 11:41 UTC\" [level=4]:\n        - text: 궤도\n        - generic: Kepler + J2, 정의 2026-10-07 11:41 UTC\n      - term: 평균 고도\n      - definition: 550.0 km\n      - term: 이심률 / 경사각\n      - definition: 0.0000 / 53.00°\n      - term: 승교점 적경 (현재)\n      - definition: —°\n      - term: 근지점 편각 (현재)\n      - definition: —°\n      - term: 평균 근점 이각 (현재)\n      - definition: —°\n      - term: 주기\n      - definition: 95.65 min\n      - term: 승교점 이동률\n      - definition: \"-4.489°/일\"\n      - term: 근지점 / 원지점\n      - definition: 550 / 550 km\n      - term: 위도 / 경도\n      - definition: —° / —°\n      - term: 타원체 고도\n      - definition: — km\n      - term: 속력 (관성계)\n      - definition: — km/s\n      - term: 태양 조건\n      - definition: 위치 계산 미확인\n      - heading \"전력 순간 수지, 배터리 적분 아님\" [level=4]:\n        - text: 전력\n        - generic: 순간 수지, 배터리 적분 아님\n      - text: 발전\n      - generic: 미확인\n      - text: 소비\n      - generic: 미확인\n      - text: 여유\n      - generic: 미확인\n      - text: 배터리\n      - generic: 3,000 Wh\n      - heading \"임무 장비 전력 소비 미확인, 총 질량 579 kg\" [level=4]:\n        - text: 임무 장비\n        - generic: 전력 소비 미확인, 총 질량 579 kg\n      - generic: 광학 관측 카메라\n      - generic: 150 W\n      - generic: X 대역 데이터 다운링크\n      - generic: 60 W\n      - generic: OISL 광 단말 (표준)\n      - generic: 통신 결과 미확인\n      - generic: DTN 저장 전달 장치\n      - generic: 30 W\n      - generic: S 대역 TT&C\n      - generic: 8 W\n      - generic: GNSS 수신기\n      - generic: 5 W\n      - heading \"OISL 단말 통신 결과 미확인\" [level=4]:\n        - text: OISL 단말\n        - generic: 통신 결과 미확인\n      - generic: OISL 계산 결과가 아직 확인되지 않았습니다.\n      - paragraph:\n        - text: \"노드 탭에서 이 위성에 지정한 NASA 3D Resources 모델(Earth Observing-1 (EO-1))입니다. 표시용 형상이며 실제 기체나 촬영 이미지가 아닙니다. 대표 치수 약 7 m 기준의 실제 축척으로 표시합니다. 출처:\"\n        - link \"NASA 3D Resources\":\n          - /url: https://github.com/nasa/NASA-3D-Resources\n        - text: \", 렌더링 model_ready\"\n      - paragraph: 현재 시각의 위치 계산 미확인\n      - paragraph: \"전체 활성 단말 운용 가정: 소비 523 W, 통신 연결은 미확인\"\n      - paragraph: 표시 UTC 미확인, 현재 시각 통신 분석 미확인\n    - status: 공용 표시 UTC를 먼저 선택하세요.\n    - button \"노드 계산 다시 시도\" [disabled]\n    - button \"초안 복원, 서버 조회 재시도\" [disabled]\n    - button \"저장 배치 재확인\" [disabled]\n    - status: 공유 작업 세트, 초안 1개, 수락 배치 0개, 배치 수락 미확인, 표시 UTC 미제공, 실제 통신 미확인\n    - generic \"공유 노드 정의 확인, 초안과 수락 배치\"\n    - generic \"서버 배치 구성 JSON 보기\"\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/satellite/위성군 정의 및 배치 상세",
+    "steps": [
+      {
+        "region": "satellite-nodes",
+        "top": 0,
+        "total": 2203,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 277,
+        "total": 2203,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 553,
+        "total": 2203,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 830,
+        "total": 2203,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 1106,
+        "total": 2203,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 1383,
+        "total": 2203,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 1659,
+        "total": 2203,
+        "h": 395
+      },
+      {
+        "region": "satellite-nodes",
+        "top": 1808,
+        "total": 2203,
+        "h": 395
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 위성 상태 및 궤도\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 상태, 궤도 계산과 위성군 구성\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"위성 찾기\"\n    - button \"실시간 및 시각별 분석\"\n    - button \"위성군 구성\" [pressed]\n    - button \"저장 궤도 분석\"\n    - button \"저장 궤도 거리, 도플러\"\n  - main:\n    - generic \"공용 지구의 내 위성 제어\":\n      - group \"지구 보기\":\n        - generic: 지구 보기\n        - button \"뷰 초기화\"\n        - button \"뷰 정렬\" [disabled]\n        - button \"궤적\" [pressed]\n        - button \"OISL 링크\" [pressed]\n        - button \"3D 모델\" [pressed]\n        - button \"햇빛 표시\" [pressed]: 햇빛\n      - group \"분석 시각\":\n        - generic: 분석 시각\n        - generic: 표시 시각 미확인\n        - time: —\n        - generic: UTC\n        - button \"−60s\" [disabled]\n        - button \"분석 시계 재생 상태 미확인\" [disabled]: ▶\n        - button \"+60s\" [disabled]\n        - combobox \"분석 배속\" [disabled]:\n          - option \"×1\" [disabled]\n          - option \"×10\" [disabled]\n          - option \"×60\" [disabled]\n          - option \"×600\" [disabled]\n        - button \"현재\" [disabled]\n      - group \"확대, 축소\":\n        - generic: 확대, 축소\n        - button \"공용 지구 확대\": +\n        - slider \"공용 지구 확대 수준\": \"76.5\"\n        - button \"공용 지구 축소\": −\n    - paragraph: 공용 지구와 표시 UTC를 사용합니다. Kepler+J2 모의 노드, 실제 통신 미확인\n    - region \"위성군 구성 도구\":\n      - heading \"위성군 구성\" [level=2]\n      - group \"배치 프리셋\":\n        - button \"단일\"\n        - button \"열차형\"\n        - button \"Walker Δ\" [pressed]\n        - button \"Walker ★\"\n      - text: 이름 접두사\n      - textbox \"이름 접두사\": ODT\n      - text: 위성 버스\n      - combobox \"버스 프리셋\":\n        - option \"평판형 통신위성 버스\"\n        - option \"소형 통신위성 버스\" [selected]\n        - option \"지구관측 소형위성\"\n        - option \"3U 큐브샛\"\n        - option \"정지궤도 중계위성\"\n      - text: OISL 연결 정책\n      - combobox \"OISL 링크 정책\":\n        - option \"앞, 뒤 + 좌, 우 (4 링크)\" [selected]\n        - option \"앞, 뒤만 (동일 궤도면)\"\n        - option \"OISL 사용 안 함\"\n      - generic: 궤도면 수\n      - slider \"궤도면 수\": \"4\"\n      - spinbutton \"궤도면 수 입력\": \"4\"\n      - emphasis: 면\n      - generic: 면당 위성 수\n      - slider \"면당 위성 수\": \"10\"\n      - spinbutton \"면당 위성 수 입력\": \"10\"\n      - emphasis: 기\n      - generic: 고도\n      - slider \"고도\": \"550\"\n      - spinbutton \"고도 입력\": \"550\"\n      - emphasis: km\n      - generic: 경사각\n      - slider \"경사각\": \"53\"\n      - spinbutton \"경사각 입력\": \"53\"\n      - emphasis: °\n      - generic: 위상 계수 F\n      - slider \"위상 계수 F\": \"1\"\n      - spinbutton \"위상 계수 F 입력\": \"1\"\n      - emphasis\n      - generic: 위성 간 위상 간격\n      - slider \"위성 간 위상 간격\" [disabled]: \"30\"\n      - spinbutton \"위성 간 위상 간격 입력\" [disabled]: \"30\"\n      - emphasis: °\n      - generic: 첫 궤도면 승교점 적경\n      - slider \"첫 궤도면 승교점 적경\": \"0\"\n      - spinbutton \"첫 궤도면 승교점 적경 입력\": \"0\"\n      - emphasis: °\n      - generic: 궤도면 분포 폭\n      - slider \"궤도면 분포 폭\": \"360\"\n      - spinbutton \"궤도면 분포 폭 입력\": \"360\"\n      - emphasis: °\n      - generic: 첫 위성 평균 근점 이각\n      - slider \"첫 위성 평균 근점 이각\": \"0\"\n      - spinbutton \"첫 위성 평균 근점 이각 입력\": \"0\"\n      - emphasis: °\n      - checkbox \"슬라이더 즉시 반영\" [checked]\n      - text: 슬라이더 즉시 반영\n      - button \"편대 생성\"\n      - button \"편대 제거\" [disabled]\n      - button \"전체 비우기\"\n      - generic: 서버 배치 revision 0, 편집 변경 있음\n      - button \"배치 완료 → 대시보드\"\n      - button \"회수\" [disabled]\n    - complementary \"내 위성과 선택 위성\":\n      - heading \"내 위성 1\" [level=2]\n      - button \"＋ 위성 추가\"\n      - paragraph: 표시 UTC 미확인, 현재 시각 통신 분석 미확인\n      - listbox \"내 위성 목록\":\n        - option \"통신 결과 미확인 NODE-0001 LEO, 550 km, i 53.0° 정상 운용\" [selected]:\n          - generic \"통신 결과 미확인\"\n          - generic: NODE-0001\n          - generic: LEO, 550 km, i 53.0°\n          - generic: 정상 운용\n      - text: 지구관측 소형위성, NODE-0001, 참조 900001\n      - heading \"NODE-0001\" [level=3]\n      - button \"NODE-0001 설명 보기\": i\n      - generic: 정상 운용\n      - generic: LEO\n      - generic: 개별 배치\n      - button \"편집\"\n      - button \"복제\"\n      - button \"뷰 정렬\" [disabled]\n      - button \"삭제\"\n      - figure \"Earth Observing-1 사용자 지정 모델, 대표 치수 7.0 m\":\n        - img \"NASA 3D Resources 렌더링 · Earth Observing-1 (EO-1)\"\n        - generic: Earth Observing-1\n        - generic: 사용자 지정 모델, 대표 치수 7.0 m\n      - heading \"궤도 Kepler + J2, 정의 2026-10-07 11:41 UTC\" [level=4]:\n        - text: 궤도\n        - generic: Kepler + J2, 정의 2026-10-07 11:41 UTC\n      - term: 평균 고도\n      - definition: 550.0 km\n      - term: 이심률 / 경사각\n      - definition: 0.0000 / 53.00°\n      - term: 승교점 적경 (현재)\n      - definition: —°\n      - term: 근지점 편각 (현재)\n      - definition: —°\n      - term: 평균 근점 이각 (현재)\n      - definition: —°\n      - term: 주기\n      - definition: 95.65 min\n      - term: 승교점 이동률\n      - definition: \"-4.489°/일\"\n      - term: 근지점 / 원지점\n      - definition: 550 / 550 km\n      - term: 위도 / 경도\n      - definition: —° / —°\n      - term: 타원체 고도\n      - definition: — km\n      - term: 속력 (관성계)\n      - definition: — km/s\n      - term: 태양 조건\n      - definition: 위치 계산 미확인\n      - heading \"전력 순간 수지, 배터리 적분 아님\" [level=4]:\n        - text: 전력\n        - generic: 순간 수지, 배터리 적분 아님\n      - text: 발전\n      - generic: 미확인\n      - text: 소비\n      - generic: 미확인\n      - text: 여유\n      - generic: 미확인\n      - text: 배터리\n      - generic: 3,000 Wh\n      - heading \"임무 장비 전력 소비 미확인, 총 질량 579 kg\" [level=4]:\n        - text: 임무 장비\n        - generic: 전력 소비 미확인, 총 질량 579 kg\n      - generic: 광학 관측 카메라\n      - generic: 150 W\n      - generic: X 대역 데이터 다운링크\n      - generic: 60 W\n      - generic: OISL 광 단말 (표준)\n      - generic: 통신 결과 미확인\n      - generic: DTN 저장 전달 장치\n      - generic: 30 W\n      - generic: S 대역 TT&C\n      - generic: 8 W\n      - generic: GNSS 수신기\n      - generic: 5 W\n      - heading \"OISL 단말 통신 결과 미확인\" [level=4]:\n        - text: OISL 단말\n        - generic: 통신 결과 미확인\n      - generic: OISL 계산 결과가 아직 확인되지 않았습니다.\n      - paragraph:\n        - text: \"노드 탭에서 이 위성에 지정한 NASA 3D Resources 모델(Earth Observing-1 (EO-1))입니다. 표시용 형상이며 실제 기체나 촬영 이미지가 아닙니다. 대표 치수 약 7 m 기준의 실제 축척으로 표시합니다. 출처:\"\n        - link \"NASA 3D Resources\":\n          - /url: https://github.com/nasa/NASA-3D-Resources\n        - text: \", 렌더링 model_ready\"\n      - paragraph: 현재 시각의 위치 계산 미확인\n      - paragraph: \"전체 활성 단말 운용 가정: 소비 523 W, 통신 연결은 미확인\"\n      - paragraph: 표시 UTC 미확인, 현재 시각 통신 분석 미확인\n    - status: 공용 표시 UTC를 먼저 선택하세요.\n    - button \"노드 계산 다시 시도\" [disabled]\n    - button \"초안 복원, 서버 조회 재시도\" [disabled]\n    - button \"저장 배치 재확인\" [disabled]\n    - status: 공유 작업 세트, 초안 1개, 수락 배치 0개, 배치 수락 미확인, 표시 UTC 미제공, 실제 통신 미확인\n    - generic \"공유 노드 정의 확인, 초안과 수락 배치\"\n    - generic: \"{ \\\"drafts\\\": [ { \\\"schema\\\": 1, \\\"id\\\": \\\"NODE-0001\\\", \\\"catalog_number\\\": 900001, \\\"name\\\": \\\"NODE-0001\\\", \\\"bus\\\": \\\"eo_smallsat\\\", \\\"model_key\\\": \\\"eo_1\\\", \\\"mode\\\": \\\"nominal\\\", \\\"mass_kg\\\": 500, \\\"power\\\": { \\\"generation_w\\\": 900, \\\"bus_w\\\": 150, \\\"battery_wh\\\": 3000 }, \\\"orbit\\\": { \\\"altitude_km\\\": 550, \\\"eccentricity\\\": 0, \\\"inclination\\\": 53, \\\"raan\\\": 0, \\\"argp\\\": 0, \\\"mean_anomaly\\\": 0, \\\"epoch\\\": 1791373271753 }, \\\"equipment\\\": [ { \\\"id\\\": \\\"5a105d1f-c979-4ff3-9b9e-11b173b988b4\\\", \\\"catalog\\\": \\\"eo_camera\\\", \\\"role\\\": null, \\\"target\\\": \\\"auto\\\", \\\"enabled\\\": true }, { \\\"id\\\": \\\"fbfce19b-c644-4273-9cfc-8264a5a59bae\\\", \\\"catalog\\\": \\\"x_band_downlink\\\", \\\"role\\\": null, \\\"target\\\": \\\"auto\\\", \\\"enabled\\\": true }, { \\\"id\\\": \\\"fbd97f90-6223-450a-8cb6-1db550c508ee\\\", \\\"catalog\\\": \\\"oisl_standard\\\", \\\"role\\\": \\\"auto\\\", \\\"target\\\": \\\"auto\\\", \\\"enabled\\\": true }, { \\\"id\\\": \\\"5001d2fb-c0ba-4fb5-b26c-b7d1016b5e7c\\\", \\\"catalog\\\": \\\"dtn_store\\\", \\\"role\\\": null, \\\"target\\\": \\\"auto\\\", \\\"enabled\\\": true }, { \\\"id\\\": \\\"66817e46-9c39-4af9-bef4-5640f0417e99\\\", \\\"catalog\\\": \\\"s_band_ttc\\\", \\\"role\\\": null, \\\"target\\\": \\\"auto\\\", \\\"enabled\\\": true }, { \\\"id\\\": \\\"e2189c1b-a79d-442f-8c54-a0d1c85f083c\\\", \\\"catalog\\\": \\\"gnss_receiver\\\", \\\"role\\\": null, \\\"target\\\": \\\"auto\\\", \\\"enabled\\\": true } ], \\\"formation\\\": null, \\\"notes\\\": \\\"\\\", \\\"created_at\\\": \\\"2026-10-07T11:41:11.754Z\\\", \\\"updated_at\\\": \\\"2026-10-07T11:45:54.401Z\\\" } ], \\\"deployed\\\": [], \\\"selected_id\\\": \\\"NODE-0001\\\" }\"\n    - generic \"서버 배치 구성 JSON 보기\" [active]\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "fixed/initial/발사 초기 운용 전체",
+    "steps": [
+      {
+        "region": "work-overview-satellite",
+        "top": 0,
+        "total": 681,
+        "h": 473
+      },
+      {
+        "region": "work-overview-satellite",
+        "top": 208,
+        "total": 681,
+        "h": 473
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\" [pressed]:\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 발사 초기 운용\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 위성 분리부터 첫 교신까지의 초기 운용 절차\n  - main [active]:\n    - heading \"분리부터 첫 접촉까지\" [level=1]\n    - paragraph: SCN-01 연구 장면, 위성, 지상국, 투입 시각은 DT 입력\n    - button \"장면 편집\"\n    - heading \"다섯 업무 인계\" [level=2]\n    - generic: 01 분리 입력\n    - strong: 위성 플랫폼\n    - generic: \"필요: 분리 신호/식별\"\n    - emphasis: \"다음: 비행역학\"\n    - generic: 02 초기 궤도\n    - strong: 비행역학\n    - generic: \"필요: 상태 벡터/오차\"\n    - emphasis: \"다음: 지상국, 운용\"\n    - generic: 03 첫 접촉 준비\n    - strong: 지상국 및 통신\n    - generic: \"필요: 예약/가시/RF\"\n    - emphasis: \"다음: 관제\"\n    - generic: 04 신호, 원격측정\n    - strong: 통신, 위성\n    - generic: \"필요: AOS/건전성\"\n    - emphasis: \"다음: 운용 판단 및 인계\"\n    - generic: 05 초기 인계\n    - strong: 운용, DT 분석\n    - generic: \"필요: 실측/모델 차이\"\n    - emphasis: \"다음: 다음 교대\"\n    - heading \"DT 투입 입력\" [level=2]\n    - generic: 궤도 종류\n    - strong: LEO\n    - generic: 투입 시각\n    - strong: 분리 후 +6분\n    - generic: 후보 지상국\n    - strong: 제주 후보\n    - generic: 첫 접촉\n    - strong: 미산출\n    - heading \"운용 확인\" [level=2]\n    - generic: 분리 신호\n    - strong: 미확인\n    - generic: 궤도결정\n    - strong: 없음\n    - generic: AOS/원격측정\n    - strong: 없음\n    - generic: 모델–실측 차이\n    - strong: 미산출\n    - heading \"인계 경계\" [level=2]\n    - generic: 후보 마커의 근접은 가시성이나 신호 획득 판정이 아닙니다.\n    - button \"위성 담당\"\n    - button \"통신 담당\"\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "facility-final",
+    "steps": [
+      {
+        "region": "work-overview-settings",
+        "top": 0,
+        "total": 901,
+        "h": 473
+      },
+      {
+        "region": "work-overview-settings",
+        "top": 331,
+        "total": 901,
+        "h": 473
+      },
+      {
+        "region": "work-overview-settings",
+        "top": 428,
+        "total": 901,
+        "h": 473
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\" [pressed]:\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상 시스템 관리\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상 전산 시스템과 시설 상태 확인\n  - main [active]:\n    - heading \"지상 시스템 관리\" [level=1]\n    - paragraph: SYS-09, 2026-09-23 03:18 UTC 고정 예시\n    - button \"관련 흐름\"\n    - heading \"지금 판단할 일\" [level=2]\n    - generic: 시설 장애가 어느 관제 서비스, 접촉, 임무를 중단시키는가?\n    - generic: 실제 자료, 권한, 절차가 없어 판단은 보류합니다.\n    - button \"통합 관제 현황\"\n    - heading \"현재 자료와 업무 상태\" [level=2]\n    - generic: 사례\n    - strong: X-IT01, 연구 가정\n    - generic: 전력/냉각\n    - strong: 계측 없음\n    - generic: 컴퓨팅/저장\n    - strong: 가용성 없음\n    - generic: 지상망\n    - strong: 경로, 용량 없음\n    - generic: 대체\n    - strong: 백업 상태 없음\n    - generic: 복구\n    - strong: 실측, 수신 확인 없음\n    - heading \"증거, 인계\" [level=2]\n    - strong: 필요한 근거\n    - generic: 시설 계측, 변경 이력\n    - strong: 없음\n    - generic: 서비스→GS→임무 영향\n    - strong: 없음\n    - generic: 복구 후 RF/자료 수신\n    - strong: 없음\n    - paragraph:\n      - strong: 다음 인계\n      - text: 시설 → 통신, 데이터 → 운용 판단 및 인계\n    - heading \"계획\" [level=2]\n    - strong: GS-02 03:24 UTC\n    - text: 접촉 계획 예시\n    - heading \"관측/실측\" [level=2]\n    - strong: 원격측정, 수신, 시험용 장비 없음\n    - heading \"DT 질문\" [level=2]\n    - generic: 복구 지연과 백업 경로가 기한에 미치는 영향은?\n    - heading \"결과 확인\" [level=2]\n    - strong: 승인, 명령 수신 확인, 수신 근거 필요\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "ground-final-two-columns",
+    "steps": [
+      {
+        "region": "body",
+        "top": 0,
+        "total": 1166,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 272,
+        "total": 1166,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 545,
+        "total": 1166,
+        "h": 389
+      },
+      {
+        "region": "body",
+        "top": 777,
+        "total": 1166,
+        "h": 389
+      }
+    ],
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\":\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\" [pressed]:\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 지상국 및 통신\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 지상국 구성, 교신 가능 시간과 통신 조건 확인\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"지상국 구성\" [pressed]\n    - button \"선택 위성의 가시 시간\"\n    - button \"저장 궤도 구간 분석\"\n    - button \"시나리오 통신 계획\"\n    - button \"RF 링크 계산\"\n    - button \"저장 궤도 가시 구간\"\n  - main [active]:\n    - status: 서버 DB 저장 완료\n    - strong: 한반도 지상국\n    - generic: 지점을 선택하거나 새 위치를 지정하세요\n    - generic \"한반도 지상국 위치 선택 지도\":\n      - button \"대전 상태 보기\":\n        - generic: ●\n        - generic: 대전\n      - button \"제주 상태 보기\":\n        - generic: ●\n        - generic: 제주\n      - button \"서울 상태 보기\":\n        - generic: ●\n        - generic: 서울\n      - link \"© OpenStreetMap contributors\":\n        - /url: https://www.openstreetmap.org/copyright\n    - status\n    - complementary:\n      - heading \"한반도 지도 내 지상국\" [level=3]\n      - button \"대전 사용\":\n        - generic: 대전\n        - generic: 사용\n      - button \"제주 사용\":\n        - generic: 제주\n        - generic: 사용\n      - button \"서울 사용\" [pressed]:\n        - generic: 서울\n        - generic: 사용\n      - generic \"해외 지상국\"\n      - heading \"서울\" [level=3]\n      - generic: 통신망 사용\n      - generic: 위도\n      - generic: 37.5717°\n      - generic: 경도\n      - generic: 126.9734°\n      - generic: 안테나\n      - generic: 7.3 m\n      - generic: 최소 고각\n      - generic: 5°\n      - generic: 실제 연결\n      - generic: 미확인\n      - generic: 지원 대역\n      - generic: S / X / Ka\n      - button \"선택 지상국 설정\"\n      - button \"이 지상국 사용 안 함\"\n      - button \"선택 지상국 초점\" [disabled]\n      - heading \"새 가상 지상국\" [level=3]\n      - button \"지도에서 위치 지정\"\n      - text: 위도 °\n      - spinbutton \"위도 °\": \"36.5\"\n      - text: 경도 °\n      - spinbutton \"경도 °\": \"127.5\"\n      - button \"좌표로 후보 위치 확인\"\n      - status: 후보 위치를 지정하세요.\n      - button \"선택 위치에 가상 지상국 추가\" [disabled]\n    - generic \"공개 지상국 목록에서 선택\"\n    - option \"모든 지역\" [selected]\n    - option \"대한민국\"\n    - option \"아시아, 오세아니아\"\n    - option \"유럽, 아프리카\"\n    - option \"북미, 남미\"\n    - option \"극지\"\n    - option \"지상국 선택\" [selected]\n    - option \"금산\"\n    - option \"대전\"\n    - option \"서울\"\n    - option \"제주\"\n    - option \"뉴노샤\"\n    - option \"동가라\"\n    - option \"비얄랄루\"\n    - option \"싱가포르\"\n    - option \"우스다\"\n    - option \"캔버라\"\n    - option \"하와이\"\n    - option \"호바트\"\n    - option \"마드리드\"\n    - option \"마스팔로마스\"\n    - option \"바일하임\"\n    - option \"키루나\"\n    - option \"하르테비스훅\"\n    - option \"골드스톤\"\n    - option \"말라르궤\"\n    - option \"아타카마\"\n    - option \"월롭스\"\n    - option \"쿠루\"\n    - option \"페어뱅크스\"\n    - option \"푼타아레나스\"\n    - option \"맥머도\"\n    - option \"스발바르\"\n    - option \"이누빅\"\n    - option \"트롤\"\n    - option \"트롬쇠\"\n    - generic \"지상국 목록 및 저장 관리\"\n    - option \"서울, 대한민국\" [selected]\n    - option \"트롬쇠, 노르웨이\"\n    - option \"페어뱅크스, 미국 알래스카\"\n    - option \"이누빅, 캐나다\"\n    - option \"싱가포르, 싱가포르\"\n    - option \"하와이, 미국\"\n    - option \"아타카마, 칠레\"\n    - option \"푼타아레나스, 칠레\"\n    - option \"호바트, 호주\"\n    - option \"직접 입력 (위도, 경도)\"\n    - option \"지상국 선택\"\n    - option \"대전, 사용, 36.3742°/127.3567°, 5°\"\n    - option \"제주, 사용, 33.4996°/126.5312°, 5°\"\n    - option \"스발바르, 사용, 78.2298°/15.4078°, 3°\"\n    - option \"서울, 사용, 37.5717°/126.9734°, 5°\" [selected]\n    - status: 지상국 4개, 저장 구성\n    - generic \"배치 위성 통신 분석\"\n    - option \"대전\" [selected]\n    - option \"제주\"\n    - option \"스발바르\"\n    - option \"서울\"\n    - option \"대전\" [selected]\n    - option \"제주\"\n    - option \"스발바르\"\n    - option \"서울\"\n    - option \"노드 선택\" [selected]\n    - option \"노드 선택\" [selected]\n    - option \"균형\" [selected]\n    - option \"지연 최소\"\n    - option \"신뢰도\"\n  - button \"작업 창 크기 조절\""
+  },
+  {
+    "label": "settings-help-final",
+    "evidence": {
+      "height": 94,
+      "open": true,
+      "smallDisplay": "block",
+      "text": "공용 지구의 표시 설정입니다. 궤도 입력, UTC, 모의실험은 바뀌지 않습니다. 태양 방향은 표시 UTC의 계산 모델이며 실측, 일식, 발전량 판정이 아닙니다.",
+      "width": 418
+    },
+    "snapshot": "- complementary \"AerODT 작업 영역\":\n  - link \"AerODT Satellite 상황판\":\n    - /url: \"#wall\"\n    - img \"AerODT\"\n  - generic: SATELLITE\n  - navigation \"작업 대상\":\n    - button \"상황판 작업 목록 열기\" [pressed]:\n      - generic: 상황판\n    - button \"위성 작업 목록 열기\":\n      - generic: 위성\n    - button \"지상국 작업 목록 열기\":\n      - generic: 지상국\n    - button \"임무 작업 목록 열기\":\n      - generic: 임무\n    - button \"데이터 작업 목록 열기\":\n      - generic: 데이터\n    - button \"보안 작업 목록 열기\":\n      - generic: 보안\n    - button \"시험 작업 목록 열기\":\n      - generic: 시험\n    - button \"시스템 작업 목록 열기\":\n      - generic: 시스템\n  - button \"환경 설정\":\n    - generic: 환경 설정\n- generic: 현재 대상 미선택\n- generic: 현재 대상 미확인 / 자료 미확인 / 배치 미확인 / 모의실험 실행 미확인\n- button \"운용 모드 변경\": 단독 운용\n- generic: 운용 예시\n- generic: 계획\n- generic: DT 가정\n- generic: 미연동, 미확인\n- button \"현재 시각 ▾\"\n- generic \"저장 궤도 ITRF 지구\":\n  - link \"Cesium ion\":\n    - /url: https://cesium.com/\n    - img \"Cesium ion\"\n- button \"궤적 ON\" [disabled] [pressed]\n- region \"선택 위성 빠른 상태\":\n  - generic: 선택 위성, 빠른 상태\n  - strong: 미선택, 현재 대상 미확인\n  - generic: 자료 없음, 실제 원격측정, RF 미확인\n  - term: 사건\n  - definition: 실제 경보 미연동\n  - term: 자료 시각\n  - definition: 분석 UTC 미확인\n  - button \"계산 위치로 이동\" [disabled]\n  - generic \"상세정보\"\n  - button \"위성 상태 및 궤도 열기\"\n- region \"Satellite 작업 창\":\n  - button \"작업 창 이동\": 환경 설정\n  - button \"작업 창 최소화\": −\n  - button \"작업 창 확장\": □\n  - button \"별도 창으로 열기\": ↗\n  - button \"작업 창 닫기\": ×\n  - paragraph: 화면 표시와 공통 운용 설정\n  - navigation \"현재 작업의 기능 구역\":\n    - button \"공용 지구 표시 설정\" [pressed]\n    - button \"화면 설정과 자료 출처\"\n  - main:\n    - heading \"공용 지구 표시 설정\" [level=2]\n    - button \"공용 지구 표시 설정 설명 보기\" [expanded] [active]: i\n    - generic: 공용 지구의 표시 설정입니다. 궤도 입력, UTC, 모의실험은 바뀌지 않습니다. 태양 방향은 표시 UTC의 계산 모델이며 실측, 일식, 발전량 판정이 아닙니다.\n    - text: 표시 방식\n    - combobox \"표시 방식\":\n      - option \"3D 지구\" [selected]\n      - option \"2D 지도\"\n    - text: 지도\n    - combobox \"지도\":\n      - option \"NASA Blue Marble\" [selected]\n      - option \"ArcGIS 위성 영상\"\n      - option \"OpenStreetMap\"\n      - option \"Natural Earth\"\n    - text: 지도 테마\n    - combobox \"지도 테마\":\n      - option \"어두움\"\n      - option \"밝음\" [selected]\n    - checkbox \"위성 강조\" [checked]\n    - text: 위성 강조\n    - status: \"표시 지도: NASA Blue Marble\"\n    - checkbox \"태양 방향 음영\" [checked]\n    - text: 태양 방향 음영\n    - button \"태양 자료 다시 받기\"\n    - status: 현재 시각 (위성 선택 불필요), 2026-10-08 15:21:39 KST | 음영 적용됨 | 태양 화면 밖\n    - generic \"태양 계산 정보\"\n    - button \"기준 위성 및 궤도 선택\"\n    - checkbox \"전체 위성 표시\"\n    - text: 전체 위성 표시\n  - button \"작업 창 크기 조절\""
+  }
+]

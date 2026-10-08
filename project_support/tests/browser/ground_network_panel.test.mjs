@@ -69,3 +69,8 @@ for(const [width,height] of [[1280,720],[1920,1080]])test(`V6 fabric actions req
   await f.win.dispatch('pagehide',{persisted:false});
  }finally{f.dispose();}
 });
+
+test('ground station browser joins the existing network panel without duplicating controls',()=>{const f=fixture(1280,720,{hash:'#ground'});try{assert.equal(f.get('station-workspace').parentElement,f.get('ground-node-station-browser'));assert.ok(f.get('station-select'));assert.equal(f.get('screen').children.includes(f.get('station-workspace')),false);}finally{f.dispose();}});
+
+import {groundNetworkSummaryMarkup} from '../../../user_application/web/scripts/tabs/ground_network.js';
+test('ground overview labels satellite versus ground counts and puts approximation details behind disclosure',()=>{const html=groundNetworkSummaryMarkup({utc:'2026-10-07T11:00:00.000000000Z',network:{nodes:[{kind:'satellite'},{kind:'ground'},{kind:'ground'}],links:[{}]}});assert.match(html,/표시 위성<\/span><strong>1/);assert.match(html,/지상국<\/span><strong>2/);assert.match(html,/计算连接|계산 연결/);assert.match(html,/<time[^>]+>2026-10-07 11:00:00 UTC/);assert.match(html,/<details[\s\S]*GMST/);assert.match(html,/모든 활성 지상국 간 연결 가정/);});

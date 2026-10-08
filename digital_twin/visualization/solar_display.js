@@ -21,7 +21,7 @@ export class SolarDisplay {
     record.last=value;object[key]=value;
   }
   _lighting(){
-    const shaded=Boolean(this.sample)&&this.enabled&&this.theme!=='light';
+    const shaded=Boolean(this.sample)&&this.enabled;
     this._own(this.viewer.scene.globe,'enableLighting',shaded);
     this._own(this.viewer.scene.globe,'dynamicAtmosphereLighting',shaded);
     this._own(this.viewer.scene.globe,'dynamicAtmosphereLightingFromSun',false);

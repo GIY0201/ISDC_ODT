@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:34b0287e820ca1144784501eb36ab298cbc715c2647c3c943a92221084362cc7",
+  "claims": [
+    {
+      "id": "claim_1e61ea3ce90d41c18154cd73e03f3571",
+      "statement": "군집 서비스는 관측 인도, 궤도상 연산, 중계 전송, 외부 위성 데이터 수신과 군집 소프트웨어 갱신의 다섯 종류다.",
+      "evidence": [
+        {
+          "resource": "repo://digital_twin/model_library/browser/mission_types.js",
+          "version": "repo-file-v1:sha256:40131bdce418a95bb882e84b2a729fb718af7070ea6877af99313804ef1f04a7"
+        }
+      ]
+    },
+    {
+      "id": "claim_6197d42f360a4158b9ca1f796a084944",
+      "statement": "현재 원본 임무 편집 패널은 mission 화면에만 나타나고 저장 전 편집 및 외부 변경을 계획/확정 전에 검사한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/tabs/source_missions.js",
+          "version": "repo-file-v1:sha256:fedba8c4d5a74a1875bc99eceb2343a83ff9004d5242e48e5681a2c1bf754d5f"
+        }
+      ]
+    },
+    {
+      "id": "claim_ef4c5af5db314748855f8fcb9d284cee",
+      "statement": "orchestration 보호 경로는 모듈 버전과 현재 문맥, 분석 UTC 및 노드/지상국 입력을 확인해 계획과 확정을 수행한다.",
+      "evidence": [
+        {
+          "resource": "repo://communication/http/orchestration.py",
+          "version": "repo-file-v1:sha256:59c31f4791464fcd9e56145c84a1e0294e36547787b909673b825fef64d1cffa"
+        }
+      ]
+    },
+    {
+      "id": "claim_a6bdd0b43bdb4a2bb6472cd1e8e62a61",
+      "statement": "임무 종류 시험은 분석 시각에 따른 진행률·상태와 safe 모드 능력 제한을 확인한다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/tests/browser/source_mission_types.test.mjs",
+          "version": "repo-file-v1:sha256:26b89f47b743d6327c5d434d75605a664debd6f0a80ef161b788818576f273b4"
+        }
+      ]
+    },
+    {
+      "id": "claim_4ae2822876f94b159e54f798d0e92066",
+      "statement": "U036 화면 검토는 UTC 기반 군집 서비스 계획과 0~100 축 SIM 임무 편집기를 서로 다른 입력 기능으로 유지한다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/docs/validation/u036_workspace_ui_audit.md",
+          "version": "repo-file-v1:sha256:adce8059cbcd61e0fc8650857256891510ffccf18195bd45ac2d76b88ddea88b"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-08T08:27:37.110Z"
+  }
+}

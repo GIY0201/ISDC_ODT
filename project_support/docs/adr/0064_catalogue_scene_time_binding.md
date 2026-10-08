@@ -62,3 +62,13 @@ globe scenario 분기는 이 등록된 증거를 검증한 전체 scene만 허�
 ## 회귀 및 수락
 
 구현 전에 실제 기존 stored/scenario/catalog owner를 사용한 회귀시험으로 연결 누락을 재현한다. 관측소·선택 catalogue 위성이 없어도 valid stored cursor의 UTC가 전체 native scene 요청에 전달되는지, 정지/재생과 원천 변경·실패·늦은 응답이 정확히 처리되는지 확인한다. 원천 없는 fresh ON의 한 번 스냅샷, OFF 뒤 요청 취소, 전체 행/hash409 실패, 기존 catalogue 같은-group 및 601 관측 경로, no server command를 확인한다. 단위/조립 시험은 실제 모션이나 GPU 수락이 아니며 두 화면에서 위치 변화와 표시 UTC/출처를 별도로 검증한다. 전체 이식과 미해결 live 정책은 열린 상태다.
+
+## 2026-10-07 원본 선택 독립 live 정책 확정 (위 미해결 정책 대체)
+
+사용자 전체 이식 목표에 따라 fresh 전체 카탈로그 ON은 pinned 원본 `orbit/clock.js`의 `OrbitClock`을 바이트 그대로 재사용한 단 하나의 workspace catalogue owner를 사용한다. renderer마다 시계를 만들지 않는다. 원본 클래스 외부의 조립 epoch와 lifecycle만 추가한다. 이 분석 cursor는 서버 runtime이나 현재 궤도 상태가 아니며, 실제 현재 UTC에 대한 native GP 계산 요청의 시간 출처다. 위치 UTC는 원래 응답 analysis UTC 그대로 유지한다.
+
+원천 우선순위는 명시 SIM/scenario follow, 명시 same-group catalogue follow, 사용자가 실제 저장 입력 명령을 선택한 경우의 stored cursor, 그 밖의 `catalogue_live`다. 서버 저장 상태를 GET으로 복원한 사실만으로 fresh live를 과거 paused cursor로 바꾸지 않는다. 외국 그룹/실패한 명시 follow는 live로 우회하지 않고 failclosed한다. `catalogue_live` context는 `catalogue_live:<owner-generation>` key, 기존 LEAP canonical UTC, null EOP sourcehash를 가진다. native 장면은 독립 IERS-A/EOP hash와 전체 GP hash를 검증한다.
+
+whole ON 동안에만 기존 `catalog_scene`의 단일 scheduling timer가 optional `readUtc` callback을 통해 기존 owner cursor를 읽는다. 선택과 관측소가 없어도 1초 최소 시작 간격/단일 HTTP/최신 desired UTC를 유지한다. OFF/leave/destroy/error는 timer와 native pending 권한을 취소하며 자동 서버 명령, renderer timer 또는 두 번째 query lane을 추가하지 않는다. pause/play/speed/step/live는 같은 original cursor에만 위임하고 command entry에서 표시 lease를 취소한 뒤 새 native 응답으로만 재등록한다. old lease는 복원하지 않는다.
+
+기존 저장 계산 IERS-B와 catalogue IERS-A는 별개다. 현재 catalogue snapshot의 예측 범위는 별도로 검증하며 범위 밖에는 native 실패/terminal 정책을 유지한다. EOP clamping, 가짜 날짜, GP epoch 치환, EOP 파일 자동갱신은 금지한다. 원본 live 수용에는 관측소/선택 없이 두 display의 실제 UTC와 위치가 진행하고 pause/resume/OFF가 일치하는 브라우저 증거가 필요하다.

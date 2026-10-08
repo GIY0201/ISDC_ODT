@@ -36,7 +36,7 @@
 .cp-table { max-height: 360px; overflow: auto; }
 .cp-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .cp-table th, .cp-table td { padding: 8px; text-align: left; border-bottom: 1px solid #344452; white-space: nowrap; }
-.cp-table th { position: sticky; top: 0; background: #10212c; }
+.cp-table th { position: sticky; top: 0; background:var(--workspace-frame,#10212c); }
 
 .catalog-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end}.catalog-controls label{display:grid;gap:4px}.catalog-controls input{min-width:220px}#catalog-workspace .body{overflow-wrap:anywhere}#cat-detail dl{display:grid;grid-template-columns:minmax(130px,1fr) 2fr;gap:6px}#cat-detail dd{margin:0}#cat-list{max-height:350px;overflow:auto}
 /* Original satellite hover surface, mounted once in the existing globe. */
@@ -248,3 +248,37 @@ html[data-theme="light"] .mt .mt-task.running rect { stroke: #10213c; }
 .work-window #screen .headrow p{font-size:12px;line-height:1.5}.work-window #screen input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),.work-window #screen select,.work-window #screen textarea{min-height:32px;padding:5px 8px;max-width:100%;box-sizing:border-box}.work-window #screen .actions{gap:8px;flex-wrap:wrap}.work-window #screen details>summary{min-height:28px;padding:5px 0;cursor:pointer}
 .work-window #screen .satellite-node-work-panel .ns-note,.work-window #screen .satellite-node-work-panel .ns-kicker,.work-window #screen .satellite-node-work-panel .ns-values dt,.work-window #screen .satellite-node-work-panel small,.work-window #screen .satellite-node-work-panel .ns-terminal-grid,.work-window #screen .satellite-node-work-panel .ns-fleet-mode{font-size:12px;line-height:1.5}.work-window #screen #station-workspace label{display:inline-flex;gap:7px;align-items:center;margin:0 12px 8px 0}.work-window #screen #station-workspace .button{margin:0 6px 8px 0}
 .work-window #screen #wall-summary p{font-size:12px;line-height:1.55}.work-window #screen .wall-scope-controls{gap:8px;flex-wrap:wrap}
+/* Existing SIM controls and native telemetry, grouped without another panel owner. */
+#sim-workspace #sim-controls{display:grid;gap:18px}
+#sim-workspace .sim-control-group{min-width:0;margin:0}
+#sim-workspace .sim-control-group h3{margin:0 0 9px}
+#sim-workspace .sim-configuration-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px 18px}
+#sim-workspace .sim-configuration-fields .pair{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+#sim-workspace .sim-configuration-fields label{display:grid;gap:6px;flex:1;min-width:140px}
+#sim-workspace #sim-fault-form .pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px;margin-bottom:12px}
+#sim-workspace #sim-fault-form label{display:grid;gap:6px;min-width:0}
+#sim-workspace #sim-metrics,#sim-workspace #sim-faults,#sim-workspace #sim-events{margin-top:20px;min-width:0}
+#sim-workspace .sim-metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:10px;margin:0}
+#sim-workspace .sim-metric-card{padding:12px;border-radius:6px;background:var(--panel-inset);border:1px solid var(--line);min-width:0}
+#sim-workspace .sim-metric-card dt{font-size:12px;line-height:1.5;color:var(--muted);overflow-wrap:anywhere}
+#sim-workspace .sim-metric-card dd{margin:6px 0 0;font-size:21px;line-height:1.3;color:var(--text);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#sim-workspace .sim-event-table{overflow:auto;max-height:24rem}
+#sim-workspace .sim-event-table table{table-layout:fixed}
+#sim-workspace .sim-event-table th:first-child{width:90px}
+#sim-workspace .sim-event-table th:nth-child(2){width:130px}
+#sim-workspace .sim-event-table td{overflow-wrap:anywhere}
+#sim-workspace .sim-guidance{margin-top:18px;line-height:1.6}
+
+/* Keep scrolling in the available work area, including expanded and narrow windows. */
+.work-window[data-work-layout] #screen>[data-work-section-hidden=false]{flex:1 1 0!important;min-height:0!important;height:auto!important}
+.work-window[data-work-layout] #screen>.view:not(.wall-live) .panel{flex:0 0 auto;overflow:visible}
+.work-window[data-work-layout] #screen>.view:not(.wall-live) .panel>.body{height:auto;overflow:visible}
+.work-window[data-work-layout] #screen>.view:not(.wall-live)>.bottom,.work-window[data-work-layout] #screen>.view:not(.wall-live)>.lower{flex:0 0 auto}
+.work-window[data-work-layout] #screen #satellite-nodes .ns-inspector{max-height:none}
+.work-window[data-work-layout] #screen #satellite-nodes .ns-detail{flex:0 0 auto;overflow:visible}
+.work-window[data-work-layout] #screen>.panel>.body,.work-window[data-work-layout] #screen>.panel>.panel-body,.work-window[data-work-layout] #screen>.view{scroll-padding-block:12px;scrollbar-gutter:stable}
+.work-window #screen .cp-table th,.work-window #screen .cp-table td{white-space:normal;overflow-wrap:anywhere}
+.work-window #screen summary:focus-visible,.work-window #screen textarea:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+#catalog-workspace #cat-position-help{display:inline-grid;vertical-align:middle;margin-inline-start:6px}
+.work-window[data-work-layout] #screen:has(>#trial-environment){display:block;overflow:auto;overscroll-behavior:contain}
+.work-window[data-work-layout] #screen:has(>#trial-environment)>#satellite-nodes{flex:none!important;overflow:visible}

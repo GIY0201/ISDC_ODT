@@ -747,3 +747,5 @@ is fullnative validatedfuture flow then actual UI acceptance, not a physics stub
 - [ ] T198 Single current-target status row and configured-mode label; remove duplicated header/UTC unknown badge, duplicate integration heading and personal-author wording throughout UI.
 - [ ] T199 Readable simulated security verdict/cards/history/details with original API and status semantics preserved.
 - [ ] T200 Restore situation-board functional overview from existing current owners; repair blank-blue source-less 2D Earth and explain missing data accurately without invented UTC/positions.
+
+- [ ] T201 [T193] Restore pinned original station/selection-independent whole-catalogue live using one OrbitClock owner and existing catalogue scene scheduling lane; precode ADR0064/contract/spec amendment and RED required. Preserve explicit source overrides/nativeUTC and OFF/error/currentness guards. Registered catalogue_live proof must pass main/replica; actual dual-display motion/pause/resume/OFF before closure.

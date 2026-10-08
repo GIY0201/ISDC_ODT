@@ -1,3 +1,4 @@
+import {missionSummary,resourceSummary,conditionSummary} from '../operator_summary.js?v=u016';
 const copy=value=>structuredClone(value);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const lanes=['관측','처리','저장','전송','검증'];
@@ -51,6 +52,7 @@ export function createMissionWorkspace(api,changed=()=>{}){
 }
 
 export function createMissionPanel(api){
+  const document=globalThis.document;
   let view=null,last='',autoLoaded=false;
   const controller=createMissionWorkspace(api,draw);
   function draw(reason){
@@ -64,7 +66,7 @@ export function createMissionPanel(api){
     const html=`<header><h2>임무 관리 · 기존 SIM</h2><small>서버 임무 / 실명령·AI 아님</small></header><div class="body">
       <div class="actions"><label class="form">임무 <select id="mw-mission" ${s.busy?'disabled':''}>${s.missions.length?s.missions.map(item=>`<option value="${esc(item.id)}" ${item.id===s.selected?'selected':''}>${esc(item.id)} · ${esc(item.name)}</option>`).join(''):'<option value="">임무 없음</option>'}</select></label><button class="button" id="mw-refresh" ${s.busy?'disabled':''}>서버 새로고침</button></div>
       <p id="mw-feedback" role="status">${esc(s.status)} ${esc(s.error)}</p>
-      ${m?`<p id="mw-summary">${esc(m.name)} · ${esc(m.status)} · ${m.progress}% · PLAN v${m.plan_version}</p><p id="mw-resources">자원: ${Object.entries(m.resources||{}).map(([key,value])=>`${esc(key)} ${esc(value)}%`).join(' / ')}</p><p id="mw-conditions">성공 조건(기존 설정): ${(m.success_conditions||[]).map(esc).join(' / ')||'없음'} · 실측 충족 판정 아님</p>`:''}
+      ${m?`<div id="mw-summary" class="mission-summary">${missionSummary(m)}</div><div id="mw-resources" class="resource-summary">${resourceSummary(m.resources)}</div><div id="mw-conditions">${conditionSummary(m.success_conditions)}</div>`:''}
       <div class="actions">${['start','pause','replan','abort','complete'].map((action,i)=>`<button class="button" id="mw-action-${action}" ${disabled?'disabled':''}>${['실행','일시정지','재계획 상태 전환','중단','완료'][i]}</button>`).join('')}</div>
       <p>계획 축 0~100 · 원본에 물리 시간 단위가 지정되지 않았습니다.</p>
       <label class="form">작업 편집 <select id="mw-task" ${disabled?'disabled':''}><option value="">새 작업</option>${(m?.tasks||[]).map(t=>`<option value="${esc(t.id)}" ${t.id===d.task_id?'selected':''}>${esc(t.id)} · ${esc(t.name)}</option>`).join('')}</select></label>
@@ -73,14 +75,14 @@ export function createMissionPanel(api){
       <div class="actions"><button class="button" id="mw-validate" ${disabled?'disabled':''}>현재 계획 충돌 검사</button><button class="button" id="mw-preview" ${disabled?'disabled':''}>규칙 기반 재계획 미리보기</button><button class="button" id="mw-apply" ${disabled||!p?'disabled':''}>최신 계획에서 재계산·적용</button></div>
       <div id="mw-validation">${v?`<p>현재 계획 v${v.plan_version} · 충돌 ${v.conflict_count}건 · ${v.valid?'통과':'충돌 있음'}</p><ul>${v.conflicts.map(c=>`<li>${esc(c.type)} · ${esc(c.message)} · ${esc((c.task_ids||[]).join(', '))}</li>`).join('')}</ul>`:'<p>현재 계획 검증 결과 없음</p>'}</div>
       <div id="mw-preview-result">${p?`<p>미적용 시각 변경 제안 ${p.diff.length}개 · 기준 PLAN v${p.mission.plan_version}</p><ul>${p.diff.map(x=>`<li>${esc(x.task_id)}: ${esc(x.before)} → ${esc(x.after)}</li>`).join('')}</ul>`:''}</div>
-      <p class="small muted">미리보기의 충돌 판정은 현재 계획 기준입니다. 미리보기는 계획을 바꾸지 않고 조회 이벤트를 남깁니다. 적용은 최신 서버 계획을 재계산하며, 다른 창의 변경이 있으면 제안과 달라질 수 있습니다. 서버 새로고침으로 최신 상태를 확인하세요.</p></div>`;
+      <details><summary>계획 미리보기 안내</summary><p class="small muted">미리보기의 충돌 판정은 현재 계획 기준입니다. 미리보기는 계획을 바꾸지 않고 조회 이벤트를 남깁니다. 적용은 최신 서버 계획을 재계산하며, 다른 창의 변경이 있으면 제안과 달라질 수 있습니다. 서버 새로고침으로 최신 상태를 확인하세요.</p></details></div>`;
     if(reason==='telemetry'&&m){
       // A server update must not replace the form nodes or the local task draft.
       const put=(id,text)=>{const node=panel.querySelector('#'+id);if(node)node.textContent=text;};
-      put('mw-summary',`${m.name} · ${m.status} · ${m.progress}% · PLAN v${m.plan_version}`);
+      const summary=panel.querySelector('#mw-summary');if(summary)summary.innerHTML=missionSummary(m);
       put('mw-feedback',`${s.status} ${s.error}`);
-      put('mw-resources',`자원: ${Object.entries(m.resources||{}).map(([k,x])=>`${k} ${x}%`).join(' / ')}`);
-      put('mw-conditions',`성공 조건(기존 설정): ${(m.success_conditions||[]).join(' / ')||'없음'} · 실측 충족 판정 아님`);
+      const resources=panel.querySelector('#mw-resources');if(resources)resources.innerHTML=resourceSummary(m.resources);
+      const conditions=panel.querySelector('#mw-conditions');if(conditions)conditions.innerHTML=conditionSummary(m.success_conditions);
       const rows=panel.querySelector('#mw-task-rows');if(rows)rows.innerHTML=(m.tasks||[]).map(t=>`<tr><td>${esc(t.id)} · ${esc(t.name)}</td><td>${esc(t.lane)}</td><td>${t.start}</td><td>${t.duration}</td><td>${esc(t.predecessor||'없음')}</td><td>${esc(t.status)}</td></tr>`).join('');
       const task=panel.querySelector('#mw-task');if(task){task.innerHTML='<option value="">새 작업</option>'+(m.tasks||[]).map(t=>`<option value="${esc(t.id)}">${esc(t.id)} · ${esc(t.name)}</option>`).join('');task.value=m.tasks.some(t=>t.id===d.task_id)?d.task_id:'';}
       if(!v){const validation=panel.querySelector('#mw-validation');if(validation)validation.innerHTML='<p>현재 계획 검증 결과 없음</p>';}

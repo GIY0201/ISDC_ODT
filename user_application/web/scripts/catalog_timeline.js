@@ -7,8 +7,9 @@ const samePoint=(a,b)=>['latitude_deg','longitude_deg','ellipsoid_height_m','vir
 const quality=v=>['ut1','polar_motion'].every(k=>['final_b','observed_a','predicted_a'].includes(v?.[k]));
 
 export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}){
+ const wallNow=host.wallNow??(()=>Date.now());
  const now=host.now??(()=>performance.now()),requestFrame=host.requestFrame??(fn=>requestAnimationFrame(fn)),cancelFrame=host.cancelFrame??(id=>cancelAnimationFrame(id)),requestId=host.requestId??(()=>createBrowserId());
- const s={selected:null,observer:null,minimumElevation:5,utc:'',playing:false,rate:1,pending:false,buffer:null,display:null,error:''};
+ const s={selected:null,observer:null,minimumElevation:5,utc:'',playing:false,live:false,sceneFollowing:false,rate:1,pending:false,buffer:null,display:null,error:''};
  let dead=false,generation=0,abort=null,frame=null,codec=null,sampleBuffer=null,anchorUtc=null,anchorMs=0,lastNotify=-Infinity;
  const continuityProofs=new WeakMap(),continuityObservers=new Set();
  let continuityToken=Object.freeze({}),continuityLease=null,commandDepth=0,displayAvailable=false;
@@ -16,6 +17,7 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
  function continuityEvent(phase,reason){if(dead)return;for(const fn of [...continuityObservers]){try{fn(Object.freeze({phase,reason}));}catch{/* Observers cannot own the catalog clock. */}}}
  function revokeContinuity(reason,phase='invalidated'){continuityToken=Object.freeze({});continuityLease=null;continuityEvent(phase,reason);}
  function command(reason,work){
+  s.sceneFollowing=false;
   commandDepth++;revokeContinuity(reason);
   const finish=()=>{commandDepth--;continuityEvent('settled',reason);};
   try{const result=work();if(result&&typeof result.then==='function')return Promise.resolve(result).finally(finish);finish();return result;}catch(error){finish();throw error;}
@@ -41,17 +43,17 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
   observe(fn){if(typeof fn!=='function')throw new TypeError('catalog continuity observer required');if(dead)return()=>{};continuityObservers.add(fn);return()=>continuityObservers.delete(fn);},
  });
  const emit=()=>{if(!dead)notify();};
- function pause(){if(s.playing)paint();s.playing=false;if(frame!==null)cancelFrame(frame);frame=null;emit();}
+ function pause(){if(s.playing)paint();s.playing=false;s.live=false;if(frame!==null)cancelFrame(frame);frame=null;emit();}
  function cancel(){generation++;abort?.abort();abort=null;s.pending=false;s.buffer=null;sampleBuffer=null;s.error='';pause();}
  function display(value){const previous=displayAvailable;displayAvailable=!!value;s.display=value?copy(value):null;if(previous&&!displayAvailable)revokeContinuity('display unavailable','availability');if(!dead)onDisplay(value?copy(value):null);if(!previous&&displayAvailable)continuityEvent('availability','display available');}
  function reset(){cancel();display(s.selected);emit();}
  function paint(){
   if(dead||!s.buffer||!codec)return;
-  const utc=s.playing?codec.advance(anchorUtc,Math.max(0,now()-anchorMs)/1000*s.rate):s.utc;
+  const utc=s.live?codec.advance(new Date(wallNow()).toISOString(),0):s.playing?codec.advance(anchorUtc,Math.max(0,now()-anchorMs)/1000*s.rate):s.utc;
   s.utc=utc;
   const row=sampleBuffer.sampleAt(utc),elapsed=codec.difference(utc,s.buffer.start_utc),index=Math.floor(elapsed+1e-9),observed=s.buffer.rows[index];
   if(row&&observed?.status==='valid')display({...s.selected,...row,...projectCatalogDetails(s.buffer,observed),eop_quality:observed.eop_quality,ground_point:s.observer,minimum_elevation_deg:s.minimumElevation,range_m:observed.range_m,azimuth_deg:observed.azimuth_deg,observation_utc:observed.utc,observed_elevation_deg:observed.elevation_deg,visible:observed.visible,interpolated:utc!==observed.utc});else display(null);
-  if(s.playing&&elapsed>=300&&!s.pending)query(codec.advance(s.buffer.start_utc,300),true);
+  if(s.playing&&elapsed>=300&&!s.pending)query(s.live?utc:codec.advance(s.buffer.start_utc,300),true);
   if(now()-lastNotify>=200){lastNotify=now();emit();}
  }
  function tick(){frame=null;if(dead||!s.playing)return;paint();if(s.playing)frame=requestFrame(tick);}
@@ -104,12 +106,30 @@ export function createCatalogTimeline(api,onDisplay=()=>{},notify=()=>{},host={}
  }
  return{snapshot:()=>copy({...s,buffer:s.buffer?{start_utc:s.buffer.start_utc,count:s.buffer.count,status:s.buffer.status}:null}),
   displayContinuity,sampleAt,advanceUtc,currentUtc:()=>dead?null:s.utc||null,
+  // Accepted whole-scene native snapshots supply display geometry only.
+  // No observer, per-satellite query, RAF clock or playback state is created.
+  displaySceneSelection(scene){
+   if(dead||!s.selected||s.observer||s.pending||s.playing||s.buffer)return false;
+   const row=scene?.rows?.find(value=>value.catalog_number===s.selected.catalog_number);
+   let valid=scene?.frame==='ITRF'&&scene.group===s.selected.group&&scene.profile===s.selected.profile&&
+    scene.eop_sha256===s.selected.eop_sha256&&scene.leap_sha256===s.selected.leap_sha256&&quality(scene.eop_quality)&&
+    row?.status==='valid'&&row.error_code===null&&row.normalized_gp_sha256===s.selected.normalized_gp_sha256&&
+    Array.isArray(row.position_m)&&row.position_m.length===3&&row.position_m.every(Number.isFinite);
+   try{valid=valid&&codec.advance(scene.utc,0)===scene.utc;}catch{valid=false;}
+   if(!valid){if(s.sceneFollowing){s.utc='';display(null);emit();}return false;}
+   s.sceneFollowing=true;s.utc=scene.utc;s.error='';
+   display({...s.selected,...copy(row),...projectCatalogDetails(scene,{...row,utc:scene.utc}),utc:scene.utc,frame:scene.frame,
+    eop_quality:copy(scene.eop_quality),eop_sha256:scene.eop_sha256,leap_sha256:scene.leap_sha256,
+    ground_point:null,range_m:null,azimuth_deg:null,elevation_deg:null,visible:null,observation_utc:null,interpolated:false});
+   emit();return true;
+  },
   select(base,pin=null){if(dead)return;return command('select',()=>{cancel();s.selected=base?copy(base):null;codec=null;let first=base?{...base,...projectCatalogDetails(base)}:base;try{codec=base?createUtcCodec(base.leap_sha256):null;
    if(base&&pin){if(pin.normalized_gp_sha256!==base.normalized_gp_sha256||!Array.isArray(pin.position_m)||pin.position_m.length!==3||!pin.position_m.every(Number.isFinite))throw Error('지구 선택 GP/위치가 일치하지 않습니다.');const utc=codec.advance(pin.utc,0);first={...base,...(utc===base.utc?projectCatalogDetails(base):{geodetic:null,teme_speed_km_s:null,details_utc:null}),utc,position_m:copy(pin.position_m)};}
   }catch(e){s.error=e.message;first=pin?null:base;}s.utc=first?.utc??base?.epoch_utc??'';anchorUtc=s.utc;display(first);emit();});},
   observer(point,minimum){if(dead)return false;if(!point||!['latitude_deg','longitude_deg','ellipsoid_height_m'].every(k=>Number.isFinite(point[k]))||Math.abs(point.latitude_deg)>90||Math.abs(point.longitude_deg)>180||point.virtual!==true||point.ellipsoid!=='WGS84'||!Number.isFinite(minimum)||minimum<0||minimum>90)return false;return command('observer',()=>{s.observer=copy(point);s.minimumElevation=minimum;reset();return true;});},
   seek(utc){if(dead||!codec)return;const canonical=codec.advance(utc,0);return command('seek',()=>{cancel();s.utc=canonical;anchorUtc=canonical;display(null);emit();});},
   calculate(){if(dead)return query(s.utc);return command('calculate',()=>query(s.utc));},
+  live(){if(dead||!codec)return;return command('live',async()=>{const start=codec.advance(new Date(wallNow()).toISOString(),0),pending=query(start),ticket=generation;await pending;if(dead||ticket!==generation||!s.buffer||s.error)return;s.rate=1;s.live=true;s.playing=true;anchorUtc=s.utc;anchorMs=now();paint();frame=requestFrame(tick);emit();});},
   invalidate(){if(!dead)return command('invalidate',reset);},
   play(){if(dead||!s.buffer||s.playing)return;return command('play',()=>{s.playing=true;anchorUtc=s.utc;anchorMs=now();frame=requestFrame(tick);emit();});},pause(){if(!dead)return command('pause',pause);},
   rate(value){if(dead||![.1,1,10,60].includes(value))return;return command('rate',()=>{const playing=s.playing;pause();s.rate=value;anchorUtc=s.utc;anchorMs=now();if(playing){s.playing=true;frame=requestFrame(tick);}emit();});},

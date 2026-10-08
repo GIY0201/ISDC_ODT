@@ -46,6 +46,25 @@ test('empty accepted catalogue permits explicit filter policy but no object serv
 test('failed current query cannot authorize dispatch by clearing error, and stale deployment sends no command',async()=>{const f=fixture();await f.get('refresh').dispatch('click');f.get('action').value='verify';f.api.dataManagementDashboard=async()=>{throw Error('module unavailable');};await f.get('refresh').dispatch('click');assert.equal(f.get('action-submit').disabled,true);await f.get('action-submit').dispatch('click');assert.equal(f.calls.length,0);assert.equal(f.panel.contextSnapshot().error,'module unavailable');f.panel.destroy();const stale=fixture();await stale.get('refresh').dispatch('click');stale.get('action').value='verify';stale.deployment.revision++;await stale.get('action-submit').dispatch('click');assert.equal(stale.calls.length,0);assert.match(stale.panel.contextSnapshot().error,/배치/);stale.panel.destroy();});
 
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
+test('technical report disclosures retain user choices while fresh query updates their content',async()=>{
+ const f=fixture();
+ const module=f.get('module-details'),policy=f.get('policy-details');
+ assert.ok(module);assert.ok(policy);
+ module.open=true;policy.open=false;
+ await f.get('refresh').dispatch('click');
+ assert.equal(f.get('module-details'),module);
+ assert.equal(f.get('policy-details'),policy);
+ assert.equal(module.open,true);assert.equal(policy.open,false);
+ assert.match(f.get('module').innerHTML,/scope-1/);
+ assert.match(f.get('policy').textContent,/imagery/);
+ policy.open=true;module.open=false;
+ f.report.overview.policy.replication.imagery=2;
+ await f.get('refresh').dispatch('click');
+ assert.equal(module.open,false);assert.equal(policy.open,true);
+ assert.equal(JSON.parse(f.get('policy').textContent).replication.imagery,2);
+ assert.equal(f.calls.length,0);
+ f.panel.destroy();
+});
 function timerHost(){let id=0;const timers=new Map(),cleared=[];return{timers,cleared,setInterval(fn,ms){const key=++id;timers.set(key,{fn,ms});return key;},clearInterval(key){cleared.push(key);timers.delete(key);}};}
 test('active data view polls original 3s readonly lifecycle and preserves selected object plus dirty policy/service filters',async()=>{const host=timerHost(),f=fixture(null,()=>{},host);assert.equal(host.timers.size,1);assert.equal([...host.timers.values()][0].ms,3000);await flush();assert.equal(f.panel.snapshot().objects.items.length,1);f.get('object').value='DM-1';await f.get('object').dispatch('change');for(const [id,value]of Object.entries({class:'imagery',search:'draft search',node:'draft node',action:'set_filter',replication:'5',filter:'{"custom":true}',destination:'A','node-kind':'onboard','event-severity':'warning'}))f.get(id).value=value;f.report.overview.jobs[0].progress=.42;let reads=0;f.api.dataManagementDashboard=async()=>{reads++;return structuredClone(f.report);};await [...host.timers.values()][0].fn();assert.equal(reads,1);assert.equal(f.calls.length,0);assert.equal(f.panel.contextSnapshot().selected_id,'DM-1');for(const [id,value]of Object.entries({class:'imagery',search:'draft search',node:'draft node',action:'set_filter',replication:'5',filter:'{"custom":true}',destination:'A','node-kind':'onboard','event-severity':'warning'}))assert.equal(f.get(id).value,value,id);assert.match(f.get('jobs').innerHTML,/42%/);assert.match(f.get('jobs').innerHTML,/<progress[^>]*value="0.42"/);f.panel.destroy();assert.equal(host.timers.size,0);});
 test('poll never overlaps a pending query or command and stale hidden/disposed responses cannot publish',async()=>{const host=timerHost(),f=fixture(null,()=>{},host);await flush();const timer=[...host.timers.values()][0].fn;let reads=0,finish;f.api.dataManagementDashboard=()=>{reads++;return new Promise(resolve=>finish=resolve);};const pending=timer();await flush();await timer();assert.equal(reads,1);assert.equal(f.panel.contextSnapshot().busy,true);const before=f.panel.snapshot();f.panel.show('ground');assert.equal(host.timers.size,0);f.report.objects.items[0].label='late hidden';finish(structuredClone(f.report));await pending;assert.deepEqual(f.panel.snapshot(),before);await timer();assert.equal(reads,1);f.panel.destroy();const otherHost=timerHost(),other=fixture(null,()=>{},otherHost);await flush();let completed;other.api.dataManagementDashboard=()=>new Promise(resolve=>completed=resolve);const late=[...otherHost.timers.values()][0].fn();await flush();const old=other.panel.snapshot();other.panel.destroy();completed({...structuredClone(other.report),objects:{...other.report.objects,items:[]}});await late;assert.deepEqual(other.panel.snapshot(),old);assert.equal(otherHost.timers.size,0);});

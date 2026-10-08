@@ -86,3 +86,60 @@ Native node public clock remains unknown despite catalogue UTC; currently invest
 ## Current non-performance acceptance reconciliation
 Independent readonly reconciliation supersedes historical missing-implementation table cells. Existing source functionality is assembled; original40PoC, RF11-field calculation/restore, future12/contact24, data selection/reset, security entry/reentry and 17probe/save/draft proofs must not be repeated just because umbrella markers remain open. No newly absent original calculation function was identified.
 Specific not-yet-proven normal flows: T075 limited model readability/camera drag retention/settled3D and newwall; T076 representative manual formation/equipment edit; T077 stationfocus/coverage/groundlink toggle/currentroutequery; T078 freshpickup replan and schedule task/filter/6-12-24h; T079 newservice request/result and representative operationalprogress; T080 latestlayout display only; T081 explicitanalysisfollow/release and N020 scenario-route-draft actualhandoff; T082 newwall/view selection/clear preserving sharedowner; T083 movedDTintegration smoke. These are bounded evidence gaps, not nine missing implementations or a demand to repeat all error matrices. Prescribedtwo-resolution acceptance remains unproven; SC006 deferred after UI/PR by user. Reuse valid existing regression/failure proofs.
+
+## 2026-10-07 U020 current domain navigation and connection evidence
+
+The previous goal turn made product progress (paired dashboards, full desktop expansion and verified UI regression). This continuation revalidated the active goal and current task list: T084 is checked with actual saved byte evidence; T075-T083 remain open. No paused-goal status or historic missing-implementation statement substitutes for current evidence.
+
+Actual fixed8891 browser, Aside session2026-10-07_6YGGOgBqiwa4ciQH, viewport1920x990: System launcher opened integration while expanded DT board was present. Source settings retained standalone mode and link counts total17/active1/down0/standby6/disabled1/unknown9. Existing 17-link topology and 18 module boxes rendered. No save, mode change or probe was issued. Screenshot artifacts/t083-domain-settings.png proves the relocated integration entry smoke only, not the complete two-resolution/remote-error matrix.
+
+DT board reused those same owner counts and paused RUN-904CE008D00B at884.7s/speed5. A newly discovered presentation defect collapsed standby/disabled incident links to unknown in both module diagram and folded cards. RED regression reproduced the loss. Rendering now uses the original LINK_STATES labels and preserves standby/disabled evidence, leaving absent/unknown evidence unknown. Diagram and folded cards share the same pure aggregation; it reports incident connection evidence, not module accuracy or authentication. Exact link table remains available. Actual screenshot artifacts/u020-dt-state.png shows EM modules in standby and external security disabled, with unchanged counts and paused run. This is bounded T082 current-state sharing progress, not complete umbrella acceptance.
+
+## 2026-10-07 U020-U024 메뉴 아이콘, 지상국 화면과 현재 시각 궤도 분석
+
+상황판/위성/지상국 메뉴에 Lucide monitor/satellite/satellite-dish SVG를 적용하고 라이선스를 보존했다. 카탈로그의 반복 설명을 정렬 기준, 자료 갱신 시각, 검색 결과 수로 줄였다. 위치 안내는 표시 해제 옆 정보 버튼에 배치하고 GP epoch를 궤도 자료 기준 시각으로 표현했다. 거리/도플러 설명은 한 문장과 모델 종류 표시로 정리했다.
+
+지상국 목록을 기존 통신망 패널에 합쳤으며 별도 상태 소유자를 만들지 않았다. 위성이 없는 지상국 연결도는 빈 궤도면 공간 없이 바로 표시한다. 원본 기본 renderer의 10 golden 출력은 그대로 통과하고 UI만 명시적으로 compactGround 옵션을 사용한다. 요약은 위성/지상국/계산 연결 수와 표시 시각으로 나눴다. 지상망은 실제 회선 조회가 아니라 모든 활성 지상국 쌍에 10 Gbps를 가정하는 기존 모델이다. 사용자 질문 후 시험용 지상망과 연결 가정을 표시했다. 기본 대전/제주/스발바르의 선정은 국내 및 고위도 시험 지점이라는 소스 주석에 따른다. 실제 시설 장비 사양이나 회선 검증을 뜻하지 않는다.
+
+카탈로그 기존 timeline 소유자에 현재 UTC 연속 분석 명령을 추가했다. 기존 native 버퍼를 사용하고 정지/선택 변경/관측 조건 변경/늦은 응답 취소를 보존한다. 저장 궤도 UTC와 SIM 명령은 변경하지 않는다. 현재 UTC 계산은 실측 원격측정이 아니다. 단위 시험의 wall-clock 추종 및 취소 검증은 통과했으나 실제 브라우저의 연속 분석 버튼부터 전체 조회까지의 흐름은 아직 검증하지 않았다.
+
+검증: 관련 RED 재현 후 회귀 통과. 전체 Node u024_node.log 2153PASS/0FAIL/1SKIP 29.04초, 전체 Python u022_python.log 960PASS/8SKIP/8warnings 458.91초. U020 별도 전체 Node2147PASS/1SKIP 및 Python960PASS/8SKIP 통과. 실제8891 브라우저 1920x990에서 세 SVG 아이콘과 지상국 연결도 3개 노드/3개 선, 단일 통합 탭을 확인했다(Aside artifacts/u023-ground.png, u023-icons.png). 마지막 정보 팝업 스타일 클래스 변경은 기존 스타일 재사용이며 계산 변경은 없다.
+
+T075-T083의 전체 acceptance와 지정된 두 해상도, 전체 모델 및 GPU 검증은 계속 열려 있다. 서버 재시작, 배치, SIM 실행/속도 변경, 모듈 probe/save는 하지 않았다.
+
+## 2026-10-07 U025-U027 한반도 지상국 지도와 사용자 시험 시나리오 작성
+
+한반도 지도에 기존 ground segment 소유자의 지상국 핀을 표시하고 선택 시 좌표, 안테나, 고각, 지원 대역과 실제 연결 미확인 상태를 보여준다. 지도 클릭 또는 좌표로 후보를 지정한 뒤 명시적 추가로 기존 저장소와 편집기를 사용한다. 후보 좌표 편집은 기존 후보를 무효화한다. 해외 지상국은 접힌 목록에 표시하며 저장된 스발바르 선택을 한반도 기본 상세에 자동 표시하지 않는다. OSM 6개 타일과 출처를 표시하고 배경 실패 시 좌표와 목록을 유지한다.
+
+내 시험 시나리오 작성 화면은 빈 정의부터 목적, 위성 구성, 현재 사용 지상국, 시간순 시험 단계를 작성하고 브라우저 저장, 재편집, JSON 내보내기를 지원한다. 장애 단계에는 장애 종류, 대상, 발생 시각, 지속 시간, 주입 조건과 확인할 결과를 작성한다. 종류는 통신 단절/노드 중단/통신 품질 저하/자원 부족/직접 정의이며 자동 주입 지원 여부를 뜻하지 않는다. 사용자 정의의 자동 실행기 연결은 아직 없으며 화면에도 명시했다.
+
+검증: 관련 RED 재현 후 회귀 통과. 전체 Node project_support/u027_node.log 2163PASS/0FAIL/1SKIP 26.79초. 전체 Python project_support/u026_python.log 959PASS/1FAIL/8SKIP/8warnings 330.87초. 실패는 기존 data fabric 불변성 시험이 벽시계 analytics.generated_at의 초 경계를 함께 비교한 것이며 해당 파일 단독 재검증 7PASS/1warning. 전체 Python 성공으로 기록하지 않는다. 설치 시험에는 기존 native wheel 경로를 명시했다. 실제 8891 브라우저에서 지도 선택 상세, 접힌 해외 목록, 사용자 작성 화면을 확인했다. artifacts/u027-ground-refresh.png에서 동일 URL 새로고침 뒤 추가 서울 지상국의 좌표/안테나/지원 대역 유지 확인. 사용자 보고의 설정 유실은 아직 재현하지 못했고 저장 완료 여부 확인 중이다.
+
+현재 지상국과 사용자 정의 저장은 localStorage이며 서버 DB 연결이 아니다. DB 제안은 지상국/위성 구성/시나리오/장애 정의/버전/실행 기록을 API 통해 PostgreSQL에 저장하고 저장 성공·실패와 낙관적 버전 충돌을 표시하는 방향이다. 이번 변경에 DB 서버 설치나 배포는 없다. 기존 실행, 저장 궤도와 서버 상태를 변경하지 않았다. 전체 T075-T083 acceptance는 열려 있다.
+
+
+## 2026-10-07 U028 PostgreSQL server and authored definition persistence
+
+User authorized PostgreSQL provisioning. Installed official EDB Windows PostgreSQL18.6 archive at project_support/tooling/postgresql/pgsql. Archive SHA256 E2246BA91D22345BC3D017586C09EDE52D9DF180B1EEB480F050445F1CAD84E2 is a recorded local integrity hash, not a separately published signature verification. Initialized isdc_workspace at 127.0.0.1:5432, SCRAM authentication, separate isdc_owner/isdc_app roles. Credentials, cluster, logs and backups are ignored under data/workspace/postgresql; verified credentials ACL grants current OS user only. ISDC-PostgreSQL login scheduled task successfully ran with LastTaskResult0, no system boot service claimed.
+
+Schema001 stores versioned ground station and user scenario definitions plus transactional change history. Additive GET status, GET/PUT definition APIs preserve original OpenAPI paths/schemas; ADR0065 records changes. Browser storage port keeps local pre-migration/pending backups, restores server definitions, imports local definitions only when server document is absent, serializes writes and refuses revision conflicts. UI exposes saving/saved/error instead of treating local acceptance as server durability. This is configuration persistence, not current runtime/telemetry persistence or automatic fault execution.
+
+Validation: RED new Python/JS cases then actual PostgreSQL repository/API roundtrip, malformed input, optimistic conflict and same-origin guard PASS. Entire Node project_support/u028_node_verified.log 2164PASS/0FAIL/1SKIP 27.35s. Entire Python project_support/u028_python_verified.log 963PASS/8SKIP/8warnings240.90s with explicit existing native wheel and actual test DB connection. Earlier u028 full run's expected additive OpenAPI registry failure was corrected explicitly; no original schema was relaxed. Isolated product factory reads real PostgreSQL, and pg_dump/custom + globals backup restored in a separate database with exact document/history comparison (backups/20261007T142218Z, synthetic test namespace only). Successful task launch and local listen address confirmed.
+
+Live8891 was NOT restarted: public capture before.json/orbit.json under data/workspace/validation/u028_database_restart shows paused RUN-904CE008D00B at884.681s/speed5 and40 deployed nodes. Rechecked same runtime fields and full deployment equality after work. resume_unconfigured_development rejects nonempty rosters and cannot restore accepted module work. Requested user decision whether to preserve this run and defer activation or explicitly allow run initialization for web DB activation. Current web server still uses browser-local storage; no live DB migration of user's configuration is claimed. DB server is running; activation of prepared API/frontend is pending. DB operations and migration guide: project_support/docs/development/postgresql_workspace_storage.md. WholeT075-T083 acceptance remains open.
+
+## 2026-10-07 U028 activation after explicit reset approval
+
+User answered "실행 초기화 허용, DB 연결 적용". Stopped only identified old8891 launcher/child and started product stored-orbit factory with ISDC_DATABASE_CONFIG. New run RUN-E578A57A4EB9 was paused after startup; prior forty-node deployment was intentionally reset under this authorization. Saved ISS input/ground point/current UTC/play rate/paused orbit selection restored via revision-checked API. Original before.json/orbit.json retained.
+
+Actual same-origin browser loaded new API/frontend. Existing four stations including Seoul37.5717/126.9734, dish7.3m, elevation5deg, S/X/Ka imported into PostgreSQL default ground_stations revision1. UI reports server DB saved. Created clearly labelled TEST-001 "저장 검증용 지상국 시험" through UI, saved to scenario_drafts revision1, refreshed and re-opened it with purpose/station snapshot/one observation step intact. Refreshed ground map still shows Seoul settings. Browser pre-migration and pending cache retained. Evidence: Aside2026-10-07_QxaEviibtksIfSGs/artifacts/u028-scenario-db-restored.png and u028-ground-db-restored.png, API capture data/workspace/validation/u028_database_restart/after_configurations.json. Real definition/history backup and exact isolated restore PASS at backups/20261007T143506Z. Logon task starts DB under current user; not a boot service.
+
+Entire Python963PASS/8SKIP and Node2164PASS/1SKIP from preactivation validation; final neutral ground storage wording adjustment verified with13 relevant Node tests PASS. SQL persistence is for station and authored scenario definitions; runtime persistence and automatic custom fault execution remain outside this change. WholeT075-T083 remains open.
+
+Final activation receipt: selecting Seoul produced ground_stations revision2; scenario_drafts remains revision1. API values captured and saved ISS input verified again. Latest backup/isolated exact restore at20261007T143800Z PASS; scoped git diff --check PASS.
+
+## 2026-10-08 U029 idle performance optimization
+
+Paused stored GP polling still reads server and updates receipt but no longer clones the full result/notifies all panels when only observation time changed. Playing, forced reads, revision/provenance changes still notify. Replica preRender validates source every frame but only reapplies changed position/visibility; missing-source cleanup is idempotent and newly bound renderers are cleared. Native calculations and API contracts unchanged.
+
+RED tests reproduced both loops and new hidden-renderer cleanup; final Node2168PASS/1SKIP29.47s and Python963PASS/8SKIP264.00s. Benchmark601 rows/240 paused reads: notifications240->0, row copies144240->0,167.05->1.65ms local microbenchmark only. Replica extra60 frame requests120->0. Real1920x990 RAF p95 remains19.0->18.9ms; interrupting samples limit comparison and16.7ms gate remains unmet. No FPS/GPU usage improvement claim. Actual current run, deployment, stored GP and DB definitions unchanged; static reload only. Report project_support/docs/validation/u029_idle_performance.md. WholeT075-T083 acceptance remains open.

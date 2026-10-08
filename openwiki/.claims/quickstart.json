@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:a8455519f2faba31e8ce2a99463fa89267071947e0da77fcea28eaf93c2beba4",
+  "claims": [
+    {
+      "id": "claim_738fd48ad4d541a192a0a2543077fb77",
+      "statement": "현재 메뉴 그룹은 상황판, 위성, 지상국, 임무, 데이터, 보안, 시험과 시스템이며 환경 설정을 별도로 제공한다.",
+      "evidence": [
+        {
+          "resource": "repo://user_application/web/scripts/workspace.js",
+          "version": "repo-file-v1:sha256:b84a413fd048b0dff9fb75a800dd5f60a346d3ddc28ab8eba4edaa1532933eeb"
+        }
+      ]
+    },
+    {
+      "id": "claim_8f31fc7f151b4026b7fe94f3abb6ab23",
+      "statement": "프로젝트는 독립 ISDC ODT 개발 저장소이며 제품 개발 포트를8891로 사용한다.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:7900ca625896ca98d1cfa4d713fbc8df93d05dd8da455746713c2c7933fbdff8"
+        },
+        {
+          "resource": "repo://README.md",
+          "version": "repo-file-v1:sha256:705609c99b8a3e8649644c69155d46c0ba5030e621ff03e8c4594ac65e02d676"
+        }
+      ]
+    },
+    {
+      "id": "claim_7845397c4c104634b78daab0c8e14623",
+      "statement": "최근 UI 검토는 시험 환경, 시나리오, 실행과 평가의 제어 소유권을 분리하고 관제 실측 미연동 수치를 미확인으로 표시한다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/docs/validation/ui_request_completion_review.md",
+          "version": "repo-file-v1:sha256:7c1e399a7b38aba9582fd190208cf1ebef8c20ac44924b1eb056cbc5d55f2d9d"
+        }
+      ]
+    },
+    {
+      "id": "claim_19658773fa7545fd9314fdc72dde4b5e",
+      "statement": "현재 시스템 연동 패널은 연결도·연결 목록·모듈·ICD를 제공하며 U036 실화면 기록은 8개 인터페이스 상세 접근을 확인했다.",
+      "evidence": [
+        {
+          "resource": "repo://project_support/docs/validation/u036_workspace_ui_audit.md",
+          "version": "repo-file-v1:sha256:adce8059cbcd61e0fc8650857256891510ffccf18195bd45ac2d76b88ddea88b"
+        },
+        {
+          "resource": "repo://user_application/web/scripts/tabs/source_settings.js",
+          "version": "repo-file-v1:sha256:6e29917aec6cb9680634eaca139cb543c516ef2d7b676436ba4b8fb3bdae6efe"
+        }
+      ]
+    },
+    {
+      "id": "claim_c87405a3d0854cf59a15c05f471eb313",
+      "statement": "현재 README의 직접 실행 안내는 준비된 로컬 DB 접속 파일을 ISDC_DATABASE_CONFIG로 지정하고 create_stored_orbit_app factory를 8891 포트에서 실행한다.",
+      "evidence": [
+        {
+          "resource": "repo://README.md",
+          "version": "repo-file-v1:sha256:705609c99b8a3e8649644c69155d46c0ba5030e621ff03e8c4594ac65e02d676"
+        },
+        {
+          "resource": "repo://project_support/tooling/start_workspace_app.ps1",
+          "version": "repo-file-v1:sha256:2c459dca4abe7703c243a9f929eee8ae636dc42a96f25314f5caf2690b44a6b9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-08T09:47:53.692Z"
+  }
+}

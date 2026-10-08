@@ -11,3 +11,5 @@ test('sampled diagram keeps geometry selectable without fabric quality, route or
  assert.equal(links[0].usable,true);assert.equal(links[0].quality,99,'borrowed native input is unchanged');
  const exact=diagramMarkup(layout,links,{routeLinkIds:new Set(['AB']),showLabels:true});assert.match(exact,/품질 99/);assert.match(exact,/nd-flow forward/);
 });
+
+test('ground-only diagram starts stations near the heading without an empty orbital tier',()=>{const layout=layoutNetwork({compactGround:true,stations:[{id:'G1',name:'대전'},{id:'G2',name:'제주'},{id:'G3',name:'스발바르'}]});assert.ok(layout.positions.get('G1').y<190);assert.ok(layout.height<300);const html=diagramMarkup(layout,[],{unverifiedAnalysis:true});assert.match(html,/시험용 지상망/);assert.doesNotMatch(html,/min-width:816/);});
