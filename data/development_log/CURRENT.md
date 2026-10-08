@@ -1,3 +1,7 @@
+## 2026-10-08 U039 README terminology and main publication
+
+User explicitly requested applying the accumulated validated branch to main and removing personal references from README. Root README has no 선배 wording; changed the remaining 원본 프로그램 소개 phrase to 초기 프로토타입 기록. Verified origin/main is an ancestor of the current application branch, permitting a normal fast-forward publication. Documentation-only follow-up; existing U038 Node2195PASS1SKIP and U037 Python967PASS8SKIP remain the code validation evidence. README terminology and local links are checked before commit. Remote main publication is verified separately after the commit and push; no force push or runtime change is required.
+
 ## 2026-10-08 U038 publication preparation and current README
 
 User requested committing and pushing the accumulated changes to GitHub, then requested a current README. Publication scope includes the application, PostgreSQL definition persistence and launchers, task-oriented UI and display behavior, regression tests, documentation/wiki and selected validation evidence. Exclude local debug cache in .gitignore alongside runtime data, database cluster/connection files and downloaded PostgreSQL binaries. Local author paths in publishable validation prose are replaced by artifact names. Preserve existing SIM and DB; no restart or setup operation is needed for publication.

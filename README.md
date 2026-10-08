@@ -131,4 +131,4 @@ node --test project_support/tests/browser/*.test.mjs
 
 작업 전 [AGENTS.md](AGENTS.md)와 [공동 개발 규칙](project_support/docs/DEVELOPMENT.md)을 읽습니다. 구조와 의존성은 [설계 문서](project_support/docs/architecture/design.md), 궤도 API는 [계약 문서](project_support/specs/001-v6-function-integration/contracts/orbit_api.md), 화면별 재현 절차는 [검증 quickstart](project_support/specs/001-v6-function-integration/quickstart.md)를 참고합니다. quickstart와 이전 검증 보고서는 작성 시점의 이력을 포함하므로 현재 실행 환경 및 상태는 이 README와 최신 개발 현황을 함께 확인합니다.
 
-원본 프로그램 소개는 [prototype_readme.md](project_support/docs/prototype_readme.md)에, 위성 표시 자산의 출처와 파생본 정보는 [자산 안내](digital_twin/model_library/packages/satellite_display/v1/README.md)에 보존합니다.
+초기 프로토타입 기록은 [prototype_readme.md](project_support/docs/prototype_readme.md)에, 위성 표시 자산의 출처와 파생본 정보는 [자산 안내](digital_twin/model_library/packages/satellite_display/v1/README.md)에 정리되어 있습니다.
